@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(perangkat)
+  createdAt DateTime @default(now())
+
+  // relasi
+  Scores    Score[]
+}
+
+enum Role {
+  admin
+  perangkat
+}
+
+model Criterion {
+  id        Int      @id @default(autoincrement())
+  name      String
+  type      CriterionType
+  createdAt DateTime @default(now())
+
+  // relasi
+  Scores   Score[]
+  Weights  Weight[]
+}
+
+enum CriterionType {
+  benefit
+  cost
+}
+
+model Alternative {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+
+  // relasi
+  Scores  Score[]
+  Results Result[]
+}
+
+model Score {
+  id            Int         @id @default(autoincrement())
+  value         Float
+  alternative   Alternative @relation(fields: [alternativeId], references: [id], onDelete: Cascade)
+  alternativeId Int
+  criterion     Criterion   @relation(fields: [criterionId], references: [id], onDelete: Cascade)
+  criterionId   Int
+  user          User?       @relation(fields: [userId], references: [id])
+  userId        Int?
+}
+
+model Weight {
+  id          Int       @id @default(autoincrement())
+  weight      Float
+  criterion   Criterion @relation(fields: [criterionId], references: [id], onDelete: Cascade)
+  criterionId Int
+}
+
+model Result {
+  id            Int         @id @default(autoincrement())
+  score         Float
+  rank          Int
+  createdAt     DateTime    @default(now())
+  alternative   Alternative @relation(fields: [alternativeId], references: [id], onDelete: Cascade)
+  alternativeId Int
+}
