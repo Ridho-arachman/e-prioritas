@@ -9,7 +9,7 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String     @id    @default(cuid())
   name      String
   email     String   @unique
   password  String
@@ -26,7 +26,7 @@ enum Role {
 }
 
 model Criterion {
-  id        Int      @id @default(autoincrement())
+  id        String      @id       @default(cuid())
   name      String
   type      CriterionType
   createdAt DateTime @default(now())
@@ -42,7 +42,7 @@ enum CriterionType {
 }
 
 model Alternative {
-  id          Int      @id @default(autoincrement())
+  id          String      @id     @default(cuid())
   name        String
   description String?
   createdAt   DateTime @default(now())
@@ -53,21 +53,21 @@ model Alternative {
 }
 
 model Score {
-  id            Int         @id @default(autoincrement())
+  id            String         @id  @default(cuid())
   value         Float
   alternative   Alternative @relation(fields: [alternativeId], references: [id], onDelete: Cascade)
-  alternativeId Int
+  alternativeId   String
   criterion     Criterion   @relation(fields: [criterionId], references: [id], onDelete: Cascade)
-  criterionId   Int
+  criterionId   String
   user          User?       @relation(fields: [userId], references: [id])
-  userId        Int?
+  userId        String?
 }
 
 model Weight {
-  id          Int       @id @default(autoincrement())
+  id          String       @id @default(cuid())
   weight      Float
   criterion   Criterion @relation(fields: [criterionId], references: [id], onDelete: Cascade)
-  criterionId Int
+  criterionId String
 }
 
 model Result {
@@ -76,5 +76,5 @@ model Result {
   rank          Int
   createdAt     DateTime    @default(now())
   alternative   Alternative @relation(fields: [alternativeId], references: [id], onDelete: Cascade)
-  alternativeId Int
+  alternativeId String
 }
