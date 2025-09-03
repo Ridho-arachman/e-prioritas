@@ -13,7 +13,10 @@ export const createUserSchema = z.object({
     .email("Format email tidak valid"),
   password: z
     .string()
-    .min(1, "Password tidak boleh kosong")
     .trim()
-    .min(6, "Password minimal 6 karakter"),
+    .min(8, "Password minimal 8 karakter")
+    .regex(/[a-z]/, "Password harus mengandung huruf kecil")
+    .regex(/[A-Z]/, "Password harus mengandung huruf besar")
+    .regex(/[0-9]/, "Password harus mengandung angka")
+    .regex(/[^a-zA-Z0-9]/, "Password harus mengandung simbol"),
 });

@@ -1,10 +1,10 @@
-import { Prisma } from "@/generated/prisma";
+// import { Prisma } from "@/generated/prisma";
 import { hashPassword } from "@/lib/hashing";
 import { prisma } from "@/lib/prisma";
 import { createUserSchema } from "@/schema/sign-up";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest) {
+const POST = async (req: NextRequest) => {
   try {
     // parse body
     const body = await req.json();
@@ -32,27 +32,31 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Data diterima",
+      message: "Data diterima dengan sukses",
       data: {
         id: user.id,
         name: user.name,
         email: user.email,
       },
     });
-  } catch (e) {
-    // error prisma
-    if (e instanceof Prisma.PrismaClientKnownRequestError) {
-      if (e.code === "P2002") {
-        return NextResponse.json(
-          { success: false, error: "Email sudah terdaftar" },
-          { status: 400 }
-        );
-      }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (e: any) {
+    console.error("POST /api/user error:", e);
+
+    // cek berdasarkan code aja
+    if (e?.code === "P2002") {
+      return NextResponse.json(
+        { success: false, error: "Email sudah terdaftar" },
+        { status: 400 }
+      );
     }
 
+    // internal server error
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }
     );
   }
-}
+};
+
+export { POST };
