@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { createUserSchema } from "@/schema/sign-up";
 import { toast } from "sonner";
-import { useRegister } from "@/hook/useRegister";
+import { useRegister } from "@/hooks/useRegister";
 
 export default function RegisterPage() {
   const { trigger, isMutating } = useRegister();
@@ -47,12 +47,11 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-6 sm:p-8">
+    <div className="min-h-auto flex items-center justify-center bg-gray-50  sm:px-6 lg:px-8">
+      <div className="w-full mt-16 max-w-md bg-white shadow-lg rounded-2xl p-6 sm:p-8">
         <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center">
           Register
         </h1>
-
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* NAME */}
@@ -76,7 +75,6 @@ export default function RegisterPage() {
                 </FormItem>
               )}
             />
-
             {/* EMAIL */}
             <FormField
               control={form.control}
@@ -96,7 +94,6 @@ export default function RegisterPage() {
                 </FormItem>
               )}
             />
-
             {/* PASSWORD */}
             <FormField
               control={form.control}
@@ -116,7 +113,6 @@ export default function RegisterPage() {
                 </FormItem>
               )}
             />
-
             {/* SUBMIT */}
             <Button type="submit" disabled={isMutating} className="w-full">
               {isMutating ? "Loading..." : "Register"}

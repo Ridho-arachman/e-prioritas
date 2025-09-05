@@ -1,7 +1,3 @@
-const GET = async () => {
-  return new Response(null, {
-    status: 200,
-  });
-};
+const GET = async () => {};
 
 export { GET };
