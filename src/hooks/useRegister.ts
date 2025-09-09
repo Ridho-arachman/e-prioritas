@@ -15,5 +15,5 @@ async function registerUser(
 }
 
 export function useRegister() {
-  return useSWRMutation("/api/auth/sign-up", registerUser);
+  return useSWRMutation("/api/auth/register", registerUser);
 }

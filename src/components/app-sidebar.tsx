@@ -9,10 +9,10 @@ import {
   Home,
   Inbox,
   MessageCircleQuestion,
-  Search,
   Settings2,
   Sparkles,
   Trash2,
+  User,
 } from "lucide-react";
 
 import { NavFavorites } from "@/components/nav-favorites";
@@ -48,9 +48,15 @@ const data = {
   ],
   navMain: [
     {
-      title: "Search",
-      url: "#",
-      icon: Search,
+      title: "Dashboard",
+      url: "/admin",
+      icon: User,
+      isActive: true,
+    },
+    {
+      title: "Kelola Perangkat",
+      url: "/admin/kelola-perangkat/tambah",
+      icon: User,
     },
     {
       title: "Ask AI",
