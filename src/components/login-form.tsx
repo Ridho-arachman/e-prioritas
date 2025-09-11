@@ -37,11 +37,11 @@ export function LoginForm({
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     try {
       const res = await trigger(values);
+      form.reset();
+      router.push("/admin");
       toast.success("Berhasil 🎉", {
         description: res.message || "Login berhasil",
       });
-      form.reset();
-      router.push("/admin");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error("Gagal ❌", {

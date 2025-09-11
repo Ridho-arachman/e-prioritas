@@ -53,14 +53,14 @@ const POST = async (req: NextRequest) => {
 
     response.cookies.set("accessToken", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "development", // otomatis true di prod
+      secure: process.env.NODE_ENV === "production", // otomatis true di prod
       sameSite: "strict",
       path: "/", // penting biar bisa diakses seluruh route
     });
 
     response.cookies.set("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "development", // otomatis true di prod
+      secure: process.env.NODE_ENV === "production", // otomatis true di prod
       sameSite: "strict",
       path: "/", // penting biar bisa diakses seluruh route
     });

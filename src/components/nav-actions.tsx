@@ -35,10 +35,13 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useRouter } from "next/navigation";
+import { useLogout } from "@/hooks/useLogout";
+import { toast } from "sonner";
 
 export function NavActions() {
   const [isOpen, setIsOpen] = React.useState(false);
   const router = useRouter();
+  const { trigger, isMutating } = useLogout();
 
   React.useEffect(() => {
     setIsOpen(true);
@@ -107,8 +110,15 @@ export function NavActions() {
       {
         label: "Logout",
         icon: CornerUpLeft,
-        fn: () => {
-          router.push("/login");
+        fn: async () => {
+          try {
+            await trigger();
+            router.push("/login");
+            toast.success("Logout berhasil");
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          } catch (error) {
+            toast.error("Logout gagal");
+          }
         },
       },
     ],
@@ -147,6 +157,7 @@ export function NavActions() {
                           <SidebarMenuButton
                             className="cursor-pointer"
                             onClick={item.fn}
+                            disabled={isMutating}
                           >
                             <item.icon /> <span>{item.label}</span>
                           </SidebarMenuButton>
