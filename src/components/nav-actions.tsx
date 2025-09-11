@@ -34,76 +34,85 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-
-const data = [
-  [
-    {
-      label: "Customize Page",
-      icon: Settings2,
-    },
-    {
-      label: "Turn into wiki",
-      icon: FileText,
-    },
-  ],
-  [
-    {
-      label: "Copy Link",
-      icon: Link,
-    },
-    {
-      label: "Duplicate",
-      icon: Copy,
-    },
-    {
-      label: "Move to",
-      icon: CornerUpRight,
-    },
-    {
-      label: "Move to Trash",
-      icon: Trash2,
-    },
-  ],
-  [
-    {
-      label: "Undo",
-      icon: CornerUpLeft,
-    },
-    {
-      label: "View analytics",
-      icon: LineChart,
-    },
-    {
-      label: "Version History",
-      icon: GalleryVerticalEnd,
-    },
-    {
-      label: "Show delete pages",
-      icon: Trash,
-    },
-    {
-      label: "Notifications",
-      icon: Bell,
-    },
-  ],
-  [
-    {
-      label: "Import",
-      icon: ArrowUp,
-    },
-    {
-      label: "Export",
-      icon: ArrowDown,
-    },
-  ],
-];
+import { useRouter } from "next/navigation";
 
 export function NavActions() {
   const [isOpen, setIsOpen] = React.useState(false);
+  const router = useRouter();
 
   React.useEffect(() => {
     setIsOpen(true);
   }, []);
+
+  const data = [
+    [
+      {
+        label: "Customize Page",
+        icon: Settings2,
+      },
+      {
+        label: "Turn into wiki",
+        icon: FileText,
+      },
+    ],
+    [
+      {
+        label: "Copy Link",
+        icon: Link,
+      },
+      {
+        label: "Duplicate",
+        icon: Copy,
+      },
+      {
+        label: "Move to",
+        icon: CornerUpRight,
+      },
+      {
+        label: "Move to Trash",
+        icon: Trash2,
+      },
+    ],
+    [
+      {
+        label: "Undo",
+        icon: CornerUpLeft,
+      },
+      {
+        label: "View analytics",
+        icon: LineChart,
+      },
+      {
+        label: "Version History",
+        icon: GalleryVerticalEnd,
+      },
+      {
+        label: "Show delete pages",
+        icon: Trash,
+      },
+      {
+        label: "Notifications",
+        icon: Bell,
+      },
+    ],
+    [
+      {
+        label: "Import",
+        icon: ArrowUp,
+      },
+      {
+        label: "Export",
+        icon: ArrowDown,
+      },
+      {
+        label: "Logout",
+        icon: CornerUpLeft,
+        fn: () => {
+          router.push("/login");
+        },
+      },
+    ],
+  ];
 
   return (
     <div className="flex items-center gap-2 text-sm">
@@ -135,7 +144,10 @@ export function NavActions() {
                     <SidebarMenu>
                       {group.map((item, index) => (
                         <SidebarMenuItem key={index}>
-                          <SidebarMenuButton>
+                          <SidebarMenuButton
+                            className="cursor-pointer"
+                            onClick={item.fn}
+                          >
                             <item.icon /> <span>{item.label}</span>
                           </SidebarMenuButton>
                         </SidebarMenuItem>

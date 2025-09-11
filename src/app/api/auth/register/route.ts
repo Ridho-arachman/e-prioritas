@@ -1,6 +1,7 @@
 // import { Prisma } from "@/generated/prisma";
 import { hashPassword } from "@/lib/hashing";
 import { prisma } from "@/lib/prisma";
+import { extractErrors } from "@/lib/extractErrors";
 import { createUserSchema } from "@/schema/sign-up";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -10,17 +11,15 @@ const POST = async (req: NextRequest) => {
     const body = await req.json();
 
     // validation
-    const parseResult = createUserSchema.safeParse(body);
-    if (!parseResult.success) {
-      const errors = parseResult.error.issues.map((issue) => ({
-        field: issue.path.join("."),
-        message: issue.message,
-      }));
-      return NextResponse.json({ success: false, errors }, { status: 400 });
-    }
+    const parsed = createUserSchema.safeParse(body);
+    if (!parsed.success)
+      return NextResponse.json(
+        { success: false, errors: extractErrors(parsed) },
+        { status: 400 }
+      );
 
     // get data
-    const { name, email, password } = parseResult.data;
+    const { name, email, password } = parsed.data;
 
     // hashing password
     const hashedPassword = await hashPassword(password);
@@ -32,7 +31,7 @@ const POST = async (req: NextRequest) => {
 
     return NextResponse.json({
       success: true,
-      message: "Data diterima dengan sukses",
+      message: "Perangkat Desa Berhasil Di Daftarkan",
       data: {
         id: user.id,
         name: user.name,
@@ -41,8 +40,6 @@ const POST = async (req: NextRequest) => {
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
-    console.error("POST /api/user error:", e);
-
     // cek berdasarkan code aja
     if (e?.code === "P2002") {
       return NextResponse.json(
@@ -53,7 +50,7 @@ const POST = async (req: NextRequest) => {
 
     // internal server error
     return NextResponse.json(
-      { success: false, error: "Internal server error" },
+      { success: false, error: "Internal Server Error" },
       { status: 500 }
     );
   }
