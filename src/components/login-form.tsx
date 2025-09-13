@@ -18,6 +18,7 @@ import { loginSchema } from "@/schema/login";
 import { useLogin } from "@/hooks/useLogin";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import jwt from "jsonwebtoken";
 
 export function LoginForm({
   className,
@@ -37,15 +38,18 @@ export function LoginForm({
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     try {
       const res = await trigger(values);
-      form.reset();
+
       router.push("/admin");
+      form.reset();
       toast.success("Berhasil 🎉", {
         description: res.message || "Login berhasil",
+        style: { color: "#4ade80" },
       });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error("Gagal ❌", {
         description: err.message || "Terjadi kesalahan",
+        style: { color: "#ef4444" },
       });
     }
   };

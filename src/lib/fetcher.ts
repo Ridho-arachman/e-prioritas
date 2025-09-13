@@ -3,7 +3,7 @@ export async function fetcher(url: string, options?: RequestInit) {
 
   if (!res.ok) {
     const error = await res.json().catch(() => ({}));
-    throw new Error(error.error || "Request failed");
+    throw new Error(error.message || "Request failed");
   }
 
   return res.json();

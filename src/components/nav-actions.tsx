@@ -37,6 +37,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useLogout } from "@/hooks/useLogout";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export function NavActions() {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -114,12 +115,16 @@ export function NavActions() {
           try {
             await trigger();
             router.push("/login");
-            toast.success("Logout berhasil");
+            toast.success("Logout berhasil", {
+              description: "Berhasil logout",
+              style: { color: "#4ade80" },
+            });
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
           } catch (error) {
             toast.error("Logout gagal");
           }
         },
+        style: "bg-red-500 text-white",
       },
     ],
   ];
@@ -155,7 +160,7 @@ export function NavActions() {
                       {group.map((item, index) => (
                         <SidebarMenuItem key={index}>
                           <SidebarMenuButton
-                            className="cursor-pointer"
+                            className={cn("cursor-pointer", item.style)}
                             onClick={item.fn}
                             disabled={isMutating}
                           >
