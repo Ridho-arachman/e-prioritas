@@ -33,6 +33,7 @@ Aplikasi ini menggunakan kombinasi metode **AHP–TOPSIS** untuk menghasilkan ke
 
 ## 📂 Struktur Folder (Next.js App Router)
 
+```
 app/
 ├─ page.tsx # Landing page (publik)
 ├─ masuk/ # Halaman login
@@ -54,6 +55,7 @@ app/
 ├─ hasil/
 ├─ ahp/
 └─ topsis/
+```
 
 ---
 
