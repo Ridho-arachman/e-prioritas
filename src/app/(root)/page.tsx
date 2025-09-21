@@ -18,6 +18,7 @@ import {
   LucideIcon,
 } from "lucide-react";
 import Image from "next/image";
+import InfiniteLogoSlider from "@/components/logo-slider";
 
 // Definisikan tipe data untuk setiap kartu utama (MainCard)
 interface MainCard {
@@ -38,9 +39,9 @@ const mainCards: MainCard[] = [
     title: "Masuk sebagai Perangkat Desa",
     description:
       "Kelola data, proses masukan warga, dan hasilkan rekomendasi dengan kecerdasan buatan.",
-    imageSrc: "/images/kelurahan-dashboard.svg",
+    imageSrc: "/home/1.png",
     imageAlt: "Dashboard Admin",
-    linkHref: "/login-perangkat-desa",
+    linkHref: "/login",
     buttonText: "Masuk Sekarang",
     borderColor: "blue",
     textColor: "blue",
@@ -49,7 +50,7 @@ const mainCards: MainCard[] = [
     title: "Sampaikan Masukan Anda",
     description:
       "Berpartisipasi aktif dalam proses pembangunan dengan memberikan saran atau keluhan.",
-    imageSrc: "/images/warga-input.svg",
+    imageSrc: "/home/2.png",
     imageAlt: "Formulir Masukan Warga",
     linkHref: "/masukan-warga",
     buttonText: "Sampaikan Masukan",
@@ -100,7 +101,7 @@ export default function LandingPage() {
 
       <div className="relative z-10 w-full max-w-7xl flex flex-col items-center">
         {/* Header Utama */}
-        <div className="text-center mb-12">
+        <div className="text-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 text-gray-900 dark:text-gray-50">
             Sistem Cerdas untuk Pembangunan Kelurahan
           </h1>
@@ -111,7 +112,10 @@ export default function LandingPage() {
           </p>
         </div>
 
-        {/* Bagian Utama - Kartu Interaktif (menggunakan map dari array) */}
+        <div className="w-full max-w-5xl my-24">
+          <InfiniteLogoSlider />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 w-full mb-24">
           {mainCards.map((card) => (
             <Link key={card.title} href={card.linkHref}>
@@ -149,7 +153,6 @@ export default function LandingPage() {
           ))}
         </div>
 
-        {/* Section Fitur (menggunakan map dari array) */}
         <div className="w-full max-w-5xl text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-8 text-gray-900 dark:text-gray-50">
             Mengapa Sistem Ini Penting?
