@@ -3,6 +3,7 @@ import { comparePassword } from "@/lib/hashing";
 import { generateAccessToken, generateRefreshToken } from "@/lib/jwtHelper";
 import { prisma } from "@/lib/prisma";
 import { loginSchema } from "@/schema/login";
+import { log } from "console";
 
 import { NextRequest, NextResponse } from "next/server";
 
@@ -25,6 +26,8 @@ const POST = async (req: NextRequest) => {
 
     // find user
     const user = await prisma.user.findUnique({ where: { email } });
+    log(user);
+
     if (!user)
       return NextResponse.json(
         { success: false, message: "User tidak ditemukan" },
@@ -68,6 +71,7 @@ const POST = async (req: NextRequest) => {
     return response;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (err) {
+    log(err);
     return NextResponse.json(
       { success: false, message: "Terjadi Error Pada Server" },
       { status: 500 }
