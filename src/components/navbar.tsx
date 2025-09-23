@@ -1,27 +1,35 @@
 // components/layout/navbar.tsx
-"use client"; // Ini adalah Client Component karena ada interaksi state untuk menu mobile
+"use client";
 
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Home, Layers, MessageSquare, Settings } from "lucide-react"; // Ikon untuk navigasi
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet"; // Import SheetHeader dan SheetTitle
+import { Menu, Home, Layers, MessageSquare, Settings } from "lucide-react";
 import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 const navLinks = [
   { href: "/", label: "Beranda", icon: Home },
-  { href: "/tentang", label: "Tentang", icon: Layers }, // Contoh tautan tambahan
+  { href: "/tentang", label: "Tentang", icon: Layers },
   { href: "/masukan-warga", label: "Masukan Warga", icon: MessageSquare },
   { href: "/login-perangkat-desa", label: "Perangkat Desa", icon: Settings },
 ];
 
 export default function Navbar() {
+  const pathName = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <nav className="sticky top-0 z-50 w-full bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm shadow-sm">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        {/* Logo / Nama Sistem */}
         <Link href="/" className="flex items-center gap-2">
           <Image
             src="/logo.svg"
@@ -41,7 +49,12 @@ export default function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-1"
+              className={cn(
+                "text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-1",
+                pathName === link.href
+                  ? "font-semibold text-blue-600 dark:text-blue-400 underline"
+                  : "font-medium"
+              )}
             >
               <link.icon className="w-4 h-4" />
               {link.label}
@@ -62,13 +75,22 @@ export default function Navbar() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
+              {/* Tambahkan SheetHeader dan SheetTitle di sini */}
+              <SheetHeader>
+                <SheetTitle>Menu Navigasi</SheetTitle>
+              </SheetHeader>
               <nav className="flex flex-col gap-4 py-6">
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="text-lg font-medium text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
-                    onClick={() => setIsOpen(false)} // Tutup menu setelah klik
+                    className={cn(
+                      "text-lg font-medium text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2",
+                      pathName === link.href
+                        ? "font-semibold text-blue-600 dark:text-blue-400 underline"
+                        : "font-medium"
+                    )}
+                    onClick={() => setIsOpen(false)}
                   >
                     <link.icon className="w-5 h-5" />
                     {link.label}

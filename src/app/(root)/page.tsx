@@ -1,5 +1,5 @@
 // app/page.tsx
-
+"use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import InfiniteLogoSlider from "@/components/logo-slider";
+import { cn } from "@/lib/utils";
 
 // Definisikan tipe data untuk setiap kartu utama (MainCard)
 interface MainCard {
@@ -29,36 +30,10 @@ interface MainCard {
   linkHref: string;
   buttonText: string;
   variant?: "default" | "outline";
-  borderColor: string;
+  hoverBorderColor: string;
+  hoverBorderColorDark: string;
   textColor: string;
 }
-
-// Data array untuk kartu utama
-const mainCards: MainCard[] = [
-  {
-    title: "Masuk sebagai Perangkat Desa",
-    description:
-      "Kelola data, proses masukan warga, dan hasilkan rekomendasi dengan kecerdasan buatan.",
-    imageSrc: "/home/1.png",
-    imageAlt: "Dashboard Admin",
-    linkHref: "/login",
-    buttonText: "Masuk Sekarang",
-    borderColor: "blue",
-    textColor: "blue",
-  },
-  {
-    title: "Sampaikan Masukan Anda",
-    description:
-      "Berpartisipasi aktif dalam proses pembangunan dengan memberikan saran atau keluhan.",
-    imageSrc: "/home/2.png",
-    imageAlt: "Formulir Masukan Warga",
-    linkHref: "/masukan-warga",
-    buttonText: "Sampaikan Masukan",
-    variant: "outline",
-    borderColor: "green",
-    textColor: "green",
-  },
-];
 
 // Definisikan tipe data untuk setiap fitur (FeatureCard)
 interface Feature {
@@ -66,34 +41,67 @@ interface Feature {
   description: string;
   icon: LucideIcon;
   color: string;
+  colorDark: string;
 }
 
-// Data array untuk fitur
-const features: Feature[] = [
-  {
-    title: "Partisipasi Aktif Warga",
-    description:
-      "Sistem memungkinkan warga untuk menyampaikan aspirasi dan masukan secara langsung, memastikan setiap suara didengar.",
-    icon: Users,
-    color: "blue",
-  },
-  {
-    title: "Rekomendasi Berbasis AI",
-    description:
-      "Memanfaatkan kecerdasan buatan dari OpenAI untuk menganalisis data dan memberikan rekomendasi yang objektif.",
-    icon: Bot,
-    color: "green",
-  },
-  {
-    title: "Pengambilan Keputusan Cerdas",
-    description:
-      "Membantu perangkat desa dalam memprioritaskan pembangunan berdasarkan data dan kebutuhan riil masyarakat.",
-    icon: BarChart3,
-    color: "purple",
-  },
-];
-
 export default function LandingPage() {
+  // Data array untuk kartu utama
+  const mainCards: MainCard[] = [
+    {
+      title: "Masuk sebagai Perangkat Desa",
+      description:
+        "Kelola data, proses masukan warga, dan hasilkan rekomendasi dengan kecerdasan buatan.",
+      imageSrc: "/home/1.png",
+      imageAlt: "Dashboard Admin",
+      linkHref: "/login",
+      buttonText: "Masuk Sekarang",
+      hoverBorderColor: "hover:border-blue-500",
+      hoverBorderColorDark: "dark:hover:border-blue-500",
+      textColor: "blue",
+    },
+    {
+      title: "Sampaikan Masukan Anda",
+      description:
+        "Berpartisipasi aktif dalam proses pembangunan dengan memberikan saran atau keluhan.",
+      imageSrc: "/home/2.png",
+      imageAlt: "Formulir Masukan Warga",
+      linkHref: "/masukan-warga",
+      buttonText: "Sampaikan Masukan",
+      variant: "outline",
+      hoverBorderColor: "hover:border-green-500",
+      hoverBorderColorDark: "dark:hover:border-green-500",
+      textColor: "green",
+    },
+  ];
+
+  // Data array untuk fitur
+  const features: Feature[] = [
+    {
+      title: "Partisipasi Aktif Warga",
+      description:
+        "Sistem memungkinkan warga untuk menyampaikan aspirasi dan masukan secara langsung, memastikan setiap suara didengar.",
+      icon: Users,
+      color: "text-blue-600",
+      colorDark: "dark:text-blue-400",
+    },
+    {
+      title: "Rekomendasi Berbasis AI",
+      description:
+        "Memanfaatkan kecerdasan buatan dari OpenAI untuk menganalisis data dan memberikan rekomendasi yang objektif.",
+      icon: Bot,
+      color: "text-green-600",
+      colorDark: "dark:text-green-400",
+    },
+    {
+      title: "Pengambilan Keputusan Cerdas",
+      description:
+        "Membantu perangkat desa dalam memprioritaskan pembangunan berdasarkan data dan kebutuhan riil masyarakat.",
+      icon: BarChart3,
+      color: "text-purple-600",
+      colorDark: "dark:text-purple-400",
+    },
+  ];
+
   return (
     <main className="relative flex min-h-screen flex-col items-center p-6 sm:p-24 overflow-hidden">
       {/* Latar Belakang Gradien Animasi */}
@@ -108,7 +116,7 @@ export default function LandingPage() {
           <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             Platform berbasis Next.js dan OpenAI untuk memprioritaskan
             pembangunan fasilitas umum secara akurat dan transparan di Kelurahan
-            Panggungjati.
+            Panggungjati. s
           </p>
         </div>
 
@@ -120,7 +128,7 @@ export default function LandingPage() {
           {mainCards.map((card) => (
             <Link key={card.title} href={card.linkHref}>
               <Card
-                className={`flex flex-col h-full hover:shadow-2xl hover:scale-105 transition-all duration-500 cursor-pointer border-2 border-transparent hover:border-${card.borderColor}-500 dark:hover:border-${card.borderColor}-700`}
+                className={`flex flex-col h-full hover:shadow-2xl hover:scale-105 transition-all duration-500 cursor-pointer border-2 border-transparent ${card.hoverBorderColor} ${card.hoverBorderColorDark}`}
               >
                 <CardHeader>
                   <CardTitle
@@ -162,7 +170,11 @@ export default function LandingPage() {
               <Card key={feature.title} className="p-6 text-left">
                 <CardContent className="flex flex-col items-center p-0">
                   <feature.icon
-                    className={`w-12 h-12 text-${feature.color}-600 dark:text-${feature.color}-400 mb-4`}
+                    className={cn(
+                      "w-12 h-12 mb-4",
+                      feature.color,
+                      feature.colorDark
+                    )}
                   />
                   <CardTitle className="mb-2 text-xl font-semibold">
                     {feature.title}

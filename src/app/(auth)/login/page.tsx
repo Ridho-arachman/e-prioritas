@@ -22,7 +22,7 @@ export default function LoginPage() {
         <Image
           width={900}
           height={100}
-          src="/login/image.png"
+          src="/logo-kelurahan.png"
           alt="Image"
           className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
         />
