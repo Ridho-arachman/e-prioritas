@@ -103,7 +103,7 @@ export default function LandingPage() {
   ];
 
   return (
-    <main className="relative flex min-h-screen flex-col items-center p-6 sm:p-24 overflow-hidden">
+    <div className="relative flex min-h-screen flex-col items-center p-6 sm:p-24 overflow-hidden">
       {/* Latar Belakang Gradien Animasi */}
       <div className="absolute inset-0 z-0 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-950 dark:to-blue-950 animate-pulse-slow opacity-50"></div>
 
@@ -188,6 +188,6 @@ export default function LandingPage() {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
