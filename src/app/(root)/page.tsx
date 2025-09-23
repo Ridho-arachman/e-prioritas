@@ -150,7 +150,7 @@ export default function LandingPage() {
                 <CardFooter className="flex justify-end">
                   <Button
                     variant={card.variant}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 cursor-pointer"
                   >
                     {card.buttonText}{" "}
                     <ArrowRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-1" />
