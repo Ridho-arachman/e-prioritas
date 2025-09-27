@@ -19,8 +19,8 @@ import { cn } from "@/lib/utils";
 const navLinks = [
   { href: "/", label: "Beranda", icon: Home },
   { href: "/tentang", label: "Tentang", icon: Layers },
-  { href: "/masukan-warga", label: "Masukan Warga", icon: MessageSquare },
-  { href: "/login-perangkat-desa", label: "Perangkat Desa", icon: Settings },
+  { href: "/masukan", label: "Masukan Warga", icon: MessageSquare },
+  { href: "/login", label: "Perangkat Desa", icon: Settings },
 ];
 
 export default function Navbar() {
