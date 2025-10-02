@@ -1,5 +1,5 @@
 import type { NextConfig } from "next";
-// import type { Configuration } from "webpack";
+import type { Configuration } from "webpack";
 
 const nextConfig: NextConfig = {
   // webpackDevMiddleware: (config: Configuration) => {

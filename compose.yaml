@@ -2,61 +2,32 @@
 #   e-prioritas-net:
 #     driver: bridge
 
-# services:
-#   app:
-#     build:
-#       context: .
-#       dockerfile: docker/Dockerfile.dev
-#     volumes:
-#       - ./src:/app/src
-#       - /app/node_modules
-#     ports:
-#       - "3000:3000"
-#     environment:
-#       NODE_ENV: development
-#     networks:
-#       - e-prioritas-net
-
-#   nginx:
-#     image: nginx:alpine
-#     ports:
-#       - "8080:80"
-#     volumes:
-#       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
-#     depends_on:
-#       - app
-#     networks:
-#       - e-prioritas-net
-
-networks:
-  e-prioritas-net:
-    driver: bridge
-
 services:
   app:
     build:
       context: .
       dockerfile: docker/Dockerfile.dev
     volumes:
-      - ./:/app
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./prisma:/app/prisma
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./postcss.config.mjs:/app/postcss.config.mjs
       - /app/node_modules
     ports:
       - "3000:3000"
-    environment:
-      NODE_ENV: development
-      NEXT_DEV_POLLING: "true"
-      CHOKIDAR_USEPOLLING: "true"
-      WATCHPACK_POLLING: "true"
-    networks:
-      - e-prioritas-net
+    env_file:
+      - .env.local
+    # networks:
+    #   - e-prioritas-net
 
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "8080:80"
-    volumes:
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - app
-    networks:
-      - e-prioritas-net
+  # nginx:
+  #   image: nginx:alpine
+  #   ports:
+  #     - "8080:80"
+  #   volumes:
+  #     - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+  #   depends_on:
+  #     - app
+  #   networks:
+  #     - e-prioritas-net

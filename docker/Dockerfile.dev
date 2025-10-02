@@ -1,33 +1,37 @@
 # Base image
-FROM node:22-slim
+FROM node:24-alpine
+
 WORKDIR /app
-RUN apt-get update -y && apt-get install -y \
-    openssl \
-    libssl-dev \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+
+# Install runtime deps (buat prisma, bcrypt, crypto, dll)
+RUN apk add --no-cache \
+  libc6-compat \
+  openssl \
+  libssl3 \
+  libstdc++ \
+  python3 \
+  make \
+  g++
 
 # Install pnpm
 RUN npm install -g pnpm
 
-# Copy package files & configs
+# Copy package files
 COPY ../package.json ../pnpm-lock.yaml ./
-COPY ../tsconfig.json ../postcss.config.mjs ./
 
-# Approve ignored built dependencies & install
-ENV PNPM_APPROVE_BUILDS=true
+# Install dependencies (dev deps juga ikut)
 RUN pnpm install
 
-# Copy Prisma & generate client
+# Copy configs & source
+COPY ../tsconfig.json ../postcss.config.mjs ./
 COPY ../prisma ./prisma
-RUN pnpm prisma generate
-
-# Copy source code & public folder
 COPY ../src ./src
 COPY ../public ./public
 
-# Expose port Next.js
+# Generate Prisma client
+RUN pnpm prisma generate
+
 EXPOSE 3000
 
-# Command untuk development (hot reload)
+# Dev mode (hot reload)
 CMD ["pnpm", "dev"]
