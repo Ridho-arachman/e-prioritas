@@ -10,13 +10,21 @@ export type JwtUser = {
 };
 
 export const generateAccessToken = (user: JwtUser) => {
-  return jwt.sign({ id: user.id, email: user.email }, ACCESS_SECRET, {
-    expiresIn: "15m",
-  });
+  return jwt.sign(
+    { id: user.id, email: user.email, role: user.role },
+    ACCESS_SECRET,
+    {
+      expiresIn: "15m",
+    }
+  );
 };
 
 export const generateRefreshToken = (user: JwtUser) => {
-  return jwt.sign({ id: user.id, email: user.email }, REFRESH_SECRET, {
-    expiresIn: "7d",
-  });
+  return jwt.sign(
+    { id: user.id, email: user.email, role: user.role },
+    REFRESH_SECRET,
+    {
+      expiresIn: "7d",
+    }
+  );
 };

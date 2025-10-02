@@ -26,7 +26,6 @@ const POST = async (req: NextRequest) => {
 
     // find user
     const user = await prisma.user.findUnique({ where: { email } });
-    log(user);
 
     if (!user)
       return NextResponse.json(
@@ -48,6 +47,7 @@ const POST = async (req: NextRequest) => {
     // generate token
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
+    console.log(accessToken);
 
     const response = NextResponse.json({
       success: true,
