@@ -18,12 +18,14 @@ import { loginSchema } from "@/schema/login";
 import { useLogin } from "@/hooks/useLogin";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import jwt from "jsonwebtoken";
+import { Eye, EyeClosed } from "lucide-react";
+import { useState } from "react";
 
 export function LoginForm({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
+  const [seePassword, setSeePassword] = useState(false);
   const router = useRouter();
   const { trigger, isMutating } = useLogin();
 
@@ -94,7 +96,21 @@ export function LoginForm({
                   </a>
                 </div>
                 <FormControl>
-                  <Input type="password" {...field} />
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type={seePassword ? "text" : "password"}
+                      {...field}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      type="button"
+                      className="cursor-pointer"
+                      onClick={() => setSeePassword(!seePassword)}
+                    >
+                      {seePassword ? <Eye /> : <EyeClosed />}
+                    </Button>
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>

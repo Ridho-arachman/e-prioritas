@@ -3,7 +3,6 @@ import { comparePassword } from "@/lib/hashing";
 import { generateAccessToken, generateRefreshToken } from "@/lib/jwtHelper";
 import { prisma } from "@/lib/prisma";
 import { loginSchema } from "@/schema/login";
-import { log } from "console";
 
 import { NextRequest, NextResponse } from "next/server";
 
@@ -47,7 +46,6 @@ const POST = async (req: NextRequest) => {
     // generate token
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
-    console.log(accessToken);
 
     const response = NextResponse.json({
       success: true,
@@ -71,7 +69,6 @@ const POST = async (req: NextRequest) => {
     return response;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (err) {
-    log(err);
     return NextResponse.json(
       { success: false, message: "Terjadi Error Pada Server" },
       { status: 500 }

@@ -121,7 +121,7 @@ export default function LandingPage() {
           <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             Platform berbasis Next.js dan OpenAI untuk memprioritaskan
             pembangunan fasilitas umum secara akurat dan transparan di Kelurahan
-            Panggungjati.hdjfssss
+            Panggungjati.sssnln
           </p>
         </div>
 
