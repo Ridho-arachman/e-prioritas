@@ -19,4 +19,11 @@ export const createUserSchema = z.object({
     .regex(/[A-Z]/, "Password harus mengandung huruf besar")
     .regex(/[0-9]/, "Password harus mengandung angka")
     .regex(/[^a-zA-Z0-9]/, "Password harus mengandung simbol"),
+  jabatan: z.string().min(1, "Jabatan tidak boleh kosong").trim(),
+  role: z
+    .enum(
+      ["ADMIN", "PERANGKAT_DESA"],
+      "Role hanya boleh PERANGKAT_DESA atau ADMIN"
+    )
+    .optional(),
 });

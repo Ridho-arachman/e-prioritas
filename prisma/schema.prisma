@@ -1,7 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
-  binaryTargets = ["native", "windows", "linux-musl-openssl-3.0.x","debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -10,72 +8,102 @@ datasource db {
 }
 
 model User {
-  id        String     @id    @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  role      Role     @default(perangkat)
-  createdAt DateTime @default(now())
+  id                    String    @id @default(cuid())
+  name                  String   
+  email                 String    @unique
+  password              String    @map("password_hash") 
+  jabatan               String
+  role                  Role      @default(PERANGKAT_DESA)
+  isActive              Boolean   @default(true) @map("is_active")
+  createdAt             DateTime  @default(now()) @map("created_at")
 
-  // relasi
-  Scores    Score[]
+  masukanVerifikasi     MasukanWarga[] @relation("MasukanVerifikasi")
+  rekomendasiDiproses   Rekomendasi[]  @relation("RekomendasiDiproses")
+  dataMasterUpdate      DataMaster[]   @relation("DataMasterUpdate")
+
+  @@map("users") 
+}
+
+model Kategori {
+  id                String            @id @default(cuid())
+  namaKategori      String         @unique @map("nama_kategori")
+  deskripsi         String?
+  
+  masukanWarga      MasukanWarga[]
+
+  @@map("kategori")
+}
+
+model MasukanWarga {
+  id                    String      @id @default(cuid())
+  namaPengirim          String     @map("nama_pengirim")
+  emailPengirim         String     @map("email_pengirim")
+  lokasiRtrw            String      @map("lokasi_rtrw")
+  deskripsiMasukan      String      @db.Text @map("deskripsi_masukan") 
+  status                MasukanStatus @default(MENUNGGU_VERIFIKASI) 
+  alasanPenolakan       String?     @map("alasan_penolakan")
+  createdAt             DateTime    @default(now()) @map("created_at")
+
+  kategoriId            String         @map("kategori_id")
+  kategori              Kategori    @relation(fields: [kategoriId], references: [id])
+
+  verifiedByUserId      String?     @map("verified_by_user_id")
+  verifiedBy            User?       @relation("MasukanVerifikasi", fields: [verifiedByUserId], references: [id])
+
+  rekomendasi           RekomendasiMasukan[]
+
+  @@map("masukan_warga")
+}
+
+model DataMaster {
+  id                    String    @id @default(cuid())
+  jenisData             String    @map("jenis_data")
+  namaAtribut           String    @map("nama_atribut")
+  nilai                 String
+  lokasiRtrw            String?   @map("lokasi_rtrw")
+
+  updatedByUserId       String    @map("updated_by_user_id")
+  updatedBy             User      @relation("DataMasterUpdate", fields: [updatedByUserId], references: [id])
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  @@map("data_master")
+}
+
+model Rekomendasi {
+  id                    String      @id @default(cuid())
+  judul                 String
+  tanggalProses         DateTime    @map("tanggal_proses") @db.Date
+  prioritas1Deskripsi   String      @db.Text @map("prioritas_1_deskripsi")
+  prioritas1Skor        Float       @map("prioritas_1_skor")
+  laporanLengkap        Json?       @map("laporan_lengkap")
+
+  processedByUserId     String      @map("processed_by_user_id")
+  processedBy           User        @relation("RekomendasiDiproses", fields: [processedByUserId], references: [id])
+  
+  masukanWarga          RekomendasiMasukan[]
+
+  @@map("rekomendasi")
+}
+
+model RekomendasiMasukan {
+  rekomendasiId         String      @map("rekomendasi_id")
+  masukanId             String      @map("masukan_id")
+
+  rekomendasi           Rekomendasi   @relation(fields: [rekomendasiId], references: [id])
+  masukan               MasukanWarga  @relation(fields: [masukanId], references: [id])
+
+  @@id([rekomendasiId, masukanId]) 
+  @@map("rekomendasi_masukan")
 }
 
 enum Role {
-  admin
-  perangkat
+  ADMIN
+  PERANGKAT_DESA
 }
 
-model Criterion {
-  id        String      @id       @default(cuid())
-  name      String
-  type      CriterionType
-  createdAt DateTime @default(now())
-
-  // relasi
-  Scores   Score[]
-  Weights  Weight[]
-}
-
-enum CriterionType {
-  benefit
-  cost
-}
-
-model Alternative {
-  id          String      @id     @default(cuid())
-  name        String
-  description String?
-  createdAt   DateTime @default(now())
-
-  // relasi
-  Scores  Score[]
-  Results Result[]
-}
-
-model Score {
-  id            String         @id  @default(cuid())
-  value         Float
-  alternative   Alternative @relation(fields: [alternativeId], references: [id], onDelete: Cascade)
-  alternativeId   String
-  criterion     Criterion   @relation(fields: [criterionId], references: [id], onDelete: Cascade)
-  criterionId   String
-  user          User?       @relation(fields: [userId], references: [id])
-  userId        String?
-}
-
-model Weight {
-  id          String       @id @default(cuid())
-  weight      Float
-  criterion   Criterion @relation(fields: [criterionId], references: [id], onDelete: Cascade)
-  criterionId String
-}
-
-model Result {
-  id            Int         @id @default(autoincrement())
-  score         Float
-  rank          Int
-  createdAt     DateTime    @default(now())
-  alternative   Alternative @relation(fields: [alternativeId], references: [id], onDelete: Cascade)
-  alternativeId String
+enum MasukanStatus {
+  MENUNGGU_VERIFIKASI
+  DITERIMA
+  DITOLAK
+  SELESAI_DIPROSES
 }

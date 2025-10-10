@@ -19,14 +19,20 @@ const POST = async (req: NextRequest) => {
       );
 
     // get data
-    const { name, email, password } = parsed.data;
+    const { name, email, password, jabatan, role } = parsed.data;
 
     // hashing password
     const hashedPassword = await hashPassword(password);
 
     // create user
     const user = await prisma.user.create({
-      data: { name, email, password: hashedPassword },
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        jabatan,
+        role: role || "PERANGKAT_DESA",
+      },
     });
 
     return NextResponse.json({

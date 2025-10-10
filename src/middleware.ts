@@ -55,12 +55,12 @@ export async function middleware(req: NextRequest) {
 
     // Cek Otorisasi (Apakah user boleh di path ini?)
     // Jika user admin mencoba mengakses path /perangkat, TOLAK
-    if (pathname.startsWith("/perangkat") && role !== "perangkat") {
+    if (pathname.startsWith("/perangkat") && role !== "PERANGKAT_DESA") {
       return NextResponse.redirect(getRedirectUrlByRole(role, req.url));
     }
 
     // Jika user perangkat mencoba mengakses path /admin, TOLAK
-    if (pathname.startsWith("/admin") && role !== "admin") {
+    if (pathname.startsWith("/admin") && role !== "ADMIN") {
       return NextResponse.redirect(getRedirectUrlByRole(role, req.url));
     }
 
