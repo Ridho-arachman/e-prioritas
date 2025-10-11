@@ -1,4 +1,5 @@
 import { extractErrors } from "@/lib/extractErrors";
+import { prisma } from "@/lib/prisma";
 import { createMasukanWargaSchema } from "@/schema/masukanWarga";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -16,7 +17,25 @@ const POST = async (req: NextRequest) => {
       { status: 400 }
     );
   }
+
+  const {
+    namaPengirim,
+    emailPengirim,
+    lokasiRtrw,
+    deskripsiMasukan,
+    kategoriId,
+  } = parsed.data;
+
   try {
+    const masukan = await prisma.masukanWarga.create({
+      data: {
+        namaPengirim,
+        emailPengirim,
+        lokasiRtrw,
+        deskripsiMasukan,
+        kategoriId,
+      },
+    });
   } catch (err: any) {}
 };
 
