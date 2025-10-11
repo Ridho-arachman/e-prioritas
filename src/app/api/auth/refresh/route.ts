@@ -14,7 +14,6 @@ export async function POST(req: NextRequest) {
   try {
     const decoded = jwt.verify(refreshToken, REFRESH_SECRET);
 
-    // pastikan hasilnya sesuai tipe
     if (!decoded || typeof decoded === "string") {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }

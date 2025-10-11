@@ -1,17 +1,14 @@
+import { generateAccessToken, generateRefreshToken } from "@/lib/jwtHelper";
+import { NextRequest, NextResponse } from "next/server";
 import { extractErrors } from "@/lib/extractErrors";
 import { comparePassword } from "@/lib/hashing";
-import { generateAccessToken, generateRefreshToken } from "@/lib/jwtHelper";
-import { prisma } from "@/lib/prisma";
 import { loginSchema } from "@/schema/login";
-
-import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 const POST = async (req: NextRequest) => {
   try {
-    //parse body
     const body = await req.json();
 
-    // validation
     const parsed = loginSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
@@ -20,10 +17,8 @@ const POST = async (req: NextRequest) => {
       );
     }
 
-    // get data
     const { email, password } = parsed.data;
 
-    // find user
     const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user)
@@ -32,7 +27,6 @@ const POST = async (req: NextRequest) => {
         { status: 401 }
       );
 
-    // compare password
     const isPasswordValid = await comparePassword(password, user.password);
     if (!isPasswordValid)
       return NextResponse.json(
@@ -43,7 +37,6 @@ const POST = async (req: NextRequest) => {
         { status: 401 }
       );
 
-    // generate token
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
 
@@ -54,16 +47,16 @@ const POST = async (req: NextRequest) => {
 
     response.cookies.set("accessToken", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // otomatis true di prod
+      secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      path: "/", // penting biar bisa diakses seluruh route
+      path: "/",
     });
 
     response.cookies.set("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // otomatis true di prod
+      secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      path: "/", // penting biar bisa diakses seluruh route
+      path: "/",
     });
 
     return response;

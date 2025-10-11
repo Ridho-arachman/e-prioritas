@@ -7,10 +7,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 const POST = async (req: NextRequest) => {
   try {
-    // parse body
     const body = await req.json();
 
-    // validation
     const parsed = createUserSchema.safeParse(body);
     if (!parsed.success)
       return NextResponse.json(
@@ -18,13 +16,10 @@ const POST = async (req: NextRequest) => {
         { status: 400 }
       );
 
-    // get data
     const { name, email, password, jabatan, role } = parsed.data;
 
-    // hashing password
     const hashedPassword = await hashPassword(password);
 
-    // create user
     const user = await prisma.user.create({
       data: {
         name,
@@ -46,7 +41,6 @@ const POST = async (req: NextRequest) => {
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
-    // cek berdasarkan code aja
     if (e?.code === "P2002") {
       return NextResponse.json(
         { success: false, error: "Email sudah terdaftar" },
@@ -54,7 +48,6 @@ const POST = async (req: NextRequest) => {
       );
     }
 
-    // internal server error
     return NextResponse.json(
       { success: false, error: "Internal Server Error" },
       { status: 500 }
