@@ -4,10 +4,16 @@ import { extractErrors } from "@/lib/extractErrors";
 import { comparePassword } from "@/lib/hashing";
 import { loginSchema } from "@/schema/login";
 import { prisma } from "@/lib/prisma";
+import { cors } from "@/lib/cors";
 
 const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();
+
+    const headers = cors(req, {
+      allowedOrigins: [process.env.NEXT_PUBLIC_APP_URL!],
+    });
+    if (headers instanceof NextResponse) return headers;
 
     const parsed = loginSchema.safeParse(body);
     if (!parsed.success) {

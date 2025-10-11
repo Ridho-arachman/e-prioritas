@@ -1,13 +1,22 @@
-// lib/cors.ts
 import { NextRequest, NextResponse } from "next/server";
 
-const allowedOrigins = [
-  process.env.NEXT_PUBLIC_APP_URL, // domain app kamu sendiri
-  "http://localhost:3000", // dev origin
-  // tambahkan domain lain bila perlu
-];
+interface CorsOptions {
+  allowedOrigins?: string[];
+}
 
-export function cors(req: NextRequest) {
+/**
+ * Dynamic CORS handler
+ * @param req - NextRequest object
+ * @param options - optional { allowedOrigins: [...] }
+ */
+export function cors(req: NextRequest, options?: CorsOptions) {
+  const defaultOrigins = [
+    process.env.NEXT_PUBLIC_APP_URL,
+    "http://localhost:3000",
+  ];
+
+  const allowedOrigins = options?.allowedOrigins ?? defaultOrigins;
+
   const origin = req.headers.get("origin") || "";
   const isAllowed = allowedOrigins.includes(origin);
 
@@ -20,7 +29,7 @@ export function cors(req: NextRequest) {
     "Access-Control-Allow-Credentials": "true",
   };
 
-  // kalau request OPTIONS (preflight), langsung return tanpa lanjut ke handler
+  // Handle preflight (OPTIONS)
   if (req.method === "OPTIONS") {
     return new NextResponse(null, { status: 204, headers });
   }
