@@ -1,21 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { generateAccessToken, JwtUser } from "@/lib/jwtHelper";
+import { log } from "console";
 
 const REFRESH_SECRET = process.env.REFRESH_SECRET!;
 
 export async function POST(req: NextRequest) {
-  const refreshToken = req.cookies.get("refreshToken")?.value;
-
-  if (!refreshToken) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-  }
-
   try {
-    const decoded = jwt.verify(refreshToken, REFRESH_SECRET);
+    const cookieStore = await req.cookies;
+    const refreshToken = cookieStore.get("refreshToken")?.value;
 
+    if (!refreshToken) {
+      return NextResponse.json(
+        { success: false, message: "User belum login" },
+        { status: 401 }
+      );
+    }
+
+    const decoded = jwt.verify(refreshToken, REFRESH_SECRET);
     if (!decoded || typeof decoded === "string") {
-      return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+      return NextResponse.json(
+        { succes: false, message: "User tidak mempunyai akses" },
+        { status: 403 }
+      );
     }
 
     const user = decoded as JwtUser;
@@ -26,9 +33,25 @@ export async function POST(req: NextRequest) {
       role: user.role,
     });
 
-    return NextResponse.json({ accessToken }, { status: 200 });
+    return NextResponse.json(
+      { success: true, message: "Token berhasil di refresh", accessToken },
+      { status: 200 }
+    );
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (err) {
-    return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+    if (err instanceof jwt.JsonWebTokenError) {
+      // Token ada, tetapi tidak valid (kadaluwarsa, signature salah)
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Refresh token tidak valid atau kadaluwarsa.",
+        },
+        { status: 403 } // 403 Forbidden: Klien mengirim token yang tidak berhak
+      );
+    }
+    return NextResponse.json(
+      { success: false, message: "Terjadi Error Pada Server" },
+      { status: 500 }
+    );
   }
 }

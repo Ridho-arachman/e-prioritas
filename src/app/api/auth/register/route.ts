@@ -4,10 +4,16 @@ import { prisma } from "@/lib/prisma";
 import { extractErrors } from "@/lib/extractErrors";
 import { createUserSchema } from "@/schema/sign-up";
 import { NextRequest, NextResponse } from "next/server";
+import { cors } from "@/lib/cors";
 
 const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();
+
+    const headers = cors(req, {
+      allowedOrigins: [process.env.NEXT_PUBLIC_APP_URL!],
+    });
+    if (headers instanceof NextResponse) return headers;
 
     const parsed = createUserSchema.safeParse(body);
     if (!parsed.success)
@@ -30,15 +36,18 @@ const POST = async (req: NextRequest) => {
       },
     });
 
-    return NextResponse.json({
-      success: true,
-      message: "Perangkat Desa Berhasil Di Daftarkan",
-      data: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Perangkat Desa Berhasil Di Daftarkan",
+        data: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        },
       },
-    });
+      { status: 201, headers }
+    );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     if (e?.code === "P2002") {
@@ -49,7 +58,7 @@ const POST = async (req: NextRequest) => {
     }
 
     return NextResponse.json(
-      { success: false, error: "Internal Server Error" },
+      { success: false, error: "Terjadi Error Pada Server" },
       { status: 500 }
     );
   }
