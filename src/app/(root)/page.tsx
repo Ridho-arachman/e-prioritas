@@ -70,7 +70,7 @@ export default function LandingPage() {
         "Berpartisipasi aktif dalam proses pembangunan dengan memberikan saran atau keluhan.",
       imageSrc: "/home/2.png",
       imageAlt: "Formulir Masukan Warga",
-      linkHref: "/masukan-warga",
+      linkHref: "/masukan",
       buttonText: "Sampaikan Masukan",
       variant: "outline",
       hoverBorderColor: "hover:border-green-500",

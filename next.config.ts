@@ -31,6 +31,7 @@ const nextConfig: NextConfig = {
               "connect-src 'self' https://* ws://* wss://*;", // izinkan API lokal & eksternal
               "frame-ancestors 'none';",
               "object-src 'none';",
+              "default-src 'self'; frame-src 'self' https://www.google.com;",
             ].join(" "),
           },
 

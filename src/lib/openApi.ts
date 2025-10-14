@@ -275,5 +275,81 @@ export const openApiDocument = createDocument({
         },
       },
     },
+    "/api/kelola-masukan-warga": {
+      get: {
+        tags: ["Masukan Warga"],
+        summary: "Ambil semua masukan warga",
+        description: "Api untuk mendapatkan semua masukan warga",
+        requestParams: {
+          cookie: z.object({
+            accessToken: z.string().jwt("accessToken"),
+            refreshToken: z.string().jwt("refreshToken"),
+          }),
+        },
+        responses: {
+          200: {
+            description: "Masukan warga berhasil diambil",
+            content: {
+              "application/json": {
+                example: {
+                  success: true,
+                  message: "Masukan warga retrieved successfully",
+                  data: [
+                    {
+                      id: 1,
+                      nama: "John Doe",
+                      email: "FgD5w@example.com",
+                      kategori: "Umum",
+                      isi: "Ini adalah masukan dari warga.",
+                      tanggalDibuat: "2023-10-01T12:34:56Z",
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          400: {
+            description: "Validation user schema failed",
+            content: {
+              "application/json": {
+                example: {
+                  success: false,
+                  errors: [
+                    {
+                      field: "email",
+                      message: "Format email tidak valid",
+                    },
+                    {
+                      field: "password",
+                      message: "Password harus mengandung huruf kecil",
+                    },
+                    {
+                      field: "password",
+                      message: "Password harus mengandung huruf besar",
+                    },
+                    {
+                      field: "password",
+                      message: "Password harus mengandung angka",
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                example: {
+                  success: false,
+                  message: "Terjadi Error Pada Server",
+                },
+                status: 500,
+              },
+            },
+          },
+        },
+      },
+    },
   },
 });

@@ -1,0 +1,17 @@
+import z from "zod";
+
+export const kategoriSchema = z.object({
+  namaKategori: z
+    .string("Nama kategori harus teks")
+    .trim()
+    .min(2, "Nama kategori tidak boleh kosong")
+    .max(255, "Nama kategori maksimal 255 karakter"),
+  deskripsi: z
+    .string("Deskripsi harus berupa teks")
+    .trim()
+    .min(1, "Deskripsi tidak boleh kosong"),
+});
+
+export const kategoriByIdSchema = z.object({
+  id: z.cuid("Id kategori tidak valid").trim(),
+});

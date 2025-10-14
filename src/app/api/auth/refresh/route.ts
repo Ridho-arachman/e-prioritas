@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { generateAccessToken, JwtUser } from "@/lib/jwtHelper";
-import { log } from "console";
 
 const REFRESH_SECRET = process.env.REFRESH_SECRET!;
 
 export async function POST(req: NextRequest) {
   try {
     const cookieStore = await req.cookies;
-    const refreshToken = cookieStore.get("refreshToken")?.value;
+    const refreshToken = await cookieStore.get("refreshToken")?.value;
+
+    console.log(refreshToken);
 
     if (!refreshToken) {
       return NextResponse.json(

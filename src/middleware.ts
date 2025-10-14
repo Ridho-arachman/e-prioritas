@@ -4,166 +4,73 @@ import * as jose from "jose";
 const ACCESS_SECRET = new TextEncoder().encode(
   process.env.ACCESS_SECRET || "fallback-access-secret"
 );
-const REFRESH_SECRET = new TextEncoder().encode(
-  process.env.REFRESH_SECRET || "fallback-refresh-secret"
-);
 
-function getRedirectUrlByRole(role: string | undefined, reqUrl: string): URL {
-  if (role === "admin") return new URL("/admin", reqUrl);
-
-  if (role === "perangkat") return new URL("/perangkat", reqUrl);
-
-  return new URL("/", reqUrl);
+function getRedirectUrlByRole(role: string | undefined, baseUrl: string): URL {
+  switch (role) {
+    case "ADMIN":
+      return new URL("/admin", baseUrl);
+    case "PERANGKAT_DESA":
+      return new URL("/perangkat", baseUrl);
+    default:
+      return new URL("/", baseUrl);
+  }
 }
 
 export async function middleware(req: NextRequest) {
-  const pathname = req.nextUrl.pathname;
+  const { pathname } = req.nextUrl;
   const accessToken = req.cookies.get("accessToken")?.value;
   const refreshToken = req.cookies.get("refreshToken")?.value;
 
   const LOGIN_URL = new URL("/login", req.url);
-  const HOME_URL = new URL("/", req.url);
 
-  // 1. Logika untuk Halaman Login
+  // 1️⃣ Halaman login → jika sudah punya token valid, redirect ke dashboard
   if (pathname === "/login") {
     if (accessToken) {
       try {
         const { payload } = await jose.jwtVerify(accessToken, ACCESS_SECRET);
-        // Redirect ke dashboard yang sesuai dengan role jika token valid
         return NextResponse.redirect(
           getRedirectUrlByRole(payload.role as string, req.url)
         );
-      } catch (e) {
-        // Token tidak valid/expired, biarkan mereka di /login
-        return NextResponse.next();
+      } catch {
+        return NextResponse.next(); // biarkan ke halaman login
       }
     }
-    return NextResponse.next(); // Lanjutkan ke halaman login
+    return NextResponse.next();
   }
 
-  // 2. Jika tidak ada Access Token sama sekali
+  // 2️⃣ Jika tidak ada access token → redirect ke login
   if (!accessToken) {
-    // Jika path-nya bukan login, redirect ke login
     LOGIN_URL.searchParams.set("from", pathname);
     return NextResponse.redirect(LOGIN_URL);
   }
 
-  // --- Verifikasi Token & Otorisasi ---
+  // 3️⃣ Verifikasi token
   try {
     const { payload } = await jose.jwtVerify(accessToken, ACCESS_SECRET);
     const role = payload.role as string;
 
-    // Cek Otorisasi (Apakah user boleh di path ini?)
-    // Jika user admin mencoba mengakses path /perangkat, TOLAK
+    // Cek izin akses berdasarkan role
+    if (pathname.startsWith("/admin") && role !== "ADMIN") {
+      return NextResponse.redirect(getRedirectUrlByRole(role, req.url));
+    }
     if (pathname.startsWith("/perangkat") && role !== "PERANGKAT_DESA") {
       return NextResponse.redirect(getRedirectUrlByRole(role, req.url));
     }
 
-    // Jika user perangkat mencoba mengakses path /admin, TOLAK
-    if (pathname.startsWith("/admin") && role !== "ADMIN") {
-      return NextResponse.redirect(getRedirectUrlByRole(role, req.url));
-    }
-
-    // Jika role sudah benar, atau path-nya public, lanjutkan
+    // Token valid & izin sesuai
     return NextResponse.next();
   } catch (err: any) {
-    // --- Penanganan Token Expired dan Refresh ---
+    // 4️⃣ Kalau token expired dan masih ada refresh token → arahkan ke API refresh
     if (err.code === "ERR_JWT_EXPIRED" && refreshToken) {
-      try {
-        const { payload: refreshPayload } = await jose.jwtVerify(
-          refreshToken,
-          REFRESH_SECRET
-        );
-
-        // Pastikan role diambil dari refresh token
-        const userRole = refreshPayload.role as string;
-
-        // Buat Access Token baru
-        const newAccessToken = await new jose.SignJWT({
-          id: refreshPayload.id,
-          email: refreshPayload.email,
-          role: userRole,
-        })
-          .setProtectedHeader({ alg: "HS256" })
-          .setIssuedAt()
-          .setExpirationTime("15m")
-          .sign(ACCESS_SECRET);
-
-        // Setelah refresh, redirect ke URL yang sesuai dengan role
-        // (Ini lebih aman daripada redirect ke req.url, terutama jika req.url adalah halaman terlarang)
-        const redirectUrl = getRedirectUrlByRole(userRole, req.url);
-        const res = NextResponse.redirect(redirectUrl);
-
-        // Simpan accessToken baru ke cookie
-        res.cookies.set("accessToken", newAccessToken, {
-          httpOnly: true,
-          sameSite: "strict",
-          secure: process.env.NODE_ENV === "production",
-          path: "/",
-        });
-
-        return res;
-      } catch (refreshErr) {
-        // Refresh token tidak valid atau expired, harus login ulang
-        console.error("Refresh Token Invalid atau Expired:", refreshErr);
-        return NextResponse.redirect(LOGIN_URL);
-      }
+      const redirectToRefresh = new URL("/api/auth/refresh", req.url);
+      redirectToRefresh.searchParams.set("redirect", pathname); // bisa arahkan balik setelah refresh
+      return NextResponse.redirect(redirectToRefresh);
     }
 
-    // Token invalid (selain expired) atau tidak ada Refresh Token
-    console.error("Access Token Invalid:", err);
+    console.error("❌ Token invalid:", err);
     return NextResponse.redirect(LOGIN_URL);
   }
 }
-
-// export const config = {
-//   // Jalankan middleware di semua tempat kecuali aset statis dan folder internal Next.js
-//   matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
-// };
-
-// try {
-//   const { payload } = await jose.jwtVerify(accessToken, ACCESS_SECRET);
-
-//   const requestHeaders = new Headers(req.headers);
-//   requestHeaders.set("x-user", JSON.stringify(payload));
-
-//   return NextResponse.next({ request: { headers: requestHeaders } });
-//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-// } catch (err: any) {
-//   // Kalau expired → cek refreshToken
-//   if (err.code === "ERR_JWT_EXPIRED" && refreshToken) {
-//     try {
-//       const { payload } = await jose.jwtVerify(refreshToken, REFRESH_SECRET);
-
-//       // bikin accessToken baru
-//       const newAccessToken = await new jose.SignJWT({
-//         id: payload.id,
-//         email: payload.email,
-//       })
-//         .setProtectedHeader({ alg: "HS256" })
-//         .setIssuedAt()
-//         .setExpirationTime("15m")
-//         .sign(ACCESS_SECRET);
-
-//       const res = NextResponse.next();
-
-//       // simpan accessToken baru ke cookie
-//       res.cookies.set("accessToken", newAccessToken, {
-//         httpOnly: true,
-//         sameSite: "strict",
-//         path: "/",
-//       });
-
-//       return res;
-//     } catch (refreshErr) {
-//       console.error("refresh token invalid", refreshErr);
-//       return NextResponse.redirect(new URL("/login", req.url));
-//     }
-//   }
-
-//   return NextResponse.redirect(new URL("/login", req.url));
-// }
-// }
 
 export const config = {
   matcher: ["/admin/:path*", "/perangkat/:path*"],
