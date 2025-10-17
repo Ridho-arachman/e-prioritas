@@ -81,9 +81,8 @@ const POST = async (req: NextRequest) => {
   //VALIDASI REQ BODY
   const body = await req.json();
   const parsed = kategoriSchema.safeParse(body);
-  if (!parsed.success) {
-    return handleZodValidation(parsed, headers);
-  }
+
+  if (!parsed.success) return handleZodValidation(parsed, headers);
 
   //JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
   const { namaKategori, deskripsi } = parsed.data;

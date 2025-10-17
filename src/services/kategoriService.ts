@@ -36,7 +36,7 @@ export const kategoriService = {
     });
   },
 
-  delete: async (kategoriId: string) => {
+  deleteById: async (kategoriId: string) => {
     return prisma.kategori.delete({
       where: {
         id: kategoriId,

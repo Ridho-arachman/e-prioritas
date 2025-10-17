@@ -135,7 +135,7 @@ const DELETE = async (
 
   try {
     // HAPUS DATA KATEGORI KE DATABASE
-    const kategori = await kategoriService.delete(kategoriId);
+    const kategori = await kategoriService.deleteById(kategoriId);
 
     // JIKA DATA KATEGORI TIDAK DITEMUKAN
     return handleResponse({
