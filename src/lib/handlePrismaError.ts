@@ -1,134 +1,98 @@
 import { Prisma } from "@prisma/client";
 
 interface PrismaErrorResponse {
-  message: string;
   status: number;
-  code?: string;
+  message: string;
 }
 
-/**
- * Universal Prisma error handler
- * Menangani semua error code Prisma yang umum muncul di CRUD
- */
-export function handlePrismaError(error: unknown): PrismaErrorResponse {
+export function handlePrismaError(error: unknown): PrismaErrorResponse | null {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     switch (error.code) {
-      // === Unique Constraint (duplikat data)
+      // ===== CREATE (POST) =====
       case "P2002":
-        return {
-          code: error.code,
-          message: "Data sudah ada atau melanggar unique constraint",
-          status: 409,
-        };
-
-      // === Foreign Key Constraint (relasi tidak valid)
+        return { status: 409, message: "Data sudah ada (unique constraint)" };
       case "P2003":
         return {
-          code: error.code,
-          message:
-            "Relasi tidak valid, data masih digunakan atau referensi tidak ditemukan",
           status: 400,
+          message: "Relasi foreign key tidak valid atau masih digunakan",
         };
-
-      // === Data terlalu panjang
       case "P2000":
-        return {
-          code: error.code,
-          message: "Nilai field terlalu panjang untuk kolom database",
-          status: 400,
-        };
-
-      // === Field wajib tidak diisi
-      case "P2011":
-      case "P2012":
-        return {
-          code: error.code,
-          message: "Field wajib tidak boleh kosong atau null",
-          status: 400,
-        };
-
-      // === Record tidak ditemukan
-      case "P2015":
+        return { status: 400, message: "Nilai field terlalu panjang" };
       case "P2025":
         return {
-          code: error.code,
-          message: "Data tidak ditemukan di database",
           status: 404,
+          message: "Parent ID tidak ditemukan (nested create)",
         };
 
-      // === Relasi tidak valid atau rusak
-      case "P2016":
-      case "P2017":
+      // ===== READ (GET) =====
+      case "P2001":
         return {
-          code: error.code,
-          message: "Relasi data tidak konsisten atau invalid",
+          status: 404,
+          message: "Record tidak ada / data tidak ditemukan",
+        };
+      case "P2018":
+        return { status: 400, message: "Relasi wajib tidak lengkap" };
+      case "P2025":
+        return { status: 404, message: "Data tidak ditemukan" };
+
+      // ===== UPDATE (PUT/PATCH) =====
+      case "P2002":
+        return {
+          status: 409,
+          message: "Duplikat data saat update (unique constraint)",
+        };
+      case "P2003":
+        return {
           status: 400,
+          message: "Relasi foreign key tidak valid saat update",
         };
-
-      // === Struktur query salah
-      case "P2008":
-      case "P2009":
-      case "P2010":
+      case "P2011":
         return {
-          code: error.code,
-          message: "Kesalahan query database internal",
-          status: 500,
+          status: 400,
+          message: "Field wajib tidak boleh null saat update",
         };
+      case "P2025":
+        return { status: 404, message: "Data tidak ditemukan untuk update" };
 
-      // === Database schema mismatch
-      case "P2021":
-      case "P2022":
+      // ===== DELETE (DELETE) =====
+      case "P2003": // sama seperti di CREATE/UPDATE
+        return { status: 400, message: "Data masih digunakan di tabel lain" };
+      case "P2025":
         return {
-          code: error.code,
-          message:
-            "Skema Prisma tidak sinkron dengan database (tabel/kolom hilang)",
-          status: 500,
+          status: 404,
+          message: "Data yang mau dihapus tidak ditemukan",
         };
 
-      // === Constraint umum lainnya
+      // ===== Prisma error umum lainnya =====
+      case "P1000":
+        return {
+          status: 500,
+          message: "Authentication failed (DB credentials salah)",
+        };
+      case "P1001":
+        return {
+          status: 500,
+          message: "Database tidak dapat dijangkau / host salah",
+        };
+      case "P1002":
+        return { status: 500, message: "Connection timeout / DB lambat" };
+      case "P1017":
+        return {
+          status: 500,
+          message: "Server menutup koneksi secara tak terduga",
+        };
       case "P2004":
         return {
-          code: error.code,
-          message: "Terjadi pelanggaran constraint database",
           status: 400,
+          message: "Failed constraint check (custom constraint gagal)",
         };
 
+      // Default fallback untuk kode Prisma lain
       default:
-        return {
-          code: error.code,
-          message: `Kesalahan database tidak dikenal (${error.code})`,
-          status: 500,
-        };
+        return { status: 500, message: `Error Prisma (${error.code})` };
     }
   }
 
-  // === Error input atau validasi prisma
-  if (error instanceof Prisma.PrismaClientValidationError) {
-    return {
-      message: "Input data tidak valid untuk operasi Prisma",
-      status: 400,
-    };
-  }
-
-  // === Error koneksi / inisialisasi Prisma
-  if (error instanceof Prisma.PrismaClientInitializationError) {
-    return {
-      message: "Gagal menghubungkan ke database",
-      status: 500,
-    };
-  }
-
-  // === Prisma internal panic (jarang banget)
-  if (error instanceof Prisma.PrismaClientRustPanicError) {
-    return {
-      message: "Terjadi kesalahan fatal di Prisma Engine",
-      status: 500,
-    };
-  }
-
-  // === Fallback untuk error non-Prisma
-  return {
-    message: "Terjadi kesalahan internal server",
-    status: 500,
-  };
+  // Bukan error Prisma
+  return null;
 }

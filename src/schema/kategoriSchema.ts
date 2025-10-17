@@ -13,5 +13,15 @@ export const kategoriSchema = z.object({
 });
 
 export const kategoriByIdSchema = z.object({
-  id: z.cuid("Id kategori tidak valid").trim(),
+  id: z
+    .cuid("Id kategori tidak valid")
+    .trim()
+    .min(1, "Id kategori tidak valid"),
+});
+
+export const kategoriQuerySchema = z.object({
+  namaKategori: z
+    .string("Nama kategori harus teks")
+    .max(255, "Nama kategori maksimal 255 karakter")
+    .optional(),
 });

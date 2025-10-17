@@ -1,10 +1,10 @@
 import { cors } from "@/lib/cors";
-import { extractErrors } from "@/lib/extractErrors";
-import { handlePrismaError } from "@/lib/handlePrismaError";
-import { prisma } from "@/lib/prisma";
-import { kategoriByIdSchema, kategoriSchema } from "@/schema/kategoriSchema";
-import { Prisma } from "@prisma/client";
+import { handleResponse } from "@/lib/responseHandler";
 import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/handlePrismaError";
+import { kategoriService } from "@/services/kategoriService";
+import { handleZodValidation } from "@/lib/handleZodValidation";
+import { kategoriByIdSchema, kategoriSchema } from "@/schema/kategoriSchema";
 
 const GET = async (
   req: NextRequest,
@@ -20,40 +20,41 @@ const GET = async (
   const { id } = await ctx.params;
   const parsedId = kategoriByIdSchema.safeParse({ id });
   if (!parsedId.success) {
-    return NextResponse.json(
-      { success: false, errors: extractErrors(parsedId) },
-      { status: 400 }
-    );
+    return handleZodValidation(parsedId, headers);
   }
 
   const kategoriId = parsedId.data.id;
 
   try {
     //AMBIL DATA KATEGORI DARI DATABASE BERDASARKAN ID
-    const data = await prisma.kategori.findUniqueOrThrow({
-      where: { id: kategoriId },
-    });
+    const data = await kategoriService.getById(kategoriId);
 
     //JIKA DATA ADA
-    return NextResponse.json(
-      { success: true, message: "Data kategori berhasil diambil", data },
-      { status: 200 }
-    );
+    return handleResponse({
+      success: true,
+      message: "Data kategori berhasil diambil",
+      data,
+      status: 200,
+    });
   } catch (err) {
-    // JIKA ID TIDAK DITEMUKAN
-    if (err instanceof Prisma.PrismaClientKnownRequestError) {
-      if (err.code === "P2025" || err.code === "P2001") {
-        return NextResponse.json(
-          { success: false, message: "Data kategori tidak ditemukan" },
-          { status: 404 }
-        );
-      }
+    //PRISMA ERROR
+    const prismaResponse = handlePrismaError(err);
+    if (prismaResponse) {
+      return handleResponse({
+        success: false,
+        message: prismaResponse.message,
+        status: prismaResponse.status,
+        headers,
+      });
     }
-    // JIKA ERROR LAINNYA
-    return NextResponse.json(
-      { success: false, message: "Terjadi error pada server" },
-      { status: 500 }
-    );
+
+    //SERVER ERROR
+    return handleResponse({
+      success: false,
+      message: "Terjadi error pada server",
+      status: 500,
+      headers,
+    });
   }
 };
 
@@ -74,60 +75,41 @@ const PUT = async (
   // VALIDASI REQ BODY & PARAM
   const parsed = kategoriSchema.safeParse(body);
   const parsedId = kategoriByIdSchema.safeParse({ id });
-  if (!parsedId.success)
-    return NextResponse.json(
-      { success: false, errors: extractErrors(parsedId) },
-      { status: 400 }
-    );
-  if (!parsed.success)
-    return NextResponse.json(
-      { success: false, errors: extractErrors(parsed) },
-      { status: 400 }
-    );
+  if (!parsedId.success) return handleZodValidation(parsedId, headers);
+  if (!parsed.success) return handleZodValidation(parsed, headers);
 
   // JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
-  const { namaKategori, deskripsi } = parsed.data;
+  const data = parsed.data;
   const kategoriId = parsedId.data.id;
 
   try {
-    // JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
-    const { namaKategori, deskripsi } = parsed.data;
-
     // SIMPAN DATA KATEGORI KE DATABASE
-    const kategori = await prisma.kategori.update({
-      where: {
-        id: kategoriId,
-      },
-      data: {
-        namaKategori,
-        deskripsi,
-      },
-    });
-
-    return NextResponse.json({
+    const kategori = await kategoriService.update(kategoriId, data);
+    return handleResponse({
       success: true,
       message: "Data kategori berhasil diupdate",
       data: kategori,
+      status: 200,
     });
   } catch (err) {
-    if (err instanceof Prisma.PrismaClientKnownRequestError) {
-      // JIKA ID TIDAK DITEMUKAN
-      if (err.code === "P2025")
-        return NextResponse.json(
-          { success: false, message: "Data kategori tidak ditemukan" },
-          { status: 404 }
-        );
-      // JIKA NAMA KATEGORI SUDAH ADA
-      if (err.code === "P2002")
-        return NextResponse.json(
-          { success: false, message: "Nama kategori sudah digunakan" },
-          { status: 409 }
-        );
+    //PRISMA ERROR
+    const prismaResponse = handlePrismaError(err);
+    if (prismaResponse) {
+      return handleResponse({
+        success: false,
+        message: prismaResponse.message,
+        status: prismaResponse.status,
+        headers,
+      });
     }
-    return NextResponse.json(
-      { success: false, message: "Terjadi error pada server" },
-      { status: 500 }
-    );
+
+    //SERVER ERROR
+    return handleResponse({
+      success: false,
+      message: "Terjadi error pada server",
+      status: 500,
+      headers,
+    });
   }
 };
 
@@ -141,58 +123,46 @@ const DELETE = async (
   });
   if (headers instanceof NextResponse) return headers;
 
+  // NGGAMBIL PARAM
+  const { id } = await ctx.params;
+
+  // VALIDASI REQ BODY & PARAM
+  const parsedId = kategoriByIdSchema.safeParse({ id });
+  if (!parsedId.success) return handleZodValidation(parsedId, headers);
+
+  // JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
+  const kategoriId = parsedId.data.id;
+
   try {
-    // NGGAMBIL PARAM
-    const { id } = await ctx.params;
-
-    // VALIDASI REQ BODY & PARAM
-    const parsedId = kategoriByIdSchema.safeParse({ id });
-    if (!parsedId.success) {
-      return NextResponse.json(
-        { success: false, errors: extractErrors(parsedId) },
-        { status: 400 }
-      );
-    }
-
-    // JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
-    const kategoriId = parsedId.data.id;
-
     // HAPUS DATA KATEGORI KE DATABASE
-    const kategori = await prisma.kategori.delete({
-      where: {
-        id: kategoriId,
-      },
-    });
+    const kategori = await kategoriService.delete(kategoriId);
 
     // JIKA DATA KATEGORI TIDAK DITEMUKAN
-    return NextResponse.json({
+    return handleResponse({
       success: true,
       message: "Data kategori berhasil dihapus",
       data: kategori,
+      status: 200,
     });
   } catch (err) {
-    // JIKA ID TIDAK DITEMUKAN
-    if (err instanceof Prisma.PrismaClientKnownRequestError) {
-      if (err.code === "P2025")
-        return NextResponse.json(
-          { success: false, message: "Data kategori tidak ditemukan" },
-          { status: 404 }
-        );
-      if (err.code === "P2003") {
-        return NextResponse.json(
-          {
-            success: false,
-            message:
-              "Data kategori masih digunakan di data lain, tidak dapat dihapus",
-          },
-          { status: 400 }
-        );
-      }
+    //PRISMA ERROR
+    const prismaResponse = handlePrismaError(err);
+    if (prismaResponse) {
+      return handleResponse({
+        success: false,
+        message: prismaResponse.message,
+        status: prismaResponse.status,
+        headers,
+      });
     }
-    return NextResponse.json(
-      { success: false, message: "Terjadi error pada server" },
-      { status: 500 }
-    );
+
+    //SERVER ERROR
+    return handleResponse({
+      success: false,
+      message: "Terjadi error pada server",
+      status: 500,
+      headers,
+    });
   }
 };
 

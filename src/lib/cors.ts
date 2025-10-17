@@ -4,11 +4,6 @@ interface CorsOptions {
   allowedOrigins?: string[];
 }
 
-/**
- * Dynamic CORS handler
- * @param req - NextRequest object
- * @param options - optional { allowedOrigins: [...] }
- */
 export function cors(req: NextRequest, options?: CorsOptions) {
   const defaultOrigins = [
     process.env.NEXT_PUBLIC_APP_URL,

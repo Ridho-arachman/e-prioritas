@@ -42,9 +42,10 @@ model MasukanWarga {
   deskripsiMasukan      String      @db.Text @map("deskripsi_masukan") 
   status                MasukanStatus @default(MENUNGGU_VERIFIKASI) 
   alasanPenolakan       String?     @map("alasan_penolakan")
+  updatedAt             DateTime    @updatedAt @map("updated_at")
   createdAt             DateTime    @default(now()) @map("created_at")
 
-  kategoriId            String         @map("kategori_id")
+  kategoriId            String         @map("kategori_id")   
   kategori              Kategori    @relation(fields: [kategoriId], references: [id])
 
   verifiedByUserId      String?     @map("verified_by_user_id")
@@ -53,6 +54,12 @@ model MasukanWarga {
   rekomendasi           RekomendasiMasukan[]
 
   @@map("masukan_warga")
+  @@index([emailPengirim])
+  @@index([createdAt])
+  @@index([namaPengirim])
+  @@index([status])
+  @@index([kategoriId])
+  
 }
 
 model DataMaster {

@@ -1,9 +1,10 @@
 import { cors } from "@/lib/cors";
-import { extractErrors } from "@/lib/extractErrors";
-import { prisma } from "@/lib/prisma";
-import { kategoriSchema } from "@/schema/kategoriSchema";
-import { Prisma } from "@prisma/client";
+import { handleResponse } from "@/lib/responseHandler";
 import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/handlePrismaError";
+import { kategoriService } from "@/services/kategoriService";
+import { handleZodValidation } from "@/lib/handleZodValidation";
+import { kategoriQuerySchema, kategoriSchema } from "@/schema/kategoriSchema";
 
 const GET = async (req: NextRequest) => {
   //CORS
@@ -12,28 +13,61 @@ const GET = async (req: NextRequest) => {
   });
   if (headers instanceof NextResponse) return headers;
 
+  //AMBIL QUERY
+  const searchParams = req.nextUrl.searchParams;
+  const namaKategori = searchParams.get("search");
+
+  //VALIDASI QUERY
+  let namaKategoriParam: string | undefined;
+  if (namaKategori) {
+    const parsed = kategoriQuerySchema.safeParse({ namaKategori });
+    if (!parsed.success) {
+      return handleZodValidation(parsed, headers);
+    }
+    namaKategoriParam = parsed.data.namaKategori;
+  }
+
   try {
     //AMBIL DATA KATEGORI DARI DATABASE
-    const data = await prisma.kategori.findMany();
+    const data = await kategoriService.getAll(namaKategoriParam);
 
     //JIKA DATA KOSONG
     if (data.length === 0) {
-      return NextResponse.json(
-        { success: true, message: "Data kategori masih kosong" },
-        { status: 404 }
-      );
+      return handleResponse({
+        success: true,
+        message: "Data kategori tidak ditemukan",
+        status: 404,
+        headers,
+      });
     }
 
     //JIKA DATA ADA
-    return NextResponse.json(
-      { success: true, message: "Data kategori berhasil diambil", data },
-      { status: 200 }
-    );
+    return handleResponse({
+      success: true,
+      message: "Data kategori berhasil diambil",
+      data,
+      status: 200,
+      headers,
+    });
   } catch (err) {
-    return NextResponse.json(
-      { success: false, message: "Terjadi error pada server" },
-      { status: 500 }
-    );
+    //PRISMA ERROR
+    const prismaResponse = handlePrismaError(err);
+    if (prismaResponse) {
+      return handleResponse({
+        success: false,
+        message: prismaResponse.message,
+        status: prismaResponse.status,
+        headers,
+      });
+    }
+
+    //SERVER ERROR
+    return handleResponse({
+      success: false,
+      message: "Terjadi error pada server",
+      status: 500,
+      headers,
+    });
   }
 };
 
@@ -44,52 +78,49 @@ const POST = async (req: NextRequest) => {
   });
   if (headers instanceof NextResponse) return headers;
 
+  //VALIDASI REQ BODY
+  const body = await req.json();
+  const parsed = kategoriSchema.safeParse(body);
+  if (!parsed.success) {
+    return handleZodValidation(parsed, headers);
+  }
+
+  //JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
+  const { namaKategori, deskripsi } = parsed.data;
+
   try {
-    //NGGAMBIL REQ BODY
-    const body = await req.json();
-
-    // VALIDASI REQ BODY DENGAN ZOD
-    const parsed = kategoriSchema.safeParse(body);
-    if (!parsed.success) {
-      return NextResponse.json(
-        { success: false, errors: extractErrors(parsed) },
-        { status: 400 }
-      );
-    }
-
-    //JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
-    const { namaKategori, deskripsi } = parsed.data;
-
     //SIMPAN DATA KATEGORI KE DATABASE
-    const kategori = await prisma.kategori.create({
-      data: {
-        namaKategori,
-        deskripsi,
-      },
+    const kategori = await kategoriService.create({
+      namaKategori,
+      deskripsi,
     });
 
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Kategori Berhasil Ditambahkan",
-        data: kategori,
-      },
-      { status: 201, headers }
-    );
+    return handleResponse({
+      success: true,
+      message: "Kategori Berhasil Ditambahkan",
+      data: kategori,
+      status: 201,
+      headers,
+    });
   } catch (err) {
-    //JIKA NAMA KATEGORI SUDAH ADA
-    if (err instanceof Prisma.PrismaClientKnownRequestError) {
-      if (err.code === "P2002")
-        return NextResponse.json(
-          { success: false, message: "Kategori sudah ada" },
-          { status: 400, headers }
-        );
+    //PRISMA ERROR
+    const prismaResponse = handlePrismaError(err);
+    if (prismaResponse) {
+      return handleResponse({
+        success: false,
+        message: prismaResponse.message,
+        status: prismaResponse.status,
+        headers,
+      });
     }
 
-    return NextResponse.json(
-      { success: false, message: "Terjadi Error pada server" },
-      { status: 500, headers }
-    );
+    //SERVER ERROR
+    return handleResponse({
+      success: false,
+      message: "Terjadi error pada server",
+      status: 500,
+      headers,
+    });
   }
 };
 
