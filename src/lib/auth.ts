@@ -10,15 +10,10 @@ const ACCESS_SECRET = new TextEncoder().encode(
 interface JWTPayload {
   id: string;
   email: string;
-  role: "admin" | "perangkat";
+  role: "ADMIN" | "PERANGKAT_DESA";
   [key: string]: any; // Untuk properti lain
 }
 
-/**
- * Memeriksa JWT dari Header Authorization: Bearer
- * @param req Objek NextRequest
- * @returns Payload JWT yang sudah diverifikasi atau null jika gagal
- */
 export async function verifyApiToken(
   req: NextRequest
 ): Promise<JWTPayload | null> {
@@ -33,14 +28,9 @@ export async function verifyApiToken(
   const accessToken = authHeader.split(" ")[1];
 
   try {
-    // 3. Verifikasi token menggunakan Secret Key
     const { payload } = await jose.jwtVerify(accessToken, ACCESS_SECRET);
-
-    // 4. Kembalikan payload yang sudah di-verify
     return payload as JWTPayload;
   } catch (err) {
-    // Token tidak valid (expired, signature salah, dll.)
-    console.error("API Token Verification Failed:", err);
     return null;
   }
 }

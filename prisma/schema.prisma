@@ -25,31 +25,36 @@ model User {
 }
 
 model Kategori {
-  id                String            @id @default(cuid())
+  id                String         @id @default(cuid())
   namaKategori      String         @unique @map("nama_kategori")
   deskripsi         String?
+  status            StatusKategori @default(AKTIF)
+  createdAt         DateTime       @default(now()) @map("created_at")
+  
   
   masukanWarga      MasukanWarga[]
 
+  @@index([status])
   @@map("kategori")
 }
 
 model MasukanWarga {
-  id                    String      @id @default(cuid())
-  namaPengirim          String     @map("nama_pengirim")
-  emailPengirim         String     @map("email_pengirim")
-  lokasiRtrw            String      @map("lokasi_rtrw")
-  deskripsiMasukan      String      @db.Text @map("deskripsi_masukan") 
+  id                    String        @id @default(cuid())
+  namaPengirim          String        @map("nama_pengirim")
+  emailPengirim         String        @map("email_pengirim")
+  lokasiRt              String        @db.VarChar(3) @map("lokasi_rt")
+  lokasiRw              String        @db.VarChar(3) @map("lokasi_rw")
+  deskripsiMasukan      String        @db.Text @map("deskripsi_masukan") 
   status                MasukanStatus @default(MENUNGGU_VERIFIKASI) 
-  alasanPenolakan       String?     @map("alasan_penolakan")
-  updatedAt             DateTime    @updatedAt @map("updated_at")
-  createdAt             DateTime    @default(now()) @map("created_at")
+  alasanPenolakan       String?       @map("alasan_penolakan")
+  updatedAt             DateTime      @updatedAt @map("updated_at")
+  createdAt             DateTime      @default(now()) @map("created_at")
 
-  kategoriId            String         @map("kategori_id")   
-  kategori              Kategori    @relation(fields: [kategoriId], references: [id])
+  kategoriId            String        @map("kategori_id")   
+  kategori              Kategori      @relation(fields: [kategoriId], references: [id])
 
-  verifiedByUserId      String?     @map("verified_by_user_id")
-  verifiedBy            User?       @relation("MasukanVerifikasi", fields: [verifiedByUserId], references: [id])
+  verifiedByUserId      String?       @map("verified_by_user_id")
+  verifiedBy            User?         @relation("MasukanVerifikasi", fields: [verifiedByUserId], references: [id])
 
   rekomendasi           RekomendasiMasukan[]
 
@@ -67,7 +72,8 @@ model DataMaster {
   jenisData             String    @map("jenis_data")
   namaAtribut           String    @map("nama_atribut")
   nilai                 String
-  lokasiRtrw            String?   @map("lokasi_rtrw")
+  lokasiRt              String?   @db.VarChar(3) @map("lokasi_rt")
+  lokasiRw              String?   @db.VarChar(3) @map("lokasi_rw")
 
   updatedByUserId       String    @map("updated_by_user_id")
   updatedBy             User      @relation("DataMasterUpdate", fields: [updatedByUserId], references: [id])
@@ -101,6 +107,11 @@ model RekomendasiMasukan {
 
   @@id([rekomendasiId, masukanId]) 
   @@map("rekomendasi_masukan")
+}
+
+enum StatusKategori {
+  AKTIF
+  NON_AKTIF
 }
 
 enum Role {

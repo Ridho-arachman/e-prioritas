@@ -4,15 +4,19 @@ import { extractErrors } from "@/lib/extractErrors";
 import { NextRequest, NextResponse } from "next/server";
 import { createMasukanWargaSchema } from "@/schema/masukanWarga";
 import { masukanWargaQuerySchema } from "@/schema/masukanWarga";
+import { handleResponse } from "@/lib/responseHandler";
+import { handlePrismaError } from "@/lib/handlePrismaError";
+import { handleZodValidation } from "@/lib/handleZodValidation";
+import { masukanWargaService } from "@/services/masukanWargaService";
 
 const GET = async (req: NextRequest) => {
-  // ✅ CORS
+  // CORS
   const headers = cors(req, {
     allowedOrigins: [process.env.NEXT_PUBLIC_APP_URL!],
   });
   if (headers instanceof NextResponse) return headers;
 
-  // ✅ Ambil semua search params
+  // AMBIL QUERY PARAMETER
   const searchParams = req.nextUrl.searchParams;
   const query = {
     namaPengirim: searchParams.get("namaPengirim") ?? undefined,
@@ -22,77 +26,74 @@ const GET = async (req: NextRequest) => {
     kategoriId: searchParams.get("kategoriId") ?? undefined,
   };
 
-  // ✅ Validasi dengan Zod
+  // VALIDASI QUERY PARAMETER DENGAN ZOD
   const parsed = masukanWargaQuerySchema.safeParse(query);
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, errors: extractErrors(parsed) },
-      { status: 400 }
-    );
+    return handleZodValidation(parsed, headers);
   }
 
+  // JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
   const filters = parsed.data;
 
   try {
-    // ✅ Bangun filter dinamis untuk Prisma
+    // BUAT KONDISI WHERE UNTUK FILTERING
     const where: any = {};
-
-    if (filters.namaPengirim) {
+    if (filters.namaPengirim)
       where.namaPengirim = {
         contains: filters.namaPengirim,
         mode: "insensitive",
       };
-    }
-
-    if (filters.emailPengirim) {
+    if (filters.emailPengirim)
       where.emailPengirim = {
         contains: filters.emailPengirim,
         mode: "insensitive",
       };
-    }
-
-    if (filters.lokasiRtrw) {
+    if (filters.lokasiRtrw)
       where.lokasiRtrw = {
         contains: filters.lokasiRtrw,
         mode: "insensitive",
       };
-    }
+    if (filters.status) where.status = filters.status;
+    if (filters.kategoriId) where.kategoriId = filters.kategoriId;
 
-    if (filters.status) {
-      where.status = filters.status;
-    }
+    // AMBIL DATA MASUKAN WARGA DARI DATABASE DENGAN FILTERING
+    const data = await masukanWargaService.getAll(where);
 
-    if (filters.kategoriId) {
-      where.kategoriId = filters.kategoriId;
-    }
+    // JIKA DATA KOSONG
+    if (data.length === 0)
+      return handleResponse({
+        success: true,
+        message: "Data masukan warga tidak ditemukan",
+        status: 404,
+        headers,
+      });
 
-    // ✅ Ambil data dari database
-    const data = await prisma.masukanWarga.findMany({
-      where,
-      include: {
-        kategori: { select: { id: true, namaKategori: true } },
-        verifiedBy: { select: { id: true, name: true } },
-      },
-      orderBy: { createdAt: "desc" },
+    return handleResponse({
+      success: true,
+      message: "Data masukan warga berhasil diambil",
+      data,
+      status: 200,
+      headers,
     });
-
-    if (data.length === 0) {
-      return NextResponse.json(
-        { success: true, message: "Data masukan warga tidak ditemukan" },
-        { status: 404 }
-      );
+  } catch (err) {
+    //PRISMA ERROR
+    const prismaResponse = handlePrismaError(err);
+    if (prismaResponse) {
+      return handleResponse({
+        success: false,
+        message: prismaResponse.message,
+        status: prismaResponse.status,
+        headers,
+      });
     }
 
-    return NextResponse.json(
-      { success: true, message: "Data masukan warga berhasil diambil", data },
-      { status: 200 }
-    );
-  } catch (err) {
-    console.error("❌ ERROR GET Masukan Warga:", err);
-    return NextResponse.json(
-      { success: false, message: "Terjadi error pada server" },
-      { status: 500 }
-    );
+    //SERVER ERROR
+    return handleResponse({
+      success: false,
+      message: "Terjadi error pada server",
+      status: 500,
+      headers,
+    });
   }
 };
 
@@ -109,34 +110,59 @@ const POST = async (req: NextRequest) => {
   // VALIDASI REQ BODY DENGAN ZOD
   const parsed = createMasukanWargaSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, errors: extractErrors(parsed) },
-      { status: 400 }
-    );
+    return handleZodValidation(parsed, headers);
   }
 
   //JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
-  const data = parsed.data;
+  const {
+    deskripsiMasukan,
+    emailPengirim,
+    kategoriId,
+    lokasiRtrw,
+    namaPengirim,
+    verifiedByUserId,
+  } = parsed.data;
+
+  const data = {
+    deskripsiMasukan,
+    emailPengirim,
+    kategoriId,
+    lokasiRtrw,
+    namaPengirim,
+    verifiedByUserId,
+  };
 
   try {
     //SIMPAN DATA MASUKAN WARGA KE DATABASE
-    const masukanWarga = await prisma.masukanWarga.create({
-      data,
-    });
+    const masukanWarga = await masukanWargaService.create(data);
 
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Masukan Berhasil Ditambahkan",
-        data: masukanWarga,
-      },
-      { status: 201, headers }
-    );
+    //JIKA SIMPAN DATA MASUKAN WARGA BERHASIL
+    return handleResponse({
+      success: true,
+      message: "Masukan Berhasil Ditambahkan",
+      data: masukanWarga,
+      status: 201,
+      headers,
+    });
   } catch (err) {
-    return NextResponse.json(
-      { success: false, message: "Terjadi Error pada server" },
-      { status: 500, headers }
-    );
+    //PRISMA ERROR
+    const prismaResponse = handlePrismaError(err);
+    if (prismaResponse) {
+      return handleResponse({
+        success: false,
+        message: prismaResponse.message,
+        status: prismaResponse.status,
+        headers,
+      });
+    }
+
+    //SERVER ERROR
+    return handleResponse({
+      success: false,
+      message: "Terjadi error pada server",
+      status: 500,
+      headers,
+    });
   }
 };
 

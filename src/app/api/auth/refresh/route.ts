@@ -1,58 +1,83 @@
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import * as jose from "jose";
 import { generateAccessToken, JwtUser } from "@/lib/jwtHelper";
+import { handleResponse } from "@/lib/responseHandler";
 
-const REFRESH_SECRET = process.env.REFRESH_SECRET!;
+const REFRESH_SECRET = new TextEncoder().encode(
+  process.env.REFRESH_SECRET || "fallback-refresh-secret"
+);
 
 export async function POST(req: NextRequest) {
   try {
-    const cookieStore = await req.cookies;
-    const refreshToken = await cookieStore.get("refreshToken")?.value;
-
-    console.log(refreshToken);
+    const refreshToken = req.cookies.get("refreshToken")?.value;
+    console.log("Ssss");
 
     if (!refreshToken) {
-      return NextResponse.json(
-        { success: false, message: "User belum login" },
-        { status: 401 }
-      );
+      return handleResponse({
+        success: false,
+        message: "User belum login",
+        status: 401,
+      });
     }
 
-    const decoded = jwt.verify(refreshToken, REFRESH_SECRET);
-    if (!decoded || typeof decoded === "string") {
-      return NextResponse.json(
-        { succes: false, message: "User tidak mempunyai akses" },
-        { status: 403 }
-      );
+    // ✅ Verifikasi refresh token
+    const { payload } = await jose.jwtVerify(refreshToken, REFRESH_SECRET);
+    if (!payload || typeof payload !== "object") {
+      return handleResponse({
+        success: false,
+        message: "User tidak mempunyai akses",
+        status: 403,
+      });
     }
 
-    const user = decoded as JwtUser;
+    const user = payload as JwtUser;
 
-    const accessToken = generateAccessToken({
+    // ✅ Buat accessToken baru
+    const accessToken = await generateAccessToken({
       id: user.id,
       email: user.email,
       role: user.role,
     });
 
-    return NextResponse.json(
-      { success: true, message: "Token berhasil di refresh", accessToken },
-      { status: 200 }
-    );
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (err) {
-    if (err instanceof jwt.JsonWebTokenError) {
-      // Token ada, tetapi tidak valid (kadaluwarsa, signature salah)
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Refresh token tidak valid atau kadaluwarsa.",
-        },
-        { status: 403 } // 403 Forbidden: Klien mengirim token yang tidak berhak
-      );
+    // ✅ Buat response
+    const response = handleResponse({
+      success: true,
+      message: "Token berhasil di-refresh",
+      data: {
+        accessToken: accessToken,
+      },
+      status: 200,
+    });
+
+    // ✅ Simpan accessToken baru di cookie
+    response.cookies.set("accessToken", accessToken, {
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+    });
+
+    return response;
+  } catch (err: any) {
+    if (err instanceof jose.errors.JWTExpired) {
+      return handleResponse({
+        success: false,
+        message: "Refresh token kadaluwarsa.",
+        status: 403,
+      });
     }
-    return NextResponse.json(
-      { success: false, message: "Terjadi Error Pada Server" },
-      { status: 500 }
-    );
+
+    if (err instanceof jose.errors.JWTInvalid) {
+      return handleResponse({
+        success: false,
+        message: "Refresh token tidak valid.",
+        status: 403,
+      });
+    }
+
+    return handleResponse({
+      success: false,
+      message: "Terjadi kesalahan pada server.",
+      status: 500,
+    });
   }
 }

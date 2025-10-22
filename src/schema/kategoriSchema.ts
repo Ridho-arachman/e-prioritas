@@ -1,3 +1,4 @@
+import { StatusKategori } from "@prisma/client";
 import z from "zod";
 
 export const kategoriSchema = z.object({
@@ -10,6 +11,7 @@ export const kategoriSchema = z.object({
     .string("Deskripsi harus berupa teks")
     .trim()
     .min(1, "Deskripsi tidak boleh kosong"),
+  status: z.nativeEnum(StatusKategori, { message: "Status tidak valid" }),
 });
 
 export const kategoriByIdSchema = z.object({

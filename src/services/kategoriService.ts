@@ -1,8 +1,11 @@
 import { prisma } from "@/lib/prisma";
-import { string } from "zod";
+import { Prisma } from "@prisma/client";
+
+type createDataSchema = Prisma.KategoriCreateInput;
+type updateDataSchema = Prisma.KategoriUpdateInput;
 
 export const kategoriService = {
-  create: async (data: { namaKategori: string; deskripsi?: string }) => {
+  create: async (data: createDataSchema) => {
     return prisma.kategori.create({ data });
   },
 
@@ -12,6 +15,7 @@ export const kategoriService = {
         ? { namaKategori: { contains: namaKategori, mode: "insensitive" } }
         : {},
       orderBy: { namaKategori: "asc" },
+      include: { _count: { select: { masukanWarga: true } } },
     });
   },
 
@@ -21,13 +25,7 @@ export const kategoriService = {
     });
   },
 
-  update: async (
-    kategoriId: string,
-    data: {
-      namaKategori: string;
-      deskripsi: string;
-    }
-  ) => {
+  update: async (kategoriId: string, data: updateDataSchema) => {
     return prisma.kategori.update({
       where: {
         id: kategoriId,

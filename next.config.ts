@@ -23,15 +23,16 @@ const nextConfig: NextConfig = {
           {
             key: "Content-Security-Policy",
             value: [
+              // ✅ default-src hanya sekali
               "default-src 'self';",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval';", // biar Next.js scripts tetap jalan
-              "style-src 'self' 'unsafe-inline';", // biar Tailwind inline style aman
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval';",
+              "style-src 'self' 'unsafe-inline';",
               "img-src 'self' data: blob:;",
               "font-src 'self';",
-              "connect-src 'self' https://* ws://* wss://*;", // izinkan API lokal & eksternal
+              "connect-src 'self' https://* ws://* wss://*;",
+              "frame-src 'self' https://www.google.com;", // ✅ pindahkan ke sini
               "frame-ancestors 'none';",
               "object-src 'none';",
-              "default-src 'self'; frame-src 'self' https://www.google.com;",
             ].join(" "),
           },
 

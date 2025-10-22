@@ -23,9 +23,6 @@ export const createMasukanWargaSchema = z.object({
     .string("Kategori id harus teks")
     .trim()
     .cuid("Kategori id tidak valid"),
-  status: z
-    .nativeEnum(MasukanStatus, { message: "Status tidak valid" })
-    .optional(),
   verifiedByUserId: z
     .string("Verified by user id harus teks")
     .trim()
@@ -65,7 +62,9 @@ export const masukanWargaQuerySchema = z.object({
     .max(255, "Lokasi maksimal 255 karakter")
     .optional(),
 
-  status: z.enum(["MENUNGGU_VERIFIKASI", "DITERIMA", "DITOLAK"]).optional(),
+  status: z
+    .nativeEnum(MasukanStatus, { message: "Status tidak valid" })
+    .optional(),
 
   kategoriId: z
     .string("ID kategori harus teks")

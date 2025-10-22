@@ -5,6 +5,7 @@ import { handlePrismaError } from "@/lib/handlePrismaError";
 import { kategoriService } from "@/services/kategoriService";
 import { handleZodValidation } from "@/lib/handleZodValidation";
 import { kategoriByIdSchema, kategoriSchema } from "@/schema/kategoriSchema";
+import { verifyApiToken } from "@/lib/auth";
 
 const GET = async (
   req: NextRequest,
@@ -15,6 +16,26 @@ const GET = async (
     allowedOrigins: [process.env.NEXT_PUBLIC_APP_URL!],
   });
   if (headers instanceof NextResponse) return headers;
+
+  // VERIFIKASI JWT
+  const user = await verifyApiToken(req);
+
+  if (!user) {
+    return handleResponse({
+      success: false,
+      message: "Unauthorized: Token invalid",
+      status: 401,
+    });
+  }
+
+  // AUTHORIZATION
+  if (user.role !== "ADMIN") {
+    return handleResponse({
+      success: false,
+      message: "Anda tidak memiliki akses untuk terhadap data ini",
+      status: 403,
+    });
+  }
 
   // VALIDASI PARAM ID
   const { id } = await ctx.params;
@@ -35,6 +56,7 @@ const GET = async (
       message: "Data kategori berhasil diambil",
       data,
       status: 200,
+      headers,
     });
   } catch (err) {
     //PRISMA ERROR
@@ -68,6 +90,26 @@ const PUT = async (
   });
   if (headers instanceof NextResponse) return headers;
 
+  // VERIFIKASI JWT
+  const user = await verifyApiToken(req);
+
+  if (!user) {
+    return handleResponse({
+      success: false,
+      message: "Unauthorized: Token invalid",
+      status: 401,
+    });
+  }
+
+  // AUTHORIZATION
+  if (user.role !== "ADMIN") {
+    return handleResponse({
+      success: false,
+      message: "Anda tidak memiliki akses untuk terhadap data ini",
+      status: 403,
+    });
+  }
+
   // NGGAMBIL REQ BODY & PARAM
   const { id } = await ctx.params;
   const body = await req.json();
@@ -90,6 +132,7 @@ const PUT = async (
       message: "Data kategori berhasil diupdate",
       data: kategori,
       status: 200,
+      headers,
     });
   } catch (err) {
     //PRISMA ERROR
@@ -123,6 +166,26 @@ const DELETE = async (
   });
   if (headers instanceof NextResponse) return headers;
 
+  // VERIFIKASI JWT
+  const user = await verifyApiToken(req);
+
+  if (!user) {
+    return handleResponse({
+      success: false,
+      message: "Unauthorized: Token invalid",
+      status: 401,
+    });
+  }
+
+  // AUTHORIZATION
+  if (user.role !== "ADMIN") {
+    return handleResponse({
+      success: false,
+      message: "Anda tidak memiliki akses untuk terhadap data ini",
+      status: 403,
+    });
+  }
+
   // NGGAMBIL PARAM
   const { id } = await ctx.params;
 
@@ -143,6 +206,7 @@ const DELETE = async (
       message: "Data kategori berhasil dihapus",
       data: kategori,
       status: 200,
+      headers,
     });
   } catch (err) {
     //PRISMA ERROR

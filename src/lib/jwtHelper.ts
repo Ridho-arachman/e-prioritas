@@ -1,7 +1,4 @@
-import jwt from "jsonwebtoken";
-
-const ACCESS_SECRET = process.env.ACCESS_SECRET!;
-const REFRESH_SECRET = process.env.REFRESH_SECRET!;
+import * as jose from "jose";
 
 export type JwtUser = {
   id: string;
@@ -9,22 +6,40 @@ export type JwtUser = {
   role?: string;
 };
 
-export const generateAccessToken = (user: JwtUser) => {
-  return jwt.sign(
-    { id: user.id, email: user.email, role: user.role },
-    ACCESS_SECRET,
-    {
-      expiresIn: "15m",
-    }
-  );
+// Pastikan env sudah ada
+const ACCESS_SECRET = new TextEncoder().encode(
+  process.env.ACCESS_SECRET || "fallback-access-secret"
+);
+const REFRESH_SECRET = new TextEncoder().encode(
+  process.env.REFRESH_SECRET || "fallback-refresh-secret"
+);
+
+/**
+ * Generate Access Token (durasi pendek, misal 15 menit)
+ */
+export const generateAccessToken = async (user: JwtUser) => {
+  return await new jose.SignJWT({
+    id: user.id,
+    email: user.email,
+    role: user.role,
+  })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("1m")
+    .sign(ACCESS_SECRET);
 };
 
-export const generateRefreshToken = (user: JwtUser) => {
-  return jwt.sign(
-    { id: user.id, email: user.email, role: user.role },
-    REFRESH_SECRET,
-    {
-      expiresIn: "7d",
-    }
-  );
+/**
+ * Generate Refresh Token (durasi panjang, misal 7 hari)
+ */
+export const generateRefreshToken = async (user: JwtUser) => {
+  return await new jose.SignJWT({
+    id: user.id,
+    email: user.email,
+    role: user.role,
+  })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("7d")
+    .sign(REFRESH_SECRET);
 };

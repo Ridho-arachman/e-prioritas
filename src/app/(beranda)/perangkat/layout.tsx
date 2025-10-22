@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/app-sidebar-perangkat";
 import { NavActions } from "@/components/nav-actions";
 import {
   Breadcrumb,

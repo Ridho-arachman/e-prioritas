@@ -1,3 +1,4 @@
+"use client";
 import { ChevronRight, MoreHorizontal, Plus } from "lucide-react";
 
 import {

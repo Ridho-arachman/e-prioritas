@@ -43,19 +43,20 @@ const POST = async (req: NextRequest) => {
         { status: 401 }
       );
 
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
+    const accessToken = await generateAccessToken(user);
+    const refreshToken = await generateRefreshToken(user);
 
     const response = NextResponse.json(
       {
         success: true,
         message: "Login Berhasil",
+        accessToken,
+        refreshToken,
       },
       { status: 200, headers }
     );
 
     response.cookies.set("accessToken", accessToken, {
-      httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       path: "/",
