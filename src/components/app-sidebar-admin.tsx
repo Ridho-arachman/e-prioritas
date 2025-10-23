@@ -15,6 +15,7 @@ import {
   Tags,
   Trash2,
   User,
+  User2Icon,
 } from "lucide-react";
 
 import { NavFavorites } from "@/components/nav-favorites";
@@ -56,14 +57,14 @@ const data = {
       isActive: true,
     },
     {
+      title: "Kelola Perangkat",
+      url: "#",
+      icon: User2Icon,
+    },
+    {
       title: "Kelola Kategori",
       url: "/admin/kelola-kategori",
       icon: Tags,
-    },
-    {
-      title: "Ask AI",
-      url: "#",
-      icon: Sparkles,
     },
     {
       title: "Home",
