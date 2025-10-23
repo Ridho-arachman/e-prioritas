@@ -8,6 +8,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
+import { isActiveRoute } from "@/utils/isActiveRoute";
 
 export function NavMain({
   items,
@@ -24,7 +25,10 @@ export function NavMain({
     <SidebarMenu suppressHydrationWarning>
       {items.map((item) => (
         <SidebarMenuItem key={item.title}>
-          <SidebarMenuButton asChild isActive={pathname === item.url}>
+          <SidebarMenuButton
+            asChild
+            isActive={isActiveRoute(pathname, item.url)}
+          >
             <a href={item.url}>
               <item.icon />
               <span>{item.title}</span>
