@@ -9,7 +9,7 @@ datasource db {
 
 model User {
   id                    String    @id @default(cuid())
-  name                  String   
+  name                  String    
   email                 String    @unique
   password              String    @map("password_hash") 
   jabatan               String
@@ -22,6 +22,9 @@ model User {
   dataMasterUpdate      DataMaster[]   @relation("DataMasterUpdate")
 
   @@map("users") 
+  @@index([name])
+  @@index([jabatan])
+  @@index([isActive])
 }
 
 model Kategori {

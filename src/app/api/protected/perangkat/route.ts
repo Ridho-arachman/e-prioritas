@@ -1,11 +1,15 @@
-import { cors } from "@/lib/cors";
-import { handleResponse } from "@/lib/responseHandler";
-import { NextRequest, NextResponse } from "next/server";
-import { handlePrismaError } from "@/lib/handlePrismaError";
-import { kategoriService } from "@/services/kategoriService";
-import { handleZodValidation } from "@/lib/handleZodValidation";
-import { kategoriQuerySchema, kategoriSchema } from "@/schema/kategoriSchema";
 import { verifyApiToken } from "@/lib/auth";
+import { cors } from "@/lib/cors";
+import { handlePrismaError } from "@/lib/handlePrismaError";
+import { handleZodValidation } from "@/lib/handleZodValidation";
+import { hashPassword } from "@/lib/hashing";
+import { handleResponse } from "@/lib/responseHandler";
+import {
+  createUserSchema,
+  queryUserSchema,
+} from "@/schema/userPerangkatSchema";
+import { userService } from "@/services/userService";
+import { NextRequest, NextResponse } from "next/server";
 
 const GET = async (req: NextRequest) => {
   //CORS
@@ -34,28 +38,26 @@ const GET = async (req: NextRequest) => {
     });
   }
 
-  //AMBIL QUERY
-  const searchParams = req.nextUrl.searchParams;
-  const namaKategori = searchParams.get("search");
-
-  //VALIDASI QUERY
-  let namaKategoriParam: string | undefined;
-  if (namaKategori) {
-    const parsed = kategoriQuerySchema.safeParse({ namaKategori });
-    if (!parsed.success) {
-      return handleZodValidation(parsed, headers);
-    }
-    namaKategoriParam = parsed.data.namaKategori;
-  }
-
   try {
+    //AMBIL QUERY
+    const searchParams = req.nextUrl.searchParams;
+    const q = searchParams.get("q") || "";
+    const isActive = searchParams.get("isActive") || undefined;
+
+    //VALIDASI QUERY
+    const parsed = queryUserSchema.safeParse({ q, isActive });
+    if (!parsed.success) return handleZodValidation(parsed, headers);
+
+    //HASIL VALIDASI
+    const { isActive: isActiveParam, q: queryUser } = parsed.data;
+
     //AMBIL DATA KATEGORI DARI DATABASE
-    const data = await kategoriService.getAll(namaKategoriParam);
+    const data = await userService.getAll(queryUser, isActiveParam);
 
     //JIKA DATA KOSONG
 
     if (data.length === 0) {
-      if (namaKategoriParam)
+      if (queryUser)
         return handleResponse({
           success: true,
           message: "Data kategori tidak ditemukan",
@@ -108,9 +110,8 @@ const POST = async (req: NextRequest) => {
   });
   if (headers instanceof NextResponse) return headers;
 
-  // VERIFIKASI JWT
+  //VERIFIKASI JWT
   const user = await verifyApiToken(req);
-
   if (!user) {
     return handleResponse({
       success: false,
@@ -128,23 +129,23 @@ const POST = async (req: NextRequest) => {
     });
   }
 
-  //VALIDASI REQ BODY
-  const body = await req.json();
-  const parsed = kategoriSchema.safeParse(body);
-
-  if (!parsed.success) return handleZodValidation(parsed, headers);
-
-  //JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
-  const { namaKategori, deskripsi, status } = parsed.data;
-
   try {
-    //SIMPAN DATA KATEGORI KE DATABASE
-    const kategori = await kategoriService.create({
-      namaKategori,
-      deskripsi,
-      status,
-    });
+    //VALIDASI REQ BODY
+    const body = await req.json();
+    const parsed = createUserSchema.safeParse(body);
 
+    if (!parsed.success) return handleZodValidation(parsed, headers);
+
+    //
+    const hashedPassword = await hashPassword(parsed.data.password);
+
+    //JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
+    const data = { ...parsed.data, password: hashedPassword };
+
+    //SIMPAN DATA KATEGORI KE DATABASE
+    const kategori = await userService.create(data);
+
+    //BERHASIL
     return handleResponse({
       success: true,
       message: "Kategori Berhasil Ditambahkan",
