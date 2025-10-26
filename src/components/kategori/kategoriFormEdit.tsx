@@ -1,9 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import z from "zod";
+import { useEffect } from "react";
+import { Spinner } from "../ui/spinner";
+import { notifier } from "../ToastNotifier";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter, useParams } from "next/navigation";
+import { kategoriSchema } from "@/schema/kategoriSchema";
+import { Field, FieldError } from "@/components/ui/field";
+import { useEditKategori, useKategoriById } from "@/hooks/api/kategoriHooks";
 import {
   Select,
   SelectContent,
@@ -11,142 +21,162 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useParams, useRouter } from "next/navigation";
-import { useEditKategori, useKategoriById } from "@/hooks/api/kategoriHooks";
-import { notifier } from "../ToastNotifier";
-import { Spinner } from "../ui/spinner";
 
 export function KategoriFormEdit() {
-  const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const { id } = useParams<{ id: string }>();
 
   const { data, isLoading } = useKategoriById(id);
   const kategori = data?.data;
 
-  const {
-    execute: editExecute,
-    loading: editLoading,
-    error: editError,
-  } = useEditKategori();
+  const form = useForm<z.infer<typeof kategoriSchema>>({
+    resolver: zodResolver(kategoriSchema),
+    defaultValues: {
+      namaKategori: "",
+      deskripsi: "",
+      status: "AKTIF",
+    },
+  });
 
-  const [namaKategori, setNamaKategori] = useState("");
-  const [deskripsi, setDeskripsi] = useState("");
-  const [status, setStatus] = useState("");
+  const { execute, loading } = useEditKategori();
 
-  // Sync state saat data fetch selesai
+  // Saat data kategori sudah diambil, isi default value form
   useEffect(() => {
     if (kategori) {
-      setNamaKategori(kategori.namaKategori);
-      setDeskripsi(kategori.deskripsi);
-
-      console.log("Status dari API yang diset ke state:", kategori.status);
+      form.reset({
+        namaKategori: kategori.namaKategori,
+        deskripsi: kategori.deskripsi,
+        status: kategori.status,
+      });
     }
-  }, [kategori]);
+  }, [kategori, form]);
 
-  // Handle submit
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const payload = { namaKategori, deskripsi, status };
-
-    const res = await editExecute(
+  const handleSubmit = async (data: z.infer<typeof kategoriSchema>) => {
+    const { data: res, error } = await execute(
       `/protected/kategori/${id}`,
-      payload,
-      {},
-      `/protected/kategori/${id}`
+      data,
+      { headers: { "Content-Type": "application/json" } },
+      "/protected/kategori"
     );
-    if (res) {
-      notifier.success(res.message || "Kategori berhasil diperbarui");
-      router.back();
-    } else {
-      notifier.error(editError || res.message || "Gagal memperbarui kategori");
+
+    if (error) {
+      notifier.error(error);
+      return;
     }
+
+    notifier.success(res?.message || "Kategori berhasil diperbarui");
+    router.back();
   };
 
   const formComponent = (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-2">
-        <label
-          htmlFor="namaKategori"
-          className="block text-sm font-medium text-muted-foreground"
-        >
-          Nama Kategori
-        </label>
-        <Input
-          id="namaKategori"
+    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+      <div className="space-y-6">
+        {/* Nama Kategori */}
+        <Controller
           name="namaKategori"
-          placeholder="Contoh: Infrastruktur, Kesehatan..."
-          required
-          value={namaKategori}
-          onChange={(e) => setNamaKategori(e.target.value)}
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field>
+              <Label htmlFor="namaKategori">Nama Kategori</Label>
+              <Input
+                {...field}
+                id="namaKategori"
+                aria-invalid={fieldState.invalid}
+                placeholder="Contoh: Infrastruktur, Kesehatan..."
+                disabled={loading || isLoading}
+              />
+              {fieldState.invalid && (
+                <FieldError>
+                  {fieldState.error?.message || "Wajib diisi"}
+                </FieldError>
+              )}
+            </Field>
+          )}
         />
-      </div>
 
-      <div className="space-y-2">
-        <label
-          htmlFor="deskripsi"
-          className="block text-sm font-medium text-muted-foreground"
-        >
-          Deskripsi
-        </label>
-        <Textarea
-          id="deskripsi"
+        {/* Deskripsi */}
+        <Controller
           name="deskripsi"
-          placeholder="Tulis deskripsi singkat..."
-          value={deskripsi}
-          onChange={(e) => setDeskripsi(e.target.value)}
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field>
+              <Label htmlFor="deskripsi">Deskripsi</Label>
+              <Textarea
+                {...field}
+                id="deskripsi"
+                placeholder="Tulis deskripsi singkat..."
+                aria-invalid={fieldState.invalid}
+                rows={4}
+                disabled={loading || isLoading}
+              />
+              {fieldState.invalid && (
+                <FieldError>
+                  {fieldState.error?.message || "Wajib diisi"}
+                </FieldError>
+              )}
+            </Field>
+          )}
         />
-      </div>
 
-      <div className="space-y-2">
-        <label
-          htmlFor="status"
-          className="block text-sm font-medium text-muted-foreground"
-        >
-          Status
-        </label>
-        <Select
-          defaultValue={kategori?.status}
-          onValueChange={(val) => setStatus(val as "AKTIF" | "NON_AKTIF")}
-        >
-          <SelectTrigger className="w-[240px]">
-            <SelectValue placeholder="Pilih status kategori" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="AKTIF">Aktif</SelectItem>
-            {/* PASTIKAN nilai ini cocok dengan yang dari API: */}
-            <SelectItem value="NON_AKTIF">Non_Aktif</SelectItem>
-            {/* Jika API mengembalikan "NONAKTIF" (tanpa underscore), ubah value-nya menjadi:
-            <SelectItem value="NONAKTIF">Non_Aktif</SelectItem> */}
-          </SelectContent>
-        </Select>
+        {/* Status */}
+        <Controller
+          name="status"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field>
+              <Label htmlFor="status">Status</Label>
+              <Select
+                onValueChange={field.onChange}
+                value={field.value}
+                defaultValue={field.value}
+                disabled={loading || isLoading}
+              >
+                <SelectTrigger id="status" className="w-[240px]">
+                  <SelectValue placeholder="Pilih status kategori" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="AKTIF">Aktif</SelectItem>
+                  <SelectItem value="NON_AKTIF">Nonaktif</SelectItem>
+                </SelectContent>
+              </Select>
+              {fieldState.invalid && (
+                <FieldError>
+                  {fieldState.error?.message || "Wajib diisi"}
+                </FieldError>
+              )}
+            </Field>
+          )}
+        />
       </div>
 
       <div className="flex items-center justify-end gap-3 pt-8 border-t border-border">
-        <Button variant="ghost" type="button" onClick={() => router.back()}>
+        <Button
+          variant="ghost"
+          type="button"
+          onClick={() => router.back()}
+          disabled={loading || isLoading}
+          className="cursor-pointer"
+        >
           Kembali
         </Button>
-        <Button type="submit" disabled={editLoading}>
-          {editLoading ? "Memuat..." : "Simpan Kategori"}
+
+        <Button
+          type="submit"
+          disabled={loading || isLoading}
+          className="cursor-pointer"
+        >
+          {loading ? (
+            <div className="flex items-center">
+              <Spinner className="mr-2 size-4" />
+              Menyimpan...
+            </div>
+          ) : (
+            "Simpan Perubahan"
+          )}
         </Button>
       </div>
     </form>
   );
 
-  return (
-    <>
-      {isLoading ? (
-        <div className="flex justify-center items-center w-full min-h-[50vh]">
-          <Spinner className="size-28" />
-        </div>
-      ) : (
-        formComponent
-      )}
-
-      {editLoading && (
-        <div className="fixed inset-0 flex justify-center items-center bg-background/80 backdrop-blur-sm z-50">
-          <Spinner className="size-28" />
-        </div>
-      )}
-    </>
-  );
+  return formComponent;
 }

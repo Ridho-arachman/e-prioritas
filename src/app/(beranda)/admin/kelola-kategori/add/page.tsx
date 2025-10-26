@@ -9,8 +9,7 @@ export default function CreateKategoriPage() {
           Buat kategori untuk mengelompokkan masukan warga berdasarkan tema.
         </p>
       </div>
-
-      {/* <KategoriForm type="tambah"  */}
+      {/* form kategori tambah */}
       <KategoriFormAdd />
     </div>
   );

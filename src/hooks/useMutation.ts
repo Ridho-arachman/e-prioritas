@@ -1,44 +1,40 @@
-// hooks/useMutation.ts
 import { useState } from "react";
 import { api } from "@/lib/axios";
 import { mutate } from "swr";
 
 type MutationMethod = "post" | "put" | "delete" | "patch";
 
-// hooks/useMutation.ts (DITINGKATKAN)
-
 export const useMutation = (method: MutationMethod = "post") => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Perubahan: execute sekarang menerima 'url' sebagai parameter PERTAMA
   const execute = async (
     url: string,
     payload?: any,
     config?: any,
     mutateKey?: string
-  ) => {
+  ): Promise<{ data: any | null; error: string | null }> => {
     try {
       setLoading(true);
+      setError(null);
 
       let res;
       if (method === "delete") {
-        // Axios delete dapat menerima URL, dan body di config.data
+        // axios.delete pakai data di config
         res = await api.delete(url, { data: payload, ...config });
       } else {
-        // Untuk POST/PUT/PATCH, URL sudah lengkap
         res = await api[method](url, payload, config);
       }
 
-      // jika disediakan key SWR, lakukan revalidate otomatis
       if (mutateKey) {
         mutate(mutateKey);
       }
 
-      return res.data;
+      return { data: res.data, error: null };
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message);
-      return null;
+      const msg = err.response?.data?.message || err.message;
+      setError(msg);
+      return { data: null, error: msg };
     } finally {
       setLoading(false);
     }

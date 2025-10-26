@@ -85,7 +85,7 @@ export default function TambahPerangkatPage() {
 
         {/* Buttons */}
         <div className="flex gap-4">
-          <Button variant="outline" onClick={() => router.push("/perangkat")}>
+          <Button variant="outline" onClick={() => router.back()}>
             Batal
           </Button>
           <Button type="submit">Simpan</Button>

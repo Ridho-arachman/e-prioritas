@@ -15,7 +15,7 @@ const BASE_STYLE: CSSProperties = {
 
 export const notifier = {
   // Sukses (Success)
-  success: (message = "Operasi berhasil!", description = "Berhasil") => {
+  success: (message = "Operasi berhasil!", description?: string) => {
     toast.success(message, {
       description,
       duration: DEFAULT_DURATION,

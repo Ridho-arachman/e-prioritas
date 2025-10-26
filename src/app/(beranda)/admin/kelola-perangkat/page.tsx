@@ -62,7 +62,7 @@ export default function PerangkatListPage() {
     <div className="p-6">
       <Card>
         <CardHeader className="flex justify-between items-center">
-          <CardTitle>Kelola Perangkat</CardTitle>
+          <CardTitle>👥 Kelola Perangkat</CardTitle>
           <Link href="/admin/kelola-perangkat/add">
             <Button>Tambah Perangkat</Button>
           </Link>

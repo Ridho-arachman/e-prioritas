@@ -9,7 +9,7 @@ export default function EditKategoriPage() {
           Perbarui informasi kategori masukan warga sesuai kebutuhan.
         </p>
       </div>
-
+      {/* form kategori edit */}
       <KategoriFormEdit />
     </div>
   );

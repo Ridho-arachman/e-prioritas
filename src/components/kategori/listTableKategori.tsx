@@ -5,9 +5,9 @@ import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { CardContent } from "@/components/ui/card";
 import { useKategoriAll } from "@/hooks/api/kategoriHooks";
 import { useDeleteKategori } from "@/hooks/api/kategoriHooks";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -27,11 +27,8 @@ export default function ListTableKategori() {
 
   const [search, setSearch] = useState(searchParams.get("q") || "");
   const { data: response, error, isLoading, refresh } = useKategoriAll(search);
-  const {
-    execute: deleteKategori,
-    loading: deleteLoading,
-    error: deleteError,
-  } = useDeleteKategori();
+  const { execute: deleteKategori, loading: deleteLoading } =
+    useDeleteKategori();
 
   const [value] = useDebounce(search, 500);
 
@@ -44,132 +41,127 @@ export default function ListTableKategori() {
   }, [value]);
 
   return (
-    <div className="p-6 space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>Kelola Kategori Masukan Warga</span>
-            <Link href="/admin/kelola-kategori/add">
-              <Button variant="default">+ Tambah Kategori</Button>
-            </Link>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-4 flex items-center justify-between">
-            <div className="flex gap-2">
-              <Input
-                placeholder="Cari kategori..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="max-w-sm"
-              />
-              <Button variant="default" onClick={() => setSearch("")}>
-                <XIcon />
-              </Button>
-            </div>
+    <>
+      <CardContent>
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex gap-2">
+            <Input
+              placeholder="Cari kategori..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="max-w-sm"
+            />
+            <Button
+              variant="default"
+              onClick={() => setSearch("")}
+              className="cursor-pointer"
+            >
+              <XIcon />
+            </Button>
           </div>
+        </div>
 
-          <Table>
-            <TableHeader>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>No</TableHead>
+              <TableHead>Nama Kategori</TableHead>
+              <TableHead>Deskripsi</TableHead>
+              <TableHead>Jumlah Masukan</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Aksi</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
               <TableRow>
-                <TableHead>No</TableHead>
-                <TableHead>Nama Kategori</TableHead>
-                <TableHead>Deskripsi</TableHead>
-                <TableHead>Jumlah Masukan</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Aksi</TableHead>
+                <TableCell
+                  colSpan={6}
+                  className="text-center text-muted-foreground"
+                >
+                  Memuat data...
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="text-center text-muted-foreground"
-                  >
-                    Memuat data...
+            ) : error ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center text-red-500">
+                  {error.response?.status === 403
+                    ? "Anda tidak memiliki akses untuk melihat data ini."
+                    : data.message || "Terjadi kesalahan saat memuat data."}
+                </TableCell>
+              </TableRow>
+            ) : data.length > 0 ? (
+              data.map((item: any, i: number) => (
+                <TableRow key={item.id}>
+                  <TableCell>{i + 1}</TableCell>
+                  <TableCell className="font-medium">
+                    {item.namaKategori}
                   </TableCell>
-                </TableRow>
-              ) : error ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center text-red-500">
-                    {error.response?.status === 403
-                      ? "Anda tidak memiliki akses untuk melihat data ini."
-                      : data.message || "Terjadi kesalahan saat memuat data."}
+                  <TableCell className="text-muted-foreground">
+                    {item.deskripsi}
                   </TableCell>
-                </TableRow>
-              ) : data.length > 0 ? (
-                data.map((item: any, i: number) => (
-                  <TableRow key={item.id}>
-                    <TableCell>{i + 1}</TableCell>
-                    <TableCell className="font-medium">
-                      {item.namaKategori}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {item.deskripsi}
-                    </TableCell>
-                    <TableCell>{item._count.masukanWarga}</TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          item.status === "AKTIF" ? "default" : "secondary"
-                        }
-                      >
-                        {item.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="space-x-2">
+                  <TableCell>{item._count.masukanWarga}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        item.status === "AKTIF" ? "default" : "secondary"
+                      }
+                    >
+                      {item.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="space-x-2">
+                    <Link href={`/admin/kelola-kategori/${item.id}`} prefetch>
                       <Button
-                        onClick={() =>
-                          router.push(`/admin/kelola-kategori/${item.id}`)
-                        }
                         variant="outline"
                         size="sm"
                         disabled={deleteLoading}
+                        className="cursor-pointer"
                       >
                         Edit
                       </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        disabled={deleteLoading}
-                        onClick={async () => {
-                          const res = await deleteKategori(
-                            `/protected/kategori/${item.id}`,
-                            {},
-                            {},
-                            `/protected/kategori/${item.id}`
-                          );
-                          if (res) {
-                            notifier.success(
-                              res.message || "Kategori berhasil dihapus"
-                            );
-                            refresh();
-                          }
-                          notifier.error(
-                            res.message || "Gagal menghapus kategori"
-                          );
-                        }}
-                      >
-                        Hapus
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="text-center text-muted-foreground"
-                  >
-                    Tidak ada kategori ditemukan.
+                    </Link>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      disabled={deleteLoading}
+                      onClick={async () => {
+                        const { data: res, error } = await deleteKategori(
+                          `/protected/kategori/${item.id}`,
+                          {},
+                          {},
+                          `/protected/kategori/${item.id}`
+                        );
+                        if (error) {
+                          notifier.error(error);
+                          return;
+                        }
+
+                        notifier.success(
+                          res?.message || "Kategori Berhasil Dihapus"
+                        );
+                        refresh();
+                      }}
+                      className="cursor-pointer"
+                    >
+                      Hapus
+                    </Button>
                   </TableCell>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-    </div>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={6}
+                  className="text-center text-muted-foreground"
+                >
+                  Tidak ada kategori ditemukan.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </>
   );
 }

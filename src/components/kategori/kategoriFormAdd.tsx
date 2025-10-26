@@ -1,9 +1,17 @@
 "use client";
 
+import z from "zod";
+import { useRouter } from "next/navigation";
+import { notifier } from "../ToastNotifier";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label"; // Tambahkan Label dari shadcn/ui
+import { Textarea } from "@/components/ui/textarea";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, Controller } from "react-hook-form";
+import { kategoriSchema } from "@/schema/kategoriSchema";
+import { Field, FieldError } from "@/components/ui/field";
+import { useCreateKategori } from "@/hooks/api/kategoriHooks";
 import {
   Select,
   SelectContent,
@@ -11,22 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { useRouter } from "next/navigation";
-import { useCreateKategori } from "@/hooks/api/kategoriHooks";
-import { useForm, Controller } from "react-hook-form";
-import z from "zod";
-import { kategoriSchema } from "@/schema/kategoriSchema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { notifier } from "../ToastNotifier";
-
-// Hapus semua import yang tidak terpakai seperti useParams
+import { Spinner } from "../ui/spinner"; // Pastikan Spinner diekspor dengan benar
 
 export function KategoriFormAdd() {
   const router = useRouter();
@@ -41,48 +34,40 @@ export function KategoriFormAdd() {
   });
 
   const { execute, loading } = useCreateKategori();
-  const { errors } = form.formState;
 
-  const handleSubmit = async (data: z.infer<typeof kategoriSchema>) => {
-    const res = await execute(
-      `/protected/kategori`,
+  const handleSubmit = async (data: any) => {
+    const { data: res, error } = await execute(
+      "/protected/kategori",
       data,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      },
-      `/protected/kategori` // SWR mutate key
+      { headers: { "Content-Type": "application/json" } },
+      "/protected/kategori"
     );
-    if (res) {
-      router.back();
-      notifier.success(res.message || "Kategori berhasil ditambahkan");
-    } else {
-      notifier.error("Gagal menambahkan kategori");
+
+    if (error) {
+      notifier.error(error);
+      return;
     }
+
+    notifier.success(res?.message || "Kategori berhasil ditambahkan");
+    router.back();
   };
 
-  return (
-    // Menggunakan form.handleSubmit yang diikat ke RHF
+  const formComponent = (
     <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-      {/* Mulai mengganti FieldGroup dengan div standar 
-        dan menggunakan Controller untuk semua field.
-      */}
       <div className="space-y-6">
         {/* Nama Kategori */}
         <Controller
           name="namaKategori"
           control={form.control}
           render={({ field, fieldState }) => (
-            // Ganti Field dengan div yang dibungkus Field kustom/div standar
             <Field>
               <Label htmlFor="namaKategori">Nama Kategori</Label>
               <Input
-                {...field} // Menyebarkan value, onChange, onBlur
+                {...field}
                 id="namaKategori"
                 aria-invalid={fieldState.invalid}
                 placeholder="Contoh: Infrastruktur, Kesehatan..."
-                // Tidak perlu required di sini, karena sudah ditangani Zod
+                disabled={loading} // Tambahkan disabled saat loading
               />
               {fieldState.invalid && (
                 <FieldError>
@@ -92,24 +77,21 @@ export function KategoriFormAdd() {
             </Field>
           )}
         />
-
         {/* Deskripsi */}
         <Controller
           name="deskripsi"
           control={form.control}
           render={({ field, fieldState }) => (
-            // Ganti Field dengan div yang dibungkus Field kustom/div standar
             <Field>
               <Label htmlFor="deskripsi">Deskripsi</Label>
-              {/* Ganti InputGroup/InputGroupTextarea dengan Textarea shadcn */}
               <Textarea
-                {...field} // Menyebarkan value, onChange, onBlur
+                {...field}
                 id="deskripsi"
                 placeholder="Tulis deskripsi singkat..."
                 aria-invalid={fieldState.invalid}
                 rows={4}
+                disabled={loading} // Tambahkan disabled saat loading
               />
-              {/* Anda bisa menambahkan fitur hitungan karakter di sini jika perlu */}
               {fieldState.invalid && (
                 <FieldError>
                   {fieldState.error?.message || "Wajib diisi"}
@@ -118,8 +100,6 @@ export function KategoriFormAdd() {
             </Field>
           )}
         />
-
-        {/* Status (Select) */}
         <Controller
           name="status"
           control={form.control}
@@ -130,13 +110,13 @@ export function KategoriFormAdd() {
                 onValueChange={field.onChange}
                 value={field.value}
                 defaultValue={field.value}
+                disabled={loading} // Tambahkan disabled saat loading
               >
                 <SelectTrigger id="status" className="w-[240px]">
                   <SelectValue placeholder="Pilih status kategori" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="AKTIF">Aktif</SelectItem>
-                  {/* Pastikan nilai ini sesuai dengan Schema Zod Anda */}
                   <SelectItem value="NON_AKTIF">Nonaktif</SelectItem>
                 </SelectContent>
               </Select>
@@ -149,15 +129,30 @@ export function KategoriFormAdd() {
           )}
         />
       </div>
-
       <div className="flex items-center justify-end gap-3 pt-8 border-t border-border">
-        <Button variant="ghost" type="button" onClick={() => router.back()}>
+        <Button
+          variant="ghost"
+          type="button"
+          onClick={() => router.back()}
+          disabled={loading}
+          className="cursor-pointer"
+        >
           Kembali
         </Button>
-        <Button type="submit" disabled={loading}>
-          {loading ? "Menyimpan..." : "Simpan Kategori"}
+
+        <Button type="submit" disabled={loading} className="cursor-pointer">
+          {loading ? (
+            <div className="flex items-center">
+              <Spinner className="mr-2 size-4" />
+              Menyimpan...
+            </div>
+          ) : (
+            "Simpan Kategori"
+          )}
         </Button>
       </div>
     </form>
   );
+
+  return formComponent;
 }
