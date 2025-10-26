@@ -6,8 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
-import { useKategoriAll } from "@/hooks/api/kategoriHooks";
-import { useDeleteKategori } from "@/hooks/api/kategoriHooks";
+import { useGetAllKategori } from "@/hooks/api/useKategori";
+import { useDeleteKategori } from "@/hooks/api/useKategori";
 import {
   Table,
   TableBody,
@@ -26,7 +26,12 @@ export default function ListTableKategori() {
   const router = useRouter();
 
   const [search, setSearch] = useState(searchParams.get("q") || "");
-  const { data: response, error, isLoading, refresh } = useKategoriAll(search);
+  const {
+    data: response,
+    error,
+    isLoading,
+    refresh,
+  } = useGetAllKategori(search);
   const { execute: deleteKategori, loading: deleteLoading } =
     useDeleteKategori();
 

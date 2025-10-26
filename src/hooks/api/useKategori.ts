@@ -6,7 +6,7 @@ const useCreateKategori = () => {
   return { error, execute, loading };
 };
 
-const useKategoriAll = (search?: string) => {
+const useGetAllKategori = (search?: string) => {
   const { data, error, isLoading, refresh } = useFetch("/protected/kategori", {
     params: {
       search: search,
@@ -15,7 +15,7 @@ const useKategoriAll = (search?: string) => {
   return { data, error, isLoading, refresh };
 };
 
-const useKategoriById = (id: string) => {
+const useGetKategoriById = (id: string) => {
   const { data, error, isLoading, refresh } = useFetch(
     `/protected/kategori/${id}`
   );
@@ -33,8 +33,8 @@ const useDeleteKategori = () => {
 };
 
 export {
-  useKategoriAll,
-  useKategoriById,
+  useGetAllKategori,
+  useGetKategoriById,
   useEditKategori,
   useDeleteKategori,
   useCreateKategori,

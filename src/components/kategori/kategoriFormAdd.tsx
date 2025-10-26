@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 import { kategoriSchema } from "@/schema/kategoriSchema";
 import { Field, FieldError } from "@/components/ui/field";
-import { useCreateKategori } from "@/hooks/api/kategoriHooks";
+import { useCreateKategori } from "@/hooks/api/useKategori";
 import {
   Select,
   SelectContent,

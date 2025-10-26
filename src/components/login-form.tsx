@@ -41,16 +41,11 @@ export function LoginForm({
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     try {
       const res = await trigger(values);
-
       router.push("/admin");
       form.reset();
       notifier.success("Berhasil 🎉", res.message || "Login berhasil");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      toast.error("Gagal ❌", {
-        description: err.message || "Terjadi kesalahan",
-        style: { color: "#ef4444" },
-      });
+      toast.error("Gagal ❌", err.message || "Terjadi kesalahan");
     }
   };
 

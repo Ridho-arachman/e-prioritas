@@ -13,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useParams } from "next/navigation";
 import { kategoriSchema } from "@/schema/kategoriSchema";
 import { Field, FieldError } from "@/components/ui/field";
-import { useEditKategori, useKategoriById } from "@/hooks/api/kategoriHooks";
+import { useEditKategori, useGetKategoriById } from "@/hooks/api/useKategori";
 import {
   Select,
   SelectContent,
@@ -26,7 +26,7 @@ export function KategoriFormEdit() {
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
 
-  const { data, isLoading } = useKategoriById(id);
+  const { data, isLoading } = useGetKategoriById(id);
   const kategori = data?.data;
 
   const form = useForm<z.infer<typeof kategoriSchema>>({
