@@ -15,8 +15,9 @@ const BASE_STYLE: CSSProperties = {
 
 export const notifier = {
   // Sukses (Success)
-  success: (message = "Operasi berhasil!") => {
+  success: (message = "Operasi berhasil!", description = "Berhasil") => {
     toast.success(message, {
+      description,
       duration: DEFAULT_DURATION,
       // Menerapkan style kustom pada container toast
       style: {

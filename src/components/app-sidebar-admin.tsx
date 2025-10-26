@@ -58,7 +58,7 @@ const data = {
     },
     {
       title: "Kelola Perangkat",
-      url: "#",
+      url: "/admin/kelola-perangkat",
       icon: User2Icon,
     },
     {

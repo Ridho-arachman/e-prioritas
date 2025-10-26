@@ -13,10 +13,8 @@ import {
 } from "@/components/ui/select";
 import { useParams, useRouter } from "next/navigation";
 import { useEditKategori, useKategoriById } from "@/hooks/api/kategoriHooks";
-import { toast } from "sonner";
 import { notifier } from "../ToastNotifier";
 import { Spinner } from "../ui/spinner";
-import { stat } from "fs";
 
 export function KategoriFormEdit() {
   const { id } = useParams<{ id: string }>();
