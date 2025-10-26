@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Eye, EyeClosed } from "lucide-react";
 import { useState } from "react";
+import { notifier } from "./ToastNotifier";
 
 export function LoginForm({
   className,
@@ -43,10 +44,7 @@ export function LoginForm({
 
       router.push("/admin");
       form.reset();
-      toast.success("Berhasil 🎉", {
-        description: res.message || "Login berhasil",
-        style: { color: "#4ade80" },
-      });
+      notifier.success("Berhasil 🎉", res.message || "Login berhasil");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error("Gagal ❌", {

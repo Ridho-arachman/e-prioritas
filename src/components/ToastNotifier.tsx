@@ -30,8 +30,12 @@ export const notifier = {
   },
 
   // Gagal/Error
-  error: (message = "Terjadi kesalahan. Silakan coba lagi.") => {
+  error: (
+    message = "Terjadi kesalahan. Silakan coba lagi.",
+    description?: string
+  ) => {
     toast.error(message, {
+      description,
       duration: DEFAULT_DURATION + 1000,
       style: {
         ...BASE_STYLE,
@@ -43,8 +47,9 @@ export const notifier = {
   },
 
   // Informasi (Info) - Menggunakan toast.message karena sonner tidak memiliki toast.info bawaan
-  info: (message = "Informasi.") => {
+  info: (message = "Informasi.", description?: string) => {
     toast.message(message, {
+      description,
       icon: "ℹ️",
       duration: DEFAULT_DURATION,
       style: {
@@ -57,9 +62,10 @@ export const notifier = {
   },
 
   // Peringatan (Warning)
-  warning: (message = "Perhatian.") => {
+  warning: (message = "Perhatian.", description?: string) => {
     toast.message(message, {
       // Menggunakan toast.message karena sonner tidak memiliki toast.warning bawaan
+      description,
       icon: "⚠️",
       duration: DEFAULT_DURATION,
       style: {
@@ -69,21 +75,5 @@ export const notifier = {
         border: "1px solid #ffdb4d",
       },
     });
-  },
-
-  // Memuat (Loading)
-  loading: (message = "Mohon tunggu...") => {
-    // Hanya menggunakan style untuk padding dan font, karena loading style bawaan sonner sudah baik.
-    return toast.loading(message, {
-      style: {
-        padding: "16px",
-        fontWeight: "bold",
-        borderRadius: "8px",
-      },
-    });
-  },
-
-  dismiss: (toastId?: string | number | null) => {
-    toast.dismiss(toastId || toastId === 0 ? toastId : undefined);
   },
 };
