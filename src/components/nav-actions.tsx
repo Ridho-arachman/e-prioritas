@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { cn } from "@/lib/utils";
 import {
   ArrowDown,
   ArrowUp,
@@ -35,18 +35,15 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useRouter } from "next/navigation";
-import { useLogout } from "@/hooks/useLogout";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { useLogout } from "@/hooks/api/useAuth";
+import { notifier } from "./ToastNotifier";
+import { useEffect, useState } from "react";
 
 export function NavActions() {
-  const [isOpen, setIsOpen] = React.useState(false);
   const router = useRouter();
-  const { trigger, isMutating } = useLogout();
 
-  React.useEffect(() => {
-    setIsOpen(true);
-  }, []);
+  const [isOpen, setIsOpen] = useState(false);
+  const { execute, loading } = useLogout();
 
   const data = [
     [
@@ -112,17 +109,19 @@ export function NavActions() {
         label: "Logout",
         icon: CornerUpLeft,
         fn: async () => {
-          try {
-            await trigger();
-            router.push("/login");
-            toast.success("Logout berhasil", {
-              description: "Berhasil logout",
-              style: { color: "#4ade80" },
-            });
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          } catch (error) {
-            toast.error("Logout gagal");
+          const { data: res, error } = await execute(
+            "/auth/logout",
+            {},
+            "/login"
+          );
+
+          if (error) {
+            notifier.error(error);
+            return;
           }
+
+          notifier.success(res?.message || "Kategori berhasil ditambahkan");
+          router.push("/admin");
         },
         style: "bg-red-500 text-white",
       },
@@ -162,7 +161,7 @@ export function NavActions() {
                           <SidebarMenuButton
                             className={cn("cursor-pointer", item.style)}
                             onClick={item.fn}
-                            disabled={isMutating}
+                            disabled={loading}
                           >
                             <item.icon /> <span>{item.label}</span>
                           </SidebarMenuButton>

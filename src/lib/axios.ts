@@ -20,7 +20,7 @@ const BASE_URL = api.defaults.baseURL; // Ambil base URL untuk hit refresh token
 // Pindahkan atau definisikan fungsi signOut di sini atau impor dari file terpisah
 export const signOut = async () => {
   try {
-    await api.delete("/auth/logout");
+    await api.post("/auth/logout");
   } catch (error) {
     console.error(
       "Logout API call failed, proceeding with client cleanup:",

@@ -15,12 +15,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { loginSchema } from "@/schema/login";
-import { useLogin } from "@/hooks/useLogin";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Eye, EyeClosed } from "lucide-react";
 import { useState } from "react";
 import { notifier } from "./ToastNotifier";
+import { useLogin } from "@/hooks/api/useAuth";
 
 export function LoginForm({
   className,
@@ -28,7 +27,7 @@ export function LoginForm({
 }: React.HTMLAttributes<HTMLDivElement>) {
   const [seePassword, setSeePassword] = useState(false);
   const router = useRouter();
-  const { trigger, isMutating } = useLogin();
+  const { execute, loading } = useLogin();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -38,15 +37,21 @@ export function LoginForm({
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof loginSchema>) => {
-    try {
-      const res = await trigger(values);
-      router.push("/admin");
-      form.reset();
-      notifier.success("Berhasil 🎉", res.message || "Login berhasil");
-    } catch (err: any) {
-      toast.error("Gagal ❌", err.message || "Terjadi kesalahan");
+  const onSubmit = async (data: z.infer<typeof loginSchema>) => {
+    const { data: res, error } = await execute(
+      "/auth/login",
+      data,
+      { headers: { "Content-Type": "application/json" } },
+      "/protected/kategori"
+    );
+
+    if (error) {
+      notifier.error(error);
+      return;
     }
+
+    notifier.success(res?.message || "Kategori berhasil ditambahkan");
+    router.push("/admin");
   };
 
   return (
@@ -67,7 +72,12 @@ export function LoginForm({
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="m@example.com" type="email" {...field} />
+                  <Input
+                    placeholder="m@example.com"
+                    type="email"
+                    disabled={loading}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -92,6 +102,7 @@ export function LoginForm({
                   <div className="flex items-center gap-2">
                     <Input
                       type={seePassword ? "text" : "password"}
+                      disabled={loading}
                       {...field}
                     />
                     <Button
@@ -99,6 +110,7 @@ export function LoginForm({
                       size="icon"
                       type="button"
                       className="cursor-pointer"
+                      aria-label="Toggle password visibility"
                       onClick={() => setSeePassword(!seePassword)}
                     >
                       {seePassword ? <Eye /> : <EyeClosed />}
@@ -110,7 +122,7 @@ export function LoginForm({
             )}
           />
 
-          <Button type="submit" className="w-full" disabled={isMutating}>
+          <Button type="submit" className="w-full" disabled={loading}>
             Login
           </Button>
         </form>
