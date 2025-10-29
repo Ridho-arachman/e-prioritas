@@ -13,7 +13,10 @@ export const useMutation = (method: MutationMethod = "post") => {
     payload?: any,
     config?: any,
     mutateKey?: string
-  ): Promise<{ data: any | null; error: string | null }> => {
+  ): Promise<{
+    data: any | null;
+    error: string | null;
+  }> => {
     try {
       setLoading(true);
       setError(null);

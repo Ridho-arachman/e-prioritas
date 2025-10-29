@@ -6,9 +6,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { handlePrismaError } from "@/lib/handlePrismaError";
 import { handleZodValidation } from "@/lib/handleZodValidation";
 import {
-  deleteUserSchema,
-  detailUserSchema,
-  updateUserSchema,
+  deleteUserPerangkatSchema,
+  detailUserPerangkatSchema,
+  updateUserPerangkatSchema,
 } from "@/schema/userPerangkatSchema";
 
 const GET = async (
@@ -43,7 +43,7 @@ const GET = async (
 
   // VALIDASI PARAM ID
   const { id } = await ctx.params;
-  const parsedId = detailUserSchema.safeParse({ id });
+  const parsedId = detailUserPerangkatSchema.safeParse({ id });
   if (!parsedId.success) return handleZodValidation(parsedId, headers);
 
   const userId = parsedId.data.id;
@@ -82,7 +82,7 @@ const GET = async (
   }
 };
 
-const PUT = async (
+const PATCH = async (
   req: NextRequest,
   ctx: RouteContext<"/api/protected/perangkat/[id]">
 ) => {
@@ -118,14 +118,13 @@ const PUT = async (
     const body = await req.json();
 
     // VALIDASI REQ BODY & PARAM
-    const parsed = updateUserSchema.safeParse({ ...body, id });
+    const parsed = updateUserPerangkatSchema.safeParse(body);
+    const parsedId = detailUserPerangkatSchema.safeParse({ id });
+    if (!parsedId.success) return handleZodValidation(parsedId, headers);
     if (!parsed.success) return handleZodValidation(parsed, headers);
 
-    // JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
-    const data = parsed.data;
-
     // SIMPAN DATA perangkat desa KE DATABASE
-    const kategori = await userService.update(data);
+    const kategori = await userService.update(parsedId.data.id, parsed.data);
     return handleResponse({
       success: true,
       message: "Data perangkat desa berhasil diupdate",
@@ -190,7 +189,7 @@ const DELETE = async (
     const { id } = await ctx.params;
 
     // VALIDASI REQ PARAM
-    const parsedId = deleteUserSchema.safeParse({ id });
+    const parsedId = deleteUserPerangkatSchema.safeParse({ id });
     if (!parsedId.success) return handleZodValidation(parsedId, headers);
 
     // JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
@@ -229,4 +228,4 @@ const DELETE = async (
   }
 };
 
-export { PUT, DELETE, GET };
+export { PATCH, DELETE, GET };

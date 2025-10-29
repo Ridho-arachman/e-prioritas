@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 
 type createDataSchema = Prisma.UserCreateInput;
-type updateDataSchema = Prisma.UserUpdateInput & { id: string };
+type updateDataSchema = Prisma.UserUpdateInput;
 
 export const userService = {
   create: async (data: createDataSchema) => {
@@ -42,9 +42,7 @@ export const userService = {
     });
   },
 
-  update: async (body: updateDataSchema) => {
-    const { id, ...data } = body;
-
+  update: async (id: string, data: updateDataSchema) => {
     return prisma.user.update({
       where: { id },
       data,

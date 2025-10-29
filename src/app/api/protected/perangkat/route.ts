@@ -5,8 +5,8 @@ import { handleZodValidation } from "@/lib/handleZodValidation";
 import { hashPassword } from "@/lib/hashing";
 import { handleResponse } from "@/lib/responseHandler";
 import {
-  createUserSchema,
-  queryUserSchema,
+  createUserPerangkatSchema,
+  queryUserPerangkatSchema,
 } from "@/schema/userPerangkatSchema";
 import { userService } from "@/services/userService";
 import { NextRequest, NextResponse } from "next/server";
@@ -45,7 +45,7 @@ const GET = async (req: NextRequest) => {
     const isActive = searchParams.get("isActive") || undefined;
 
     //VALIDASI QUERY
-    const parsed = queryUserSchema.safeParse({ q, isActive });
+    const parsed = queryUserPerangkatSchema.safeParse({ q, isActive });
     if (!parsed.success) return handleZodValidation(parsed, headers);
 
     //HASIL VALIDASI
@@ -60,14 +60,14 @@ const GET = async (req: NextRequest) => {
       if (queryUser)
         return handleResponse({
           success: true,
-          message: "Data kategori tidak ditemukan",
+          message: "Data perangkat desa tidak ditemukan",
           status: 404,
           headers,
         });
 
       return handleResponse({
         success: true,
-        message: "Data kategori masih kosong",
+        message: "Data perangkat desa masih kosong",
         status: 404,
         headers,
       });
@@ -76,7 +76,7 @@ const GET = async (req: NextRequest) => {
     //JIKA DATA ADA
     return handleResponse({
       success: true,
-      message: "Data kategori berhasil diambil",
+      message: "Data perangkat desa berhasil diambil",
       data,
       status: 200,
       headers,
@@ -132,15 +132,18 @@ const POST = async (req: NextRequest) => {
   try {
     //VALIDASI REQ BODY
     const body = await req.json();
-    const parsed = createUserSchema.safeParse(body);
+
+    const parsed = createUserPerangkatSchema.safeParse(body);
 
     if (!parsed.success) return handleZodValidation(parsed, headers);
 
+    const { confirmPassword, password, ...parsedData } = parsed.data;
+
     //
-    const hashedPassword = await hashPassword(parsed.data.password);
+    const hashedPassword = await hashPassword(password);
 
     //JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
-    const data = { ...parsed.data, password: hashedPassword };
+    const data = { ...parsedData, password: hashedPassword };
 
     //SIMPAN DATA KATEGORI KE DATABASE
     const kategori = await userService.create(data);
@@ -148,7 +151,7 @@ const POST = async (req: NextRequest) => {
     //BERHASIL
     return handleResponse({
       success: true,
-      message: "Kategori Berhasil Ditambahkan",
+      message: "Perangkat Desa Berhasil Ditambahkan",
       data: kategori,
       status: 201,
       headers,

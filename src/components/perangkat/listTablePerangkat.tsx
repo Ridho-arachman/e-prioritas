@@ -1,13 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import { XIcon } from "lucide-react";
+import { useDebounce } from "use-debounce";
 import { useState, useEffect } from "react";
-import { Badge } from "@/components/ui/badge";
+import { notifier } from "../ToastNotifier";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
-import { useGetAllKategori } from "@/hooks/api/useKategori";
 import { useDeleteKategori } from "@/hooks/api/useKategori";
+import { useGetAllKategori } from "@/hooks/api/useKategori";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -16,34 +20,42 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useSearchParams, useRouter } from "next/navigation";
-import { XIcon } from "lucide-react";
-import { useDebounce } from "use-debounce";
-import { notifier } from "../ToastNotifier";
+import {
+  useDeletePerangkat,
+  useGetAllPerangkat,
+} from "@/hooks/api/usePerangkat";
+import { User } from "@prisma/client";
 
-export default function ListTableKategori() {
-  const searchParams = useSearchParams();
+export default function ListTablePerangkat() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [search, setSearch] = useState(searchParams.get("q") || "");
+  const [q, setQ] = useState(searchParams.get("q") || "");
+  const [active, setActive] = useState<boolean | string>(
+    searchParams.get("isActive") || ""
+  );
   const {
     data: response,
     error,
     isLoading,
     refresh,
-  } = useGetAllKategori(search);
+  } = useGetAllPerangkat(q, active);
   const { execute: deleteKategori, loading: deleteLoading } =
-    useDeleteKategori();
+    useDeletePerangkat();
 
-  const [value] = useDebounce(search, 500);
+  const [value] = useDebounce(q, 500);
 
   const data: any = response?.data ?? [];
 
   // Debounce search
   useEffect(() => {
-    router.replace(`?q=${encodeURIComponent(value)}`);
+    router.replace(
+      `?${value ? `q=${encodeURIComponent(value)}` : ""}${
+        active ? `&isActive=${encodeURIComponent(active)}` : ""
+      }`
+    );
     refresh();
-  }, [value]);
+  }, [value, active]);
 
   return (
     <>
@@ -51,17 +63,35 @@ export default function ListTableKategori() {
         <div className="mb-4 flex items-center justify-between">
           <div className="flex gap-2">
             <Input
-              placeholder="Cari kategori..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Cari Nama/Jabatan/Email"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
               className="max-w-sm"
             />
             <Button
               variant="default"
-              onClick={() => setSearch("")}
+              onClick={() => setQ("")}
               className="cursor-pointer"
             >
               <XIcon />
+            </Button>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant={active === "true" ? "default" : "outline"}
+              onClick={() => setActive("true")}
+              onDoubleClick={() => setActive("")}
+              className="cursor-pointer"
+            >
+              Aktif
+            </Button>
+            <Button
+              variant={active === "false" ? "default" : "outline"}
+              onClick={() => setActive("false")}
+              onDoubleClick={() => setActive("")}
+              className="cursor-pointer"
+            >
+              Tidak Aktif
             </Button>
           </div>
         </div>
@@ -70,10 +100,11 @@ export default function ListTableKategori() {
           <TableHeader>
             <TableRow>
               <TableHead>No</TableHead>
-              <TableHead>Nama Kategori</TableHead>
-              <TableHead>Deskripsi</TableHead>
-              <TableHead>Jumlah Masukan</TableHead>
+              <TableHead>Nama</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Jabatan</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Tanggal Dibuat</TableHead>
               <TableHead>Aksi</TableHead>
             </TableRow>
           </TableHeader>
@@ -97,27 +128,26 @@ export default function ListTableKategori() {
                 </TableCell>
               </TableRow>
             ) : data.length > 0 ? (
-              data.map((item: any, i: number) => (
+              data.map((item: User, i: number) => (
                 <TableRow key={item.id}>
                   <TableCell>{i + 1}</TableCell>
-                  <TableCell className="font-medium">
-                    {item.namaKategori}
-                  </TableCell>
+                  <TableCell className="font-medium">{item.name}</TableCell>
                   <TableCell className="text-muted-foreground">
-                    {item.deskripsi}
+                    {item.email}
                   </TableCell>
-                  <TableCell>{item._count.masukanWarga}</TableCell>
+                  <TableCell>{item.jabatan}</TableCell>
                   <TableCell>
                     <Badge
-                      variant={
-                        item.status === "AKTIF" ? "default" : "secondary"
-                      }
+                      variant={item.isActive === true ? "default" : "secondary"}
                     >
-                      {item.status}
+                      {item.isActive === true ? "Aktif" : "Tidak Aktif"}
                     </Badge>
                   </TableCell>
+                  <TableCell>
+                    {new Date(item.createdAt).toLocaleDateString("id-ID")}
+                  </TableCell>
                   <TableCell className="space-x-2">
-                    <Link href={`/admin/kelola-kategori/${item.id}`} prefetch>
+                    <Link href={`/admin/kelola-perangkat/${item.id}`} prefetch>
                       <Button
                         variant="outline"
                         size="sm"
@@ -133,14 +163,13 @@ export default function ListTableKategori() {
                       disabled={deleteLoading}
                       onClick={async () => {
                         const { data: res, error } = await deleteKategori(
-                          `/protected/kategori/${item.id}`,
+                          `/protected/perangkat/${item.id}`,
                           {},
                           {},
-                          `/protected/kategori/${item.id}`
+                          `/protected/perangkat/${item.id}`
                         );
                         if (error) {
                           notifier.error(error);
-                          return;
                         }
 
                         notifier.success(

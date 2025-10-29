@@ -6,6 +6,7 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
+  BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -30,9 +31,9 @@ export default function Page({ children }: { children: React.ReactNode }) {
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem>
-                    <BreadcrumbLink className="line-clamp-1">
+                    <BreadcrumbPage className="line-clamp-1">
                       Project Management & Task Tracking
-                    </BreadcrumbLink>
+                    </BreadcrumbPage>
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
@@ -41,7 +42,9 @@ export default function Page({ children }: { children: React.ReactNode }) {
               <NavActions />
             </div>
           </header>
-          {children}
+          <div className="flex flex-1 flex-col gap-4 px-4 py-10">
+            {children}
+          </div>
         </SidebarInset>
       </SidebarProvider>
     </RoleGuardWrapper>

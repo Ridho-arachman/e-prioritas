@@ -8,7 +8,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
-import { isActiveRoute } from "@/utils/isActiveRoute";
+import { isActiveRoute } from "@/lib/isActiveRoute";
 
 export function NavMain({
   items,
