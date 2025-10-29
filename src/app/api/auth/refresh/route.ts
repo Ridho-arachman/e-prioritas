@@ -2,15 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import * as jose from "jose";
 import { generateAccessToken, JwtUser } from "@/lib/jwtHelper";
 import { handleResponse } from "@/lib/responseHandler";
+import { cors } from "@/lib/cors";
 
 const REFRESH_SECRET = new TextEncoder().encode(
   process.env.REFRESH_SECRET || "fallback-refresh-secret"
 );
 
 export async function POST(req: NextRequest) {
+  const headers = cors(req, {
+    allowedOrigins: [process.env.NEXT_PUBLIC_APP_URL!],
+  });
+
+  if (headers instanceof NextResponse) return headers;
   try {
     const refreshToken = req.cookies.get("refreshToken")?.value;
-    console.log("Ssss");
 
     if (!refreshToken) {
       return handleResponse({
