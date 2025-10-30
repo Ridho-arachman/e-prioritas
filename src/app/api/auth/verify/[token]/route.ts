@@ -35,7 +35,6 @@ export async function GET(
         status: 400,
       });
     }
-    console.log("PAYLOAD DARI TOKEN:", payload);
 
     // Update user jadi verified
     await prisma.user.update({
@@ -48,7 +47,7 @@ export async function GET(
 
     // // Redirect ke halaman sukses (opsional)
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/verified-email-success`
+      `${process.env.NEXT_PUBLIC_APP_URL}/verified-email-success?success=true`
     );
   } catch (error) {
     console.error("VERIFY ERROR DETAIL:", error);

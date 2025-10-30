@@ -9,6 +9,7 @@ import {
   Home,
   Inbox,
   LayoutDashboard,
+  MessageCircleMore,
   MessageCircleQuestion,
   Settings2,
   Sparkles,
@@ -65,6 +66,11 @@ const data = {
       title: "Kelola Kategori",
       url: "/admin/kelola-kategori",
       icon: Tags,
+    },
+    {
+      title: "Kelola Masukan Warga",
+      url: "/admin/kelola-masukan",
+      icon: MessageCircleMore,
     },
     {
       title: "Home",
