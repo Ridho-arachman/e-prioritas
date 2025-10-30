@@ -10,10 +10,14 @@ export type JwtUser = {
 const ACCESS_SECRET = new TextEncoder().encode(
   process.env.ACCESS_SECRET || "fallback-access-secret"
 );
+
 const REFRESH_SECRET = new TextEncoder().encode(
   process.env.REFRESH_SECRET || "fallback-refresh-secret"
 );
 
+const VERIFY_SECRET = new TextEncoder().encode(
+  process.env.VERIFY_SECRET || "fallback-refresh-secret"
+);
 /**
  * Generate Access Token (durasi pendek, misal 15 menit)
  */
@@ -25,7 +29,7 @@ export const generateAccessToken = async (user: JwtUser) => {
   })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("1m")
+    .setExpirationTime("15m")
     .sign(ACCESS_SECRET);
 };
 
@@ -42,4 +46,16 @@ export const generateRefreshToken = async (user: JwtUser) => {
     .setIssuedAt()
     .setExpirationTime("7d")
     .sign(REFRESH_SECRET);
+};
+
+export const generateVerifyToken = async (user: JwtUser) => {
+  return await new jose.SignJWT({
+    id: user.id,
+    email: user.email,
+    role: user.role,
+  })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("15m")
+    .sign(VERIFY_SECRET);
 };

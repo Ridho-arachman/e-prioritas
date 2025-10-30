@@ -3,13 +3,18 @@ import { cors } from "@/lib/cors";
 import { handlePrismaError } from "@/lib/handlePrismaError";
 import { handleZodValidation } from "@/lib/handleZodValidation";
 import { hashPassword } from "@/lib/hashing";
+import { generateVerifyToken } from "@/lib/jwtHelper";
 import { handleResponse } from "@/lib/responseHandler";
 import {
   createUserPerangkatSchema,
   queryUserPerangkatSchema,
 } from "@/schema/userPerangkatSchema";
 import { userService } from "@/services/userService";
+import { Resend } from "resend";
 import { NextRequest, NextResponse } from "next/server";
+import { VerificationEmail } from "@/components/emails/VerificationEmail";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const GET = async (req: NextRequest) => {
   //CORS
@@ -146,13 +151,37 @@ const POST = async (req: NextRequest) => {
     const data = { ...parsedData, password: hashedPassword };
 
     //SIMPAN DATA KATEGORI KE DATABASE
-    const kategori = await userService.create(data);
+    const perangkat = await userService.create(data);
+
+    const verifyToken = generateVerifyToken(perangkat);
+
+    const verifyUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/verify/${verifyToken}`;
+
+    // const html = await render(
+    //   VerificationEmail({
+    //     nama: perangkat.name,
+    //     verifyUrl,
+    //   })
+    // );
+    console.log("Perangkat email:", perangkat.email);
+
+    const a = await resend.emails.send({
+      from: "Acme <onboarding@resend.dev>",
+      to: [perangkat.email],
+      subject: "hello world",
+      react: VerificationEmail({
+        nama: perangkat.name,
+        verifyUrl,
+      }),
+    });
+
+    console.log("Resend response:", a);
 
     //BERHASIL
     return handleResponse({
       success: true,
       message: "Perangkat Desa Berhasil Ditambahkan",
-      data: kategori,
+      data: perangkat,
       status: 201,
       headers,
     });

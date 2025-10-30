@@ -41,10 +41,16 @@ const useDeletePerangkat = () => {
   return { error, execute, loading };
 };
 
+const useSendVerifyEmail = () => {
+  const { error, execute, loading } = useMutation("post");
+  return { error, execute, loading };
+};
+
 export {
   useGetAllPerangkat,
   useGetPerangkatById,
   useEditPerangkat,
   useDeletePerangkat,
   useCreatePerangkat,
+  useSendVerifyEmail,
 };

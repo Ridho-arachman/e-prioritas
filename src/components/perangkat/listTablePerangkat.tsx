@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { XIcon } from "lucide-react";
+import { Send, XIcon } from "lucide-react";
 import { useDebounce } from "use-debounce";
 import { useState, useEffect } from "react";
 import { notifier } from "../ToastNotifier";
@@ -23,6 +23,7 @@ import {
 import {
   useDeletePerangkat,
   useGetAllPerangkat,
+  useSendVerifyEmail,
 } from "@/hooks/api/usePerangkat";
 import { User } from "@prisma/client";
 
@@ -42,6 +43,7 @@ export default function ListTablePerangkat() {
   } = useGetAllPerangkat(q, active);
   const { execute: deleteKategori, loading: deleteLoading } =
     useDeletePerangkat();
+  const { execute, loading } = useSendVerifyEmail();
 
   const [value] = useDebounce(q, 500);
 
@@ -103,7 +105,8 @@ export default function ListTablePerangkat() {
               <TableHead>Nama</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Jabatan</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Aktif</TableHead>
+              <TableHead>Verifikasi Email</TableHead>
               <TableHead>Tanggal Dibuat</TableHead>
               <TableHead>Aksi</TableHead>
             </TableRow>
@@ -137,10 +140,13 @@ export default function ListTablePerangkat() {
                   </TableCell>
                   <TableCell>{item.jabatan}</TableCell>
                   <TableCell>
-                    <Badge
-                      variant={item.isActive === true ? "default" : "secondary"}
-                    >
-                      {item.isActive === true ? "Aktif" : "Tidak Aktif"}
+                    <Badge variant="secondary">
+                      {item.isActive === true ? "✅" : "❌"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">
+                      {item.isEmailVerified === true ? "✅" : "❌"}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -180,6 +186,29 @@ export default function ListTablePerangkat() {
                       className="cursor-pointer"
                     >
                       Hapus
+                    </Button>
+                    <Button
+                      className="cursor-pointer bg-green-600 hover:bg-green-700"
+                      size="sm"
+                      disabled={deleteLoading || loading}
+                      onClick={async () => {
+                        const { data: res, error } = await execute(
+                          `/auth/send-verify-email/${item.id}`,
+                          {},
+                          {},
+                          `/auth/send-verify-email/${item.id}`
+                        );
+                        if (error) {
+                          notifier.error(error);
+                        }
+
+                        notifier.success(
+                          res?.message || "Kategori Berhasil Dihapus"
+                        );
+                        refresh();
+                      }}
+                    >
+                      <Send />
                     </Button>
                   </TableCell>
                 </TableRow>
