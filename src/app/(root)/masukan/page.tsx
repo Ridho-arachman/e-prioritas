@@ -5,118 +5,103 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowRight, Send, MapPin, MessageSquare, User, Mail, Tag, AlertTriangle } from "lucide-react";
+import {
+  MessageSquare,
+  Building2,
+  CalendarDays,
+  MapPinned,
+  ArrowRight,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import MasukanWargaFormAdd from "@/components/masukan/masukanFormAdd";
 
-// Data Dummy untuk Select
-const rtrwOptions = ["Pilih RT/RW", "RT 01 / RW 01", "RT 02 / RW 01", "RT 03 / RW 02", "RT 04 / RW 02", "Lainnya"];
-const kategoriOptions = ["Infrastruktur", "Sosial & Budaya", "Kesehatan", "Pendidikan", "Keamanan & Ketertiban"];
+const agendaDesa = [
+  { nama: "Musyawarah Dusun", tanggal: "5 Nov 2025" },
+  { nama: "Gotong Royong Bersama", tanggal: "10 Nov 2025" },
+  { nama: "Rapat Evaluasi Program", tanggal: "15 Nov 2025" },
+];
 
 export default function MasukanPage() {
   return (
-    <main className="flex min-h-[calc(100vh-8rem)] items-center justify-center p-6 sm:p-24">
-      <div className="w-full max-w-2xl">
-        <Card>
+    <div className="flex flex-col md:flex-row min-h-[calc(100vh-8rem)] gap-6 p-6 sm:p-10 md:p-16">
+      {/* Bagian Form */}
+      <div className="flex-1">
+        <Card className="hover:shadow-xl transition-shadow duration-300">
           <CardHeader className="text-center">
-            <MessageSquare className="w-12 h-12 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
-            <CardTitle className="text-3xl font-bold">
+            <MessageSquare className="w-12 h-12 text-blue-600 dark:text-blue-400 mx-auto mb-3" />
+            <CardTitle className="text-3xl font-bold tracking-tight">
               Sampaikan Masukan Anda
             </CardTitle>
-            <CardDescription className="text-md mt-2">
-              Masukan Anda akan diverifikasi oleh Perangkat Desa sebelum diproses.
+            <CardDescription className="text-md mt-2 text-muted-foreground">
+              Masukan Anda akan diverifikasi oleh Perangkat Desa sebelum
+              diproses.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <form className="space-y-6">
-              
-              {/* Field Nama */}
-              <div className="space-y-2">
-                <Label htmlFor="nama" className="flex items-center gap-2">
-                  <User className="w-4 h-4 text-gray-500" /> Nama Lengkap (Opsional)
-                </Label>
-                <Input id="nama" placeholder="Masukkan nama Anda" />
-              </div>
-
-              {/* Field Email */}
-              <div className="space-y-2">
-                <Label htmlFor="email" className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-gray-500" /> Email (Opsional)
-                </Label>
-                <Input id="email" type="email" placeholder="Untuk keperluan verifikasi jika dibutuhkan" />
-              </div>
-
-              {/* Field Kategori (Wajib) */}
-              <div className="space-y-2">
-                <Label htmlFor="kategori" className="flex items-center gap-2 font-semibold">
-                  <Tag className="w-4 h-4 text-red-500" /> Kategori Masukan <span className="text-red-500">* Wajib</span>
-                </Label>
-                <Select required>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Pilih Kategori Masukan" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {kategoriOptions.map((kategori) => (
-                      <SelectItem key={kategori} value={kategori}>
-                        {kategori}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Field RT/RW (Wajib) */}
-              <div className="space-y-2">
-                <Label htmlFor="rtrw" className="flex items-center gap-2 font-semibold">
-                  <MapPin className="w-4 h-4 text-red-500" /> Lokasi (RT/RW) <span className="text-red-500">* Wajib</span>
-                </Label>
-                <Select required>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Pilih Lokasi RT/RW Anda" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {rtrwOptions.map((lokasi) => (
-                      <SelectItem key={lokasi} value={lokasi}>
-                        {lokasi}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Field Deskripsi */}
-              <div className="space-y-2">
-                <Label htmlFor="deskripsi" className="flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-gray-500" /> Deskripsi Masukan
-                </Label>
-                <Textarea
-                  id="deskripsi"
-                  placeholder="Jelaskan masukan Anda secara rinci..."
-                  rows={5}
-                  required
-                />
-              </div>
-
-              {/* Peringatan Verifikasi */}
-              <div className="flex items-center p-3 text-sm rounded-md bg-yellow-50 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300">
-                <AlertTriangle className="w-5 h-5 mr-2 flex-shrink-0" />
-                Masukan yang tidak lengkap atau di luar cakupan Kelurahan Panggungjati akan ditolak.
-              </div>
-
-              {/* Tombol Submit */}
-              <div className="flex justify-end">
-                <Button type="submit" className="flex items-center gap-2">
-                  Kirim Masukan
-                  <Send className="w-4 h-4" />
-                </Button>
-              </div>
-            </form>
+            <MasukanWargaFormAdd />
           </CardContent>
         </Card>
       </div>
-    </main>
+
+      {/* Bagian Aside */}
+      <aside className="w-full md:w-1/3 space-y-4">
+        {/* Card Informasi Desa */}
+        <Card className="hover:shadow-md transition-all duration-300 border-blue-100 dark:border-blue-900">
+          <CardHeader className="flex items-center gap-2">
+            <Building2 className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            <CardTitle>Informasi Desa</CardTitle>
+          </CardHeader>
+          <CardContent className="text-sm space-y-2">
+            <div className="flex items-center gap-2">
+              <MapPinned className="w-4 h-4 text-gray-500" />
+              <p>
+                <strong>Nama Desa:</strong> Panggungjati
+              </p>
+            </div>
+            <p>
+              <strong>Kecamatan:</strong> Taktakan
+            </p>
+            <p>
+              <strong>Kabupaten:</strong> Serang
+            </p>
+            <p>
+              <strong>Provinsi:</strong> Banten
+            </p>
+            <p>
+              <strong>Kode Pos:</strong> 42415
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Card Agenda Desa */}
+        <Card className="hover:shadow-md transition-all duration-300 border-green-100 dark:border-green-900">
+          <CardHeader className="flex items-center gap-2">
+            <CalendarDays className="w-6 h-6 text-green-600 dark:text-green-400" />
+            <CardTitle>Agenda Desa</CardTitle>
+          </CardHeader>
+          <CardContent className="text-sm space-y-3">
+            <ul className="space-y-2">
+              {agendaDesa.map((agenda) => (
+                <li
+                  key={agenda.nama}
+                  className="flex items-center justify-between p-2 rounded-md bg-muted hover:bg-muted/80 transition-colors"
+                >
+                  <span className="flex items-center gap-2">
+                    <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                    {agenda.nama}
+                  </span>
+                  <Badge variant="outline" className="text-xs">
+                    {agenda.tanggal}
+                  </Badge>
+                </li>
+              ))}
+            </ul>
+            <p className="text-muted-foreground mt-3 text-xs italic">
+              Agenda akan diperbarui secara berkala oleh perangkat desa.
+            </p>
+          </CardContent>
+        </Card>
+      </aside>
+    </div>
   );
 }

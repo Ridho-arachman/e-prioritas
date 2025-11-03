@@ -9,15 +9,17 @@ datasource db {
 
 model User {
   id                    String    @id @default(cuid())
-  name                  String    
+  name                  String    @db.VarChar(255)
   email                 String    @unique
   password              String    @map("password_hash") 
-  jabatan               String
+  jabatan               String    @db.VarChar(100)
   role                  Role      @default(PERANGKAT_DESA)
   isActive              Boolean   @default(true) @map("is_active")
   isEmailVerified       Boolean   @default(false) @map("is_email_verified")
   emailVerifiedAt       DateTime? @map("email_verified_at")
   createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
 
   masukanVerifikasi     MasukanWarga[] @relation("MasukanVerifikasi")
   rekomendasiDiproses   Rekomendasi[]  @relation("RekomendasiDiproses")
@@ -48,7 +50,7 @@ model Kategori {
 
 model MasukanWarga {
   id                    String        @id @default(cuid())
-  namaPengirim          String        @map("nama_pengirim")
+  namaPengirim          String        @db.VarChar(255) @map("nama_pengirim")
   emailPengirim         String        @map("email_pengirim")
   lokasiRt              String        @db.VarChar(3) @map("lokasi_rt")
   lokasiRw              String        @db.VarChar(3) @map("lokasi_rw")
@@ -68,11 +70,10 @@ model MasukanWarga {
 
   @@map("masukan_warga")
   @@index([emailPengirim])
-  @@index([createdAt])
   @@index([namaPengirim])
+  @@index([createdAt])
   @@index([status])
   @@index([kategoriId])
-  
 }
 
 model DataMaster {
@@ -131,5 +132,4 @@ enum MasukanStatus {
   MENUNGGU_VERIFIKASI
   DITERIMA
   DITOLAK
-  SELESAI_DIPROSES
 }

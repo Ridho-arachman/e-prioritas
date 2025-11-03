@@ -32,10 +32,16 @@ const useDeleteKategori = () => {
   return { error, execute, loading };
 };
 
+const useGetAllKategoriNoProtected = () => {
+  const { data, error, isLoading, refresh } = useFetch("/kategori");
+  return { data, error, isLoading, refresh };
+};
+
 export {
   useGetAllKategori,
   useGetKategoriById,
   useEditKategori,
   useDeleteKategori,
   useCreateKategori,
+  useGetAllKategoriNoProtected,
 };

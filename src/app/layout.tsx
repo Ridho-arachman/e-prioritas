@@ -1,6 +1,64 @@
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
 import { Toaster } from "sonner";
+import "./globals.css";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  metadataBase: new URL("http://localhost:3000"), // ganti dengan domainmu
+  title: {
+    default: "HOME",
+    template: "%s | E - Prioritas",
+  },
+  description:
+    "Sistem rekomendasi pembangunan fasilitas desa Panggungjati untuk membantu perangkat desa agar bisa mendaptkan output prioritas pembangunan fasilitas desa.",
+  keywords: [
+    "Desa Panggungjati",
+    "E - Prioritas",
+    "Masukan Warga",
+    "Rekomendasi Desa",
+    "Pelayanan Masyarakat",
+  ],
+  authors: [
+    {
+      name: "MUHAMMAD RIDHO ARACHMAN",
+      url: "https://www.instagram.com/ridho_arachman/",
+    },
+  ],
+  creator: "Tim IT Desa Panggungjati",
+  publisher: "Desa Panggungjati",
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    type: "website",
+    locale: "id_ID",
+    url: "http://localhost:3000",
+    title: "E - Prioritas",
+    description:
+      "Sistem rekomendasi pembangunan fasilitas desa Panggungjati untuk membantu perangkat desa agar bisa mendaptkan output prioritas pembangunan fasilitas desa.",
+    siteName: "Desa Panggungjati",
+    images: [
+      {
+        url: "http://localhost:3000/logo-full.svg",
+        width: 1200,
+        height: 630,
+        alt: "Desa Panggungjati",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "E - Prioritas",
+    description:
+      "Sistem rekomendasi pembangunan fasilitas desa Panggungjati untuk membantu perangkat desa agar bisa mendaptkan output prioritas pembangunan fasilitas desa.",
+    images: ["http://localhost:3000/logo-full.svg"],
+    creator: "@desapanggungjati",
+  },
+  alternates: {
+    canonical: "http://localhost:3000",
+  },
+};
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

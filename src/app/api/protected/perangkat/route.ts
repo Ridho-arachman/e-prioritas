@@ -57,7 +57,7 @@ const GET = async (req: NextRequest) => {
     const { isActive: isActiveParam, q: queryUser } = parsed.data;
 
     //AMBIL DATA KATEGORI DARI DATABASE
-    const data = await userService.getAll(queryUser, isActiveParam);
+    const data = await userService.getAllPerangkat(queryUser, isActiveParam);
 
     //JIKA DATA KOSONG
 

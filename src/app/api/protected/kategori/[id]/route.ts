@@ -110,21 +110,21 @@ const PUT = async (
     });
   }
 
-  // NGGAMBIL REQ BODY & PARAM
-  const { id } = await ctx.params;
-  const body = await req.json();
-
-  // VALIDASI REQ BODY & PARAM
-  const parsed = kategoriSchema.safeParse(body);
-  const parsedId = kategoriByIdSchema.safeParse({ id });
-  if (!parsedId.success) return handleZodValidation(parsedId, headers);
-  if (!parsed.success) return handleZodValidation(parsed, headers);
-
-  // JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
-  const data = parsed.data;
-  const kategoriId = parsedId.data.id;
-
   try {
+    // NGGAMBIL REQ BODY & PARAM
+    const { id } = await ctx.params;
+    const body = await req.json();
+
+    // VALIDASI REQ BODY & PARAM
+    const parsed = kategoriSchema.safeParse(body);
+    const parsedId = kategoriByIdSchema.safeParse({ id });
+    if (!parsedId.success) return handleZodValidation(parsedId, headers);
+    if (!parsed.success) return handleZodValidation(parsed, headers);
+
+    // JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
+    const data = parsed.data;
+    const kategoriId = parsedId.data.id;
+
     // SIMPAN DATA KATEGORI KE DATABASE
     const kategori = await kategoriService.update(kategoriId, data);
     return handleResponse({

@@ -1,5 +1,6 @@
 import { loginSchema } from "@/schema/login";
-import { createUserSchema } from "@/schema/sign-up";
+import { createUserPerangkatSchema } from "@/schema/userPerangkatSchema";
+
 import { createDocument } from "zod-openapi";
 import * as z from "zod/v4";
 
@@ -30,7 +31,7 @@ export const openApiDocument = createDocument({
           required: true,
           content: {
             "application/json": {
-              schema: createUserSchema.meta({
+              schema: createUserPerangkatSchema.meta({
                 title: "RegisterRequest",
               }),
             },
@@ -41,7 +42,9 @@ export const openApiDocument = createDocument({
             description: "User created successfully",
             content: {
               "application/json": {
-                schema: createUserSchema.meta({ description: "User data" }),
+                schema: createUserPerangkatSchema.meta({
+                  description: "User data",
+                }),
                 status: 201,
               },
             },

@@ -12,7 +12,7 @@ export const userService = {
     });
   },
 
-  getAll: async (q?: string, isActive?: string) => {
+  getAllPerangkat: async (q?: string, isActive?: string) => {
     return prisma.user.findMany({
       where: {
         AND: [
@@ -32,6 +32,13 @@ export const userService = {
       },
       omit: { role: true, password: true },
       orderBy: { createdAt: "desc" },
+    });
+  },
+
+  getAll: async () => {
+    return prisma.user.findMany({
+      omit: { role: true, password: true },
+      orderBy: { name: "asc" },
     });
   },
 

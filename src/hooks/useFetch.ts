@@ -8,17 +8,16 @@ type FetchConfig = {
 };
 
 export const useFetch = (url: string, config: FetchConfig = {}) => {
-  const fetcher = async (url: string) => {
+  const key = [
+    url,
+    JSON.stringify(config.params ?? {}),
+    JSON.stringify(config.headers ?? {}),
+  ];
+
+  const { data, error, isLoading, mutate } = useSWR(key, async () => {
     const res = await api.get(url, config);
     return res.data;
-  };
+  });
 
-  const { data, error, isLoading, mutate } = useSWR(url, fetcher);
-
-  return {
-    data,
-    error,
-    isLoading,
-    refresh: mutate,
-  };
+  return { data, error, isLoading, refresh: mutate };
 };

@@ -11,23 +11,24 @@ export const createMasukanWargaSchema = z.object({
     .string("Email pengirim harus teks")
     .trim()
     .email("Format email tidak valid"),
-  lokasiRtrw: z
-    .string("Lokasi RT/RW harus teks")
+  lokasiRt: z
+    .string("Lokasi RT harus teks")
     .trim()
-    .min(1, "Lokasi RT/RW tidak boleh kosong"),
+    .min(1, "Lokasi RT tidak boleh kosong")
+    .max(3, "Lokasi RT maksimal 3 karakter"),
+  lokasiRw: z
+    .string("Lokasi RW harus teks")
+    .trim()
+    .min(1, "Lokasi RW tidak boleh kosong")
+    .max(3, "Lokasi RW maksimal 3 karakter"),
   deskripsiMasukan: z
-    .string("Isi masukan harus teks")
+    .string("Deskripsi masukan harus teks")
     .trim()
-    .min(1, "Isi masukan tidak boleh kosong"),
+    .min(1, "Deskripsi masukan tidak boleh kosong"),
   kategoriId: z
     .string("Kategori id harus teks")
     .trim()
     .cuid("Kategori id tidak valid"),
-  verifiedByUserId: z
-    .string("Verified by user id harus teks")
-    .trim()
-    .cuid("Verified by user id tidak valid")
-    .optional(),
 });
 
 export const editStatusMasukanWargaSchema = z.object({
@@ -44,30 +45,35 @@ export const masukanWargaByIdSchema = z.object({
 });
 
 export const masukanWargaQuerySchema = z.object({
-  namaPengirim: z
-    .string("Nama pengirim harus teks")
-    .trim()
-    .max(255, "Nama pengirim maksimal 255 karakter")
-    .optional(),
-
-  emailPengirim: z
-    .string("Email harus teks")
-    .trim()
-    .email("Format email tidak valid")
-    .optional(),
-
-  lokasiRtrw: z
-    .string("Lokasi RT/RW harus teks")
-    .trim()
-    .max(255, "Lokasi maksimal 255 karakter")
-    .optional(),
-
+  q: z.string().optional(),
   status: z
     .nativeEnum(MasukanStatus, { message: "Status tidak valid" })
     .optional(),
 
   kategoriId: z
-    .string("ID kategori harus teks")
-    .cuid("ID kategori tidak valid")
-    .optional(),
+    .string()
+    .optional()
+    .refine((val) => !val || /^c[a-z0-9]{24}$/i.test(val), {
+      message: "ID kategori tidak valid (harus berupa cuid)",
+    }),
+
+  verifiedByUserId: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^c[a-z0-9]{24}$/i.test(val), {
+      message: "ID user tidak valid (harus berupa cuid)",
+    }),
+
+  createdAt: z
+    .string()
+    .optional()
+    .refine(
+      (val) =>
+        !val ||
+        /^\d{4}-\d{2}-\d{2}(?:\s\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?)?$/.test(val),
+      {
+        message:
+          "Format tanggal tidak valid (gunakan YYYY-MM-DD atau YYYY-MM-DD HH:mm:ss)",
+      }
+    ),
 });

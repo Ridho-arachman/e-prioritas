@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 
 type whereQuerySchema = Prisma.MasukanWargaWhereInput;
 type createDataSchema = Prisma.MasukanWargaCreateInput | any;
+type updateDataSchema = Prisma.MasukanWargaUpdateInput | any;
 
 export const masukanWargaService = {
   create: async (data: createDataSchema) => {
@@ -16,27 +17,24 @@ export const masukanWargaService = {
           verifiedBy: { connect: { id: verifiedByUserId } },
         }),
       },
-      include: {
-        kategori: { select: { id: true, namaKategori: true } },
-        verifiedBy: { select: { id: true, name: true } },
-      },
     });
   },
 
   getAll: async (where?: whereQuerySchema) => {
     return prisma.masukanWarga.findMany({
       where,
-      include: {
-        kategori: { select: { id: true, namaKategori: true } },
-        verifiedBy: { select: { id: true, name: true } },
-      },
       orderBy: { createdAt: "desc" },
     });
   },
 
   getById: async () => {},
 
-  update: async () => {},
-
-  deleteById: async () => {},
+  update: async (id: string, data: updateDataSchema) => {
+    return prisma.masukanWarga.update({
+      where: { id },
+      data: {
+        status: data.status,
+      },
+    });
+  },
 };
