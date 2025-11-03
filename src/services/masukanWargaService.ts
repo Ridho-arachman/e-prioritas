@@ -27,13 +27,24 @@ export const masukanWargaService = {
     });
   },
 
-  getById: async () => {},
+  getById: async (id?: string) => {
+    return prisma.masukanWarga.findUniqueOrThrow({
+      where: { id },
+      include: {
+        kategori: { select: { id: true, namaKategori: true } },
+        verifiedBy: { select: { id: true, name: true, email: true } },
+      },
+    });
+  },
 
   update: async (id: string, data: updateDataSchema) => {
     return prisma.masukanWarga.update({
       where: { id },
       data: {
+        alasanPenolakan:
+          data.status === "DITOLAK" ? data.alasanPenolakan : null,
         status: data.status,
+        verifiedByUserId: data.verifiedByUserId ? data.verifiedByUserId : null,
       },
     });
   },

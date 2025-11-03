@@ -29,4 +29,26 @@ const useGetAllMasukanWarga = (
   return { error, data, isLoading, refresh };
 };
 
-export { useCreateMasukanWarga, useGetAllMasukanWarga };
+const useGetDetailMasukanWarga = (id: string) => {
+  const { error, data, isLoading, refresh } = useFetch(
+    `/protected/masukan/${id}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return { error, data, isLoading, refresh };
+};
+
+const useUpdateMasukanWarga = () => {
+  const { error, execute, loading } = useMutation("patch");
+  return { error, execute, loading };
+};
+
+export {
+  useUpdateMasukanWarga,
+  useCreateMasukanWarga,
+  useGetAllMasukanWarga,
+  useGetDetailMasukanWarga,
+};

@@ -18,7 +18,7 @@ model User {
   isEmailVerified       Boolean   @default(false) @map("is_email_verified")
   emailVerifiedAt       DateTime? @map("email_verified_at")
   createdAt             DateTime  @default(now()) @map("created_at")
-  updatedAt             DateTime  @updatedAt @map("updated_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at") @default(now())
 
 
   masukanVerifikasi     MasukanWarga[] @relation("MasukanVerifikasi")

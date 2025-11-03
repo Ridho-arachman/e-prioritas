@@ -32,16 +32,23 @@ export const createMasukanWargaSchema = z.object({
 });
 
 export const editStatusMasukanWargaSchema = z.object({
-  status: z
-    .nativeEnum(MasukanStatus, { message: "Status tidak valid" })
+  status: z.nativeEnum(MasukanStatus, { message: "Status tidak valid" }),
+  verifiedByUserId: z
+    .string("ID user wajib diisi")
+    .trim()
+    .cuid("ID user tidak valid"),
+  alasanPenolakan: z
+    .string("Alasan penolakan")
+    .trim()
+    .min(1, "Alasan penolakan tidak boleh kosong")
     .optional(),
 });
 
 export const masukanWargaByIdSchema = z.object({
   id: z
-    .cuid("Id kategori tidak valid")
+    .string("Id kategori wajib diisi")
     .trim()
-    .min(1, "Id kategori tidak valid"),
+    .cuid("Id kategori tidak valid"),
 });
 
 export const masukanWargaQuerySchema = z.object({
