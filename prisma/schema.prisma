@@ -88,6 +88,9 @@ model DataMaster {
   updatedBy             User      @relation("DataMasterUpdate", fields: [updatedByUserId], references: [id])
   updatedAt             DateTime  @updatedAt @map("updated_at")
 
+  @@unique([jenisData, namaAtribut, lokasiRt, lokasiRw])
+  @@index([jenisData])
+  @@index([lokasiRt, lokasiRw])
   @@map("data_master")
 }
 
