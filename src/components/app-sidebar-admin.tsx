@@ -6,19 +6,17 @@ import {
   Blocks,
   Calendar,
   Command,
+  Database,
   Home,
   Inbox,
   LayoutDashboard,
   MessageCircleMore,
   MessageCircleQuestion,
   Settings2,
-  Sparkles,
   Tags,
   Trash2,
-  User,
   User2Icon,
 } from "lucide-react";
-
 import { NavFavorites } from "@/components/nav-favorites";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
@@ -73,10 +71,9 @@ const data = {
       icon: MessageCircleMore,
     },
     {
-      title: "Home",
-      url: "#",
-      icon: Home,
-      isActive: true,
+      title: "Kelola Data Master",
+      url: "/admin/kelola-data",
+      icon: Database,
     },
     {
       title: "Inbox",

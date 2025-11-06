@@ -122,7 +122,6 @@ const GET = async (req: NextRequest) => {
       headers,
     });
   } catch (err) {
-    console.error(err);
     const prismaResponse = handlePrismaError(err);
     if (prismaResponse) {
       return handleResponse({

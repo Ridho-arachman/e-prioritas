@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
+import { JenisDataMaster } from "@prisma/client";
 
 type CreateDataInput = {
-  jenisData: string;
+  jenisData: JenisDataMaster;
   namaAtribut: string;
   nilai: string;
   lokasiRt: string;
@@ -10,7 +11,7 @@ type CreateDataInput = {
 };
 
 type UpdateDataInput = {
-  jenisData?: string;
+  jenisData?: JenisDataMaster;
   namaAtribut?: string;
   nilai?: string;
   lokasiRt?: string;
@@ -34,13 +35,30 @@ export const dataMasterService = {
     });
   },
 
-  getAll: async (namaKategori?: string) => {
-    // nanti bisa pakai prisma.dataMaster.findMany()
+  getAll: async (where?: any) => {
+    return prisma.dataMaster.findMany({
+      where,
+      include: { updatedBy: { select: { name: true } } },
+      orderBy: { updatedAt: "desc" },
+    });
   },
 
-  getById: async (kategoriId?: string) => {},
+  getById: async (id?: string) => {
+    return prisma.dataMaster.findUniqueOrThrow({
+      where: { id },
+    });
+  },
 
-  update: async (kategoriId: string, data: UpdateDataInput) => {},
+  update: async (id: string, data: UpdateDataInput) => {
+    return prisma.dataMaster.update({
+      where: { id },
+      data,
+    });
+  },
 
-  deleteById: async (kategoriId: string) => {},
+  deleteById: async (id: string) => {
+    return prisma.dataMaster.delete({
+      where: { id },
+    });
+  },
 };

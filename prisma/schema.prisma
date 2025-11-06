@@ -78,7 +78,7 @@ model MasukanWarga {
 
 model DataMaster {
   id                    String    @id @default(cuid())
-  jenisData             String    @map("jenis_data")
+  jenisData             JenisDataMaster    @map("jenis_data")
   namaAtribut           String    @map("nama_atribut")
   nilai                 String
   lokasiRt              String?   @db.VarChar(3) @map("lokasi_rt")
@@ -97,7 +97,7 @@ model DataMaster {
 model Rekomendasi {
   id                    String      @id @default(cuid())
   judul                 String
-  tanggalProses         DateTime    @map("tanggal_proses") @db.Date
+  tanggalProses         DateTime    @map("tanggal_proses") @default(now())
   prioritas1Deskripsi   String      @db.Text @map("prioritas_1_deskripsi")
   prioritas1Skor        Float       @map("prioritas_1_skor")
   laporanLengkap        Json?       @map("laporan_lengkap")
@@ -135,4 +135,17 @@ enum MasukanStatus {
   MENUNGGU_VERIFIKASI
   DITERIMA
   DITOLAK
+}
+
+enum JenisDataMaster {
+  KEPENDUDUKAN      // Jumlah penduduk, usia produktif, migrasi, dsb
+  INFRASTRUKTUR     // Jalan, jembatan, saluran air, drainase, lampu jalan, dsb
+  EKONOMI           // Pendapatan warga, usaha mikro, lapangan kerja, dsb
+  KESEHATAN         // Akses air bersih, fasilitas kesehatan, gizi, dsb
+  PENDIDIKAN        // Jumlah sekolah, tingkat pendidikan, fasilitas belajar
+  KEAMANAN          // Poskamling, kriminalitas, patroli, dll
+  LINGKUNGAN        // Kebersihan, penghijauan, pengelolaan sampah
+  SOSIAL_BUDAYA     // Kegiatan masyarakat, adat, organisasi sosial
+  PEMERINTAHAN      // Pelayanan publik, administrasi, perizinan
+  TEKNOLOGI         // Akses internet, perangkat digital, inovasi TTG
 }
