@@ -13,6 +13,7 @@
     "enabled": false
   },
   "dependencies": {
+    "@google/genai": "^1.29.0",
     "@hookform/resolvers": "^5.2.1",
     "@prisma/client": "^6.16.3",
     "@radix-ui/react-collapsible": "^1.1.12",
