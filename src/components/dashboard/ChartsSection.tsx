@@ -19,30 +19,38 @@ import {
   BarChart,
   Bar,
 } from "recharts";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useDashboardCharts } from "@/hooks/api/useDashboardData";
 
 export default function ChartsSection() {
-  const monthlyData = [
-    { month: "Jan", waiting: 4, accepted: 6, rejected: 2 },
-    { month: "Feb", waiting: 3, accepted: 8, rejected: 1 },
-    { month: "Mar", waiting: 5, accepted: 10, rejected: 3 },
-    { month: "Apr", waiting: 4, accepted: 12, rejected: 1 },
-    { month: "May", waiting: 6, accepted: 9, rejected: 2 },
-    { month: "Jun", waiting: 3, accepted: 11, rejected: 2 },
-    { month: "Jul", waiting: 5, accepted: 14, rejected: 3 },
-    { month: "Aug", waiting: 7, accepted: 13, rejected: 2 },
-    { month: "Sep", waiting: 6, accepted: 10, rejected: 1 },
-    { month: "Oct", waiting: 4, accepted: 8, rejected: 1 },
-    { month: "Nov", waiting: 3, accepted: 9, rejected: 0 },
-    { month: "Dec", waiting: 5, accepted: 11, rejected: 2 },
-  ];
+  const { data, isLoading, error } = useDashboardCharts();
 
-  const dataMasterCategory = [
-    { name: "Kependudukan", value: 12 },
-    { name: "Pendidikan", value: 8 },
-    { name: "Kesehatan", value: 6 },
-    { name: "Infrastruktur", value: 4 },
-    { name: "Lainnya", value: 2 },
-  ];
+  if (isLoading) {
+    return (
+      <div className="grid md:grid-cols-2 gap-6">
+        {[...Array(2)].map((_, i) => (
+          <Card key={i} className="border border-gray-200">
+            <CardHeader>
+              <Skeleton className="h-6 w-2/3 mb-2" />
+              <Skeleton className="h-4 w-1/2" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-64 w-full" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
+  if (error)
+    return (
+      <div className="p-6 text-center text-red-500 font-medium">
+        Gagal memuat data chart
+      </div>
+    );
+
+  const { monthlyData, dataMasterCategory } = data;
 
   return (
     <div className="grid md:grid-cols-2 gap-6">

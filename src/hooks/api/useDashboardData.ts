@@ -31,4 +31,22 @@ const useActivityStats = () => {
   return { data: data?.data || [], error, isLoading, refresh };
 };
 
-export { useStatsDashboard, useRecentActivities, useActivityStats };
+const useDashboardCharts = () => {
+  const { data, error, isLoading } = useFetch(
+    "/protected/dashboard/charts",
+    {}
+  );
+
+  return {
+    data: data?.data || { monthlyData: [], dataMasterCategory: [] },
+    error,
+    isLoading,
+  };
+};
+
+export {
+  useStatsDashboard,
+  useRecentActivities,
+  useActivityStats,
+  useDashboardCharts,
+};

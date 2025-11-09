@@ -117,4 +117,106 @@ export const dashboardService = {
       masukanWaiting,
     };
   },
+
+  getMonthlyMasukanStats: async () => {
+    // Ambil semua masukan warga dari 12 bulan terakhir
+    const now = new Date();
+    const twelveMonthsAgo = new Date();
+    twelveMonthsAgo.setMonth(now.getMonth() - 11);
+
+    const masukan = await prisma.masukanWarga.findMany({
+      where: { createdAt: { gte: twelveMonthsAgo } },
+      select: { createdAt: true, status: true },
+    });
+
+    // Buat array 12 bulan
+    const months = Array.from({ length: 12 }, (_, i) => {
+      const d = new Date(twelveMonthsAgo);
+      d.setMonth(d.getMonth() + i);
+      return {
+        month: d.toLocaleString("id-ID", { month: "short" }),
+        waiting: 0,
+        accepted: 0,
+        rejected: 0,
+      };
+    });
+
+    masukan.forEach((m) => {
+      const monthName = m.createdAt.toLocaleString("id-ID", { month: "short" });
+      const monthData = months.find((x) => x.month === monthName);
+      if (!monthData) return;
+
+      if (m.status === "MENUNGGU_VERIFIKASI") monthData.waiting++;
+      if (m.status === "DITERIMA") monthData.accepted++;
+      if (m.status === "DITOLAK") monthData.rejected++;
+    });
+
+    return months;
+  },
+
+  getDataMasterStats: async () => {
+    const masterCategory = await prisma.dataMaster.groupBy({
+      by: ["jenisData"], // hanya field yang ada di model
+      _count: { id: true },
+    });
+
+    return masterCategory.map((c) => ({
+      name: c.jenisData,
+      value: c._count?.id ?? 0, // fallback 0 kalau undefined
+    }));
+  },
+  //   getDashboardCharts: async () => {
+  //     // Ambil semua data masukan
+  //     const masukan = await prisma.masukanWarga.findMany({
+  //       select: { createdAt: true, status: true },
+  //     });
+
+  //     // Buat array bulan kosong
+  //     const months = [
+  //       "Jan",
+  //       "Feb",
+  //       "Mar",
+  //       "Apr",
+  //       "May",
+  //       "Jun",
+  //       "Jul",
+  //       "Aug",
+  //       "Sep",
+  //       "Oct",
+  //       "Nov",
+  //       "Dec",
+  //     ];
+
+  //     const monthlyData = months.map((month) => ({
+  //       month,
+  //       waiting: 0,
+  //       accepted: 0,
+  //       rejected: 0,
+  //     }));
+
+  //     // Kelompokkan per bulan
+  //     masukan.forEach((m) => {
+  //       const date = new Date(m.createdAt);
+  //       const idx = date.getMonth();
+  //       if (m.status === "MENUNGGU_VERIFIKASI") monthlyData[idx].waiting++;
+  //       if (m.status === "DITERIMA") monthlyData[idx].accepted++;
+  //       if (m.status === "DITOLAK") monthlyData[idx].rejected++;
+  //     });
+
+  //     // Kategorisasi Data Master
+  //     const masterCategory = await prisma.dataMaster.groupBy({
+  //       by: ["kategori"],
+  //       _count: { id: true },
+  //     });
+
+  //     const dataMasterCategory = masterCategory.map((c) => ({
+  //       name: c.kategori,
+  //       value: c._count.id,
+  //     }));
+
+  //     return {
+  //       monthlyData,
+  //       dataMasterCategory,
+  //     };
+  //   },
 };
