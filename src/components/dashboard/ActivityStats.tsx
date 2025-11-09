@@ -15,19 +15,62 @@ import {
   Cell,
   Legend,
 } from "recharts";
-import { PieChart as PieChartIcon } from "lucide-react";
+import { PieChart as PieChartIcon, AlertCircle } from "lucide-react";
+import { useActivityStats } from "@/hooks/api/useDashboardData";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ActivityStats() {
-  const stats = {
-    masukanAccepted: 45,
-    masukanRejected: 12,
-    masukanWaiting: 8,
-  };
+  const { data, isLoading, error } = useActivityStats();
 
+  // === LOADING STATE (SKELETON) ===
+  if (isLoading) {
+    return (
+      <Card className="border border-gray-200">
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold flex items-center gap-2">
+            <PieChartIcon className="w-5 h-5 text-green-500" />
+            Statistik Aktivitas
+          </CardTitle>
+          <CardDescription>Perbandingan jumlah masukan warga</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center h-64 animate-pulse">
+            <Skeleton className="w-32 h-32 rounded-full mb-4" />
+            <Skeleton className="w-3/4 h-4 mb-2" />
+            <Skeleton className="w-1/2 h-4" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // === ERROR STATE ===
+  if (error) {
+    return (
+      <Card className="border border-gray-200 text-center text-red-600 p-6">
+        <div className="flex flex-col items-center justify-center h-64 gap-3">
+          <AlertCircle className="w-8 h-8" />
+          <p className="font-medium">Gagal memuat data statistik</p>
+        </div>
+      </Card>
+    );
+  }
+
+  if (!data) {
+    return (
+      <Card className="border border-gray-200 text-center p-6">
+        <div className="flex flex-col items-center justify-center h-64 gap-3">
+          <p className="text-gray-500">Tidak ada data statistik tersedia</p>
+        </div>
+      </Card>
+    );
+  }
+
+  // === NORMAL STATE ===
   const chartData = [
-    { name: "Diterima", value: stats.masukanAccepted },
-    { name: "Ditolak", value: stats.masukanRejected },
-    { name: "Menunggu", value: stats.masukanWaiting },
+    { name: "Diterima", value: data.masukanAccepted },
+    { name: "Ditolak", value: data.masukanRejected },
+    { name: "Menunggu", value: data.masukanWaiting },
   ];
 
   const COLORS = ["#16a34a", "#ef4444", "#facc15"]; // hijau, merah, kuning

@@ -22,4 +22,13 @@ const useRecentActivities = () => {
   };
 };
 
-export { useStatsDashboard, useRecentActivities };
+const useActivityStats = () => {
+  const { data, error, isLoading, refresh } = useFetch(
+    "/protected/dashboard/activities-stats",
+    {}
+  );
+
+  return { data: data?.data || [], error, isLoading, refresh };
+};
+
+export { useStatsDashboard, useRecentActivities, useActivityStats };

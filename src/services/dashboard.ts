@@ -102,4 +102,19 @@ export const dashboardService = {
       .sort((a, b) => b.time.getTime() - a.time.getTime())
       .slice(0, 6);
   },
+
+  getActivityStats: async () => {
+    const [masukanAccepted, masukanRejected, masukanWaiting] =
+      await Promise.all([
+        prisma.masukanWarga.count({ where: { status: "DITERIMA" } }),
+        prisma.masukanWarga.count({ where: { status: "DITOLAK" } }),
+        prisma.masukanWarga.count({ where: { status: "MENUNGGU_VERIFIKASI" } }),
+      ]);
+
+    return {
+      masukanAccepted,
+      masukanRejected,
+      masukanWaiting,
+    };
+  },
 };
