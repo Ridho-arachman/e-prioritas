@@ -78,18 +78,21 @@ export default function ChartsSection() {
                   dataKey="accepted"
                   stroke="#16a34a"
                   strokeWidth={2}
+                  className="cursor-pointer"
                 />
                 <Line
                   type="monotone"
                   dataKey="waiting"
                   stroke="#facc15"
                   strokeWidth={2}
+                  className="cursor-pointer"
                 />
                 <Line
                   type="monotone"
                   dataKey="rejected"
                   stroke="#ef4444"
                   strokeWidth={2}
+                  className="cursor-pointer"
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -116,7 +119,12 @@ export default function ChartsSection() {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                <Bar
+                  dataKey="value"
+                  fill="#3b82f6"
+                  radius={[4, 4, 0, 0]}
+                  className="cursor-pointer"
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>

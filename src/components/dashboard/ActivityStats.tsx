@@ -103,6 +103,7 @@ export default function ActivityStats() {
                   <Cell
                     key={`cell-${index}`}
                     fill={COLORS[index % COLORS.length]}
+                    className="cursor-pointer"
                   />
                 ))}
               </Pie>

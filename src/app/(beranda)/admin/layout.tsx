@@ -4,7 +4,6 @@ import RoleGuardWrapper from "@/components/RoleGuardWrapper";
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
@@ -15,7 +14,13 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-export default function Page({ children }: { children: React.ReactNode }) {
+export default function Page({
+  children,
+  rekomendasi,
+}: {
+  children: React.ReactNode;
+  rekomendasi: React.ReactNode;
+}) {
   return (
     <RoleGuardWrapper allowedRoles={["ADMIN"]}>
       <SidebarProvider>
@@ -47,6 +52,7 @@ export default function Page({ children }: { children: React.ReactNode }) {
           </div>
         </SidebarInset>
       </SidebarProvider>
+      {rekomendasi}
     </RoleGuardWrapper>
   );
 }

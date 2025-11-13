@@ -1,7 +1,6 @@
 "use client";
 
 import { type LucideIcon } from "lucide-react";
-
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -17,7 +16,6 @@ export function NavMain({
     title: string;
     url: string;
     icon: LucideIcon;
-    isActive?: boolean;
   }[];
 }) {
   const pathname = usePathname();

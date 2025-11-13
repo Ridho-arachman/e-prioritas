@@ -2,13 +2,9 @@
 
 import * as React from "react";
 import {
-  AudioWaveform,
   Blocks,
-  Bot,
   Calendar,
-  Command,
   Database,
-  Inbox,
   LayoutDashboard,
   MessageCircleMore,
   MessageCircleQuestion,
@@ -20,8 +16,6 @@ import {
 import { NavFavorites } from "@/components/nav-favorites";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
-import { NavWorkspaces } from "@/components/nav-workspaces";
-import { TeamSwitcher } from "@/components/team-switcher";
 import {
   Sidebar,
   SidebarContent,
@@ -29,6 +23,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import Image from "next/image";
+import Modal from "./rekomendasi/Modal";
 
 // This is sample data.
 const data = {
@@ -37,7 +32,6 @@ const data = {
       title: "Dashboard",
       url: "/admin",
       icon: LayoutDashboard,
-      isActive: true,
     },
     {
       title: "Kelola Perangkat",
@@ -58,12 +52,6 @@ const data = {
       title: "Kelola Data Master",
       url: "/admin/kelola-data",
       icon: Database,
-    },
-    {
-      title: "+ Rekomendasi AI",
-      url: "#",
-      icon: Bot,
-      badge: "10",
     },
   ],
   navSecondary: [
@@ -93,58 +81,6 @@ const data = {
       icon: MessageCircleQuestion,
     },
   ],
-  favorites: [
-    {
-      name: "Project Management & Task Tracking",
-      url: "#",
-      emoji: "📊",
-    },
-    {
-      name: "Family Recipe Collection & Meal Planning",
-      url: "#",
-      emoji: "🍳",
-    },
-    {
-      name: "Fitness Tracker & Workout Routines",
-      url: "#",
-      emoji: "💪",
-    },
-    {
-      name: "Book Notes & Reading List",
-      url: "#",
-      emoji: "📚",
-    },
-    {
-      name: "Sustainable Gardening Tips & Plant Care",
-      url: "#",
-      emoji: "🌱",
-    },
-    {
-      name: "Language Learning Progress & Resources",
-      url: "#",
-      emoji: "🗣️",
-    },
-    {
-      name: "Home Renovation Ideas & Budget Tracker",
-      url: "#",
-      emoji: "🏠",
-    },
-    {
-      name: "Personal Finance & Investment Portfolio",
-      url: "#",
-      emoji: "💰",
-    },
-    {
-      name: "Movie & TV Show Watchlist with Reviews",
-      url: "#",
-      emoji: "🎬",
-    },
-    {
-      name: "Daily Habit Tracker & Goal Setting",
-      url: "#",
-      emoji: "✅",
-    },
-  ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -158,9 +94,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </h1>
         </span>
         <NavMain items={data.navMain} />
+        <Modal />
       </SidebarHeader>
       <SidebarContent>
-        <NavFavorites favorites={data.favorites} />
+        <NavFavorites />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarRail />
