@@ -23,7 +23,7 @@ const useGetKategoriById = (id: string) => {
 };
 
 const useEditKategori = () => {
-  const { error, execute, loading } = useMutation("patch");
+  const { error, execute, loading } = useMutation("put");
   return { error, execute, loading };
 };
 

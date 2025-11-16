@@ -22,6 +22,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+// Simple skeleton
+const Skeleton = ({ className }: { className: string }) => (
+  <div className={`animate-pulse rounded-md bg-muted ${className}`} />
+);
+
 export function KategoriFormEdit() {
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
@@ -40,7 +45,7 @@ export function KategoriFormEdit() {
 
   const { execute, loading } = useEditKategori();
 
-  // Saat data kategori sudah diambil, isi default value form
+  // Populate form saat fetch selesai
   useEffect(() => {
     if (kategori) {
       form.reset({
@@ -68,7 +73,39 @@ export function KategoriFormEdit() {
     router.back();
   };
 
-  const formComponent = (
+  // ------------------------
+  // 🔥 SKELETON SAAT LOADING
+  // ------------------------
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Skeleton className="h-5 w-40" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+
+        <div className="space-y-2">
+          <Skeleton className="h-5 w-40" />
+          <Skeleton className="h-24 w-full" />
+        </div>
+
+        <div className="space-y-2">
+          <Skeleton className="h-5 w-40" />
+          <Skeleton className="h-10 w-60" />
+        </div>
+
+        <div className="flex justify-end gap-3 pt-8 border-t border-border">
+          <Skeleton className="h-10 w-24" />
+          <Skeleton className="h-10 w-40" />
+        </div>
+      </div>
+    );
+  }
+
+  // ------------------------
+  // 🔥 FORM NORMAL
+  // ------------------------
+  return (
     <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
       <div className="space-y-6">
         {/* Nama Kategori */}
@@ -81,14 +118,12 @@ export function KategoriFormEdit() {
               <Input
                 {...field}
                 id="namaKategori"
-                aria-invalid={fieldState.invalid}
                 placeholder="Contoh: Infrastruktur, Kesehatan..."
-                disabled={loading || isLoading}
+                disabled={loading}
+                aria-invalid={fieldState.invalid}
               />
               {fieldState.invalid && (
-                <FieldError>
-                  {fieldState.error?.message || "Wajib diisi"}
-                </FieldError>
+                <FieldError>{fieldState.error?.message}</FieldError>
               )}
             </Field>
           )}
@@ -104,15 +139,13 @@ export function KategoriFormEdit() {
               <Textarea
                 {...field}
                 id="deskripsi"
-                placeholder="Tulis deskripsi singkat..."
-                aria-invalid={fieldState.invalid}
                 rows={4}
-                disabled={loading || isLoading}
+                placeholder="Tulis deskripsi singkat..."
+                disabled={loading}
+                aria-invalid={fieldState.invalid}
               />
               {fieldState.invalid && (
-                <FieldError>
-                  {fieldState.error?.message || "Wajib diisi"}
-                </FieldError>
+                <FieldError>{fieldState.error?.message}</FieldError>
               )}
             </Field>
           )}
@@ -129,9 +162,9 @@ export function KategoriFormEdit() {
                 onValueChange={field.onChange}
                 value={field.value}
                 defaultValue={field.value}
-                disabled={loading || isLoading}
+                disabled={loading}
               >
-                <SelectTrigger id="status" className="w-[240px]">
+                <SelectTrigger className="w-[240px]">
                   <SelectValue placeholder="Pilih status kategori" />
                 </SelectTrigger>
                 <SelectContent>
@@ -140,31 +173,25 @@ export function KategoriFormEdit() {
                 </SelectContent>
               </Select>
               {fieldState.invalid && (
-                <FieldError>
-                  {fieldState.error?.message || "Wajib diisi"}
-                </FieldError>
+                <FieldError>{fieldState.error?.message}</FieldError>
               )}
             </Field>
           )}
         />
       </div>
 
-      <div className="flex items-center justify-end gap-3 pt-8 border-t border-border">
+      <div className="flex justify-end gap-3 pt-8 border-t border-border">
         <Button
           variant="ghost"
           type="button"
           onClick={() => router.back()}
-          disabled={loading || isLoading}
+          disabled={loading}
           className="cursor-pointer"
         >
           Kembali
         </Button>
 
-        <Button
-          type="submit"
-          disabled={loading || isLoading}
-          className="cursor-pointer"
-        >
+        <Button type="submit" disabled={loading} className="cursor-pointer">
           {loading ? (
             <div className="flex items-center">
               <Spinner className="mr-2 size-4" />
@@ -177,6 +204,4 @@ export function KategoriFormEdit() {
       </div>
     </form>
   );
-
-  return formComponent;
 }

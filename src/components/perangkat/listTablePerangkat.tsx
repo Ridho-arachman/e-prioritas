@@ -26,6 +26,7 @@ import {
   useSendVerifyEmail,
 } from "@/hooks/api/usePerangkat";
 import { User } from "@prisma/client";
+import { Skeleton } from "../ui/skeleton";
 
 export default function ListTablePerangkat() {
   const router = useRouter();
@@ -113,14 +114,36 @@ export default function ListTablePerangkat() {
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell
-                  colSpan={6}
-                  className="text-center text-muted-foreground"
-                >
-                  Memuat data...
-                </TableCell>
-              </TableRow>
+              [...Array(5)].map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell>
+                    <Skeleton className="h-4 w-8" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-32" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-40" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-16" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-16" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-28" />
+                  </TableCell>
+                  <TableCell className="flex gap-2">
+                    <Skeleton className="h-8 w-14" />
+                    <Skeleton className="h-8 w-14" />
+                    <Skeleton className="h-8 w-14" />
+                  </TableCell>
+                </TableRow>
+              ))
             ) : error ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center text-red-500">

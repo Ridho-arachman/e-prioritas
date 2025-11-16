@@ -22,6 +22,7 @@ import {
   useGetPerangkatById,
 } from "@/hooks/api/usePerangkat";
 import { Switch } from "@/components/ui/switch";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function PerangkatFormEdit() {
   const router = useRouter();
@@ -41,7 +42,6 @@ export function PerangkatFormEdit() {
     },
   });
 
-  // Saat data kategori sudah diambil, isi default value form
   useEffect(() => {
     if (perangkat) {
       form.reset({
@@ -53,17 +53,53 @@ export function PerangkatFormEdit() {
     }
   }, [perangkat, form]);
 
+  // =============================
+  // ⭐ SKELETON LOADING
+  // =============================
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-16" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-28" />
+          <Skeleton className="h-10 w-24" />
+        </div>
+
+        <div className="flex justify-end gap-2 pt-4">
+          <Skeleton className="h-10 w-24" />
+          <Skeleton className="h-10 w-32" />
+        </div>
+      </div>
+    );
+  }
+
+  // =============================
+  // ⭐ SUBMIT HANDLER
+  // =============================
   const onSubmit = async (data: z.infer<typeof updateUserPerangkatSchema>) => {
     const { data: res, error } = await execute(
       `/protected/perangkat/${id}`,
       data,
       { headers: { "Content-Type": "application/json" } },
-      "/protected/perangkat/${id}"
+      `/protected/perangkat/${id}`
     );
 
     if (error) {
       console.log(error);
-
       notifier.error(error);
       return;
     }
@@ -72,6 +108,9 @@ export function PerangkatFormEdit() {
     router.back();
   };
 
+  // =============================
+  // ⭐ FORM RENDER
+  // =============================
   return (
     <div>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -87,7 +126,7 @@ export function PerangkatFormEdit() {
                   {...field}
                   id={field.name}
                   readOnly={loading}
-                  disabled={isLoading}
+                  disabled={loading}
                   aria-invalid={fieldState.invalid}
                   type="text"
                   placeholder="Masukkan nama lengkap"
@@ -112,7 +151,7 @@ export function PerangkatFormEdit() {
                   placeholder="contoh@email.com"
                   id={field.name}
                   readOnly={loading}
-                  disabled={isLoading}
+                  disabled={loading}
                   aria-invalid={fieldState.invalid}
                   {...field}
                   autoComplete="off"
@@ -135,7 +174,7 @@ export function PerangkatFormEdit() {
                   autoComplete="off"
                   id={field.name}
                   readOnly={loading}
-                  disabled={isLoading}
+                  disabled={loading}
                   type="text"
                   placeholder="Masukkan jabatan"
                   {...field}
@@ -162,7 +201,7 @@ export function PerangkatFormEdit() {
                 <FieldContent>
                   <Switch
                     id={field.name}
-                    disabled={loading || isLoading}
+                    disabled={loading}
                     aria-invalid={fieldState.invalid}
                     checked={field.value}
                     onCheckedChange={field.onChange}
@@ -177,16 +216,12 @@ export function PerangkatFormEdit() {
             <Button
               type="button"
               variant="outline"
-              disabled={loading || isLoading}
+              disabled={loading}
               onClick={() => router.back()}
             >
               Kembali
             </Button>
-            <Button
-              type="submit"
-              disabled={loading || isLoading}
-              className="cursor-pointer"
-            >
+            <Button type="submit" disabled={loading} className="cursor-pointer">
               {loading ? (
                 <div className="flex items-center">
                   <Spinner className="mr-2 size-4" />

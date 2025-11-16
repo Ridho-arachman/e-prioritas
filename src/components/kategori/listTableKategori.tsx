@@ -20,6 +20,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { XIcon } from "lucide-react";
 import { useDebounce } from "use-debounce";
 import { notifier } from "../ToastNotifier";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ListTableKategori() {
   const searchParams = useSearchParams();
@@ -36,7 +37,6 @@ export default function ListTableKategori() {
     useDeleteKategori();
 
   const [value] = useDebounce(search, 500);
-
   const data: any = response?.data ?? [];
 
   // Debounce search
@@ -77,16 +77,35 @@ export default function ListTableKategori() {
               <TableHead>Aksi</TableHead>
             </TableRow>
           </TableHeader>
+
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell
-                  colSpan={6}
-                  className="text-center text-muted-foreground"
-                >
-                  Memuat data...
-                </TableCell>
-              </TableRow>
+              // ============================
+              // ⭐ Skeleton Loading Rows
+              // ============================
+              Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell>
+                    <Skeleton className="h-4 w-6" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-32" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-48" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-10" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-5 w-20" />
+                  </TableCell>
+                  <TableCell className="flex gap-2">
+                    <Skeleton className="h-8 w-16" />
+                    <Skeleton className="h-8 w-16" />
+                  </TableCell>
+                </TableRow>
+              ))
             ) : error ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center text-red-500">

@@ -261,11 +261,28 @@ export default function MasukanListTable() {
 
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center">
-                  Memuat data...
-                </TableCell>
-              </TableRow>
+              [...Array(5)].map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell>
+                    <div className="h-4 w-32 bg-gray-200 rounded animate-pulse" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-4 w-40 bg-gray-200 rounded animate-pulse" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-4 w-60 bg-gray-200 rounded animate-pulse" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-4 w-28 bg-gray-200 rounded animate-pulse" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-8 w-16 bg-gray-200 rounded animate-pulse" />
+                  </TableCell>
+                </TableRow>
+              ))
             ) : data && data.length > 0 ? (
               data.map((item) => (
                 <TableRow key={item.id}>

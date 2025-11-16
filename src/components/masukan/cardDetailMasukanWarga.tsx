@@ -29,6 +29,7 @@ import { useParams } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
 import { MasukanStatus } from "@prisma/client";
 import { useRouter } from "next/navigation";
+import { Skeleton } from "../ui/skeleton";
 
 export default function CardDetailMasukanWarga() {
   const router = useRouter();
@@ -88,7 +89,6 @@ export default function CardDetailMasukanWarga() {
       refresh();
     } catch (err) {
       toast.error("Gagal memperbarui status masukan");
-      console.error(err);
     } finally {
       setOpenRejectModal(false);
       setOpenConfirmModal(false);
@@ -99,8 +99,59 @@ export default function CardDetailMasukanWarga() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <Spinner />
+      <div className="p-6 space-y-6">
+        <Card>
+          <CardHeader>
+            <div className="space-y-2">
+              <Skeleton className="h-6 w-48" />
+              <Skeleton className="h-4 w-80" />
+            </div>
+          </CardHeader>
+
+          <CardContent className="space-y-6">
+            {/* Header User */}
+            <div className="flex justify-between items-center">
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-40" />
+                <Skeleton className="h-4 w-60" />
+              </div>
+              <Skeleton className="h-6 w-24" />
+            </div>
+
+            <Separator />
+
+            {/* Detail Grid */}
+            <div className="grid grid-cols-2 gap-4">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-48" />
+                </div>
+              ))}
+
+              <div className="col-span-2 space-y-2">
+                <Skeleton className="h-4 w-40" />
+                <Skeleton className="h-20 w-full" />
+              </div>
+
+              <div className="col-span-2 space-y-2">
+                <Skeleton className="h-4 w-40" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex gap-4 pt-4">
+              <Skeleton className="h-10 w-40" />
+              <Skeleton className="h-10 w-32" />
+              <Skeleton className="h-10 w-52" />
+            </div>
+
+            <div className="flex justify-end">
+              <Skeleton className="h-10 w-24" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
