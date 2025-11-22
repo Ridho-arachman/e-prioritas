@@ -1,84 +1,129 @@
 // lib/buildPrompt.ts
-// Asumsi tipe data MasukanWarga dan DataMaster sudah didefinisikan atau diimpor
+import { prisma } from "@/lib/prisma";
 
-type PromptArgs = {
+export async function buildPrompt(args: {
   mode: "FUSI_DATA" | "DATA_MASTER_SAJA";
   judulLaporan: string;
-  masukanWarga: any[]; // Gunakan tipe yang benar
-  dataMaster: any[]; // Gunakan tipe yang benar
-  exclusionTitles: string[];
-};
+}) {
+  const { mode, judulLaporan } = args;
 
-export function buildPrompt(args: PromptArgs): string {
-  const { mode, judulLaporan, masukanWarga, dataMaster, exclusionTitles } =
-    args;
+  // Ambil data dari database
+  const dataMaster = await prisma.dataMaster.findMany();
+  const masukanWarga = await prisma.masukanWarga.findMany();
+  const exclusionTitles = await prisma.rekomendasi.findMany({
+    select: { prioritas1Deskripsi: true },
+  });
 
-  const masukanWargaJsonString = JSON.stringify(masukanWarga, null, 2);
-  const dataMasterJsonString = JSON.stringify(dataMaster, null, 2);
-  const exclusionListString = JSON.stringify(exclusionTitles, null, 2);
+  const exclusionList = exclusionTitles.map((e) => e.prioritas1Deskripsi);
 
-  // Kriteria Dasar & Format Output
-  const baseInstruction = `
-        Anda adalah analis pembangunan kelurahan ahli. Tugas Anda adalah menghasilkan 5 rekomendasi prioritas paling mendesak.
-        
-        ### KETENTUAN UMUM:
-        1. Anda WAJIB merespon HANYA dalam format JSON valid. Jangan sertakan teks pengantar.
-        2. Gunakan judul laporan: "${judulLaporan}" sebagai konteks untuk penyesuaian fokus analisis (misalnya jika mengandung kata 'Kesehatan', bobot kategori tersebut ditambah).
-        3. PENCEGAHAN REDUNDANSI: Dilarang memasukkan rekomendasi yang identik dengan item di DAFTAR PENGECUALIAN.
-        4. DAFTAR PENGECUALIAN: ${exclusionListString}
-        
-        ### DATA INPUT:
-        DATA MASTER KELURAHAN (KONTEKS BOBOT): ${dataMasterJsonString}
-    `;
+  // Konversi JSON
+  const dataMasterJson = JSON.stringify(dataMaster, null, 2);
+  const masukanWargaJson = JSON.stringify(masukanWarga, null, 2);
+  const exclusionJson = JSON.stringify(exclusionList, null, 2);
 
-  // Logika Prompt berdasarkan Mode
-  let specificInstruction = "";
-  let masukanDataSection = "";
+  return `
+Anda adalah seorang analis pembangunan kelurahan tingkat ahli yang memiliki kemampuan analisis sosial, ekonomi, infrastruktur, dan perencanaan pembangunan berbasis data.
 
-  if (mode === "FUSI_DATA") {
-    specificInstruction = `
-            ### MODE: FUSI DATA (Kuat)
-            Prioritaskan masalah yang paling sering muncul di Masukan Warga (frekuensi tinggi) DAN memiliki nilai bobot Data Master (nilai 4 atau 5) di lokasi yang sama. Alasan analisis harus menyebutkan kedua sumber data (Frekuensi Masukan + Bobot Data Master).
-        `;
-    masukanDataSection = `
-            DATA MASUKAN WARGA (STATUS: DITERIMA): ${masukanWargaJsonString}
-        `;
-  } else {
-    // DATA_MASTER_SAJA
-    specificInstruction = `
-            ### MODE: CADANGAN (Hanya Data Master)
-            Data aspirasi warga saat ini KOSONG. Anda HANYA diperbolehkan menganalisis Data Master. Prioritas harus ditentukan murni berdasarkan Nilai Bobot (5, 4, 3) dari yang paling Kritis. Kolom 'masukan_terkait_ids' harus diisi dengan array kosong []. Alasan harus menyebutkan 'Mode Cadangan' dan murni data master.
-        `;
-    masukanDataSection = `
-            DATA MASUKAN WARGA (STATUS: KOSONG): []
-        `;
-  }
+TUGAS:
+Hasilkan 5 rekomendasi prioritas paling mendesak dalam bentuk JSON VALID TANPA TEKS TAMBAHAN.
 
-  const outputFormat = `
-        ### FORMAT OUTPUT:
-        Anda HARUS mengembalikan JSON dengan skema berikut. Pastikan 'masukan_terkait_ids' adalah array of strings.
-        
-        ${JSON.stringify(
-          {
-            judul_laporan: judulLaporan,
-            tanggal_proses: new Date().toISOString().split("T")[0],
-            rekomendasi_prioritas: [
-              {
-                prioritas_ke: 1,
-                deskripsi: "Rekomendasi solusi...",
-                skor_prioritas: 0.9,
-                alasan_analisis: "Justifikasi berdasarkan fusi/data master.",
-                masukan_terkait_ids: ["m-101", "m-105"],
-              },
-              // ... 4 item lainnya hingga prioritas_ke: 5
-            ],
-          },
-          null,
-          2
-        )}
-    `;
+PENTING:
+1. Output HARUS berupa JSON valid yang bisa langsung di-parse tanpa error.
+2. Dilarang menambahkan narasi di luar JSON.
+3. Jika Anda ragu, tetap keluarkan JSON valid sesuai skema.
 
-  return (
-    baseInstruction + specificInstruction + masukanDataSection + outputFormat
-  );
+====================================================================
+KETENTUAN INTI
+====================================================================
+
+• Gunakan judul laporan sebagai konteks: "${judulLaporan}"
+• Jika judul mengandung kata seperti “Kesehatan”, “Infrastruktur”, “Ekonomi”, tambahkan bobot +10% pada kategori tersebut.
+• Jangan membuat rekomendasi yang judulnya identik atau sangat mirip dengan daftar berikut:
+  ${exclusionJson}
+
+====================================================================
+DATA MASTER KELURAHAN (diambil dari database)
+====================================================================
+${dataMasterJson}
+
+${
+  mode === "FUSI_DATA"
+    ? `
+====================================================================
+MODE: FUSI DATA
+====================================================================
+Gunakan kedua sumber berikut:
+1. Frekuensi kemunculan masalah dalam MASUKAN WARGA.
+2. Nilai bobot Data Master (nilai numerik 1–5).
+3. Perhatikan lokasi RT/RW untuk menguatkan urgensi.
+
+DATA MASUKAN WARGA (DITERIMA dari database):
+${masukanWargaJson}
+`
+    : `
+====================================================================
+MODE: DATA MASTER SAJA (CADANGAN)
+====================================================================
+• Abaikan aspirasi warga (kosong).
+• Hanya gunakan Data Master sebagai dasar rekomendasi.
+• Prioritas ditentukan berdasarkan nilai bobot tertinggi (5 paling mendesak).
+• masukan_terkait_ids harus berupa [] dan alasan harus menyebutkan “Mode Cadangan”.
+
+DATA MASUKAN WARGA:
+[]
+`
+}
+
+====================================================================
+FORMAT OUTPUT (WAJIB DIIKUTI)
+====================================================================
+${JSON.stringify(
+  {
+    judul_laporan: judulLaporan,
+    tanggal_proses: new Date().toISOString().split("T")[0],
+    rekomendasi_prioritas: [
+      {
+        prioritas_ke: 1,
+        deskripsi: "Rekomendasi solusi...",
+        skor_prioritas: 0.9,
+        alasan_analisis:
+          mode === "FUSI_DATA"
+            ? "Analisis berdasarkan fusi frekuensi + bobot data master."
+            : "Mode Cadangan: berdasarkan bobot data master.",
+        masukan_terkait_ids: mode === "FUSI_DATA" ? ["m-101"] : [],
+      },
+      {
+        prioritas_ke: 2,
+        deskripsi: "",
+        skor_prioritas: 0,
+        alasan_analisis: "",
+        masukan_terkait_ids: [],
+      },
+      {
+        prioritas_ke: 3,
+        deskripsi: "",
+        skor_prioritas: 0,
+        alasan_analisis: "",
+        masukan_terkait_ids: [],
+      },
+      {
+        prioritas_ke: 4,
+        deskripsi: "",
+        skor_prioritas: 0,
+        alasan_analisis: "",
+        masukan_terkait_ids: [],
+      },
+      {
+        prioritas_ke: 5,
+        deskripsi: "",
+        skor_prioritas: 0,
+        alasan_analisis: "",
+        masukan_terkait_ids: [],
+      },
+    ],
+  },
+  null,
+  2
+)}
+`;
 }

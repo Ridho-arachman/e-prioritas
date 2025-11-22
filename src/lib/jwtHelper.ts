@@ -3,7 +3,8 @@ import * as jose from "jose";
 export type JwtUser = {
   id: string;
   email: string;
-  role?: string;
+  name: string;
+  role: string;
 };
 
 // Pastikan env sudah ada
@@ -24,6 +25,7 @@ const VERIFY_SECRET = new TextEncoder().encode(
 export const generateAccessToken = async (user: JwtUser) => {
   return await new jose.SignJWT({
     id: user.id,
+    name: user.name,
     email: user.email,
     role: user.role,
   })
@@ -39,7 +41,6 @@ export const generateAccessToken = async (user: JwtUser) => {
 export const generateRefreshToken = async (user: JwtUser) => {
   return await new jose.SignJWT({
     id: user.id,
-    email: user.email,
     role: user.role,
   })
     .setProtectedHeader({ alg: "HS256" })
@@ -51,6 +52,7 @@ export const generateRefreshToken = async (user: JwtUser) => {
 export const generateVerifyToken = async (user: JwtUser) => {
   return await new jose.SignJWT({
     id: user.id,
+    name: user.name,
     email: user.email,
     role: user.role,
   })

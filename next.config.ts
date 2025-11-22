@@ -1,6 +1,9 @@
+// next.config.js
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  reactCompiler: true,
+
   async headers() {
     return [
       {
@@ -21,16 +24,29 @@ const nextConfig: NextConfig = {
           // 🔐 Content Security Policy (CSP)
           // NOTE: pastikan disesuaikan kalau kamu load font, script, atau image dari luar
           {
+            // key: "Content-Security-Policy",
+            // value: [
+            //   // ✅ default-src hanya sekali
+            //   "default-src 'self';",
+            //   "script-src 'self';",
+            //   "style-src 'self' 'unsafe-inline';",
+            //   "img-src 'self' data: blob:;",
+            //   "font-src 'self';",
+            //   "connect-src 'self' https://* ws://* wss://*;",
+            //   "frame-src 'self' https://www.google.com;", // ✅ pindahkan ke sini
+            //   "frame-ancestors 'none';",
+            //   "object-src 'none';",
+            // ].join(" "),
             key: "Content-Security-Policy",
             value: [
-              // ✅ default-src hanya sekali
               "default-src 'self';",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval';",
-              "style-src 'self' 'unsafe-inline';",
-              "img-src 'self' data: blob:;",
-              "font-src 'self';",
-              "connect-src 'self' https://* ws://* wss://*;",
-              "frame-src 'self' https://www.google.com;", // ✅ pindahkan ke sini
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval';", // wajib untuk framer motion di dev
+              "style-src 'self' 'unsafe-inline';", // wajib untuk framer motion
+              "img-src 'self' data: blob: https:;",
+
+              "font-src 'self' data:;",
+              "connect-src 'self' https://* ws://* wss://*;", // next dev server
+              "frame-src 'self' https://www.google.com;",
               "frame-ancestors 'none';",
               "object-src 'none';",
             ].join(" "),
