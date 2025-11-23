@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDebounce } from "use-debounce";
 import { useSearchParams, useRouter } from "next/navigation";
 import { XIcon, Filter, PlusCircleIcon } from "lucide-react";
@@ -115,6 +115,20 @@ export default function ListTableDataMaster() {
     setUpdatedAt(undefined);
     setOpenFilter(false);
   };
+
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  function triggerPicker() {
+    fileRef.current?.click();
+  }
+
+  function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    console.log("File dipilih:", file);
+    // proses upload seperti fetch("/api/upload-excel")
+  }
 
   return (
     <CardContent>
@@ -239,6 +253,17 @@ export default function ListTableDataMaster() {
               Tambah Data Master
             </Button>
           </Link>
+          <Button variant="outline" className="ml-2" onClick={triggerPicker}>
+            Import Excel
+          </Button>
+
+          <Input
+            type="file"
+            accept=".xlsx,.xls"
+            ref={fileRef}
+            className="hidden"
+            onChange={handleUpload}
+          />
         </div>
       </div>
 
