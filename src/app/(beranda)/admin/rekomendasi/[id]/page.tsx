@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/accordion";
 import { RekomendasiAccordion } from "@/components/rekomendasi/RekomendasiAccordion";
 import { Skeleton } from "@/components/ui/skeleton";
+import { MasukanTerlibatTable } from "@/components/rekomendasi/MasukanTerlibatTable";
+import { MasukanTerlibatCardList } from "@/components/rekomendasi/MasukanTelibatCardList";
 
 export default function RekomendasiDetailPage() {
   const params = useParams<{ id: string }>();
@@ -65,7 +67,7 @@ export default function RekomendasiDetailPage() {
   const rekomendasiList = rekomendasi.laporanLengkap?.rekomendasi_prioritas;
 
   return (
-    <div className="space-y-8 p-4 md:p-8">
+    <div className="space-y-8 p-4 ">
       {/* Header */}
       <header className="space-y-1">
         <h1 className="text-3xl font-bold tracking-tight">
@@ -94,31 +96,7 @@ export default function RekomendasiDetailPage() {
       <Separator />
 
       {/* Data Mentah */}
-      <section>
-        <h2 className="text-xl font-semibold mb-4">
-          Data Masukan Warga Terlibat (Keseluruhan)
-        </h2>
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground mb-4">
-              Total Masukan Warga yang digunakan:{" "}
-              {rekomendasi.masukanWarga?.length || 0} data.
-            </p>
-            <Accordion type="single" collapsible>
-              <AccordionItem value="mentah">
-                <AccordionTrigger>
-                  Tampilkan Data Masukan Mentah
-                </AccordionTrigger>
-                <AccordionContent>
-                  <pre className="overflow-x-auto text-xs bg-gray-800 text-white p-4 rounded-lg">
-                    {JSON.stringify(rekomendasi.masukanWarga, null, 2)}
-                  </pre>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </CardContent>
-        </Card>
-      </section>
+      <MasukanTerlibatCardList masukanWarga={rekomendasi.masukanWarga} />
     </div>
   );
 }

@@ -9,6 +9,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { isActiveRoute } from "@/lib/isActiveRoute";
+import { usePathname } from "next/navigation";
 
 export function NavSecondary({
   items,
@@ -21,13 +23,17 @@ export function NavSecondary({
     badge?: React.ReactNode;
   }[];
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
+  const pathname = usePathname();
   return (
     <SidebarGroup {...props}>
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild>
+              <SidebarMenuButton
+                asChild
+                isActive={isActiveRoute(pathname, item.url)}
+              >
                 <a href={item.url}>
                   <item.icon />
                   <span>{item.title}</span>

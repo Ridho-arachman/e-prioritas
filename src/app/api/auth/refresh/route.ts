@@ -38,11 +38,7 @@ export async function POST(req: NextRequest) {
     const user = payload as JwtUser;
 
     // ✅ Buat accessToken baru
-    const accessToken = await generateAccessToken({
-      id: user.id,
-      email: user.email,
-      role: user.role,
-    });
+    const accessToken = await generateAccessToken(user);
 
     // ✅ Buat response
     const response = handleResponse({

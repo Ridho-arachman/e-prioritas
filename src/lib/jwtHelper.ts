@@ -41,6 +41,8 @@ export const generateAccessToken = async (user: JwtUser) => {
 export const generateRefreshToken = async (user: JwtUser) => {
   return await new jose.SignJWT({
     id: user.id,
+    name: user.name,
+    email: user.email,
     role: user.role,
   })
     .setProtectedHeader({ alg: "HS256" })

@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import {
-  Blocks,
   Calendar,
   Database,
   LayoutDashboard,
@@ -10,7 +9,6 @@ import {
   MessageCircleQuestion,
   Settings2,
   Tags,
-  Trash2,
   User2Icon,
 } from "lucide-react";
 import { NavFavorites } from "@/components/nav-favorites";
@@ -24,66 +22,57 @@ import {
 } from "@/components/ui/sidebar";
 import Image from "next/image";
 import Modal from "./rekomendasi/Modal";
-
-// This is sample data.
-const data = {
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "/admin",
-      icon: LayoutDashboard,
-    },
-    {
-      title: "Kelola Perangkat",
-      url: "/admin/kelola-perangkat",
-      icon: User2Icon,
-    },
-    {
-      title: "Kelola Kategori",
-      url: "/admin/kelola-kategori",
-      icon: Tags,
-    },
-    {
-      title: "Kelola Masukan Warga",
-      url: "/admin/kelola-masukan",
-      icon: MessageCircleMore,
-    },
-    {
-      title: "Kelola Data Master",
-      url: "/admin/kelola-data",
-      icon: Database,
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Calendar",
-      url: "#",
-      icon: Calendar,
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-    },
-    {
-      title: "Templates",
-      url: "#",
-      icon: Blocks,
-    },
-    {
-      title: "Trash",
-      url: "#",
-      icon: Trash2,
-    },
-    {
-      title: "Help",
-      url: "#",
-      icon: MessageCircleQuestion,
-    },
-  ],
-};
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useAuthUser(); // 🔥 Ambil user login
+  // This is sample data.
+  const data = {
+    navMain: [
+      {
+        title: "Dashboard",
+        url: "/admin",
+        icon: LayoutDashboard,
+      },
+      {
+        title: "Kelola Perangkat",
+        url: "/admin/kelola-perangkat",
+        icon: User2Icon,
+      },
+      {
+        title: "Kelola Kategori",
+        url: "/admin/kelola-kategori",
+        icon: Tags,
+      },
+      {
+        title: "Kelola Masukan Warga",
+        url: "/admin/kelola-masukan",
+        icon: MessageCircleMore,
+      },
+      {
+        title: "Kelola Data Master",
+        url: "/admin/kelola-data",
+        icon: Database,
+      },
+    ],
+    navSecondary: [
+      {
+        title: "Atur Jadwal Program Mendatang",
+        url: "/admin/jadwal-program",
+        icon: Calendar,
+      },
+      {
+        title: "Setting Profile Admin",
+        url: `/admin/setting/${user?.id || ""}`,
+        icon: Settings2,
+      },
+      {
+        title: "Help",
+        url: "/admin/help",
+        icon: MessageCircleQuestion,
+      },
+    ],
+  };
   return (
     <Sidebar className="border-r-0" {...props}>
       <SidebarHeader>

@@ -47,7 +47,6 @@ export function NavActions() {
   const [isOpen, setIsOpen] = useState(false);
   const { execute, loading } = useLogout();
   const { user } = useAuthUser(); // 🔥 Ambil user login
-  console.log(user);
 
   // 📌 Tanggal sekarang
   const today = new Date().toLocaleDateString("id-ID", {
@@ -66,26 +65,24 @@ export function NavActions() {
     : "USR";
 
   const data = [
+    // [
+    //   { label: "Customize Page", icon: Settings2 },
+    //   { label: "Turn into wiki", icon: FileText },
+    // ],
+    // [
+    //   { label: "Copy Link", icon: Link },
+    //   { label: "Duplicate", icon: Copy },
+    //   { label: "Move to", icon: CornerUpRight },
+    //   { label: "Move to Trash", icon: Trash2 },
+    // ],
+    // [
+    //   { label: "Undo", icon: CornerUpLeft },
+    //   { label: "View analytics", icon: LineChart },
+    //   { label: "Version History", icon: GalleryVerticalEnd },
+    //   { label: "Show delete pages", icon: Trash },
+    //   { label: "Notifications", icon: Bell },
+    // ],
     [
-      { label: "Customize Page", icon: Settings2 },
-      { label: "Turn into wiki", icon: FileText },
-    ],
-    [
-      { label: "Copy Link", icon: Link },
-      { label: "Duplicate", icon: Copy },
-      { label: "Move to", icon: CornerUpRight },
-      { label: "Move to Trash", icon: Trash2 },
-    ],
-    [
-      { label: "Undo", icon: CornerUpLeft },
-      { label: "View analytics", icon: LineChart },
-      { label: "Version History", icon: GalleryVerticalEnd },
-      { label: "Show delete pages", icon: Trash },
-      { label: "Notifications", icon: Bell },
-    ],
-    [
-      { label: "Import", icon: ArrowUp },
-      { label: "Export", icon: ArrowDown },
       {
         label: "Logout",
         icon: CornerUpLeft,
@@ -139,9 +136,32 @@ export function NavActions() {
         </PopoverTrigger>
 
         <PopoverContent
-          className="w-56 overflow-hidden rounded-lg p-0"
+          className="w-64 overflow-hidden rounded-lg p-0"
           align="end"
         >
+          <div className="p-4 border-b flex items-center gap-3">
+            <Avatar className="h-12 w-12">
+              {user?.avatar ? (
+                <AvatarImage src={user.avatar} alt={user.name} />
+              ) : (
+                <AvatarImage src="/avatar.png" alt="User default" />
+              )}
+              <AvatarFallback className="bg-amber-300 text-amber-900">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+
+            <div className="flex flex-col">
+              <span className="font-semibold text-sm">
+                {user?.name || "User"}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {user?.email}
+              </span>
+            </div>
+          </div>
+
+          {/* MENU YANG SUDAH ADA */}
           <Sidebar collapsible="none" className="bg-transparent">
             <SidebarContent>
               {data.map((group, i) => (
