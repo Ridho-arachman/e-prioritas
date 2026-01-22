@@ -81,6 +81,7 @@ model DataMaster {
   jenisData             JenisDataMaster    @map("jenis_data")
   namaAtribut           String    @map("nama_atribut")
   nilai                 String
+  jumlah                Int
   lokasiRt              String?   @db.VarChar(3) @map("lokasi_rt")
   lokasiRw              String?   @db.VarChar(3) @map("lokasi_rw")
 

@@ -55,3 +55,5 @@ export const dataMasterQueryById = z.object({
     .trim()
     .min(1, "Id data master tidak valid"),
 });
+
+export const dataMasterArraySchema = z.array(dataMasterSchema);

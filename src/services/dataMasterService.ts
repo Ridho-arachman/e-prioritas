@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { JenisDataMaster } from "@prisma/client";
+import { create } from "domain";
 
 type CreateDataInput = {
   jenisData: JenisDataMaster;
@@ -33,6 +34,10 @@ export const dataMasterService = {
         },
       },
     });
+  },
+
+  createMany: async (inputs: CreateDataInput[]) => {
+    return prisma.dataMaster.createMany({ data: inputs });
   },
 
   getAll: async (where?: any) => {

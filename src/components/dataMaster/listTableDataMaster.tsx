@@ -35,6 +35,7 @@ import {
 
 import { notifier } from "@/components/ToastNotifier";
 import {
+  useCreateDataMasterMany,
   useDeleteDataMaster,
   useGetAllDataMaster,
 } from "@/hooks/api/useDataMaster";
@@ -42,6 +43,11 @@ import { DataMaster, JenisDataMaster } from "@prisma/client";
 import { Badge } from "../ui/badge";
 import { getNilaiBadge } from "@/lib/getNilaiBadge";
 import { Skeleton } from "../ui/skeleton";
+import {
+  dataMasterArraySchema,
+  dataMasterQuerySchema,
+} from "@/schema/dataMasterSchema";
+import * as XLSX from "xlsx";
 
 type DataMasterWithUser = DataMaster & {
   updatedBy?: {
@@ -89,6 +95,11 @@ export default function ListTableDataMaster() {
     updatedAt
   );
   const { error: errorDelete, execute, loading } = useDeleteDataMaster();
+  const {
+    error: errorCreateMany,
+    execute: executeCreateMany,
+    loading: loadingCreateMany,
+  } = useCreateDataMasterMany();
 
   const data: DataMasterWithUser[] = response?.data ?? [];
 
@@ -122,12 +133,61 @@ export default function ListTableDataMaster() {
     fileRef.current?.click();
   }
 
-  function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    console.log("File dipilih:", file);
-    // proses upload seperti fetch("/api/upload-excel")
+    try {
+      // baca excel
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer);
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const json = XLSX.utils.sheet_to_json(sheet);
+
+      const normalized = json.map((row: any) => ({
+        ...row,
+        nilai: String(row.nilai ?? ""),
+        lokasiRt:
+          row.lokasiRt !== undefined
+            ? String(row.lokasiRt).padStart(2, "0")
+            : "",
+        lokasiRw:
+          row.lokasiRw !== undefined
+            ? String(row.lokasiRw).padStart(2, "0")
+            : "",
+      }));
+
+      // validasi pakai Zod
+      const parsed = dataMasterArraySchema.safeParse(normalized);
+      if (!parsed.success) {
+        console.error(parsed.error);
+        alert("Format Excel tidak sesuai. Lihat console.");
+        e.target.value = "";
+        return;
+      }
+
+      // kirim ke backend
+      const { data: res, error } = await executeCreateMany(
+        "/protected/data-master/import",
+        {
+          data: parsed.data,
+        },
+        {},
+        "/protected/data-master/import"
+      );
+      if (error) {
+        notifier.error(error);
+        e.target.value = "";
+        return;
+      }
+      notifier.success(res?.message || "Data master berhasil diimport.");
+      refresh();
+      e.target.value = "";
+    } catch (error) {
+      e.target.value = "";
+      console.error(error);
+      alert("Terjadi error saat import.");
+    }
   }
 
   return (

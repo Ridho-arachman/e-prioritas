@@ -6,6 +6,11 @@ const useCreateDataMaster = () => {
   return { error, execute, loading };
 };
 
+const useCreateDataMasterMany = () => {
+  const { error, execute, loading } = useMutation("post");
+  return { error, execute, loading };
+};
+
 const useGetAllDataMaster = (
   q?: string,
   jenisData?: string,
@@ -53,4 +58,5 @@ export {
   useDeleteDataMaster,
   useGetDeltailDataMaster,
   useEditDataMaster,
+  useCreateDataMasterMany,
 };
