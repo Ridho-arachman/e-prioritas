@@ -1,5 +1,5 @@
-import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/app/generated/prisma";
+import prisma from "@/lib/prisma";
 
 type createDataSchema = Prisma.KategoriCreateInput;
 type updateDataSchema = Prisma.KategoriUpdateInput;

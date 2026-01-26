@@ -17,7 +17,7 @@ import {
   LucideIcon,
 } from "lucide-react";
 import Image from "next/image";
-import InfiniteLogoSlider from "@/components/logo-slider";
+import InfiniteLogoSlider from "@/components/blocks/logo-slider";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 
@@ -198,7 +198,7 @@ export default function LandingPage() {
                     className={cn(
                       "w-12 h-12 mb-4",
                       feature.color,
-                      feature.colorDark
+                      feature.colorDark,
                     )}
                   />
                   <CardTitle className="mb-2 text-xl font-semibold">

@@ -1,20 +1,19 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import ListTablePerangkat from "@/components/perangkat/listTablePerangkat";
+import { Card } from "@/components/ui/card";
+import ListTablePerangkat from "@/components/sections/perangkat/listTablePerangkat";
+import ListPerangkatMobile from "@/components/sections/perangkat/listPerangkatMobile";
 
 export default function PerangkatListPage() {
   return (
-    <div className="p-6">
-      <Card>
-        <CardHeader className="flex justify-between items-center">
-          <CardTitle>👥 Kelola Akun Perangkat Desa</CardTitle>
-          <Link href="/admin/kelola-perangkat/add">
-            <Button className="cursor-pointer">Tambah Perangkat</Button>
-          </Link>
-        </CardHeader>
+    <>
+      <h1 className="text-xl md:text-3xl font-bold font-sans flex items-center gap-2 mb-6">
+        👥 Kelola Akun Perangkat Desa
+      </h1>
+      <Card className="hidden md:block min-w-0 overflow-hidden">
         <ListTablePerangkat />
       </Card>
-    </div>
+      <Card className="md:hidden">
+        <ListPerangkatMobile />
+      </Card>
+    </>
   );
 }

@@ -1,34 +1,26 @@
-import { verifyApiToken } from "@/lib/auth";
-import { cors } from "@/lib/cors";
 import { handlePrismaError } from "@/lib/handlePrismaError";
-import { handleZodValidation } from "@/lib/handleZodValidation";
-import { handleResponse } from "@/lib/responseHandler";
+import { handleResponse } from "@/lib/handleResponse";
 import { userService } from "@/services/userService";
-import { NextRequest, NextResponse } from "next/server";
+import { Role } from "@/app/generated/prisma";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
-const GET = async (req: NextRequest) => {
-  //CORS
-  const headers = cors(req, {
-    allowedOrigins: [process.env.NEXT_PUBLIC_APP_URL!],
-  });
-  if (headers instanceof NextResponse) return headers;
+const GET = async () => {
+  const allowedRoles: Role[] = ["ADMIN"];
+  const session = await auth.api.getSession({ headers: await headers() });
 
-  // VERIFIKASI JWT
-  const user = await verifyApiToken(req);
-
-  if (!user) {
+  if (!session) {
     return handleResponse({
       success: false,
-      message: "Unauthorized: Token invalid",
-      status: 401,
+      message: "User belum login",
+      status: 403,
     });
   }
 
-  // AUTHORIZATION
-  if (user.role !== "ADMIN") {
+  if (!allowedRoles.includes(session.user.role as Role)) {
     return handleResponse({
       success: false,
-      message: "Anda tidak memiliki akses untuk terhadap data ini",
+      message: "Akses ditolak",
       status: 403,
     });
   }
@@ -43,7 +35,6 @@ const GET = async (req: NextRequest) => {
         success: true,
         message: "Data perangkat desa masih kosong",
         status: 404,
-        headers,
       });
     }
 
@@ -53,7 +44,6 @@ const GET = async (req: NextRequest) => {
       message: "Data perangkat desa berhasil diambil",
       data,
       status: 200,
-      headers,
     });
   } catch (err) {
     //PRISMA ERROR
@@ -63,7 +53,6 @@ const GET = async (req: NextRequest) => {
         success: false,
         message: prismaResponse.message,
         status: prismaResponse.status,
-        headers,
       });
     }
 
@@ -72,7 +61,6 @@ const GET = async (req: NextRequest) => {
       success: false,
       message: "Terjadi error pada server",
       status: 500,
-      headers,
     });
   }
 };

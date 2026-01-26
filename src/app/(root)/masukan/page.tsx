@@ -13,7 +13,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import MasukanWargaFormAdd from "@/components/masukan/masukanFormAdd";
+import MasukanWargaFormAdd from "@/components/sections/masukan/masukanFormAdd";
 
 const agendaDesa = [
   { nama: "Musyawarah Dusun", tanggal: "5 Nov 2025" },

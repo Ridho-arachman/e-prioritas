@@ -1,0 +1,202 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String   @db.VarChar(255)
+  email     String   @unique
+  jabatan   String?  @db.VarChar(100)
+  role      Role     @default(PERANGKAT_DESA)
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  masukanVerifikasi   MasukanWarga[] @relation("MasukanVerifikasi")
+  rekomendasiDiproses Rekomendasi[]  @relation("RekomendasiDiproses")
+  dataMasterUpdate    DataMaster[]   @relation("DataMasterUpdate")
+
+  emailVerified Boolean @default(false)
+  image         String?
+
+  phoneNumber         String   @unique(map: "users_phone_number_unique")
+  phoneNumberVerified Boolean?
+
+  sessions Session[]
+  accounts Account[]
+
+  @@unique([phoneNumber])
+  @@index([name])
+  @@index([jabatan])
+  @@index([isActive])
+  @@map("users")
+}
+
+model Kategori {
+  id           String         @id @default(cuid())
+  namaKategori String         @unique @map("nama_kategori")
+  deskripsi    String?
+  status       StatusKategori @default(AKTIF)
+  createdAt    DateTime       @default(now()) @map("created_at")
+  masukanWarga MasukanWarga[]
+
+  @@index([status])
+  @@map("kategori")
+}
+
+model MasukanWarga {
+  id               String        @id @default(cuid())
+  namaPengirim     String        @map("nama_pengirim") @db.VarChar(255)
+  emailPengirim    String        @map("email_pengirim")
+  lokasiRt         String        @map("lokasi_rt") @db.VarChar(3)
+  lokasiRw         String        @map("lokasi_rw") @db.VarChar(3)
+  deskripsiMasukan String        @map("deskripsi_masukan") @db.Text
+  status           MasukanStatus @default(MENUNGGU_VERIFIKASI)
+  alasanPenolakan  String?       @map("alasan_penolakan")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+  createdAt        DateTime      @default(now()) @map("created_at")
+
+  kategoriId String   @map("kategori_id")
+  kategori   Kategori @relation(fields: [kategoriId], references: [id])
+
+  verifiedByUserId String? @map("verified_by_user_id")
+  verifiedBy       User?   @relation("MasukanVerifikasi", fields: [verifiedByUserId], references: [id])
+
+  rekomendasi RekomendasiMasukan[]
+
+  @@index([emailPengirim])
+  @@index([namaPengirim])
+  @@index([createdAt])
+  @@index([status])
+  @@index([kategoriId])
+  @@map("masukan_warga")
+}
+
+model DataMaster {
+  id          String          @id @default(cuid())
+  jenisData   JenisDataMaster @map("jenis_data")
+  namaAtribut String          @map("nama_atribut")
+  nilai       String
+  jumlah      Int
+  lokasiRt    String?         @map("lokasi_rt") @db.VarChar(3)
+  lokasiRw    String?         @map("lokasi_rw") @db.VarChar(3)
+
+  updatedByUserId String   @map("updated_by_user_id")
+  updatedBy       User     @relation("DataMasterUpdate", fields: [updatedByUserId], references: [id])
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@unique([jenisData, namaAtribut, lokasiRt, lokasiRw])
+  @@index([jenisData])
+  @@index([lokasiRt, lokasiRw])
+  @@map("data_master")
+}
+
+model Rekomendasi {
+  id                  String   @id @default(cuid())
+  judul               String
+  tanggalProses       DateTime @default(now()) @map("tanggal_proses")
+  prioritas1Deskripsi String   @map("prioritas_1_deskripsi") @db.Text
+  prioritas1Skor      Float    @map("prioritas_1_skor")
+  laporanLengkap      Json?    @map("laporan_lengkap")
+
+  processedByUserId String               @map("processed_by_user_id")
+  processedBy       User                 @relation("RekomendasiDiproses", fields: [processedByUserId], references: [id])
+  masukanWarga      RekomendasiMasukan[]
+
+  @@map("rekomendasi")
+}
+
+model RekomendasiMasukan {
+  rekomendasiId String @map("rekomendasi_id")
+  masukanId     String @map("masukan_id")
+
+  rekomendasi Rekomendasi  @relation(fields: [rekomendasiId], references: [id])
+  masukan     MasukanWarga @relation(fields: [masukanId], references: [id])
+
+  @@id([rekomendasiId, masukanId])
+  @@map("rekomendasi_masukan")
+}
+
+enum StatusKategori {
+  AKTIF
+  NON_AKTIF
+}
+
+enum Role {
+  ADMIN
+  PERANGKAT_DESA
+  LURAH
+}
+
+enum MasukanStatus {
+  MENUNGGU_VERIFIKASI
+  DITERIMA
+  DITOLAK
+}
+
+enum JenisDataMaster {
+  KEPENDUDUKAN // Jumlah penduduk, usia produktif, migrasi, dsb
+  INFRASTRUKTUR // Jalan, jembatan, saluran air, drainase, lampu jalan, dsb
+  EKONOMI // Pendapatan warga, usaha mikro, lapangan kerja, dsb
+  KESEHATAN // Akses air bersih, fasilitas kesehatan, gizi, dsb
+  PENDIDIKAN // Jumlah sekolah, tingkat pendidikan, fasilitas belajar
+  KEAMANAN // Poskamling, kriminalitas, patroli, dll
+  LINGKUNGAN // Kebersihan, penghijauan, pengelolaan sampah
+  SOSIAL_BUDAYA // Kegiatan masyarakat, adat, organisasi sosial
+  PEMERINTAHAN // Pelayanan publik, administrasi, perizinan
+  TEKNOLOGI // Akses internet, perangkat digital, inovasi TTG
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      String?
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}

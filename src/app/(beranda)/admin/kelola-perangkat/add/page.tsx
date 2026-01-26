@@ -1,8 +1,17 @@
-import PerangkatFormAdd from "@/components/perangkat/perangkatFormAdd";
+import PerangkatFormAdd from "@/components/sections/perangkat/perangkatFormAdd";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 const page = () => {
   return (
-    <div className="px-10 py-4 space-y-10">
+    <div className="px-10 md:py-0 space-y-10">
+      <Link
+        href={"/admin/kelola-perangkat"}
+        className="flex items-center gap-2"
+      >
+        <ArrowLeft className="size-4" />
+        Kembali
+      </Link>
       <div>
         <h1 className="text-3xl font-bold mb-2">
           👤 Tambah Perangkat Desa Baru

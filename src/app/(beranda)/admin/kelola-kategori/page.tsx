@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import ListTableKategori from "@/components/kategori/listTableKategori";
+import ListTableKategori from "@/components/sections/kategori/listTableKategori";
 
 const page = () => {
   return (

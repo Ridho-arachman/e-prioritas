@@ -1,59 +1,48 @@
-import { cors } from "@/lib/cors";
-import { verifyApiToken } from "@/lib/auth";
-import { userService } from "@/services/userService";
-import { handleResponse } from "@/lib/responseHandler";
+import { handleResponse } from "@/lib/handleResponse";
 import { NextRequest, NextResponse } from "next/server";
 import { handlePrismaError } from "@/lib/handlePrismaError";
 import { handleZodValidation } from "@/lib/handleZodValidation";
-import {
-  deleteUserPerangkatSchema,
-  detailUserPerangkatSchema,
-  updateUserPerangkatSchema,
-} from "@/schema/userPerangkatSchema";
+import { deleteUserPerangkatSchema } from "@/schema/userPerangkatSchema";
 import { dataMasterService } from "@/services/dataMasterService";
 import {
   dataMasterQueryById,
   dataMasterSchema,
 } from "@/schema/dataMasterSchema";
+import { Role } from "@/app/generated/prisma";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 const GET = async (
-  req: NextRequest,
-  ctx: RouteContext<"/api/protected/data-master/[id]">
+  _req: NextRequest,
+  ctx: RouteContext<"/api/protected/data-master/[id]">,
 ) => {
-  //CORS
-  const headers = cors(req, {
-    allowedOrigins: [process.env.NEXT_PUBLIC_APP_URL!],
-  });
-  if (headers instanceof NextResponse) return headers;
+  const allowedRoles: Role[] = ["ADMIN"];
+  const session = await auth.api.getSession({ headers: await headers() });
 
-  //VERIFIKASI JWT
-  const user = await verifyApiToken(req);
-
-  if (!user) {
+  if (!session) {
     return handleResponse({
       success: false,
-      message: "Unauthorized: Token invalid",
-      status: 401,
-    });
-  }
-
-  // AUTHORIZATION
-  if (user.role !== "ADMIN") {
-    return handleResponse({
-      success: false,
-      message: "Anda tidak memiliki akses untuk terhadap data ini",
+      message: "User belum login",
       status: 403,
     });
   }
 
-  // VALIDASI PARAM ID
-  const { id } = await ctx.params;
-  const parsedId = dataMasterQueryById.safeParse({ id });
-  if (!parsedId.success) return handleZodValidation(parsedId, headers);
-
-  const dataMasterId = parsedId.data.id;
+  if (!allowedRoles.includes(session.user.role as Role)) {
+    return handleResponse({
+      success: false,
+      message: "Akses ditolak",
+      status: 403,
+    });
+  }
 
   try {
+    // VALIDASI PARAM ID
+    const { id } = await ctx.params;
+    const parsedId = dataMasterQueryById.safeParse({ id });
+    if (!parsedId.success) return handleZodValidation(parsedId);
+
+    const dataMasterId = parsedId.data.id;
+
     //AMBIL DATA perangkat desa DARI DATABASE BERDASARKAN ID
     const data = await dataMasterService.getById(dataMasterId);
 
@@ -63,7 +52,6 @@ const GET = async (
       message: "Data Master berhasil diambil",
       data,
       status: 200,
-      headers,
     });
   } catch (err) {
     //PRISMA ERROR
@@ -73,7 +61,6 @@ const GET = async (
         success: false,
         message: prismaResponse.message,
         status: prismaResponse.status,
-        headers,
       });
     }
 
@@ -82,37 +69,29 @@ const GET = async (
       success: false,
       message: "Terjadi error pada server",
       status: 500,
-      headers,
     });
   }
 };
 
 const PUT = async (
   req: NextRequest,
-  ctx: RouteContext<"/api/protected/data-master/[id]">
+  ctx: RouteContext<"/api/protected/data-master/[id]">,
 ) => {
-  //CORS
-  const headers = cors(req, {
-    allowedOrigins: [process.env.NEXT_PUBLIC_APP_URL!],
-  });
-  if (headers instanceof NextResponse) return headers;
+  const allowedRoles: Role[] = ["ADMIN"];
+  const session = await auth.api.getSession({ headers: await headers() });
 
-  //VERIFIKASI JWT
-  const user = await verifyApiToken(req);
-
-  if (!user) {
+  if (!session) {
     return handleResponse({
       success: false,
-      message: "Unauthorized: Token invalid",
-      status: 401,
+      message: "User belum login",
+      status: 403,
     });
   }
 
-  // AUTHORIZATION
-  if (user.role !== "ADMIN") {
+  if (!allowedRoles.includes(session.user.role as Role)) {
     return handleResponse({
       success: false,
-      message: "Anda tidak memiliki akses untuk terhadap data ini",
+      message: "Akses ditolak",
       status: 403,
     });
   }
@@ -125,20 +104,20 @@ const PUT = async (
     // VALIDASI REQ BODY & PARAM
     const parsed = dataMasterSchema.safeParse(body);
     const parsedId = dataMasterQueryById.safeParse({ id });
-    if (!parsedId.success) return handleZodValidation(parsedId, headers);
-    if (!parsed.success) return handleZodValidation(parsed, headers);
+
+    if (!parsedId.success) return handleZodValidation(parsedId);
+    if (!parsed.success) return handleZodValidation(parsed);
 
     // SIMPAN DATA perangkat desa KE DATABASE
     const dataMaster = await dataMasterService.update(
       parsedId.data.id,
-      parsed.data
+      parsed.data,
     );
     return handleResponse({
       success: true,
       message: "Data Master berhasil diupdate",
       data: dataMaster,
       status: 200,
-      headers,
     });
   } catch (err) {
     //PRISMA ERROR
@@ -148,7 +127,6 @@ const PUT = async (
         success: false,
         message: prismaResponse.message,
         status: prismaResponse.status,
-        headers,
       });
     }
 
@@ -157,62 +135,48 @@ const PUT = async (
       success: false,
       message: "Terjadi error pada server",
       status: 500,
-      headers,
     });
   }
 };
 
 const DELETE = async (
-  req: NextRequest,
-  ctx: RouteContext<"/api/protected/data-master/[id]">
+  _req: NextRequest,
+  ctx: RouteContext<"/api/protected/data-master/[id]">,
 ) => {
-  //CORS
-  const headers = cors(req, {
-    allowedOrigins: [process.env.NEXT_PUBLIC_APP_URL!],
-  });
-  if (headers instanceof NextResponse) return headers;
+  const allowedRoles: Role[] = ["ADMIN"];
+  const session = await auth.api.getSession({ headers: await headers() });
 
-  // VERIFIKASI JWT
-  const user = await verifyApiToken(req);
-
-  if (!user) {
+  if (!session) {
     return handleResponse({
       success: false,
-      message: "Unauthorized: Token invalid",
-      status: 401,
+      message: "User belum login",
+      status: 403,
     });
   }
 
-  // AUTHORIZATION
-  if (user.role !== "ADMIN") {
+  if (!allowedRoles.includes(session.user.role as Role)) {
     return handleResponse({
       success: false,
-      message: "Anda tidak memiliki akses untuk terhadap data ini",
+      message: "Akses ditolak",
       status: 403,
     });
   }
 
   try {
-    // NGGAMBIL PARAM
     const { id } = await ctx.params;
 
-    // VALIDASI REQ PARAM
     const parsedId = deleteUserPerangkatSchema.safeParse({ id });
-    if (!parsedId.success) return handleZodValidation(parsedId, headers);
+    if (!parsedId.success) return handleZodValidation(parsedId);
 
-    // JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
     const dataMasterId = parsedId.data.id;
 
-    // HAPUS DATA perangkat desa KE DATABASE
     const dataMaster = await dataMasterService.deleteById(dataMasterId);
 
-    // JIKA DATA perangkat desa TIDAK DITEMUKAN
     return handleResponse({
       success: true,
       message: "Data master berhasil dihapus",
       data: dataMaster,
       status: 200,
-      headers,
     });
   } catch (err) {
     //PRISMA ERROR
@@ -222,7 +186,6 @@ const DELETE = async (
         success: false,
         message: prismaResponse.message,
         status: prismaResponse.status,
-        headers,
       });
     }
 
@@ -231,7 +194,6 @@ const DELETE = async (
       success: false,
       message: "Terjadi error pada server",
       status: 500,
-      headers,
     });
   }
 };

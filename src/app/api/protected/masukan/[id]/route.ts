@@ -1,41 +1,35 @@
-import { verifyApiToken } from "@/lib/auth";
-import { cors } from "@/lib/cors";
 import { handlePrismaError } from "@/lib/handlePrismaError";
 import { handleZodValidation } from "@/lib/handleZodValidation";
-import { handleResponse } from "@/lib/responseHandler";
+import { handleResponse } from "@/lib/handleResponse";
 import {
   editStatusMasukanWargaSchema,
   masukanWargaByIdSchema,
 } from "@/schema/masukanWarga";
 import { masukanWargaService } from "@/services/masukanWargaService";
 import { NextRequest, NextResponse } from "next/server";
+import { Role } from "@/app/generated/prisma";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 const PATCH = async (
   req: NextRequest,
-  ctx: RouteContext<"/api/protected/masukan/[id]">
+  ctx: RouteContext<"/api/protected/masukan/[id]">,
 ) => {
-  //CORS
-  const headers = cors(req, {
-    allowedOrigins: [process.env.NEXT_PUBLIC_APP_URL!],
-  });
-  if (headers instanceof NextResponse) return headers;
+  const allowedRoles: Role[] = ["ADMIN"];
+  const session = await auth.api.getSession({ headers: await headers() });
 
-  // VERIFIKASI JWT
-  const user = await verifyApiToken(req);
-
-  if (!user) {
+  if (!session) {
     return handleResponse({
       success: false,
-      message: "Unauthorized: Token invalid",
-      status: 401,
+      message: "User belum login",
+      status: 403,
     });
   }
 
-  // AUTHORIZATION
-  if (user.role !== "ADMIN") {
+  if (!allowedRoles.includes(session.user.role as Role)) {
     return handleResponse({
       success: false,
-      message: "Anda tidak memiliki akses untuk terhadap data ini",
+      message: "Akses ditolak",
       status: 403,
     });
   }
@@ -49,12 +43,12 @@ const PATCH = async (
 
     //VALIDASI
     const parsed = editStatusMasukanWargaSchema.safeParse({
-      verifiedByUserId: user.id,
+      verifiedByUserId: session.user.id,
       ...body,
     });
     const parsedId = masukanWargaByIdSchema.safeParse({ id });
-    if (!parsedId.success) return handleZodValidation(parsedId, headers);
-    if (!parsed.success) return handleZodValidation(parsed, headers);
+    if (!parsedId.success) return handleZodValidation(parsedId);
+    if (!parsed.success) return handleZodValidation(parsed);
 
     //JIKA VALIDASI BERHASIL
     const data = parsed.data;
@@ -68,7 +62,6 @@ const PATCH = async (
       message: "Status Masukan Berhasil Diubah",
       data: masukan,
       status: 200,
-      headers,
     });
   } catch (err) {
     //PRISMA ERROR
@@ -78,7 +71,6 @@ const PATCH = async (
         success: false,
         message: prismaResponse.message,
         status: prismaResponse.status,
-        headers,
       });
     }
 
@@ -87,37 +79,29 @@ const PATCH = async (
       success: false,
       message: "Terjadi error pada server",
       status: 500,
-      headers,
     });
   }
 };
 
 const GET = async (
-  req: NextRequest,
-  ctx: RouteContext<"/api/protected/masukan/[id]">
+  _req: NextRequest,
+  ctx: RouteContext<"/api/protected/masukan/[id]">,
 ) => {
-  //CORS
-  const headers = cors(req, {
-    allowedOrigins: [process.env.NEXT_PUBLIC_APP_URL!],
-  });
-  if (headers instanceof NextResponse) return headers;
+  const allowedRoles: Role[] = ["ADMIN"];
+  const session = await auth.api.getSession({ headers: await headers() });
 
-  // VERIFIKASI JWT
-  const user = await verifyApiToken(req);
-
-  if (!user) {
+  if (!session) {
     return handleResponse({
       success: false,
-      message: "Unauthorized: Token invalid",
-      status: 401,
+      message: "User belum login",
+      status: 403,
     });
   }
 
-  // AUTHORIZATION
-  if (user.role !== "ADMIN") {
+  if (!allowedRoles.includes(session.user.role as Role)) {
     return handleResponse({
       success: false,
-      message: "Anda tidak memiliki akses untuk terhadap data ini",
+      message: "Akses ditolak",
       status: 403,
     });
   }
@@ -128,7 +112,7 @@ const GET = async (
 
     //VALIDASI
     const parsedId = masukanWargaByIdSchema.safeParse({ id });
-    if (!parsedId.success) return handleZodValidation(parsedId, headers);
+    if (!parsedId.success) return handleZodValidation(parsedId);
 
     //JIKA VALIDASI BERHASIL
     const masukanId = parsedId.data.id;
@@ -141,7 +125,6 @@ const GET = async (
       message: "Detail Masukan Berhasil Diambil",
       data: masukan,
       status: 200,
-      headers,
     });
   } catch (err) {
     //PRISMA ERROR
@@ -151,7 +134,6 @@ const GET = async (
         success: false,
         message: prismaResponse.message,
         status: prismaResponse.status,
-        headers,
       });
     }
 
@@ -160,7 +142,6 @@ const GET = async (
       success: false,
       message: "Terjadi error pada server",
       status: 500,
-      headers,
     });
   }
 };

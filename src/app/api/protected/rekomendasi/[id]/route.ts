@@ -1,51 +1,45 @@
-import { verifyApiToken } from "@/lib/auth";
-import { cors } from "@/lib/cors";
 import { handlePrismaError } from "@/lib/handlePrismaError";
 import { handleZodValidation } from "@/lib/handleZodValidation";
-import { handleResponse } from "@/lib/responseHandler";
+import { handleResponse } from "@/lib/handleResponse";
 import { rekomendasiByIdSchema } from "@/schema/rekomendasiSchema";
 import { rekomendasiService } from "@/services/rekomendasiService";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { Role } from "@/app/generated/prisma";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 const GET = async (
-  req: NextRequest,
-  ctx: RouteContext<"/api/protected/rekomendasi/[id]">
+  _req: NextRequest,
+  ctx: RouteContext<"/api/protected/rekomendasi/[id]">,
 ) => {
-  //CORS
-  const headers = cors(req, {
-    allowedOrigins: [process.env.NEXT_PUBLIC_APP_URL!],
-  });
-  if (headers instanceof NextResponse) return headers;
+  const allowedRoles: Role[] = ["ADMIN"];
+  const session = await auth.api.getSession({ headers: await headers() });
 
-  //VERIFIKASI JWT
-  const user = await verifyApiToken(req);
-
-  if (!user) {
+  if (!session) {
     return handleResponse({
       success: false,
-      message: "Unauthorized: Token invalid",
-      status: 401,
-    });
-  }
-
-  // AUTHORIZATION
-  if (user.role !== "ADMIN") {
-    return handleResponse({
-      success: false,
-      message: "Anda tidak memiliki akses untuk terhadap data ini",
+      message: "User belum login",
       status: 403,
     });
   }
 
-  // VALIDASI PARAM ID
-  const { id } = await ctx.params;
-
-  const parsedId = rekomendasiByIdSchema.safeParse({ id });
-  if (!parsedId.success) return handleZodValidation(parsedId, headers);
-
-  const rekomendasiId = parsedId.data.id;
+  if (!allowedRoles.includes(session.user.role as Role)) {
+    return handleResponse({
+      success: false,
+      message: "Akses ditolak",
+      status: 403,
+    });
+  }
 
   try {
+    // VALIDASI PARAM ID
+    const { id } = await ctx.params;
+
+    const parsedId = rekomendasiByIdSchema.safeParse({ id });
+    if (!parsedId.success) return handleZodValidation(parsedId);
+
+    const rekomendasiId = parsedId.data.id;
+
     //AMBIL DATA perangkat desa DARI DATABASE BERDASARKAN ID
     const data = await rekomendasiService.getById(rekomendasiId);
 
@@ -55,7 +49,6 @@ const GET = async (
       message: "Data Rekomendasi berhasil diambil",
       data,
       status: 200,
-      headers,
     });
   } catch (err) {
     //PRISMA ERROR
@@ -65,7 +58,6 @@ const GET = async (
         success: false,
         message: prismaResponse.message,
         status: prismaResponse.status,
-        headers,
       });
     }
 
@@ -74,7 +66,6 @@ const GET = async (
       success: false,
       message: "Terjadi error pada server",
       status: 500,
-      headers,
     });
   }
 };

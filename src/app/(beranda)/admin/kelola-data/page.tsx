@@ -1,4 +1,4 @@
-import ListTableDataMaster from "@/components/dataMaster/listTableDataMaster";
+import ListTableDataMaster from "@/components/sections/dataMaster/listTableDataMaster";
 import React from "react";
 
 const page = () => {

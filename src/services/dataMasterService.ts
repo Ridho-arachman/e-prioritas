@@ -1,6 +1,5 @@
-import { prisma } from "@/lib/prisma";
-import { JenisDataMaster } from "@prisma/client";
-import { create } from "domain";
+import { JenisDataMaster } from "@/app/generated/prisma";
+import prisma from "@/lib/prisma";
 
 type CreateDataInput = {
   jenisData: JenisDataMaster;

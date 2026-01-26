@@ -1,35 +1,29 @@
-import { verifyApiToken } from "@/lib/auth";
-import { cors } from "@/lib/cors";
+import { auth } from "@/lib/auth";
 import { handlePrismaError } from "@/lib/handlePrismaError";
 import { handleZodValidation } from "@/lib/handleZodValidation";
-import { handleResponse } from "@/lib/responseHandler";
+import { handleResponse } from "@/lib/handleResponse";
 import { dataMasterArraySchema } from "@/schema/dataMasterSchema";
 import { dataMasterService } from "@/services/dataMasterService";
 import { NextRequest, NextResponse } from "next/server";
+import { Role } from "@/app/generated/prisma";
+import { headers } from "next/headers";
 
 const POST = async (req: NextRequest) => {
-  //CORS
-  const headers = cors(req, {
-    allowedOrigins: [process.env.NEXT_PUBLIC_APP_URL!],
-  });
-  if (headers instanceof NextResponse) return headers;
+  const allowedRoles: Role[] = ["ADMIN"];
+  const session = await auth.api.getSession({ headers: await headers() });
 
-  // VERIFIKASI JWT
-  const user = await verifyApiToken(req);
-
-  if (!user) {
+  if (!session) {
     return handleResponse({
       success: false,
-      message: "Unauthorized: Token invalid",
-      status: 401,
+      message: "User belum login",
+      status: 403,
     });
   }
 
-  // AUTHORIZATION
-  if (user.role !== "ADMIN") {
+  if (!allowedRoles.includes(session.user.role as Role)) {
     return handleResponse({
       success: false,
-      message: "Anda tidak memiliki akses untuk terhadap data ini",
+      message: "Akses ditolak",
       status: 403,
     });
   }
@@ -40,12 +34,12 @@ const POST = async (req: NextRequest) => {
 
     const parsed = dataMasterArraySchema.safeParse(body.data);
 
-    if (!parsed.success) return handleZodValidation(parsed, headers);
+    if (!parsed.success) return handleZodValidation(parsed);
 
     //JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
     const data = parsed.data.map((item) => ({
       ...item,
-      updatedByUserId: user.id,
+      updatedByUserId: session.user.id,
     }));
 
     //SIMPAN DATA MASTER KE DATABASE
@@ -57,7 +51,6 @@ const POST = async (req: NextRequest) => {
       message: "Data Berhasil Ditambahkan",
       data: dataMaster,
       status: 201,
-      headers,
     });
   } catch (err) {
     //PRISMA ERROR
@@ -67,7 +60,6 @@ const POST = async (req: NextRequest) => {
         success: false,
         message: prismaResponse.message,
         status: prismaResponse.status,
-        headers,
       });
     }
 
@@ -76,7 +68,6 @@ const POST = async (req: NextRequest) => {
       success: false,
       message: "Terjadi error pada server",
       status: 500,
-      headers,
     });
   }
 };

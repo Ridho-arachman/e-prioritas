@@ -1,4 +1,4 @@
-import MasukanListTable from "@/components/masukan/listTableMasukan";
+import MasukanListTable from "@/components/sections/masukan/listTableMasukan";
 
 import React from "react";
 

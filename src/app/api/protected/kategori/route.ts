@@ -1,54 +1,48 @@
-import { cors } from "@/lib/cors";
-import { handleResponse } from "@/lib/responseHandler";
+import { handleResponse } from "@/lib/handleResponse";
 import { NextRequest, NextResponse } from "next/server";
 import { handlePrismaError } from "@/lib/handlePrismaError";
 import { kategoriService } from "@/services/kategoriService";
 import { handleZodValidation } from "@/lib/handleZodValidation";
 import { kategoriQuerySchema, kategoriSchema } from "@/schema/kategoriSchema";
-import { verifyApiToken } from "@/lib/auth";
+import { Role } from "@/app/generated/prisma";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 const GET = async (req: NextRequest) => {
-  //CORS
-  const headers = cors(req, {
-    allowedOrigins: [process.env.NEXT_PUBLIC_APP_URL!],
-  });
-  if (headers instanceof NextResponse) return headers;
+  const allowedRoles: Role[] = ["ADMIN"];
+  const session = await auth.api.getSession({ headers: await headers() });
 
-  // VERIFIKASI JWT
-  const user = await verifyApiToken(req);
-
-  if (!user) {
+  if (!session) {
     return handleResponse({
       success: false,
-      message: "Unauthorized: Token invalid",
-      status: 401,
-    });
-  }
-
-  // AUTHORIZATION
-  if (user.role !== "ADMIN") {
-    return handleResponse({
-      success: false,
-      message: "Anda tidak memiliki akses untuk terhadap data ini",
+      message: "User belum login",
       status: 403,
     });
   }
 
-  //AMBIL QUERY
-  const searchParams = req.nextUrl.searchParams;
-  const namaKategori = searchParams.get("search");
-
-  //VALIDASI QUERY
-  let namaKategoriParam: string | undefined;
-  if (namaKategori) {
-    const parsed = kategoriQuerySchema.safeParse({ namaKategori });
-    if (!parsed.success) {
-      return handleZodValidation(parsed, headers);
-    }
-    namaKategoriParam = parsed.data.namaKategori;
+  if (!allowedRoles.includes(session.user.role as Role)) {
+    return handleResponse({
+      success: false,
+      message: "Akses ditolak",
+      status: 403,
+    });
   }
 
   try {
+    //AMBIL QUERY
+    const searchParams = req.nextUrl.searchParams;
+    const namaKategori = searchParams.get("search");
+
+    //VALIDASI QUERY
+    let namaKategoriParam: string | undefined;
+    if (namaKategori) {
+      const parsed = kategoriQuerySchema.safeParse({ namaKategori });
+      if (!parsed.success) {
+        return handleZodValidation(parsed);
+      }
+      namaKategoriParam = parsed.data.namaKategori;
+    }
+
     //AMBIL DATA KATEGORI DARI DATABASE
     const data = await kategoriService.getAll(namaKategoriParam);
 
@@ -60,14 +54,12 @@ const GET = async (req: NextRequest) => {
           success: true,
           message: "Data kategori tidak ditemukan",
           status: 404,
-          headers,
         });
 
       return handleResponse({
         success: true,
         message: "Data kategori masih kosong",
         status: 404,
-        headers,
       });
     }
 
@@ -77,7 +69,6 @@ const GET = async (req: NextRequest) => {
       message: "Data kategori berhasil diambil",
       data,
       status: 200,
-      headers,
     });
   } catch (err) {
     //PRISMA ERROR
@@ -87,7 +78,6 @@ const GET = async (req: NextRequest) => {
         success: false,
         message: prismaResponse.message,
         status: prismaResponse.status,
-        headers,
       });
     }
 
@@ -96,48 +86,40 @@ const GET = async (req: NextRequest) => {
       success: false,
       message: "Terjadi error pada server",
       status: 500,
-      headers,
     });
   }
 };
 
 const POST = async (req: NextRequest) => {
-  //CORS
-  const headers = cors(req, {
-    allowedOrigins: [process.env.NEXT_PUBLIC_APP_URL!],
-  });
-  if (headers instanceof NextResponse) return headers;
+  const allowedRoles: Role[] = ["ADMIN"];
+  const session = await auth.api.getSession({ headers: await headers() });
 
-  // VERIFIKASI JWT
-  const user = await verifyApiToken(req);
-
-  if (!user) {
+  if (!session) {
     return handleResponse({
       success: false,
-      message: "Unauthorized: Token invalid",
-      status: 401,
-    });
-  }
-
-  // AUTHORIZATION
-  if (user.role !== "ADMIN") {
-    return handleResponse({
-      success: false,
-      message: "Anda tidak memiliki akses untuk terhadap data ini",
+      message: "User belum login",
       status: 403,
     });
   }
 
-  //VALIDASI REQ BODY
-  const body = await req.json();
-  const parsed = kategoriSchema.safeParse(body);
-
-  if (!parsed.success) return handleZodValidation(parsed, headers);
-
-  //JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
-  const { namaKategori, deskripsi, status } = parsed.data;
+  if (!allowedRoles.includes(session.user.role as Role)) {
+    return handleResponse({
+      success: false,
+      message: "Akses ditolak",
+      status: 403,
+    });
+  }
 
   try {
+    //VALIDASI REQ BODY
+    const body = await req.json();
+    const parsed = kategoriSchema.safeParse(body);
+
+    if (!parsed.success) return handleZodValidation(parsed);
+
+    //JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
+    const { namaKategori, deskripsi, status } = parsed.data;
+    
     //SIMPAN DATA KATEGORI KE DATABASE
     const kategori = await kategoriService.create({
       namaKategori,
@@ -150,7 +132,6 @@ const POST = async (req: NextRequest) => {
       message: "Kategori Berhasil Ditambahkan",
       data: kategori,
       status: 201,
-      headers,
     });
   } catch (err) {
     //PRISMA ERROR
@@ -160,7 +141,6 @@ const POST = async (req: NextRequest) => {
         success: false,
         message: prismaResponse.message,
         status: prismaResponse.status,
-        headers,
       });
     }
 
@@ -169,7 +149,6 @@ const POST = async (req: NextRequest) => {
       success: false,
       message: "Terjadi error pada server",
       status: 500,
-      headers,
     });
   }
 };

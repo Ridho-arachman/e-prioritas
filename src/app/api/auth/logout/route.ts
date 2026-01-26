@@ -1,39 +1,32 @@
-import { cors } from "@/lib/cors";
-import { handleResponse } from "@/lib/responseHandler";
-import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { handleBetterAuthError } from "@/lib/handleBetterAuthError";
+import { handleResponse } from "@/lib/handleResponse";
+import { headers } from "next/headers";
 
-const POST = async (req: NextRequest) => {
-  const headers = cors(req, {
-    allowedOrigins: [process.env.NEXT_PUBLIC_APP_URL!],
-  });
-  if (headers instanceof NextResponse) return headers;
-
+export const POST = async () => {
   try {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.delete("accessToken");
-    const refreshToken = cookieStore.delete("refreshToken");
-
-    if (!accessToken || !refreshToken) {
-      return handleResponse({
-        success: false,
-        message: "User belum login",
-        status: 401,
-      });
-    }
-
+    const response = await auth.api.signOut({ headers: await headers() });
     return handleResponse({
-      success: true,
+      success: response.success,
       message: "Logout Berhasil",
       status: 200,
     });
-  } catch (err) {
+  } catch (error) {
+    // Better Auth Handler
+    const betterAuthErr = handleBetterAuthError(error);
+    if (betterAuthErr) {
+      return handleResponse({
+        success: false,
+        message: betterAuthErr.message,
+        status: betterAuthErr.status,
+      });
+    }
+
+    // Error Internal Server
     return handleResponse({
       success: false,
-      message: "Terjadi Error pada server",
+      message: "Terjadi error pada server",
       status: 500,
     });
   }
 };
-
-export { POST };

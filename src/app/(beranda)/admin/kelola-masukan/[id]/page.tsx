@@ -1,4 +1,4 @@
-import CardDetailMasukanWarga from "@/components/masukan/cardDetailMasukanWarga";
+import CardDetailMasukanWarga from "@/components/sections/masukan/cardDetailMasukanWarga";
 
 export default function MasukanDetailPage() {
   return (

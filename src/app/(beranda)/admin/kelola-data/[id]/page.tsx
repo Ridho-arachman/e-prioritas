@@ -1,4 +1,4 @@
-import DataMasterFormEdit from "@/components/dataMaster/dataMasterFormEdit";
+import DataMasterFormEdit from "@/components/sections/dataMaster/dataMasterFormEdit";
 
 const page = () => {
   return (

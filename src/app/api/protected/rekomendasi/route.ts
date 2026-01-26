@@ -1,9 +1,6 @@
-import { verifyApiToken } from "@/lib/auth";
-import { cors } from "@/lib/cors";
 import { handlePrismaError } from "@/lib/handlePrismaError";
-import { handleResponse } from "@/lib/responseHandler";
+import { handleResponse } from "@/lib/handleResponse";
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { buildPrompt } from "@/lib/buildPrompt";
 import { geminiAi } from "@/lib/gemini";
 import {
@@ -12,6 +9,10 @@ import {
 } from "@/schema/rekomendasiSchema";
 import { handleZodValidation } from "@/lib/handleZodValidation";
 import { rekomendasiService } from "@/services/rekomendasiService";
+import { Role } from "@/app/generated/prisma";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import prisma from "@/lib/prisma";
 
 type PrioritasItem = {
   prioritas_ke: number;
@@ -28,22 +29,22 @@ type AiResponseData = {
 };
 
 const POST = async (req: NextRequest) => {
-  // CORS & Authorization Checks (Sudah Anda Sediakan)
-  const headers = cors(req, {
-    allowedOrigins: [process.env.NEXT_PUBLIC_APP_URL!],
-  });
-  if (headers instanceof NextResponse) return headers;
+  const allowedRoles: Role[] = ["ADMIN"];
+  const session = await auth.api.getSession({ headers: await headers() });
 
-  const user = await verifyApiToken(req);
-
-  if (!user || user.role !== "ADMIN") {
+  if (!session) {
     return handleResponse({
       success: false,
-      message: user
-        ? "Anda tidak memiliki akses untuk terhadap data ini"
-        : "Unauthorized: Token invalid",
-      status: user ? 403 : 401,
-      headers,
+      message: "User belum login",
+      status: 403,
+    });
+  }
+
+  if (!allowedRoles.includes(session.user.role as Role)) {
+    return handleResponse({
+      success: false,
+      message: "Akses ditolak",
+      status: 403,
     });
   }
 
@@ -52,7 +53,7 @@ const POST = async (req: NextRequest) => {
 
     const parsed = postRekomendasiSchema.safeParse(body);
 
-    if (!parsed.success) return handleZodValidation(parsed, headers);
+    if (!parsed.success) return handleZodValidation(parsed);
 
     const { judulLaporan } = parsed.data;
 
@@ -123,7 +124,6 @@ const POST = async (req: NextRequest) => {
         success: false,
         message: "Gagal memproses hasil AI. Format JSON tidak valid.",
         status: 500,
-        headers,
       });
     }
 
@@ -132,7 +132,7 @@ const POST = async (req: NextRequest) => {
 
     // Kumpulkan semua ID masukan yang terlibat dari semua prioritas
     const masukanIdsTerlibat = Array.from(
-      new Set(rekomendasiPrioritas.flatMap((p) => p.masukan_terkait_ids || []))
+      new Set(rekomendasiPrioritas.flatMap((p) => p.masukan_terkait_ids || [])),
     );
 
     // --- 4. TRANSAKSI PENYIMPANAN DATA & UPDATE STATUS ---
@@ -147,7 +147,7 @@ const POST = async (req: NextRequest) => {
           prioritas1Deskripsi: prioritas1.deskripsi,
           prioritas1Skor: prioritas1.skor_prioritas,
           laporanLengkap: hasilAnalisis as any, // Biarkan 'as any' untuk tipe Json
-          processedByUserId: user.id,
+          processedByUserId: session.user.id,
         },
       });
 
@@ -178,7 +178,6 @@ const POST = async (req: NextRequest) => {
       message: "Analisis rekomendasi AI berhasil diproses.",
       data: { rekomendasiId: result.id, judul: result.judul },
       status: 201,
-      headers,
     });
   } catch (err) {
     // PRISMA & SERVER ERROR HANDLERS (Sudah Anda Sediakan)
@@ -188,7 +187,6 @@ const POST = async (req: NextRequest) => {
         success: false,
         message: prismaResponse.message,
         status: prismaResponse.status,
-        headers,
       });
     }
 
@@ -196,34 +194,26 @@ const POST = async (req: NextRequest) => {
       success: false,
       message: "Terjadi error pada server: " + (err as Error).message,
       status: 500,
-      headers,
     });
   }
 };
 
 const GET = async (req: NextRequest) => {
-  //CORS
-  const headers = cors(req, {
-    allowedOrigins: [process.env.NEXT_PUBLIC_APP_URL!],
-  });
-  if (headers instanceof NextResponse) return headers;
+  const allowedRoles: Role[] = ["ADMIN"];
+  const session = await auth.api.getSession({ headers: await headers() });
 
-  // VERIFIKASI JWT
-  const user = await verifyApiToken(req);
-
-  if (!user) {
+  if (!session) {
     return handleResponse({
       success: false,
-      message: "Unauthorized: Token invalid",
-      status: 401,
+      message: "User belum login",
+      status: 403,
     });
   }
 
-  // AUTHORIZATION
-  if (user.role !== "ADMIN") {
+  if (!allowedRoles.includes(session.user.role as Role)) {
     return handleResponse({
       success: false,
-      message: "Anda tidak memiliki akses untuk terhadap data ini",
+      message: "Akses ditolak",
       status: 403,
     });
   }
@@ -235,7 +225,7 @@ const GET = async (req: NextRequest) => {
 
     //VALIDASI QUERY
     const parsed = queryRekomendasiSchema.safeParse({ judulLaporan });
-    if (!parsed.success) return handleZodValidation(parsed, headers);
+    if (!parsed.success) return handleZodValidation(parsed);
 
     //HASIL VALIDASI
     const judul = parsed.data.judulLaporan;
@@ -250,7 +240,6 @@ const GET = async (req: NextRequest) => {
         success: true,
         message: "Data Rekomendasi AI masih kosong",
         status: 404,
-        headers,
       });
     }
 
@@ -260,7 +249,6 @@ const GET = async (req: NextRequest) => {
       message: "Data Rekomendasi AI berhasil diambil",
       data,
       status: 200,
-      headers,
     });
   } catch (err) {
     //PRISMA ERROR
@@ -270,7 +258,6 @@ const GET = async (req: NextRequest) => {
         success: false,
         message: prismaResponse.message,
         status: prismaResponse.status,
-        headers,
       });
     }
 
@@ -279,7 +266,6 @@ const GET = async (req: NextRequest) => {
       success: false,
       message: "Terjadi error pada server",
       status: 500,
-      headers,
     });
   }
 };

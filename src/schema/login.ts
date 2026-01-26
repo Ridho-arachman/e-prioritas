@@ -14,4 +14,6 @@ export const loginSchema = z.object({
     .regex(/[A-Z]/, "Password harus mengandung huruf besar")
     .regex(/[0-9]/, "Password harus mengandung angka")
     .regex(/[^a-zA-Z0-9]/, "Password harus mengandung simbol"),
+  rememberMe: z.boolean("Remember me harus berupa boolean").optional(),
+  turnstileToken: z.string().min(1, "Captcha wajib diisi"),
 });

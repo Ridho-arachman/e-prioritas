@@ -12,10 +12,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { RekomendasiAccordion } from "@/components/rekomendasi/RekomendasiAccordion";
+import { RekomendasiAccordion } from "@/components/sections/rekomendasi/RekomendasiAccordion";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MasukanTerlibatTable } from "@/components/rekomendasi/MasukanTerlibatTable";
-import { MasukanTerlibatCardList } from "@/components/rekomendasi/MasukanTelibatCardList";
+import { MasukanTerlibatTable } from "@/components/sections/rekomendasi/MasukanTerlibatTable";
+import { MasukanTerlibatCardList } from "@/components/sections/rekomendasi/MasukanTelibatCardList";
 
 export default function RekomendasiDetailPage() {
   const params = useParams<{ id: string }>();

@@ -1,74 +1,63 @@
-import { generateAccessToken, generateRefreshToken } from "@/lib/jwtHelper";
-import { NextRequest, NextResponse } from "next/server";
-import { comparePassword } from "@/lib/hashing";
-import { loginSchema } from "@/schema/login";
-import { prisma } from "@/lib/prisma";
-import { cors } from "@/lib/cors";
-import { handleResponse } from "@/lib/responseHandler";
+import { config } from "@/config";
+import { auth } from "@/lib/auth";
+import { handleBetterAuthError } from "@/lib/handleBetterAuthError";
+import { handleResponse } from "@/lib/handleResponse";
 import { handleZodValidation } from "@/lib/handleZodValidation";
+import { loginSchema } from "@/schema/login";
+import { headers } from "next/headers";
+import { NextRequest } from "next/server";
 
-const POST = async (req: NextRequest) => {
-  const headers = cors(req, {
-    allowedOrigins: [process.env.NEXT_PUBLIC_APP_URL!],
-  });
-  if (headers instanceof NextResponse) return headers;
-
+export const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();
-
+    const turnstileToken = await req.headers.get("x-captcha-response");
     const parsed = loginSchema.safeParse(body);
-    if (!parsed.success) return handleZodValidation(parsed, headers);
 
-    const { email, password } = parsed.data;
-
-    const user = await prisma.user.findUnique({ where: { email } });
-
-    if (!user)
+    if (!turnstileToken) {
       return handleResponse({
         success: false,
-        message: "User tidak ditemukan",
-        status: 404,
+        message: "Captcha belum diverifikasi",
+        status: 400,
       });
+    }
 
-    const isPasswordValid = await comparePassword(password, user.password);
-    if (!isPasswordValid)
-      return handleResponse({
-        success: false,
-        message: "Password Atau Email Yang Anda Masukkan Salah",
-        status: 401,
-      });
+    if (!parsed.success) return handleZodValidation(parsed);
 
-    const accessToken = await generateAccessToken(user);
-    const refreshToken = await generateRefreshToken(user);
+    const { email, password, rememberMe } = parsed.data;
 
-    const response = handleResponse({
+    const result = await auth.api.signInEmail({
+      headers: {
+        "x-captcha-response": turnstileToken,
+      },
+      body: {
+        email,
+        password,
+        callbackURL: `http://localhost:3000/verify-success`,
+        rememberMe,
+      },
+    });
+
+    return handleResponse({
       success: true,
       message: "Login Berhasil",
-      status: 200,
+      data: result,
     });
+  } catch (error) {
+    console.log(error);
 
-    response.cookies.set("accessToken", accessToken, {
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      path: "/",
-    });
+    const betterAuthErr = handleBetterAuthError(error);
+    if (betterAuthErr) {
+      return handleResponse({
+        success: false,
+        message: betterAuthErr.message,
+        status: betterAuthErr.status,
+      });
+    }
 
-    response.cookies.set("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      path: "/",
-    });
-
-    return response;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (err) {
     return handleResponse({
       success: false,
-      message: "Terjadi Error Pada Server",
+      message: "Terjadi error pada server",
       status: 500,
     });
   }
 };
-
-export { POST };

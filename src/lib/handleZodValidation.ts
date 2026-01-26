@@ -1,13 +1,15 @@
-// /lib/handleZodValidation.ts
+// handleZodValidation.ts
+import { ZodTypeAny } from "zod";
 import { extractErrors } from "./extractErrors";
-import { handleResponse } from "./responseHandler";
+import { handleResponse } from "./handleResponse";
 
-export const handleZodValidation = (parsed: any, headers?: HeadersInit) => {
+export const handleZodValidation = <T extends ZodTypeAny>(
+  parsed: ReturnType<T["safeParse"]>,
+) => {
   return handleResponse({
     success: false,
     message: "Validasi gagal",
     errors: extractErrors(parsed),
     status: 400,
-    headers,
   });
 };

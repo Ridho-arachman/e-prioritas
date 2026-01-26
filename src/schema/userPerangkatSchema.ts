@@ -1,8 +1,6 @@
+import { Role } from "@/app/generated/prisma";
 import { z } from "zod";
 
-// =============================
-// CREATE SCHEMA
-// =============================
 export const createUserPerangkatSchema = z
   .object({
     name: z
@@ -25,16 +23,16 @@ export const createUserPerangkatSchema = z
     confirmPassword: z.string("Confirm Password wajib diisi").trim(),
     jabatan: z.string().trim().min(1, "Jabatan tidak boleh kosong"),
     isActive: z.boolean(),
+    role: z.enum(Role),
+    phoneNumber: z
+      .string()
+      .regex(/^(\+62|62|0)8[1-9][0-9]{6,10}$/, "Nomor HP tidak valid"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],
     message: "Password tidak sama",
   });
 
-// =============================
-// UPDATE SCHEMA
-// =============================
-// Untuk update, semua field opsional kecuali id
 export const updateUserPerangkatSchema = z.object({
   name: z
     .string("Nama wajib diisi")
@@ -44,25 +42,20 @@ export const updateUserPerangkatSchema = z.object({
   email: z.string("Email wajib diisi").trim().email("Format email tidak valid"),
   jabatan: z.string().min(1, "Jabatan tidak boleh kosong").trim(),
   isActive: z.boolean(),
+  role: z.enum(Role),
+  phoneNumber: z
+    .string()
+    .regex(/^(\+62|62|0)8[1-9][0-9]{6,10}$/, "Nomor HP tidak valid"),
 });
 
-// =============================
-// DELETE SCHEMA
-// =============================
 export const deleteUserPerangkatSchema = z.object({
-  id: z.string("ID user wajib diisi").cuid("ID user tidak valid"),
+  id: z.string("ID user wajib diisi"),
 });
 
-// =============================
-// GET / DETAIL SCHEMA
-// =============================
 export const detailUserPerangkatSchema = z.object({
-  id: z.string("ID user wajib diisi").cuid("ID user tidak valid"),
+  id: z.string("ID user wajib diisi"),
 });
 
-// =============================
-// GET / QUERY SCHEMA
-// =============================
 export const queryUserPerangkatSchema = z.object({
   q: z.string().optional(),
   isActive: z.string().optional(), // string karena dari query param

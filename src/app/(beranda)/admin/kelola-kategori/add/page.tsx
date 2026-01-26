@@ -1,4 +1,4 @@
-import { KategoriFormAdd } from "@/components/kategori/kategoriFormAdd";
+import { KategoriFormAdd } from "@/components/sections/kategori/kategoriFormAdd";
 
 export default function CreateKategoriPage() {
   return (

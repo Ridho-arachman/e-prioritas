@@ -1,16 +1,27 @@
-import { PerangkatFormEdit } from "@/components/perangkat/perangkatFormEdit";
+import UserDetail from "@/components/sections/perangkat/UserDetail";
 
-export default function EditKategoriPage() {
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+
+interface PageProps {
+  params: Promise<{
+    id: string;
+  }>;
+}
+
+export default async function DetailUserPage({ params }: PageProps) {
+  const { id } = await params;
+
   return (
-    <div className="px-10 py-4 space-y-10">
-      <div>
-        <h1 className="text-3xl font-bold mb-2">👤 Edit Perangkat Desa</h1>
-        <p className="text-muted-foreground">
-          Perbarui Data Perangkat Desa Sesuai Kebutuhan.
-        </p>
-      </div>
-      {/* form kategori edit */}
-      <PerangkatFormEdit />
+    <div>
+      <Link href="/admin/kelola-perangkat">
+        <Button variant="outline" className="mb-2">
+          <ArrowLeft className="mr-2 h-4 w-4" /> Kembali
+        </Button>
+      </Link>
+
+      <UserDetail id={id} />
     </div>
   );
 }

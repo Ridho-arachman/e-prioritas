@@ -2,7 +2,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import type { Metadata } from "next";
-import { SWRProvider } from "@/components/swr";
 
 export const metadata: Metadata = {
   metadataBase: new URL("http://localhost:3000"), // ganti dengan domainmu
@@ -81,7 +80,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SWRProvider>{children}</SWRProvider>
+        {children}
         <Toaster />
       </body>
     </html>

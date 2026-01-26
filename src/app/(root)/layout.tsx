@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
+import Navbar from "@/components/sections/navbar";
+import Footer from "@/components/sections/footer";
 import { Geist, Geist_Mono } from "next/font/google";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,7 +22,9 @@ export default function RootLayout({
   return (
     <>
       <Navbar />
-      <main>{children}</main>
+      <main>
+        <NuqsAdapter>{children}</NuqsAdapter>
+      </main>
       <Footer />
     </>
   );
