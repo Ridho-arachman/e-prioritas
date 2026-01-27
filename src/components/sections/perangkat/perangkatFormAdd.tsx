@@ -53,10 +53,13 @@ export default function PerangkatFormAdd() {
   const role = useWatch({ name: "role", control: form.control });
 
   useEffect(() => {
-    form.setValue(
-      "jabatan",
-      role !== "PERANGKAT_DESA" ? "" : form.getValues("jabatan"),
-    );
+    if (role === "LURAH") {
+      form.setValue("jabatan", "Lurah");
+    }
+
+    if (role === "PERANGKAT_DESA") {
+      form.setValue("jabatan", form.getValues("jabatan"));
+    }
   }, [role, form]);
 
   async function onSubmit(data: z.infer<typeof createUserPerangkatSchema>) {

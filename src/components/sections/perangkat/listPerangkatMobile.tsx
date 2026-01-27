@@ -1,12 +1,21 @@
 "use client";
 
-import { Plus, XIcon, Verified, X } from "lucide-react";
+import {
+  Plus,
+  XIcon,
+  Verified,
+  X,
+  Send,
+  ChevronRight,
+  ChevronLeft,
+  Trash,
+} from "lucide-react";
 import { useDebounce } from "use-debounce";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Link from "next/link";
-import { useGet, useDelete } from "@/hooks/useApi";
+import { useGet, useDelete, usePost } from "@/hooks/useApi";
 import DataKosong from "../../blocks/DataKosong";
 import DataTidakDitemukan from "../../blocks/DataTidakDitemukan";
 import DataError from "../../blocks/DataError";
@@ -15,6 +24,22 @@ import { useQueryState } from "nuqs";
 import { useRouter } from "next/navigation";
 import { buildQuery } from "@/utils/query";
 import { cn } from "@/lib/utils";
+import { notifier } from "@/lib/ToastNotifier";
+import { AxiosError } from "axios";
+import { ApiError } from "@/types/ApiError";
+import { User } from "@/app/generated/prisma";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function ListPerangkatMobile() {
   const router = useRouter();
@@ -44,13 +69,32 @@ export default function ListPerangkatMobile() {
     `/protected/perangkat${queryString}`,
   );
   const { del: deletePerangkat, loading: deleteLoading } = useDelete();
+  const { post, loading } = usePost(`/auth/send-verify-email`);
 
   const handleDelete = async (id: string) => {
     try {
-      await deletePerangkat(`/protected/perangkat/${id}`);
-      mutate();
-    } catch (err: any) {
-      alert(err?.message || "Terjadi kesalahan");
+      const res = await deletePerangkat(`/protected/perangkat/${id}`);
+      notifier.success(
+        "Berhasil",
+        res?.message || "Perangkat berhasil dihapus",
+      );
+      router.back();
+    } catch (error) {
+      const err = error as AxiosError<ApiError>;
+      notifier.error("Gagal", err?.response?.data?.message);
+    }
+  };
+
+  const handleVerify = async (email: string) => {
+    try {
+      const res = await post({ email });
+      notifier.success(
+        "Berhasil",
+        res?.message || "Verifikasi email berhasil dikirim",
+      );
+    } catch (error) {
+      const err = error as AxiosError<ApiError>;
+      notifier.error("Gagal", err?.response?.data?.message);
     }
   };
 
@@ -122,7 +166,7 @@ export default function ListPerangkatMobile() {
         {data?.length === 0 && !queryString && <DataKosong />}
 
         {data?.length > 0 &&
-          data.map((item: any, index: number) => (
+          data.map((item: User, index: number) => (
             <Card
               key={item.id}
               className="border shadow-sm"
@@ -156,8 +200,8 @@ export default function ListPerangkatMobile() {
                   <span className="font-medium">Jabatan:</span> {item.jabatan}
                 </div>
                 <div className="text-sm">
-                  <span className="font-medium">HP:</span>{" "}
-                  {item.phoneVerified ? "Terverifikasi" : "Belum"}
+                  <span className="font-medium">Verify Email:</span>{" "}
+                  {item.emailVerified ? "Terverifikasi" : "Belum"}
                 </div>
                 <div className="text-xs text-muted-foreground">
                   Dibuat: {new Date(item.createdAt).toLocaleDateString("id-ID")}
@@ -173,43 +217,89 @@ export default function ListPerangkatMobile() {
                   >
                     Edit
                   </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button size="sm" variant="destructive">
+                        <Trash /> Hapus
+                      </Button>
+                    </AlertDialogTrigger>
+
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Hapus perangkat desa?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Tindakan ini bersifat permanen. Data perangkat desa
+                          <span className="font-medium"> {item?.name} </span>
+                          akan dihapus dan tidak dapat dikembalikan.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+
+                      <AlertDialogFooter>
+                        <AlertDialogCancel disabled={loading}>
+                          Batal
+                        </AlertDialogCancel>
+
+                        <AlertDialogAction
+                          disabled={loading}
+                          onClick={() => {
+                            handleDelete(item.id);
+                          }}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          {loading ? (
+                            <>
+                              <Spinner />
+                              {"Menghapus..."}
+                            </>
+                          ) : (
+                            "Ya, hapus"
+                          )}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                   <Button
                     size="sm"
-                    variant="destructive"
-                    disabled={deleteLoading}
-                    onClick={() => handleDelete(item.id)}
+                    variant="outline"
+                    disabled={item.emailVerified || deleteLoading}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleVerify(item.email);
+                    }}
+                    className="cursor-pointer"
                   >
-                    Hapus
+                    <Send className="mr-1 h-4 w-4" /> Verify
                   </Button>
                 </div>
               </CardContent>
             </Card>
           ))}
 
-        {/* Pagination */}
-        {meta?.totalPages && meta.totalPages > 1 && (
-          <div className="flex justify-end gap-2 mt-4">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handlePrev}
-              disabled={pageNumber === 1}
-            >
-              Prev
-            </Button>
-            <span className="flex items-center px-2">
-              {pageNumber} / {meta.totalPages}
-            </span>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleNext}
-              disabled={pageNumber === meta.totalPages}
-            >
-              Next
-            </Button>
-          </div>
-        )}
+        <div className="flex justify-end gap-2 mt-4">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handlePrev}
+            disabled={pageNumber === 1}
+            className="cursor-pointer"
+          >
+            <ChevronLeft /> Prev
+          </Button>
+          <span className="flex items-center px-2">
+            {pageNumber} / {meta?.totalPages}
+          </span>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleNext}
+            disabled={pageNumber === meta?.totalPages}
+            className="cursor-pointer"
+          >
+            Next <ChevronRight />
+          </Button>
+        </div>
       </CardContent>
     </>
   );

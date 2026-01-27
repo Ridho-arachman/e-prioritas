@@ -6,7 +6,7 @@ import { Spinner } from "../../ui/spinner";
 import { notifier } from "../../../lib/ToastNotifier";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useParams } from "next/navigation";
 import {
@@ -54,17 +54,29 @@ export function PerangkatFormEdit() {
   });
 
   useEffect(() => {
-    if (data) {
-      form.reset({
-        name: data?.name,
-        email: data?.email,
-        jabatan: data?.jabatan,
-        phoneNumber: data?.phoneNumber,
-        role: data?.role,
-        isActive: data?.isActive,
-      });
-    }
+    if (!data) return;
+
+    form.reset({
+      name: data.name,
+      email: data.email,
+      phoneNumber: data.phoneNumber,
+      role: data.role,
+      jabatan: data.jabatan,
+      isActive: data.isActive,
+    });
   }, [data, form]);
+
+  const role = useWatch({ name: "role", control: form.control });
+
+  useEffect(() => {
+    if (role === "LURAH") {
+      form.setValue("jabatan", "Lurah");
+    }
+
+    if (role === "PERANGKAT_DESA") {
+      form.setValue("jabatan", "");
+    }
+  }, [role, form]);
 
   if (isLoading && !data) {
     return (
@@ -167,23 +179,6 @@ export function PerangkatFormEdit() {
           )}
         />
 
-        {/* Jabatan */}
-        <Controller
-          control={form.control}
-          name="jabatan"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Jabatan</FieldLabel>
-              <Input
-                {...field}
-                readOnly={loading}
-                placeholder="Jabatan perangkat"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-
         {/* Role */}
         <Controller
           control={form.control}
@@ -192,7 +187,8 @@ export function PerangkatFormEdit() {
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel>Role</FieldLabel>
               <Select
-                {...field}
+                key={field.value}
+                value={field.value}
                 onValueChange={field.onChange}
                 disabled={loading}
               >
@@ -208,6 +204,27 @@ export function PerangkatFormEdit() {
             </Field>
           )}
         />
+
+        {/* Jabatan */}
+        {role === "PERANGKAT_DESA" && (
+          <Controller
+            control={form.control}
+            name="jabatan"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Jabatan</FieldLabel>
+                <Input
+                  {...field}
+                  readOnly={loading}
+                  placeholder="Jabatan perangkat"
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+        )}
 
         {/* Status */}
         <Controller

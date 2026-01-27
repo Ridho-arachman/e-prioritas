@@ -223,7 +223,7 @@ export const auth = betterAuth({
         input: true,
       },
       isActive: {
-        type: "string",
+        type: "boolean",
         required: false,
         input: true,
       },
@@ -246,7 +246,7 @@ export const auth = betterAuth({
         input: true,
       },
       isActive: {
-        type: "string",
+        type: "boolean",
         required: false,
         input: true,
       },

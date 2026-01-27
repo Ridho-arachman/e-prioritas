@@ -21,7 +21,7 @@ export const POST = async (req: Request) => {
 
     return handleResponse({
       success: true,
-      message: "Nomor telepon berhasil diverifikasi",
+      message: "Verifikasi Email Berhasil Dikirim",
       status: 200,
       data: response.status,
     });

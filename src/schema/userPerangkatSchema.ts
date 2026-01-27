@@ -21,7 +21,7 @@ export const createUserPerangkatSchema = z
       .regex(/[0-9]/, "Password harus mengandung angka")
       .regex(/[^a-zA-Z0-9]/, "Password harus mengandung simbol"),
     confirmPassword: z.string("Confirm Password wajib diisi").trim(),
-    jabatan: z.string().trim().min(1, "Jabatan tidak boleh kosong"),
+    jabatan: z.string().optional(),
     isActive: z.boolean(),
     role: z.enum(Role),
     phoneNumber: z
@@ -42,7 +42,7 @@ export const updateUserPerangkatSchema = z.object({
   email: z.string("Email wajib diisi").trim().email("Format email tidak valid"),
   jabatan: z.string().min(1, "Jabatan tidak boleh kosong").trim(),
   isActive: z.boolean(),
-  role: z.enum(Role),
+  role: z.enum(["LURAH", "PERANGKAT_DESA"]),
   phoneNumber: z
     .string()
     .regex(/^(\+62|62|0)8[1-9][0-9]{6,10}$/, "Nomor HP tidak valid"),

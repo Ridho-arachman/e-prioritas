@@ -107,13 +107,15 @@ const PATCH = async (
     if (!parsedId.success) return handleZodValidation(parsedId);
     if (!parsed.success) return handleZodValidation(parsed);
 
-    // // SIMPAN DATA perangkat desa KE DATABASE
-    // const kategori = await userService.update(parsed.data);
-    // console.log(kategori);
+    const userId = parsedId.data.id;
+    const data = parsed.data;
+
+    const kategori = await userService.update(data, userId);
+
     return handleResponse({
       success: true,
       message: "Data perangkat desa berhasil diupdate",
-      // data: kategori,
+      data: kategori,
       status: 200,
     });
   } catch (err) {

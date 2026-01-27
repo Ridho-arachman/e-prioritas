@@ -16,7 +16,7 @@ export default async function DetailUserPage({ params }: PageProps) {
   return (
     <div>
       <Link href="/admin/kelola-perangkat">
-        <Button variant="outline" className="mb-2">
+        <Button variant="outline" className="mb-2 cursor-pointer">
           <ArrowLeft className="mr-2 h-4 w-4" /> Kembali
         </Button>
       </Link>

@@ -11,6 +11,19 @@ import { useRouter } from "next/navigation";
 import { notifier } from "@/lib/ToastNotifier";
 import { AxiosError } from "axios";
 import { ApiError } from "@google/genai";
+import { Edit, Trash } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Spinner } from "@/components/ui/spinner";
 
 interface UserDetailProps {
   id: string;
@@ -141,27 +154,67 @@ export default function UserDetail({ id }: UserDetailProps) {
 
         <div className="pt-2 flex gap-2">
           <Link href={`/admin/kelola-perangkat/${user?.id}/edit`}>
-            <Button size="sm">Edit</Button>
+            <Button size="sm" className="cursor-pointer">
+              <Edit /> Edit
+            </Button>
           </Link>
 
-          <Button
-            size="sm"
-            onClick={async () => {
-              try {
-                const res = await del(`/protected/perangkat/${id}`);
-                notifier.success(
-                  "Berhasil",
-                  res?.message || "Perangkat berhasil dihapus",
-                );
-                router.back();
-              } catch (error) {
-                const err = error as AxiosError<ApiError>;
-                notifier.error("Gagal", err?.response?.data?.message);
-              }
-            }}
-          >
-            Hapus
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                size="sm"
+                variant="destructive"
+                className="cursor-pointer"
+              >
+                <Trash /> Hapus
+              </Button>
+            </AlertDialogTrigger>
+
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Hapus perangkat desa?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Tindakan ini bersifat permanen. Data perangkat desa
+                  <span className="font-medium"> {user?.name} </span>
+                  akan dihapus dan tidak dapat dikembalikan.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={loading}>Batal</AlertDialogCancel>
+
+                <AlertDialogAction
+                  disabled={loading}
+                  onClick={async () => {
+                    try {
+                      const res = await del(`/protected/perangkat/${id}`);
+                      notifier.success(
+                        "Berhasil",
+                        res?.message || "Perangkat berhasil dihapus",
+                      );
+                      router.back();
+                    } catch (error) {
+                      const err = error as AxiosError<ApiError>;
+                      notifier.error(
+                        "Gagal",
+                        err?.response?.data?.message || "Gagal menghapus data",
+                      );
+                    }
+                  }}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  {loading ? (
+                    <>
+                      <Spinner />
+                      {"Menghapus..."}
+                    </>
+                  ) : (
+                    "Ya, hapus"
+                  )}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </CardContent>
     </Card>

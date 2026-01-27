@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Verified,
   X,
+  Trash,
 } from "lucide-react";
 import { useDebounce } from "use-debounce";
 import { useState } from "react";
@@ -32,24 +33,32 @@ import Link from "next/link";
 import { useQueryState } from "nuqs";
 import { buildQuery } from "@/utils/query";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
 import { AxiosError } from "axios";
 import { ApiError } from "@google/genai";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function ListTablePerangkat() {
   const router = useRouter();
+  const [selectedDeleteId, setSelectedDeleteId] = useState<string | null>(null);
 
-  // QUERY STATE
   const [q, setQ] = useQueryState("q", { defaultValue: "" });
   const [active, setActive] = useQueryState("isActive", { defaultValue: "" });
   const [page, setPage] = useQueryState("page", { defaultValue: "1" });
-  const [perPage, setPerPage] = useQueryState("perPage", {
-    defaultValue: "10",
-  });
+  const [perPage] = useQueryState("perPage", { defaultValue: "10" });
 
   const [debouncedQ] = useDebounce(q, 500);
 
-  // Konversi page dan perPage ke number
   const pageNumber = Number(page);
   const perPageNumber = Number(perPage);
 
@@ -63,24 +72,28 @@ export default function ListTablePerangkat() {
   const { data, meta, error, isLoading, mutate } = useGet(
     `/protected/perangkat${queryString}`,
   );
+
   const { del: deletePerangkat, loading: deleteLoading } = useDelete();
-  const { post, loading } = usePost("/auth/send-verify-email");
+  const { post, loading: verifyLoading } = usePost("/auth/send-verify-email");
 
   const cellCenter = "text-center align-middle truncate max-w-[150px]";
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async () => {
+    if (!selectedDeleteId) return;
     try {
-      const res = await deletePerangkat(`/protected/perangkat/${id}`);
-      notifier.success(
-        "Berhasil",
-        res?.message || "Perangkat berhasil dihapus",
+      const res = await deletePerangkat(
+        `/protected/perangkat/${selectedDeleteId}`,
       );
+      notifier.success("Berhasil", res?.message);
       mutate();
     } catch (error) {
       const err = error as AxiosError<ApiError>;
       notifier.error("Gagal", err?.response?.data?.message);
+    } finally {
+      setSelectedDeleteId(null);
     }
   };
+
   const handleVerify = async (email: string) => {
     try {
       const res = await post({ email });
@@ -93,27 +106,22 @@ export default function ListTablePerangkat() {
       notifier.error("Gagal", err?.response?.data?.message);
     }
   };
-
-  const handlePrev = () => setPage(String(Math.max(1, pageNumber - 1)));
-  const handleNext = () =>
-    setPage(String(Math.min(meta?.totalPages || 1, pageNumber + 1)));
-
   return (
     <>
       <CardHeader className="space-y-4">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="flex justify-between">
           <Link href="/admin/kelola-perangkat/add">
-            <Button className="w-full md:w-auto cursor-pointer">
+            <Button className="cursor-pointer">
               <Plus className="mr-2 h-4 w-4" /> Tambah Perangkat
             </Button>
           </Link>
 
-          {/* SEARCH */}
-          <div className="flex w-full gap-2 md:max-w-md">
+          <div className="flex gap-2">
             <Input
-              placeholder="Cari Nama / Jabatan / Email"
               value={q}
               onChange={(e) => setQ(e.target.value)}
+              placeholder="Cari Nama / Jabatan / Email"
+              className="cursor-pointer"
             />
             <Button
               variant="outline"
@@ -123,23 +131,6 @@ export default function ListTablePerangkat() {
               <XIcon />
             </Button>
           </div>
-        </div>
-
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <Button
-            variant={active === "true" ? "default" : "outline"}
-            onClick={() => setActive(active === "true" ? "" : "true")}
-            className="w-full sm:w-auto cursor-pointer"
-          >
-            Aktif
-          </Button>
-          <Button
-            variant={active === "false" ? "default" : "outline"}
-            onClick={() => setActive(active === "false" ? "" : "false")}
-            className="w-full sm:w-auto cursor-pointer"
-          >
-            Tidak Aktif
-          </Button>
         </div>
       </CardHeader>
 
@@ -152,7 +143,7 @@ export default function ListTablePerangkat() {
               <TableHead className="text-center">Email</TableHead>
               <TableHead className="text-center">Jabatan</TableHead>
               <TableHead className="text-center">Aktif</TableHead>
-              <TableHead className="text-center">Verifikasi Email</TableHead>
+              <TableHead className="text-center">Email Verified</TableHead>
               <TableHead className="text-center">Tanggal Dibuat</TableHead>
               <TableHead className="text-center">Aksi</TableHead>
             </TableRow>
@@ -161,6 +152,7 @@ export default function ListTablePerangkat() {
           <TableBody>
             {isLoading && !data && <TableSkeleton rows={5} />}
             {error && <DataError message={error?.message} />}
+
             {data?.length === 0 && queryString && (
               <TableRow>
                 <TableCell colSpan={8}>
@@ -168,6 +160,7 @@ export default function ListTablePerangkat() {
                 </TableCell>
               </TableRow>
             )}
+
             {data?.length === 0 && !queryString && (
               <TableRow>
                 <TableCell colSpan={8}>
@@ -175,6 +168,7 @@ export default function ListTablePerangkat() {
                 </TableCell>
               </TableRow>
             )}
+
             {data?.length > 0 &&
               data?.map((item: any, index: number) => (
                 <TableRow
@@ -190,22 +184,22 @@ export default function ListTablePerangkat() {
                   <TableCell className={cellCenter}>{item.name}</TableCell>
                   <TableCell className={cellCenter}>{item.email}</TableCell>
                   <TableCell className={cellCenter}>{item.jabatan}</TableCell>
-                  <TableCell className="text-center align-middle">
+                  <TableCell className="align-middle">
                     <div className="flex items-center justify-center">
                       {item.isActive ? (
-                        <Verified color="green" />
+                        <Verified className="text-green-600" />
                       ) : (
-                        <X color="red" />
+                        <X className="text-red-600" />
                       )}
                     </div>
                   </TableCell>
 
-                  <TableCell className="text-center align-middle">
+                  <TableCell className="align-middle">
                     <div className="flex items-center justify-center">
                       {item.emailVerified ? (
-                        <Verified color="green" />
+                        <Verified className="text-green-600" />
                       ) : (
-                        <X color="red" />
+                        <X className="text-red-600" />
                       )}
                     </div>
                   </TableCell>
@@ -213,41 +207,69 @@ export default function ListTablePerangkat() {
                   <TableCell className={cellCenter}>
                     {new Date(item.createdAt).toLocaleDateString("id-ID")}
                   </TableCell>
-                  <TableCell>
+
+                  {/* 🔥 AKSI — EVENT DIPUTUS DI SINI */}
+                  <TableCell onClick={(e) => e.stopPropagation()}>
                     <div className="flex justify-center gap-2">
                       <Button
                         size="sm"
-                        disabled={deleteLoading}
+                        onClick={() =>
+                          router.push(`/admin/kelola-perangkat/${item.id}/edit`)
+                        }
                         className="cursor-pointer"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          router.push(
-                            `/admin/kelola-perangkat/${item.id}/edit`,
-                          );
-                        }}
                       >
                         Edit
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        disabled={deleteLoading}
-                        className="cursor-pointer"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(item.id);
-                        }}
-                      >
-                        Hapus
-                      </Button>
+
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => setSelectedDeleteId(item.id)}
+                            className="cursor-pointer"
+                          >
+                            <Trash />
+                          </Button>
+                        </AlertDialogTrigger>
+
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Hapus perangkat desa?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Data <b>{item.name}</b> akan dihapus permanen.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+
+                          <AlertDialogFooter>
+                            <AlertDialogCancel className="cursor-pointer">
+                              Batal
+                            </AlertDialogCancel>
+                            <AlertDialogAction
+                              variant="destructive"
+                              onClick={handleDelete}
+                              disabled={deleteLoading}
+                              className="cursor-pointer"
+                            >
+                              {deleteLoading ? (
+                                <>
+                                  <Spinner /> Menghapus...
+                                </>
+                              ) : (
+                                "Hapus"
+                              )}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+
                       <Button
                         size="sm"
                         variant="outline"
-                        disabled={item.emailVerified || deleteLoading}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleVerify(item.email);
-                        }}
+                        disabled={item.emailVerified || verifyLoading}
+                        onClick={() => handleVerify(item.email)}
                         className="cursor-pointer"
                       >
                         <Send className="mr-1 h-4 w-4" /> Verify
@@ -263,19 +285,19 @@ export default function ListTablePerangkat() {
           <Button
             size="sm"
             variant="outline"
-            onClick={handlePrev}
+            onClick={() => setPage(String(pageNumber - 1))}
             disabled={pageNumber === 1}
             className="cursor-pointer"
           >
             <ChevronLeft /> Prev
           </Button>
-          <span className="flex items-center px-2">
+          <span className="px-2">
             {pageNumber} / {meta?.totalPages}
           </span>
           <Button
             size="sm"
             variant="outline"
-            onClick={handleNext}
+            onClick={() => setPage(String(pageNumber + 1))}
             disabled={pageNumber === meta?.totalPages}
             className="cursor-pointer"
           >

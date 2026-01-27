@@ -10,7 +10,9 @@ export const dashboardService = {
       dataMasterCount,
       rekomendasiCount,
     ] = await Promise.all([
-      prisma.user.count(),
+      prisma.user.count({
+        where: { role: { not: "ADMIN" } },
+      }),
 
       prisma.masukanWarga.count({
         where: { status: "MENUNGGU_VERIFIKASI" },

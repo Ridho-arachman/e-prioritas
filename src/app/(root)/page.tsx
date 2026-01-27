@@ -130,7 +130,7 @@ export default function LandingPage() {
   return (
     <div className="relative flex min-h-screen flex-col items-center p-6 sm:p-24 overflow-hidden">
       {/* Latar Belakang Gradien Animasi */}
-      <div className="absolute inset-0 z-0 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-950 dark:to-blue-950 animate-pulse-slow opacity-50"></div>
+      <div className="absolute inset-0 z-0 bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-950 dark:to-blue-950 animate-pulse-slow opacity-50"></div>
 
       <div className="relative z-10 w-full max-w-7xl flex flex-col items-center">
         {/* Header Utama */}
@@ -163,7 +163,7 @@ export default function LandingPage() {
                   </CardTitle>
                   <CardDescription>{card.description}</CardDescription>
                 </CardHeader>
-                <CardContent className="flex-grow flex items-center justify-center">
+                <CardContent className="grow flex items-center justify-center">
                   <Image
                     src={card.imageSrc}
                     alt={card.imageAlt}

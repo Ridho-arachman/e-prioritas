@@ -1,4 +1,5 @@
 import { Prisma } from "@/app/generated/prisma";
+import { config } from "@/config";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { headers } from "next/headers";
@@ -16,13 +17,23 @@ export const userService = {
     email: string;
     name: string;
     password: string;
-    jabatan: string;
+    jabatan?: string;
     phoneNumber: string;
     rememberMe?: boolean;
     role?: string;
+    isActive?: boolean;
   }) => {
     return auth.api.signUpEmail({
-      body: data,
+      body: {
+        email: data.email,
+        name: data.name,
+        password: data.password,
+        role: data.role || "PERANGKAT_DESA",
+        jabatan: data.jabatan,
+        phoneNumber: data.phoneNumber,
+        isActive: data.isActive,
+        callbackURL: `${config.appUrl}/verify-success`,
+      },
     });
   },
 
@@ -49,7 +60,9 @@ export const userService = {
                 ],
               }
             : {},
-          { role: "PERANGKAT_DESA" },
+          {
+            OR: [{ role: "PERANGKAT_DESA" }, { role: "LURAH" }],
+          },
           isActive !== undefined ? { isActive: isActive === "true" } : {},
         ],
       },
@@ -68,7 +81,9 @@ export const userService = {
                 ],
               }
             : {},
-          { role: "PERANGKAT_DESA" },
+          {
+            OR: [{ role: "PERANGKAT_DESA" }, { role: "LURAH" }],
+          },
           isActive !== undefined ? { isActive: isActive === "true" } : {},
         ],
       },
@@ -102,22 +117,28 @@ export const userService = {
     });
   },
 
-  update: async (data: any) => {
-    const { email, ...body } = data;
+  update: async (data: any, userId: string) => {
+    const { email, ...safeData } = data;
 
-    const userUpdate = auth.api.updateUser({
-      body,
-      headers: await headers(),
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true },
     });
-    const emailUpdate = auth.api.changeEmail({
-      body: {
-        newEmail: email,
-      },
-      headers: await headers(),
-    });
-    const res = { ...userUpdate, ...emailUpdate };
 
-    return res;
+    if (data.email && data.email !== user?.email) {
+      return prisma.user.update({
+        where: { id: userId },
+        data: {
+          ...data,
+          emailVerified: false,
+        },
+      });
+    }
+
+    return prisma.user.update({
+      where: { id: userId },
+      data: safeData,
+    });
   },
 
   deleteById: async (userId: string) => {
