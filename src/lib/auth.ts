@@ -13,6 +13,14 @@ export const auth = betterAuth({
       secretKey: process.env.TURNSTILE_SECRET_KEY!,
     }),
   ],
+  socialProviders: {
+    google: {
+      disableSignUp: false,
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      scope: ["https://www.googleapis.com/auth/userinfo.email"],
+    },
+  },
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),

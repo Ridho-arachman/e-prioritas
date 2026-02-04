@@ -11,7 +11,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 import { kategoriSchema } from "@/schema/kategoriSchema";
 import { Field, FieldError } from "@/components/ui/field";
-import { useCreateKategori } from "@/hooks/api/useKategori";
 import {
   Select,
   SelectContent,
@@ -20,6 +19,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Spinner } from "../../ui/spinner"; // Pastikan Spinner diekspor dengan benar
+import { usePost } from "@/hooks/useApi";
+import { AxiosError } from "axios";
+import { ApiError } from "@/types/ApiError";
 
 export function KategoriFormAdd() {
   const router = useRouter();
@@ -33,23 +35,20 @@ export function KategoriFormAdd() {
     },
   });
 
-  const { execute, loading } = useCreateKategori();
+  const { post, loading } = usePost("/protected/kategori");
 
   const handleSubmit = async (data: any) => {
-    const { data: res, error } = await execute(
-      "/protected/kategori",
-      data,
-      { headers: { "Content-Type": "application/json" } },
-      "/protected/kategori",
-    );
-
-    if (error) {
-      notifier.error(error);
-      return;
+    try {
+      const res = await post(data);
+      notifier.success(
+        "Berhasil",
+        res?.message || "Kategori berhasil ditambahkan",
+      );
+      router.back();
+    } catch (error) {
+      const err = error as AxiosError<ApiError>;
+      notifier.error("Gagal", err?.response?.data?.message);
     }
-
-    notifier.success(res?.message || "Kategori berhasil ditambahkan");
-    router.back();
   };
 
   const formComponent = (

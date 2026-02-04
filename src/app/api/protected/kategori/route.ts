@@ -29,46 +29,41 @@ const GET = async (req: NextRequest) => {
   }
 
   try {
-    //AMBIL QUERY
     const searchParams = req.nextUrl.searchParams;
-    const namaKategori = searchParams.get("search");
+    const namaKategori = searchParams.get("q") || "";
+    const page = parseInt(searchParams.get("page") || "1");
+    const perPage = parseInt(searchParams.get("perPage") || "10");
 
-    //VALIDASI QUERY
-    let namaKategoriParam: string | undefined;
-    if (namaKategori) {
-      const parsed = kategoriQuerySchema.safeParse({ namaKategori });
-      if (!parsed.success) {
-        return handleZodValidation(parsed);
-      }
-      namaKategoriParam = parsed.data.namaKategori;
-    }
+    const parsed = kategoriQuerySchema.safeParse({ namaKategori });
+    console.log(parsed);
+    if (!parsed.success) return handleZodValidation(parsed);
 
-    //AMBIL DATA KATEGORI DARI DATABASE
-    const data = await kategoriService.getAll(namaKategoriParam);
+    const namaKategoriParam = parsed.data.namaKategori;
 
-    //JIKA DATA KOSONG
+    const { data, meta } = await kategoriService.getAll({
+      namaKategori: namaKategoriParam,
+      page,
+      perPage,
+    });
 
     if (data.length === 0) {
-      if (namaKategoriParam)
-        return handleResponse({
-          success: true,
-          message: "Data kategori tidak ditemukan",
-          status: 404,
-        });
-
       return handleResponse({
         success: true,
-        message: "Data kategori masih kosong",
-        status: 404,
+        message: namaKategori
+          ? "Data kategori tidak ditemukan"
+          : "Data kategori masih kosong",
+        status: 200,
+        data: [],
+        meta,
       });
     }
 
-    //JIKA DATA ADA
     return handleResponse({
       success: true,
       message: "Data kategori berhasil diambil",
       data,
       status: 200,
+      meta,
     });
   } catch (err) {
     //PRISMA ERROR
@@ -119,7 +114,7 @@ const POST = async (req: NextRequest) => {
 
     //JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
     const { namaKategori, deskripsi, status } = parsed.data;
-    
+
     //SIMPAN DATA KATEGORI KE DATABASE
     const kategori = await kategoriService.create({
       namaKategori,

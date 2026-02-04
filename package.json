@@ -3,17 +3,24 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "next lint",
+    "docker:cmd": "docker compose exec app sh",
+    "db:studio": "prisma studio --browser none --port 5555",
+    "db:push": "prisma db push",
+    "db:migrate": "docker compose exec app prisma migrate dev",
+    "db:generate": "docker compose exec app prisma generate",
     "prepare": "husky",
-    "create-admin": "npx tsx scripts/create-admin.ts"
+    "create-admin": "pnpm dlx tsx scripts/create-admin.ts",
+    "seed": "pnpm dlx tsx prisma/seed.ts"
   },
   "scarfSettings": {
     "enabled": false
   },
   "dependencies": {
+    "@faker-js/faker": "^10.2.0",
     "@google/genai": "^1.38.0",
     "@hookform/resolvers": "^5.2.2",
     "@marsidev/react-turnstile": "^1.4.1",

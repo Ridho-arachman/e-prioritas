@@ -13,7 +13,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useParams } from "next/navigation";
 import { kategoriSchema } from "@/schema/kategoriSchema";
 import { Field, FieldError } from "@/components/ui/field";
-import { useEditKategori, useGetKategoriById } from "@/hooks/api/useKategori";
 import {
   Select,
   SelectContent,
@@ -21,6 +20,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useGet, usePut } from "@/hooks/useApi";
+import { AxiosError } from "axios";
+import { ApiError } from "@/types/ApiError";
 
 // Simple skeleton
 const Skeleton = ({ className }: { className: string }) => (
@@ -31,8 +33,7 @@ export function KategoriFormEdit() {
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
 
-  const { data, isLoading } = useGetKategoriById(id);
-  const kategori = data?.data;
+  const { data, isLoading, error } = useGet(`/protected/kategori/${id}`);
 
   const form = useForm<z.infer<typeof kategoriSchema>>({
     resolver: zodResolver(kategoriSchema),
@@ -43,39 +44,34 @@ export function KategoriFormEdit() {
     },
   });
 
-  const { execute, loading } = useEditKategori();
+  const { put, loading } = usePut(`/protected/kategori/${id}`);
 
   // Populate form saat fetch selesai
   useEffect(() => {
-    if (kategori) {
+    if (data) {
       form.reset({
-        namaKategori: kategori.namaKategori,
-        deskripsi: kategori.deskripsi,
-        status: kategori.status,
+        namaKategori: data?.namaKategori,
+        deskripsi: data?.deskripsi,
+        status: data?.status,
       });
     }
-  }, [kategori, form]);
+  }, [data, form]);
 
   const handleSubmit = async (data: z.infer<typeof kategoriSchema>) => {
-    const { data: res, error } = await execute(
-      `/protected/kategori/${id}`,
-      data,
-      { headers: { "Content-Type": "application/json" } },
-      "/protected/kategori",
-    );
+    try {
+      const res = await put(data);
 
-    if (error) {
-      notifier.error(error);
-      return;
+      notifier.success(
+        "Berhasil",
+        res?.message || "Kategori berhasil diperbarui",
+      );
+      router.back();
+    } catch (error) {
+      const err = error as AxiosError<ApiError>;
+      notifier.error("Gagal", err?.response?.data?.message);
     }
-
-    notifier.success(res?.message || "Kategori berhasil diperbarui");
-    router.back();
   };
 
-  // ------------------------
-  // 🔥 SKELETON SAAT LOADING
-  // ------------------------
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -163,8 +159,9 @@ export function KategoriFormEdit() {
                 value={field.value}
                 defaultValue={field.value}
                 disabled={loading}
+                key={field.value}
               >
-                <SelectTrigger className="w-[240px]">
+                <SelectTrigger className="w-60">
                   <SelectValue placeholder="Pilih status kategori" />
                 </SelectTrigger>
                 <SelectContent>

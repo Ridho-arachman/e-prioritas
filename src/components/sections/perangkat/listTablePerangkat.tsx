@@ -47,6 +47,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { cn } from "@/lib/utils";
 
 export default function ListTablePerangkat() {
   const router = useRouter();
@@ -109,12 +110,32 @@ export default function ListTablePerangkat() {
   return (
     <>
       <CardHeader className="space-y-4">
-        <div className="flex justify-between">
-          <Link href="/admin/kelola-perangkat/add">
-            <Button className="cursor-pointer">
-              <Plus className="mr-2 h-4 w-4" /> Tambah Perangkat
-            </Button>
-          </Link>
+        <div className="mb-4 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-2">
+          <div className="flex flex-col justify-start gap-4">
+            <Link href="/admin/kelola-perangkat/add">
+              <Button className="cursor-pointer">
+                <Plus className="mr-2 h-4 w-4" /> Tambah Perangkat
+              </Button>
+            </Link>
+
+            <div className="flex gap-2">
+              <Button
+                variant={active === "true" ? "default" : "outline"}
+                className="cursor-pointer"
+                onClick={() => setActive(active === "true" ? "" : "true")}
+              >
+                Aktif
+              </Button>
+
+              <Button
+                variant={active === "false" ? "default" : "outline"}
+                className="cursor-pointer"
+                onClick={() => setActive(active === "false" ? "" : "false")}
+              >
+                Tidak Aktif
+              </Button>
+            </div>
+          </div>
 
           <div className="flex gap-2">
             <Input

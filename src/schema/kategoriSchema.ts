@@ -1,4 +1,4 @@
-import { StatusKategori } from "@prisma/client";
+import { StatusKategori } from "@/app/generated/prisma";
 import z from "zod";
 
 export const kategoriSchema = z.object({

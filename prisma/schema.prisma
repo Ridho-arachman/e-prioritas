@@ -8,162 +8,188 @@ datasource db {
   provider = "postgresql"
 }
 
+//////////////////////////
+// ENUM
+//////////////////////////
+
+enum Role {
+  LURAH
+  PERANGKAT_DESA
+  ADMIN
+}
+
+enum StatusMasukan {
+  MENUNGGU
+  DIVERIFIKASI
+  DITOLAK
+}
+
+enum StatusRekomendasi {
+  DRAFT
+  DIAJUKAN
+  DISETUJUI
+  DITOLAK
+}
+
+//////////////////////////
+// MASTER DOMAIN ISU
+//////////////////////////
+
+model DomainIsu {
+  id        String  @id @default(cuid())
+  code      String  @unique @db.VarChar(50) // INFRASTRUKTUR, KESEHATAN, dll
+  nama      String  @db.VarChar(100)
+  deskripsi String?
+
+  masukan     MasukanWarga[]
+  dataMaster  DataMaster[]
+  rekomendasi Rekomendasi[]
+  kegiatanRapat KegiatanRapat[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//////////////////////////
+// USER
+//////////////////////////
+
 model User {
-  id        String   @id @default(cuid())
-  name      String   @db.VarChar(255)
-  email     String   @unique
-  jabatan   String?  @db.VarChar(100)
-  role      Role     @default(PERANGKAT_DESA)
-  isActive  Boolean  @default(true) @map("is_active")
+  id       String  @id @default(cuid())
+  name     String  @db.VarChar(255)
+  email    String  @unique
+  jabatan  String? @db.VarChar(100)
+  role     Role    @default(PERANGKAT_DESA)
+  isActive Boolean @default(true) @map("is_active")
+
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at") @default(now())
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  masukanVerifikasi   MasukanWarga[] @relation("MasukanVerifikasi")
-  rekomendasiDiproses Rekomendasi[]  @relation("RekomendasiDiproses")
-  dataMasterUpdate    DataMaster[]   @relation("DataMasterUpdate")
+  masukanVerifikasi   MasukanWarga[] @relation("VerifikatorMasukan")
+  rekomendasiDiproses Rekomendasi[]  @relation("PemrosesRekomendasi")
+  emailVerified       Boolean        @default(false)
+  image               String?
+  phoneNumber         String?
+  sessions            Session[]
+  accounts            Account[]
+  kegiatanRapat       KegiatanRapat[]
 
-  emailVerified Boolean @default(false)
-  image         String?
-
-  phoneNumber         String          @unique(map: "users_phone_number_unique")
-  phoneNumberVerified Boolean?
-
-  sessions Session[]
-  accounts Account[]
-
-  @@map("users")
-  @@index([name])
-  @@index([jabatan])
-  @@index([isActive])
-  @@unique([phoneNumber])
+  @@map("user")
 }
 
-model Kategori {
-  id           String         @id @default(cuid())
-  namaKategori String         @unique @map("nama_kategori")
-  deskripsi    String?
-  status       StatusKategori @default(AKTIF)
-  createdAt    DateTime       @default(now()) @map("created_at")
-  masukanWarga MasukanWarga[]
-
-  @@index([status])
-  @@map("kategori")
-}
+//////////////////////////
+// MASUKAN WARGA
+//////////////////////////
 
 model MasukanWarga {
-  id               String        @id @default(cuid())
-  namaPengirim     String        @db.VarChar(255) @map("nama_pengirim")
-  emailPengirim    String        @map("email_pengirim")
-  lokasiRt         String        @db.VarChar(3) @map("lokasi_rt")
-  lokasiRw         String        @db.VarChar(3) @map("lokasi_rw")
-  deskripsiMasukan String        @db.Text @map("deskripsi_masukan")
-  status           MasukanStatus @default(MENUNGGU_VERIFIKASI)
-  alasanPenolakan  String?       @map("alasan_penolakan")
-  updatedAt        DateTime      @updatedAt @map("updated_at")
-  createdAt        DateTime      @default(now()) @map("created_at")
+  id        String @id @default(cuid())
+  judul     String @db.VarChar(255)
+  deskripsi String
+  lokasiRt  Int
+  lokasiRw  Int
 
-  kategoriId String   @map("kategori_id")
-  kategori   Kategori @relation(fields: [kategoriId], references: [id])
+  domainIsuId String
+  domainIsu   DomainIsu @relation(fields: [domainIsuId], references: [id])
 
-  verifiedByUserId String? @map("verified_by_user_id")
-  verifiedBy       User?   @relation("MasukanVerifikasi", fields: [verifiedByUserId], references: [id])
+  status StatusMasukan @default(MENUNGGU)
 
-  rekomendasi RekomendasiMasukan[]
+  diverifikasiOlehId String?
+  diverifikasiOleh   User?   @relation("VerifikatorMasukan", fields: [diverifikasiOlehId], references: [id])
 
-  @@map("masukan_warga")
-  @@index([emailPengirim])
-  @@index([namaPengirim])
-  @@index([createdAt])
-  @@index([status])
-  @@index([kategoriId])
+  rekomendasiLinks RekomendasiMasukan[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
+
+//////////////////////////
+// DATA MASTER (KNOWLEDGE BASE)
+//////////////////////////
 
 model DataMaster {
-  id          String          @id @default(cuid())
-  jenisData   JenisDataMaster @map("jenis_data")
-  namaAtribut String          @map("nama_atribut")
-  nilai       String
-  jumlah      Int
-  lokasiRt    String?         @db.VarChar(3) @map("lokasi_rt")
-  lokasiRw    String?         @db.VarChar(3) @map("lokasi_rw")
+  id String @id @default(cuid())
 
-  updatedByUserId String   @map("updated_by_user_id")
-  updatedBy       User     @relation("DataMasterUpdate", fields: [updatedByUserId], references: [id])
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  domainIsuId String
+  domainIsu   DomainIsu @relation(fields: [domainIsuId], references: [id])
 
-  @@unique([jenisData, namaAtribut, lokasiRt, lokasiRw])
-  @@index([jenisData])
-  @@index([lokasiRt, lokasiRw])
-  @@map("data_master")
+  namaAtribut String @db.VarChar(100)
+  nilai       String @db.VarChar(255)
+  jumlah      Int?
+
+  lokasiRt Int?
+  lokasiRw Int?
+
+  sumberData String? @db.VarChar(100) // opsional: BPS, Survey Internal, dll
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([domainIsuId, namaAtribut, lokasiRt, lokasiRw])
 }
+
+//////////////////////////
+// REKOMENDASI (OUTPUT AI)
+//////////////////////////
 
 model Rekomendasi {
-  id                  String   @id @default(cuid())
-  judul               String
-  tanggalProses       DateTime @map("tanggal_proses") @default(now())
-  prioritas1Deskripsi String   @db.Text @map("prioritas_1_deskripsi")
-  prioritas1Skor      Float    @map("prioritas_1_skor")
-  laporanLengkap      Json?    @map("laporan_lengkap")
+  id String @id @default(cuid())
 
-  processedByUserId String               @map("processed_by_user_id")
-  processedBy       User                 @relation("RekomendasiDiproses", fields: [processedByUserId], references: [id])
-  masukanWarga      RekomendasiMasukan[]
+  kegiatanRapatId String
+  kegiatanRapat   KegiatanRapat @relation(fields: [kegiatanRapatId], references: [id])
 
-  @@map("rekomendasi")
+  domainIsuId String
+  domainIsu   DomainIsu @relation(fields: [domainIsuId], references: [id])
+
+  judul     String @db.VarChar(255)
+  ringkasan String @db.VarChar(500)
+  deskripsi String
+
+  skorPrioritas Float
+  status        StatusRekomendasi @default(DRAFT)
+
+  laporanLengkap Json // output reasoning Gemini (structured)
+
+  diprosesOlehId String?
+  diprosesOleh   User?   @relation("PemrosesRekomendasi", fields: [diprosesOlehId], references: [id])
+
+  masukanLinks RekomendasiMasukan[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
+//////////////////////////
+// MANY-TO-MANY
+//////////////////////////
+
 model RekomendasiMasukan {
-  rekomendasiId String @map("rekomendasi_id")
-  masukanId     String @map("masukan_id")
+  rekomendasiId String
+  masukanId     String
 
   rekomendasi Rekomendasi  @relation(fields: [rekomendasiId], references: [id])
   masukan     MasukanWarga @relation(fields: [masukanId], references: [id])
 
   @@id([rekomendasiId, masukanId])
-  @@map("rekomendasi_masukan")
 }
 
-enum StatusKategori {
-  AKTIF
-  NON_AKTIF
-}
-
-enum Role {
-  ADMIN
-  PERANGKAT_DESA
-  LURAH
-}
-
-enum MasukanStatus {
-  MENUNGGU_VERIFIKASI
-  DITERIMA
-  DITOLAK
-}
-
-enum JenisDataMaster {
-  KEPENDUDUKAN // Jumlah penduduk, usia produktif, migrasi, dsb
-  INFRASTRUKTUR // Jalan, jembatan, saluran air, drainase, lampu jalan, dsb
-  EKONOMI // Pendapatan warga, usaha mikro, lapangan kerja, dsb
-  KESEHATAN // Akses air bersih, fasilitas kesehatan, gizi, dsb
-  PENDIDIKAN // Jumlah sekolah, tingkat pendidikan, fasilitas belajar
-  KEAMANAN // Poskamling, kriminalitas, patroli, dll
-  LINGKUNGAN // Kebersihan, penghijauan, pengelolaan sampah
-  SOSIAL_BUDAYA // Kegiatan masyarakat, adat, organisasi sosial
-  PEMERINTAHAN // Pelayanan publik, administrasi, perizinan
-  TEKNOLOGI // Akses internet, perangkat digital, inovasi TTG
-}
+//////////////////////////
+// BETTERAUTH
+//////////////////////////
 
 model Session {
-  id        String   @id
-  expiresAt DateTime
-  token     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  ipAddress String?
-  userAgent String?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role      String?
+  id          String   @id
+  expiresAt   DateTime
+  token       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  ipAddress   String?
+  userAgent   String?
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        String?
+  phoneNumber String?
+  jabatan     String?
+  isActive    Boolean?
 
   @@unique([token])
   @@index([userId])
@@ -200,4 +226,30 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model KegiatanRapat {
+  id String @id @default(cuid())
+
+  judul       String @db.VarChar(255)
+  deskripsi   String @db.Text
+  tanggal     DateTime
+  lokasi      String? @db.VarChar(100)
+
+  // optional scope
+  domainIsuId String?
+  domainIsu   DomainIsu? @relation(fields: [domainIsuId], references: [id])
+
+  dibuatOlehId String
+  dibuatOleh   User @relation(fields: [dibuatOlehId], references: [id])
+
+  // AI execution metadata
+  aiModel        String? // gemini-1.5-pro, dll
+  aiPromptHash   String? // untuk audit
+  aiProcessedAt  DateTime?
+
+  rekomendasi Rekomendasi[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

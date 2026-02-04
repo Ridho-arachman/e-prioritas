@@ -120,6 +120,15 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.DomainIsuScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  nama: 'nama',
+  deskripsi: 'deskripsi',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -131,53 +140,48 @@ exports.Prisma.UserScalarFieldEnum = {
   updatedAt: 'updatedAt',
   emailVerified: 'emailVerified',
   image: 'image',
-  phoneNumber: 'phoneNumber',
-  phoneNumberVerified: 'phoneNumberVerified'
-};
-
-exports.Prisma.KategoriScalarFieldEnum = {
-  id: 'id',
-  namaKategori: 'namaKategori',
-  deskripsi: 'deskripsi',
-  status: 'status',
-  createdAt: 'createdAt'
+  phoneNumber: 'phoneNumber'
 };
 
 exports.Prisma.MasukanWargaScalarFieldEnum = {
   id: 'id',
-  namaPengirim: 'namaPengirim',
-  emailPengirim: 'emailPengirim',
+  judul: 'judul',
+  deskripsi: 'deskripsi',
   lokasiRt: 'lokasiRt',
   lokasiRw: 'lokasiRw',
-  deskripsiMasukan: 'deskripsiMasukan',
+  domainIsuId: 'domainIsuId',
   status: 'status',
-  alasanPenolakan: 'alasanPenolakan',
-  updatedAt: 'updatedAt',
+  diverifikasiOlehId: 'diverifikasiOlehId',
   createdAt: 'createdAt',
-  kategoriId: 'kategoriId',
-  verifiedByUserId: 'verifiedByUserId'
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.DataMasterScalarFieldEnum = {
   id: 'id',
-  jenisData: 'jenisData',
+  domainIsuId: 'domainIsuId',
   namaAtribut: 'namaAtribut',
   nilai: 'nilai',
   jumlah: 'jumlah',
   lokasiRt: 'lokasiRt',
   lokasiRw: 'lokasiRw',
-  updatedByUserId: 'updatedByUserId',
+  sumberData: 'sumberData',
+  createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
 exports.Prisma.RekomendasiScalarFieldEnum = {
   id: 'id',
+  kegiatanRapatId: 'kegiatanRapatId',
+  domainIsuId: 'domainIsuId',
   judul: 'judul',
-  tanggalProses: 'tanggalProses',
-  prioritas1Deskripsi: 'prioritas1Deskripsi',
-  prioritas1Skor: 'prioritas1Skor',
+  ringkasan: 'ringkasan',
+  deskripsi: 'deskripsi',
+  skorPrioritas: 'skorPrioritas',
+  status: 'status',
   laporanLengkap: 'laporanLengkap',
-  processedByUserId: 'processedByUserId'
+  diprosesOlehId: 'diprosesOlehId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.RekomendasiMasukanScalarFieldEnum = {
@@ -194,7 +198,10 @@ exports.Prisma.SessionScalarFieldEnum = {
   ipAddress: 'ipAddress',
   userAgent: 'userAgent',
   userId: 'userId',
-  role: 'role'
+  role: 'role',
+  phoneNumber: 'phoneNumber',
+  jabatan: 'jabatan',
+  isActive: 'isActive'
 };
 
 exports.Prisma.AccountScalarFieldEnum = {
@@ -222,13 +229,27 @@ exports.Prisma.VerificationScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.KegiatanRapatScalarFieldEnum = {
+  id: 'id',
+  judul: 'judul',
+  deskripsi: 'deskripsi',
+  tanggal: 'tanggal',
+  lokasi: 'lokasi',
+  domainIsuId: 'domainIsuId',
+  dibuatOlehId: 'dibuatOlehId',
+  aiModel: 'aiModel',
+  aiPromptHash: 'aiPromptHash',
+  aiProcessedAt: 'aiProcessedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
 };
 
-exports.Prisma.NullableJsonNullValueInput = {
-  DbNull: Prisma.DbNull,
+exports.Prisma.JsonNullValueInput = {
   JsonNull: Prisma.JsonNull
 };
 
@@ -248,45 +269,35 @@ exports.Prisma.JsonNullValueFilter = {
   AnyNull: Prisma.AnyNull
 };
 exports.Role = exports.$Enums.Role = {
-  ADMIN: 'ADMIN',
+  LURAH: 'LURAH',
   PERANGKAT_DESA: 'PERANGKAT_DESA',
-  LURAH: 'LURAH'
+  ADMIN: 'ADMIN'
 };
 
-exports.StatusKategori = exports.$Enums.StatusKategori = {
-  AKTIF: 'AKTIF',
-  NON_AKTIF: 'NON_AKTIF'
-};
-
-exports.MasukanStatus = exports.$Enums.MasukanStatus = {
-  MENUNGGU_VERIFIKASI: 'MENUNGGU_VERIFIKASI',
-  DITERIMA: 'DITERIMA',
+exports.StatusMasukan = exports.$Enums.StatusMasukan = {
+  MENUNGGU: 'MENUNGGU',
+  DIVERIFIKASI: 'DIVERIFIKASI',
   DITOLAK: 'DITOLAK'
 };
 
-exports.JenisDataMaster = exports.$Enums.JenisDataMaster = {
-  KEPENDUDUKAN: 'KEPENDUDUKAN',
-  INFRASTRUKTUR: 'INFRASTRUKTUR',
-  EKONOMI: 'EKONOMI',
-  KESEHATAN: 'KESEHATAN',
-  PENDIDIKAN: 'PENDIDIKAN',
-  KEAMANAN: 'KEAMANAN',
-  LINGKUNGAN: 'LINGKUNGAN',
-  SOSIAL_BUDAYA: 'SOSIAL_BUDAYA',
-  PEMERINTAHAN: 'PEMERINTAHAN',
-  TEKNOLOGI: 'TEKNOLOGI'
+exports.StatusRekomendasi = exports.$Enums.StatusRekomendasi = {
+  DRAFT: 'DRAFT',
+  DIAJUKAN: 'DIAJUKAN',
+  DISETUJUI: 'DISETUJUI',
+  DITOLAK: 'DITOLAK'
 };
 
 exports.Prisma.ModelName = {
+  DomainIsu: 'DomainIsu',
   User: 'User',
-  Kategori: 'Kategori',
   MasukanWarga: 'MasukanWarga',
   DataMaster: 'DataMaster',
   Rekomendasi: 'Rekomendasi',
   RekomendasiMasukan: 'RekomendasiMasukan',
   Session: 'Session',
   Account: 'Account',
-  Verification: 'Verification'
+  Verification: 'Verification',
+  KegiatanRapat: 'KegiatanRapat'
 };
 
 /**

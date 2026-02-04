@@ -5,19 +5,21 @@ import ListTableKategori from "@/components/sections/kategori/listTableKategori"
 
 const page = () => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span>🏷️ Kelola Kategori Masukan Warga</span>
-          <Link href="/admin/kelola-kategori/add">
-            <Button variant="default" className="cursor-pointer">
-              + Tambah Kategori
-            </Button>
-          </Link>
-        </CardTitle>
-      </CardHeader>
-      <ListTableKategori />
-    </Card>
+    <>
+      <h1 className="text-xl md:text-3xl font-bold font-sans flex items-center gap-2 mb-6">
+        🏷️ Kelola Kategori Masukan Warga
+      </h1>
+      {/* <Card className="hidden md:block min-w-0 overflow-hidden">
+        <ListTablePerangkat />
+      </Card>
+      <Card className="md:hidden">
+        <ListPerangkatMobile />
+      </Card> */}
+
+      <Card>
+        <ListTableKategori />
+      </Card>
+    </>
   );
 };
 
