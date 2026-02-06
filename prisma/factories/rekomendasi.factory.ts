@@ -1,27 +1,35 @@
-import "dotenv/config";
+import { StatusRekomendasi } from "@/app/generated/prisma";
 import prisma from "@/lib/prisma";
 import { faker } from "@faker-js/faker";
-import { config } from "@/config";
 
-export async function createRekomendasi(masukanIds: string[]) {
+export async function rekomendasiFactory(
+  kegiatanRapatId: string,
+  domainIsuId: string,
+) {
   return prisma.rekomendasi.create({
     data: {
-      judul: faker.lorem.sentence(),
-      prioritas1Deskripsi: faker.lorem.paragraph(),
-      prioritas1Skor: faker.number.float({
+      kegiatanRapatId,
+      domainIsuId,
+      judul: faker.lorem.sentence(6),
+      ringkasan: faker.lorem.sentences(2),
+      deskripsi: faker.lorem.paragraphs(3),
+      skorPrioritas: faker.number.float({
         min: 0,
         max: 100,
         fractionDigits: 2,
       }),
+      status: faker.helpers.arrayElement([
+        StatusRekomendasi.DRAFT,
+        StatusRekomendasi.DIAJUKAN,
+      ]),
       laporanLengkap: {
-        ringkasan: faker.lorem.paragraph(),
-        dampak: faker.lorem.sentences(2),
-      },
-      processedByUserId: config.prisma.user.userId,
-      masukanWarga: {
-        createMany: {
-          data: masukanIds.map((id) => ({ masukanId: id })),
-        },
+        reasoning: faker.lorem.paragraph(),
+        confidence: faker.number.float({
+          min: 0,
+          max: 1,
+          fractionDigits: 2,
+        }),
+        source: "AI Engine",
       },
     },
   });

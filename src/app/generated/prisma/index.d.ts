@@ -1789,6 +1789,7 @@ export namespace Prisma {
     sessions: number
     accounts: number
     kegiatanRapat: number
+    dataMaster: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1797,6 +1798,7 @@ export namespace Prisma {
     sessions?: boolean | UserCountOutputTypeCountSessionsArgs
     accounts?: boolean | UserCountOutputTypeCountAccountsArgs
     kegiatanRapat?: boolean | UserCountOutputTypeCountKegiatanRapatArgs
+    dataMaster?: boolean | UserCountOutputTypeCountDataMasterArgs
   }
 
   // Custom InputTypes
@@ -1843,6 +1845,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountKegiatanRapatArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: KegiatanRapatWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountDataMasterArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DataMasterWhereInput
   }
 
 
@@ -3131,7 +3140,6 @@ export namespace Prisma {
     updatedAt: Date | null
     emailVerified: boolean | null
     image: string | null
-    phoneNumber: string | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -3145,7 +3153,6 @@ export namespace Prisma {
     updatedAt: Date | null
     emailVerified: boolean | null
     image: string | null
-    phoneNumber: string | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -3159,7 +3166,6 @@ export namespace Prisma {
     updatedAt: number
     emailVerified: number
     image: number
-    phoneNumber: number
     _all: number
   }
 
@@ -3175,7 +3181,6 @@ export namespace Prisma {
     updatedAt?: true
     emailVerified?: true
     image?: true
-    phoneNumber?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -3189,7 +3194,6 @@ export namespace Prisma {
     updatedAt?: true
     emailVerified?: true
     image?: true
-    phoneNumber?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -3203,7 +3207,6 @@ export namespace Prisma {
     updatedAt?: true
     emailVerified?: true
     image?: true
-    phoneNumber?: true
     _all?: true
   }
 
@@ -3290,7 +3293,6 @@ export namespace Prisma {
     updatedAt: Date
     emailVerified: boolean
     image: string | null
-    phoneNumber: string | null
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
@@ -3321,12 +3323,12 @@ export namespace Prisma {
     updatedAt?: boolean
     emailVerified?: boolean
     image?: boolean
-    phoneNumber?: boolean
     masukanVerifikasi?: boolean | User$masukanVerifikasiArgs<ExtArgs>
     rekomendasiDiproses?: boolean | User$rekomendasiDiprosesArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     accounts?: boolean | User$accountsArgs<ExtArgs>
     kegiatanRapat?: boolean | User$kegiatanRapatArgs<ExtArgs>
+    dataMaster?: boolean | User$dataMasterArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -3341,7 +3343,6 @@ export namespace Prisma {
     updatedAt?: boolean
     emailVerified?: boolean
     image?: boolean
-    phoneNumber?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -3355,7 +3356,6 @@ export namespace Prisma {
     updatedAt?: boolean
     emailVerified?: boolean
     image?: boolean
-    phoneNumber?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -3369,16 +3369,16 @@ export namespace Prisma {
     updatedAt?: boolean
     emailVerified?: boolean
     image?: boolean
-    phoneNumber?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "jabatan" | "role" | "isActive" | "createdAt" | "updatedAt" | "emailVerified" | "image" | "phoneNumber", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "jabatan" | "role" | "isActive" | "createdAt" | "updatedAt" | "emailVerified" | "image", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     masukanVerifikasi?: boolean | User$masukanVerifikasiArgs<ExtArgs>
     rekomendasiDiproses?: boolean | User$rekomendasiDiprosesArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     accounts?: boolean | User$accountsArgs<ExtArgs>
     kegiatanRapat?: boolean | User$kegiatanRapatArgs<ExtArgs>
+    dataMaster?: boolean | User$dataMasterArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -3392,6 +3392,7 @@ export namespace Prisma {
       sessions: Prisma.$SessionPayload<ExtArgs>[]
       accounts: Prisma.$AccountPayload<ExtArgs>[]
       kegiatanRapat: Prisma.$KegiatanRapatPayload<ExtArgs>[]
+      dataMaster: Prisma.$DataMasterPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3404,7 +3405,6 @@ export namespace Prisma {
       updatedAt: Date
       emailVerified: boolean
       image: string | null
-      phoneNumber: string | null
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -3804,6 +3804,7 @@ export namespace Prisma {
     sessions<T extends User$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     accounts<T extends User$accountsArgs<ExtArgs> = {}>(args?: Subset<T, User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     kegiatanRapat<T extends User$kegiatanRapatArgs<ExtArgs> = {}>(args?: Subset<T, User$kegiatanRapatArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    dataMaster<T extends User$dataMasterArgs<ExtArgs> = {}>(args?: Subset<T, User$dataMasterArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataMasterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3843,7 +3844,6 @@ export namespace Prisma {
     readonly updatedAt: FieldRef<"User", 'DateTime'>
     readonly emailVerified: FieldRef<"User", 'Boolean'>
     readonly image: FieldRef<"User", 'String'>
-    readonly phoneNumber: FieldRef<"User", 'String'>
   }
     
 
@@ -4349,6 +4349,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: KegiatanRapatScalarFieldEnum | KegiatanRapatScalarFieldEnum[]
+  }
+
+  /**
+   * User.dataMaster
+   */
+  export type User$dataMasterArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataMaster
+     */
+    select?: DataMasterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataMaster
+     */
+    omit?: DataMasterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataMasterInclude<ExtArgs> | null
+    where?: DataMasterWhereInput
+    orderBy?: DataMasterOrderByWithRelationInput | DataMasterOrderByWithRelationInput[]
+    cursor?: DataMasterWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DataMasterScalarFieldEnum | DataMasterScalarFieldEnum[]
   }
 
   /**
@@ -5621,6 +5645,7 @@ export namespace Prisma {
     lokasiRt: number | null
     lokasiRw: number | null
     sumberData: string | null
+    diprosesOlehId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -5634,6 +5659,7 @@ export namespace Prisma {
     lokasiRt: number | null
     lokasiRw: number | null
     sumberData: string | null
+    diprosesOlehId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -5647,6 +5673,7 @@ export namespace Prisma {
     lokasiRt: number
     lokasiRw: number
     sumberData: number
+    diprosesOlehId: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -5674,6 +5701,7 @@ export namespace Prisma {
     lokasiRt?: true
     lokasiRw?: true
     sumberData?: true
+    diprosesOlehId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -5687,6 +5715,7 @@ export namespace Prisma {
     lokasiRt?: true
     lokasiRw?: true
     sumberData?: true
+    diprosesOlehId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -5700,6 +5729,7 @@ export namespace Prisma {
     lokasiRt?: true
     lokasiRw?: true
     sumberData?: true
+    diprosesOlehId?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -5800,6 +5830,7 @@ export namespace Prisma {
     lokasiRt: number | null
     lokasiRw: number | null
     sumberData: string | null
+    diprosesOlehId: string | null
     createdAt: Date
     updatedAt: Date
     _count: DataMasterCountAggregateOutputType | null
@@ -5832,9 +5863,11 @@ export namespace Prisma {
     lokasiRt?: boolean
     lokasiRw?: boolean
     sumberData?: boolean
+    diprosesOlehId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
+    diprosesOleh?: boolean | DataMaster$diprosesOlehArgs<ExtArgs>
   }, ExtArgs["result"]["dataMaster"]>
 
   export type DataMasterSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -5846,9 +5879,11 @@ export namespace Prisma {
     lokasiRt?: boolean
     lokasiRw?: boolean
     sumberData?: boolean
+    diprosesOlehId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
+    diprosesOleh?: boolean | DataMaster$diprosesOlehArgs<ExtArgs>
   }, ExtArgs["result"]["dataMaster"]>
 
   export type DataMasterSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -5860,9 +5895,11 @@ export namespace Prisma {
     lokasiRt?: boolean
     lokasiRw?: boolean
     sumberData?: boolean
+    diprosesOlehId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
+    diprosesOleh?: boolean | DataMaster$diprosesOlehArgs<ExtArgs>
   }, ExtArgs["result"]["dataMaster"]>
 
   export type DataMasterSelectScalar = {
@@ -5874,25 +5911,30 @@ export namespace Prisma {
     lokasiRt?: boolean
     lokasiRw?: boolean
     sumberData?: boolean
+    diprosesOlehId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type DataMasterOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "domainIsuId" | "namaAtribut" | "nilai" | "jumlah" | "lokasiRt" | "lokasiRw" | "sumberData" | "createdAt" | "updatedAt", ExtArgs["result"]["dataMaster"]>
+  export type DataMasterOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "domainIsuId" | "namaAtribut" | "nilai" | "jumlah" | "lokasiRt" | "lokasiRw" | "sumberData" | "diprosesOlehId" | "createdAt" | "updatedAt", ExtArgs["result"]["dataMaster"]>
   export type DataMasterInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
+    diprosesOleh?: boolean | DataMaster$diprosesOlehArgs<ExtArgs>
   }
   export type DataMasterIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
+    diprosesOleh?: boolean | DataMaster$diprosesOlehArgs<ExtArgs>
   }
   export type DataMasterIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
+    diprosesOleh?: boolean | DataMaster$diprosesOlehArgs<ExtArgs>
   }
 
   export type $DataMasterPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "DataMaster"
     objects: {
       domainIsu: Prisma.$DomainIsuPayload<ExtArgs>
+      diprosesOleh: Prisma.$UserPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -5903,6 +5945,7 @@ export namespace Prisma {
       lokasiRt: number | null
       lokasiRw: number | null
       sumberData: string | null
+      diprosesOlehId: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["dataMaster"]>
@@ -6300,6 +6343,7 @@ export namespace Prisma {
   export interface Prisma__DataMasterClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     domainIsu<T extends DomainIsuDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DomainIsuDefaultArgs<ExtArgs>>): Prisma__DomainIsuClient<$Result.GetResult<Prisma.$DomainIsuPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    diprosesOleh<T extends DataMaster$diprosesOlehArgs<ExtArgs> = {}>(args?: Subset<T, DataMaster$diprosesOlehArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6337,6 +6381,7 @@ export namespace Prisma {
     readonly lokasiRt: FieldRef<"DataMaster", 'Int'>
     readonly lokasiRw: FieldRef<"DataMaster", 'Int'>
     readonly sumberData: FieldRef<"DataMaster", 'String'>
+    readonly diprosesOlehId: FieldRef<"DataMaster", 'String'>
     readonly createdAt: FieldRef<"DataMaster", 'DateTime'>
     readonly updatedAt: FieldRef<"DataMaster", 'DateTime'>
   }
@@ -6732,6 +6777,25 @@ export namespace Prisma {
      * Limit how many DataMasters to delete.
      */
     limit?: number
+  }
+
+  /**
+   * DataMaster.diprosesOleh
+   */
+  export type DataMaster$diprosesOlehArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
   }
 
   /**
@@ -13585,8 +13649,7 @@ export namespace Prisma {
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
     emailVerified: 'emailVerified',
-    image: 'image',
-    phoneNumber: 'phoneNumber'
+    image: 'image'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -13617,6 +13680,7 @@ export namespace Prisma {
     lokasiRt: 'lokasiRt',
     lokasiRw: 'lokasiRw',
     sumberData: 'sumberData',
+    diprosesOlehId: 'diprosesOlehId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -13967,12 +14031,12 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"User"> | Date | string
     emailVerified?: BoolFilter<"User"> | boolean
     image?: StringNullableFilter<"User"> | string | null
-    phoneNumber?: StringNullableFilter<"User"> | string | null
     masukanVerifikasi?: MasukanWargaListRelationFilter
     rekomendasiDiproses?: RekomendasiListRelationFilter
     sessions?: SessionListRelationFilter
     accounts?: AccountListRelationFilter
     kegiatanRapat?: KegiatanRapatListRelationFilter
+    dataMaster?: DataMasterListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -13986,12 +14050,12 @@ export namespace Prisma {
     updatedAt?: SortOrder
     emailVerified?: SortOrder
     image?: SortOrderInput | SortOrder
-    phoneNumber?: SortOrderInput | SortOrder
     masukanVerifikasi?: MasukanWargaOrderByRelationAggregateInput
     rekomendasiDiproses?: RekomendasiOrderByRelationAggregateInput
     sessions?: SessionOrderByRelationAggregateInput
     accounts?: AccountOrderByRelationAggregateInput
     kegiatanRapat?: KegiatanRapatOrderByRelationAggregateInput
+    dataMaster?: DataMasterOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -14008,12 +14072,12 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"User"> | Date | string
     emailVerified?: BoolFilter<"User"> | boolean
     image?: StringNullableFilter<"User"> | string | null
-    phoneNumber?: StringNullableFilter<"User"> | string | null
     masukanVerifikasi?: MasukanWargaListRelationFilter
     rekomendasiDiproses?: RekomendasiListRelationFilter
     sessions?: SessionListRelationFilter
     accounts?: AccountListRelationFilter
     kegiatanRapat?: KegiatanRapatListRelationFilter
+    dataMaster?: DataMasterListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -14027,7 +14091,6 @@ export namespace Prisma {
     updatedAt?: SortOrder
     emailVerified?: SortOrder
     image?: SortOrderInput | SortOrder
-    phoneNumber?: SortOrderInput | SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
@@ -14047,7 +14110,6 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     emailVerified?: BoolWithAggregatesFilter<"User"> | boolean
     image?: StringNullableWithAggregatesFilter<"User"> | string | null
-    phoneNumber?: StringNullableWithAggregatesFilter<"User"> | string | null
   }
 
   export type MasukanWargaWhereInput = {
@@ -14150,9 +14212,11 @@ export namespace Prisma {
     lokasiRt?: IntNullableFilter<"DataMaster"> | number | null
     lokasiRw?: IntNullableFilter<"DataMaster"> | number | null
     sumberData?: StringNullableFilter<"DataMaster"> | string | null
+    diprosesOlehId?: StringNullableFilter<"DataMaster"> | string | null
     createdAt?: DateTimeFilter<"DataMaster"> | Date | string
     updatedAt?: DateTimeFilter<"DataMaster"> | Date | string
     domainIsu?: XOR<DomainIsuScalarRelationFilter, DomainIsuWhereInput>
+    diprosesOleh?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }
 
   export type DataMasterOrderByWithRelationInput = {
@@ -14164,9 +14228,11 @@ export namespace Prisma {
     lokasiRt?: SortOrderInput | SortOrder
     lokasiRw?: SortOrderInput | SortOrder
     sumberData?: SortOrderInput | SortOrder
+    diprosesOlehId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     domainIsu?: DomainIsuOrderByWithRelationInput
+    diprosesOleh?: UserOrderByWithRelationInput
   }
 
   export type DataMasterWhereUniqueInput = Prisma.AtLeast<{
@@ -14182,9 +14248,11 @@ export namespace Prisma {
     lokasiRt?: IntNullableFilter<"DataMaster"> | number | null
     lokasiRw?: IntNullableFilter<"DataMaster"> | number | null
     sumberData?: StringNullableFilter<"DataMaster"> | string | null
+    diprosesOlehId?: StringNullableFilter<"DataMaster"> | string | null
     createdAt?: DateTimeFilter<"DataMaster"> | Date | string
     updatedAt?: DateTimeFilter<"DataMaster"> | Date | string
     domainIsu?: XOR<DomainIsuScalarRelationFilter, DomainIsuWhereInput>
+    diprosesOleh?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }, "id" | "domainIsuId_namaAtribut_lokasiRt_lokasiRw">
 
   export type DataMasterOrderByWithAggregationInput = {
@@ -14196,6 +14264,7 @@ export namespace Prisma {
     lokasiRt?: SortOrderInput | SortOrder
     lokasiRw?: SortOrderInput | SortOrder
     sumberData?: SortOrderInput | SortOrder
+    diprosesOlehId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: DataMasterCountOrderByAggregateInput
@@ -14217,6 +14286,7 @@ export namespace Prisma {
     lokasiRt?: IntNullableWithAggregatesFilter<"DataMaster"> | number | null
     lokasiRw?: IntNullableWithAggregatesFilter<"DataMaster"> | number | null
     sumberData?: StringNullableWithAggregatesFilter<"DataMaster"> | string | null
+    diprosesOlehId?: StringNullableWithAggregatesFilter<"DataMaster"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"DataMaster"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"DataMaster"> | Date | string
   }
@@ -14794,12 +14864,12 @@ export namespace Prisma {
     updatedAt?: Date | string
     emailVerified?: boolean
     image?: string | null
-    phoneNumber?: string | null
     masukanVerifikasi?: MasukanWargaCreateNestedManyWithoutDiverifikasiOlehInput
     rekomendasiDiproses?: RekomendasiCreateNestedManyWithoutDiprosesOlehInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     kegiatanRapat?: KegiatanRapatCreateNestedManyWithoutDibuatOlehInput
+    dataMaster?: DataMasterCreateNestedManyWithoutDiprosesOlehInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -14813,12 +14883,12 @@ export namespace Prisma {
     updatedAt?: Date | string
     emailVerified?: boolean
     image?: string | null
-    phoneNumber?: string | null
     masukanVerifikasi?: MasukanWargaUncheckedCreateNestedManyWithoutDiverifikasiOlehInput
     rekomendasiDiproses?: RekomendasiUncheckedCreateNestedManyWithoutDiprosesOlehInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     kegiatanRapat?: KegiatanRapatUncheckedCreateNestedManyWithoutDibuatOlehInput
+    dataMaster?: DataMasterUncheckedCreateNestedManyWithoutDiprosesOlehInput
   }
 
   export type UserUpdateInput = {
@@ -14832,12 +14902,12 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     masukanVerifikasi?: MasukanWargaUpdateManyWithoutDiverifikasiOlehNestedInput
     rekomendasiDiproses?: RekomendasiUpdateManyWithoutDiprosesOlehNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     kegiatanRapat?: KegiatanRapatUpdateManyWithoutDibuatOlehNestedInput
+    dataMaster?: DataMasterUpdateManyWithoutDiprosesOlehNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -14851,12 +14921,12 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     masukanVerifikasi?: MasukanWargaUncheckedUpdateManyWithoutDiverifikasiOlehNestedInput
     rekomendasiDiproses?: RekomendasiUncheckedUpdateManyWithoutDiprosesOlehNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     kegiatanRapat?: KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehNestedInput
+    dataMaster?: DataMasterUncheckedUpdateManyWithoutDiprosesOlehNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -14870,7 +14940,6 @@ export namespace Prisma {
     updatedAt?: Date | string
     emailVerified?: boolean
     image?: string | null
-    phoneNumber?: string | null
   }
 
   export type UserUpdateManyMutationInput = {
@@ -14884,7 +14953,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -14898,7 +14966,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type MasukanWargaCreateInput = {
@@ -15005,6 +15072,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     domainIsu: DomainIsuCreateNestedOneWithoutDataMasterInput
+    diprosesOleh?: UserCreateNestedOneWithoutDataMasterInput
   }
 
   export type DataMasterUncheckedCreateInput = {
@@ -15016,6 +15084,7 @@ export namespace Prisma {
     lokasiRt?: number | null
     lokasiRw?: number | null
     sumberData?: string | null
+    diprosesOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -15031,6 +15100,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     domainIsu?: DomainIsuUpdateOneRequiredWithoutDataMasterNestedInput
+    diprosesOleh?: UserUpdateOneWithoutDataMasterNestedInput
   }
 
   export type DataMasterUncheckedUpdateInput = {
@@ -15042,6 +15112,7 @@ export namespace Prisma {
     lokasiRt?: NullableIntFieldUpdateOperationsInput | number | null
     lokasiRw?: NullableIntFieldUpdateOperationsInput | number | null
     sumberData?: NullableStringFieldUpdateOperationsInput | string | null
+    diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -15055,6 +15126,7 @@ export namespace Prisma {
     lokasiRt?: number | null
     lokasiRw?: number | null
     sumberData?: string | null
+    diprosesOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -15080,6 +15152,7 @@ export namespace Prisma {
     lokasiRt?: NullableIntFieldUpdateOperationsInput | number | null
     lokasiRw?: NullableIntFieldUpdateOperationsInput | number | null
     sumberData?: NullableStringFieldUpdateOperationsInput | string | null
+    diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -15815,7 +15888,6 @@ export namespace Prisma {
     updatedAt?: SortOrder
     emailVerified?: SortOrder
     image?: SortOrder
-    phoneNumber?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -15829,7 +15901,6 @@ export namespace Prisma {
     updatedAt?: SortOrder
     emailVerified?: SortOrder
     image?: SortOrder
-    phoneNumber?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -15843,7 +15914,6 @@ export namespace Prisma {
     updatedAt?: SortOrder
     emailVerified?: SortOrder
     image?: SortOrder
-    phoneNumber?: SortOrder
   }
 
   export type EnumRoleWithAggregatesFilter<$PrismaModel = never> = {
@@ -16004,6 +16074,7 @@ export namespace Prisma {
     lokasiRt?: SortOrder
     lokasiRw?: SortOrder
     sumberData?: SortOrder
+    diprosesOlehId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -16023,6 +16094,7 @@ export namespace Prisma {
     lokasiRt?: SortOrder
     lokasiRw?: SortOrder
     sumberData?: SortOrder
+    diprosesOlehId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -16036,6 +16108,7 @@ export namespace Prisma {
     lokasiRt?: SortOrder
     lokasiRw?: SortOrder
     sumberData?: SortOrder
+    diprosesOlehId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -16669,6 +16742,13 @@ export namespace Prisma {
     connect?: KegiatanRapatWhereUniqueInput | KegiatanRapatWhereUniqueInput[]
   }
 
+  export type DataMasterCreateNestedManyWithoutDiprosesOlehInput = {
+    create?: XOR<DataMasterCreateWithoutDiprosesOlehInput, DataMasterUncheckedCreateWithoutDiprosesOlehInput> | DataMasterCreateWithoutDiprosesOlehInput[] | DataMasterUncheckedCreateWithoutDiprosesOlehInput[]
+    connectOrCreate?: DataMasterCreateOrConnectWithoutDiprosesOlehInput | DataMasterCreateOrConnectWithoutDiprosesOlehInput[]
+    createMany?: DataMasterCreateManyDiprosesOlehInputEnvelope
+    connect?: DataMasterWhereUniqueInput | DataMasterWhereUniqueInput[]
+  }
+
   export type MasukanWargaUncheckedCreateNestedManyWithoutDiverifikasiOlehInput = {
     create?: XOR<MasukanWargaCreateWithoutDiverifikasiOlehInput, MasukanWargaUncheckedCreateWithoutDiverifikasiOlehInput> | MasukanWargaCreateWithoutDiverifikasiOlehInput[] | MasukanWargaUncheckedCreateWithoutDiverifikasiOlehInput[]
     connectOrCreate?: MasukanWargaCreateOrConnectWithoutDiverifikasiOlehInput | MasukanWargaCreateOrConnectWithoutDiverifikasiOlehInput[]
@@ -16702,6 +16782,13 @@ export namespace Prisma {
     connectOrCreate?: KegiatanRapatCreateOrConnectWithoutDibuatOlehInput | KegiatanRapatCreateOrConnectWithoutDibuatOlehInput[]
     createMany?: KegiatanRapatCreateManyDibuatOlehInputEnvelope
     connect?: KegiatanRapatWhereUniqueInput | KegiatanRapatWhereUniqueInput[]
+  }
+
+  export type DataMasterUncheckedCreateNestedManyWithoutDiprosesOlehInput = {
+    create?: XOR<DataMasterCreateWithoutDiprosesOlehInput, DataMasterUncheckedCreateWithoutDiprosesOlehInput> | DataMasterCreateWithoutDiprosesOlehInput[] | DataMasterUncheckedCreateWithoutDiprosesOlehInput[]
+    connectOrCreate?: DataMasterCreateOrConnectWithoutDiprosesOlehInput | DataMasterCreateOrConnectWithoutDiprosesOlehInput[]
+    createMany?: DataMasterCreateManyDiprosesOlehInputEnvelope
+    connect?: DataMasterWhereUniqueInput | DataMasterWhereUniqueInput[]
   }
 
   export type EnumRoleFieldUpdateOperationsInput = {
@@ -16782,6 +16869,20 @@ export namespace Prisma {
     deleteMany?: KegiatanRapatScalarWhereInput | KegiatanRapatScalarWhereInput[]
   }
 
+  export type DataMasterUpdateManyWithoutDiprosesOlehNestedInput = {
+    create?: XOR<DataMasterCreateWithoutDiprosesOlehInput, DataMasterUncheckedCreateWithoutDiprosesOlehInput> | DataMasterCreateWithoutDiprosesOlehInput[] | DataMasterUncheckedCreateWithoutDiprosesOlehInput[]
+    connectOrCreate?: DataMasterCreateOrConnectWithoutDiprosesOlehInput | DataMasterCreateOrConnectWithoutDiprosesOlehInput[]
+    upsert?: DataMasterUpsertWithWhereUniqueWithoutDiprosesOlehInput | DataMasterUpsertWithWhereUniqueWithoutDiprosesOlehInput[]
+    createMany?: DataMasterCreateManyDiprosesOlehInputEnvelope
+    set?: DataMasterWhereUniqueInput | DataMasterWhereUniqueInput[]
+    disconnect?: DataMasterWhereUniqueInput | DataMasterWhereUniqueInput[]
+    delete?: DataMasterWhereUniqueInput | DataMasterWhereUniqueInput[]
+    connect?: DataMasterWhereUniqueInput | DataMasterWhereUniqueInput[]
+    update?: DataMasterUpdateWithWhereUniqueWithoutDiprosesOlehInput | DataMasterUpdateWithWhereUniqueWithoutDiprosesOlehInput[]
+    updateMany?: DataMasterUpdateManyWithWhereWithoutDiprosesOlehInput | DataMasterUpdateManyWithWhereWithoutDiprosesOlehInput[]
+    deleteMany?: DataMasterScalarWhereInput | DataMasterScalarWhereInput[]
+  }
+
   export type MasukanWargaUncheckedUpdateManyWithoutDiverifikasiOlehNestedInput = {
     create?: XOR<MasukanWargaCreateWithoutDiverifikasiOlehInput, MasukanWargaUncheckedCreateWithoutDiverifikasiOlehInput> | MasukanWargaCreateWithoutDiverifikasiOlehInput[] | MasukanWargaUncheckedCreateWithoutDiverifikasiOlehInput[]
     connectOrCreate?: MasukanWargaCreateOrConnectWithoutDiverifikasiOlehInput | MasukanWargaCreateOrConnectWithoutDiverifikasiOlehInput[]
@@ -16850,6 +16951,20 @@ export namespace Prisma {
     update?: KegiatanRapatUpdateWithWhereUniqueWithoutDibuatOlehInput | KegiatanRapatUpdateWithWhereUniqueWithoutDibuatOlehInput[]
     updateMany?: KegiatanRapatUpdateManyWithWhereWithoutDibuatOlehInput | KegiatanRapatUpdateManyWithWhereWithoutDibuatOlehInput[]
     deleteMany?: KegiatanRapatScalarWhereInput | KegiatanRapatScalarWhereInput[]
+  }
+
+  export type DataMasterUncheckedUpdateManyWithoutDiprosesOlehNestedInput = {
+    create?: XOR<DataMasterCreateWithoutDiprosesOlehInput, DataMasterUncheckedCreateWithoutDiprosesOlehInput> | DataMasterCreateWithoutDiprosesOlehInput[] | DataMasterUncheckedCreateWithoutDiprosesOlehInput[]
+    connectOrCreate?: DataMasterCreateOrConnectWithoutDiprosesOlehInput | DataMasterCreateOrConnectWithoutDiprosesOlehInput[]
+    upsert?: DataMasterUpsertWithWhereUniqueWithoutDiprosesOlehInput | DataMasterUpsertWithWhereUniqueWithoutDiprosesOlehInput[]
+    createMany?: DataMasterCreateManyDiprosesOlehInputEnvelope
+    set?: DataMasterWhereUniqueInput | DataMasterWhereUniqueInput[]
+    disconnect?: DataMasterWhereUniqueInput | DataMasterWhereUniqueInput[]
+    delete?: DataMasterWhereUniqueInput | DataMasterWhereUniqueInput[]
+    connect?: DataMasterWhereUniqueInput | DataMasterWhereUniqueInput[]
+    update?: DataMasterUpdateWithWhereUniqueWithoutDiprosesOlehInput | DataMasterUpdateWithWhereUniqueWithoutDiprosesOlehInput[]
+    updateMany?: DataMasterUpdateManyWithWhereWithoutDiprosesOlehInput | DataMasterUpdateManyWithWhereWithoutDiprosesOlehInput[]
+    deleteMany?: DataMasterScalarWhereInput | DataMasterScalarWhereInput[]
   }
 
   export type DomainIsuCreateNestedOneWithoutMasukanInput = {
@@ -16942,6 +17057,12 @@ export namespace Prisma {
     connect?: DomainIsuWhereUniqueInput
   }
 
+  export type UserCreateNestedOneWithoutDataMasterInput = {
+    create?: XOR<UserCreateWithoutDataMasterInput, UserUncheckedCreateWithoutDataMasterInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDataMasterInput
+    connect?: UserWhereUniqueInput
+  }
+
   export type NullableIntFieldUpdateOperationsInput = {
     set?: number | null
     increment?: number
@@ -16956,6 +17077,16 @@ export namespace Prisma {
     upsert?: DomainIsuUpsertWithoutDataMasterInput
     connect?: DomainIsuWhereUniqueInput
     update?: XOR<XOR<DomainIsuUpdateToOneWithWhereWithoutDataMasterInput, DomainIsuUpdateWithoutDataMasterInput>, DomainIsuUncheckedUpdateWithoutDataMasterInput>
+  }
+
+  export type UserUpdateOneWithoutDataMasterNestedInput = {
+    create?: XOR<UserCreateWithoutDataMasterInput, UserUncheckedCreateWithoutDataMasterInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDataMasterInput
+    upsert?: UserUpsertWithoutDataMasterInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutDataMasterInput, UserUpdateWithoutDataMasterInput>, UserUncheckedUpdateWithoutDataMasterInput>
   }
 
   export type KegiatanRapatCreateNestedOneWithoutRekomendasiInput = {
@@ -17542,6 +17673,7 @@ export namespace Prisma {
     sumberData?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    diprosesOleh?: UserCreateNestedOneWithoutDataMasterInput
   }
 
   export type DataMasterUncheckedCreateWithoutDomainIsuInput = {
@@ -17552,6 +17684,7 @@ export namespace Prisma {
     lokasiRt?: number | null
     lokasiRw?: number | null
     sumberData?: string | null
+    diprosesOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -17706,6 +17839,7 @@ export namespace Prisma {
     lokasiRt?: IntNullableFilter<"DataMaster"> | number | null
     lokasiRw?: IntNullableFilter<"DataMaster"> | number | null
     sumberData?: StringNullableFilter<"DataMaster"> | string | null
+    diprosesOlehId?: StringNullableFilter<"DataMaster"> | string | null
     createdAt?: DateTimeFilter<"DataMaster"> | Date | string
     updatedAt?: DateTimeFilter<"DataMaster"> | Date | string
   }
@@ -17972,6 +18106,42 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type DataMasterCreateWithoutDiprosesOlehInput = {
+    id?: string
+    namaAtribut: string
+    nilai: string
+    jumlah?: number | null
+    lokasiRt?: number | null
+    lokasiRw?: number | null
+    sumberData?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    domainIsu: DomainIsuCreateNestedOneWithoutDataMasterInput
+  }
+
+  export type DataMasterUncheckedCreateWithoutDiprosesOlehInput = {
+    id?: string
+    domainIsuId: string
+    namaAtribut: string
+    nilai: string
+    jumlah?: number | null
+    lokasiRt?: number | null
+    lokasiRw?: number | null
+    sumberData?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DataMasterCreateOrConnectWithoutDiprosesOlehInput = {
+    where: DataMasterWhereUniqueInput
+    create: XOR<DataMasterCreateWithoutDiprosesOlehInput, DataMasterUncheckedCreateWithoutDiprosesOlehInput>
+  }
+
+  export type DataMasterCreateManyDiprosesOlehInputEnvelope = {
+    data: DataMasterCreateManyDiprosesOlehInput | DataMasterCreateManyDiprosesOlehInput[]
+    skipDuplicates?: boolean
+  }
+
   export type MasukanWargaUpsertWithWhereUniqueWithoutDiverifikasiOlehInput = {
     where: MasukanWargaWhereUniqueInput
     update: XOR<MasukanWargaUpdateWithoutDiverifikasiOlehInput, MasukanWargaUncheckedUpdateWithoutDiverifikasiOlehInput>
@@ -18089,6 +18259,22 @@ export namespace Prisma {
     data: XOR<KegiatanRapatUpdateManyMutationInput, KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehInput>
   }
 
+  export type DataMasterUpsertWithWhereUniqueWithoutDiprosesOlehInput = {
+    where: DataMasterWhereUniqueInput
+    update: XOR<DataMasterUpdateWithoutDiprosesOlehInput, DataMasterUncheckedUpdateWithoutDiprosesOlehInput>
+    create: XOR<DataMasterCreateWithoutDiprosesOlehInput, DataMasterUncheckedCreateWithoutDiprosesOlehInput>
+  }
+
+  export type DataMasterUpdateWithWhereUniqueWithoutDiprosesOlehInput = {
+    where: DataMasterWhereUniqueInput
+    data: XOR<DataMasterUpdateWithoutDiprosesOlehInput, DataMasterUncheckedUpdateWithoutDiprosesOlehInput>
+  }
+
+  export type DataMasterUpdateManyWithWhereWithoutDiprosesOlehInput = {
+    where: DataMasterScalarWhereInput
+    data: XOR<DataMasterUpdateManyMutationInput, DataMasterUncheckedUpdateManyWithoutDiprosesOlehInput>
+  }
+
   export type DomainIsuCreateWithoutMasukanInput = {
     id?: string
     code: string
@@ -18129,11 +18315,11 @@ export namespace Prisma {
     updatedAt?: Date | string
     emailVerified?: boolean
     image?: string | null
-    phoneNumber?: string | null
     rekomendasiDiproses?: RekomendasiCreateNestedManyWithoutDiprosesOlehInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     kegiatanRapat?: KegiatanRapatCreateNestedManyWithoutDibuatOlehInput
+    dataMaster?: DataMasterCreateNestedManyWithoutDiprosesOlehInput
   }
 
   export type UserUncheckedCreateWithoutMasukanVerifikasiInput = {
@@ -18147,11 +18333,11 @@ export namespace Prisma {
     updatedAt?: Date | string
     emailVerified?: boolean
     image?: string | null
-    phoneNumber?: string | null
     rekomendasiDiproses?: RekomendasiUncheckedCreateNestedManyWithoutDiprosesOlehInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     kegiatanRapat?: KegiatanRapatUncheckedCreateNestedManyWithoutDibuatOlehInput
+    dataMaster?: DataMasterUncheckedCreateNestedManyWithoutDiprosesOlehInput
   }
 
   export type UserCreateOrConnectWithoutMasukanVerifikasiInput = {
@@ -18234,11 +18420,11 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     rekomendasiDiproses?: RekomendasiUpdateManyWithoutDiprosesOlehNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     kegiatanRapat?: KegiatanRapatUpdateManyWithoutDibuatOlehNestedInput
+    dataMaster?: DataMasterUpdateManyWithoutDiprosesOlehNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMasukanVerifikasiInput = {
@@ -18252,11 +18438,11 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     rekomendasiDiproses?: RekomendasiUncheckedUpdateManyWithoutDiprosesOlehNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     kegiatanRapat?: KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehNestedInput
+    dataMaster?: DataMasterUncheckedUpdateManyWithoutDiprosesOlehNestedInput
   }
 
   export type RekomendasiMasukanUpsertWithWhereUniqueWithoutMasukanInput = {
@@ -18312,6 +18498,47 @@ export namespace Prisma {
     create: XOR<DomainIsuCreateWithoutDataMasterInput, DomainIsuUncheckedCreateWithoutDataMasterInput>
   }
 
+  export type UserCreateWithoutDataMasterInput = {
+    id?: string
+    name: string
+    email: string
+    jabatan?: string | null
+    role?: $Enums.Role
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    emailVerified?: boolean
+    image?: string | null
+    masukanVerifikasi?: MasukanWargaCreateNestedManyWithoutDiverifikasiOlehInput
+    rekomendasiDiproses?: RekomendasiCreateNestedManyWithoutDiprosesOlehInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    kegiatanRapat?: KegiatanRapatCreateNestedManyWithoutDibuatOlehInput
+  }
+
+  export type UserUncheckedCreateWithoutDataMasterInput = {
+    id?: string
+    name: string
+    email: string
+    jabatan?: string | null
+    role?: $Enums.Role
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    emailVerified?: boolean
+    image?: string | null
+    masukanVerifikasi?: MasukanWargaUncheckedCreateNestedManyWithoutDiverifikasiOlehInput
+    rekomendasiDiproses?: RekomendasiUncheckedCreateNestedManyWithoutDiprosesOlehInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    kegiatanRapat?: KegiatanRapatUncheckedCreateNestedManyWithoutDibuatOlehInput
+  }
+
+  export type UserCreateOrConnectWithoutDataMasterInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutDataMasterInput, UserUncheckedCreateWithoutDataMasterInput>
+  }
+
   export type DomainIsuUpsertWithoutDataMasterInput = {
     update: XOR<DomainIsuUpdateWithoutDataMasterInput, DomainIsuUncheckedUpdateWithoutDataMasterInput>
     create: XOR<DomainIsuCreateWithoutDataMasterInput, DomainIsuUncheckedCreateWithoutDataMasterInput>
@@ -18345,6 +18572,53 @@ export namespace Prisma {
     masukan?: MasukanWargaUncheckedUpdateManyWithoutDomainIsuNestedInput
     rekomendasi?: RekomendasiUncheckedUpdateManyWithoutDomainIsuNestedInput
     kegiatanRapat?: KegiatanRapatUncheckedUpdateManyWithoutDomainIsuNestedInput
+  }
+
+  export type UserUpsertWithoutDataMasterInput = {
+    update: XOR<UserUpdateWithoutDataMasterInput, UserUncheckedUpdateWithoutDataMasterInput>
+    create: XOR<UserCreateWithoutDataMasterInput, UserUncheckedCreateWithoutDataMasterInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutDataMasterInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutDataMasterInput, UserUncheckedUpdateWithoutDataMasterInput>
+  }
+
+  export type UserUpdateWithoutDataMasterInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    jabatan?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    masukanVerifikasi?: MasukanWargaUpdateManyWithoutDiverifikasiOlehNestedInput
+    rekomendasiDiproses?: RekomendasiUpdateManyWithoutDiprosesOlehNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    kegiatanRapat?: KegiatanRapatUpdateManyWithoutDibuatOlehNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutDataMasterInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    jabatan?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    masukanVerifikasi?: MasukanWargaUncheckedUpdateManyWithoutDiverifikasiOlehNestedInput
+    rekomendasiDiproses?: RekomendasiUncheckedUpdateManyWithoutDiprosesOlehNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    kegiatanRapat?: KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehNestedInput
   }
 
   export type KegiatanRapatCreateWithoutRekomendasiInput = {
@@ -18422,11 +18696,11 @@ export namespace Prisma {
     updatedAt?: Date | string
     emailVerified?: boolean
     image?: string | null
-    phoneNumber?: string | null
     masukanVerifikasi?: MasukanWargaCreateNestedManyWithoutDiverifikasiOlehInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     kegiatanRapat?: KegiatanRapatCreateNestedManyWithoutDibuatOlehInput
+    dataMaster?: DataMasterCreateNestedManyWithoutDiprosesOlehInput
   }
 
   export type UserUncheckedCreateWithoutRekomendasiDiprosesInput = {
@@ -18440,11 +18714,11 @@ export namespace Prisma {
     updatedAt?: Date | string
     emailVerified?: boolean
     image?: string | null
-    phoneNumber?: string | null
     masukanVerifikasi?: MasukanWargaUncheckedCreateNestedManyWithoutDiverifikasiOlehInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     kegiatanRapat?: KegiatanRapatUncheckedCreateNestedManyWithoutDibuatOlehInput
+    dataMaster?: DataMasterUncheckedCreateNestedManyWithoutDiprosesOlehInput
   }
 
   export type UserCreateOrConnectWithoutRekomendasiDiprosesInput = {
@@ -18568,11 +18842,11 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     masukanVerifikasi?: MasukanWargaUpdateManyWithoutDiverifikasiOlehNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     kegiatanRapat?: KegiatanRapatUpdateManyWithoutDibuatOlehNestedInput
+    dataMaster?: DataMasterUpdateManyWithoutDiprosesOlehNestedInput
   }
 
   export type UserUncheckedUpdateWithoutRekomendasiDiprosesInput = {
@@ -18586,11 +18860,11 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     masukanVerifikasi?: MasukanWargaUncheckedUpdateManyWithoutDiverifikasiOlehNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     kegiatanRapat?: KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehNestedInput
+    dataMaster?: DataMasterUncheckedUpdateManyWithoutDiprosesOlehNestedInput
   }
 
   export type RekomendasiMasukanUpsertWithWhereUniqueWithoutRekomendasiInput = {
@@ -18764,11 +19038,11 @@ export namespace Prisma {
     updatedAt?: Date | string
     emailVerified?: boolean
     image?: string | null
-    phoneNumber?: string | null
     masukanVerifikasi?: MasukanWargaCreateNestedManyWithoutDiverifikasiOlehInput
     rekomendasiDiproses?: RekomendasiCreateNestedManyWithoutDiprosesOlehInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     kegiatanRapat?: KegiatanRapatCreateNestedManyWithoutDibuatOlehInput
+    dataMaster?: DataMasterCreateNestedManyWithoutDiprosesOlehInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -18782,11 +19056,11 @@ export namespace Prisma {
     updatedAt?: Date | string
     emailVerified?: boolean
     image?: string | null
-    phoneNumber?: string | null
     masukanVerifikasi?: MasukanWargaUncheckedCreateNestedManyWithoutDiverifikasiOlehInput
     rekomendasiDiproses?: RekomendasiUncheckedCreateNestedManyWithoutDiprosesOlehInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     kegiatanRapat?: KegiatanRapatUncheckedCreateNestedManyWithoutDibuatOlehInput
+    dataMaster?: DataMasterUncheckedCreateNestedManyWithoutDiprosesOlehInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -18816,11 +19090,11 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     masukanVerifikasi?: MasukanWargaUpdateManyWithoutDiverifikasiOlehNestedInput
     rekomendasiDiproses?: RekomendasiUpdateManyWithoutDiprosesOlehNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     kegiatanRapat?: KegiatanRapatUpdateManyWithoutDibuatOlehNestedInput
+    dataMaster?: DataMasterUpdateManyWithoutDiprosesOlehNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -18834,11 +19108,11 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     masukanVerifikasi?: MasukanWargaUncheckedUpdateManyWithoutDiverifikasiOlehNestedInput
     rekomendasiDiproses?: RekomendasiUncheckedUpdateManyWithoutDiprosesOlehNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     kegiatanRapat?: KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehNestedInput
+    dataMaster?: DataMasterUncheckedUpdateManyWithoutDiprosesOlehNestedInput
   }
 
   export type UserCreateWithoutAccountsInput = {
@@ -18852,11 +19126,11 @@ export namespace Prisma {
     updatedAt?: Date | string
     emailVerified?: boolean
     image?: string | null
-    phoneNumber?: string | null
     masukanVerifikasi?: MasukanWargaCreateNestedManyWithoutDiverifikasiOlehInput
     rekomendasiDiproses?: RekomendasiCreateNestedManyWithoutDiprosesOlehInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     kegiatanRapat?: KegiatanRapatCreateNestedManyWithoutDibuatOlehInput
+    dataMaster?: DataMasterCreateNestedManyWithoutDiprosesOlehInput
   }
 
   export type UserUncheckedCreateWithoutAccountsInput = {
@@ -18870,11 +19144,11 @@ export namespace Prisma {
     updatedAt?: Date | string
     emailVerified?: boolean
     image?: string | null
-    phoneNumber?: string | null
     masukanVerifikasi?: MasukanWargaUncheckedCreateNestedManyWithoutDiverifikasiOlehInput
     rekomendasiDiproses?: RekomendasiUncheckedCreateNestedManyWithoutDiprosesOlehInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     kegiatanRapat?: KegiatanRapatUncheckedCreateNestedManyWithoutDibuatOlehInput
+    dataMaster?: DataMasterUncheckedCreateNestedManyWithoutDiprosesOlehInput
   }
 
   export type UserCreateOrConnectWithoutAccountsInput = {
@@ -18904,11 +19178,11 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     masukanVerifikasi?: MasukanWargaUpdateManyWithoutDiverifikasiOlehNestedInput
     rekomendasiDiproses?: RekomendasiUpdateManyWithoutDiprosesOlehNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     kegiatanRapat?: KegiatanRapatUpdateManyWithoutDibuatOlehNestedInput
+    dataMaster?: DataMasterUpdateManyWithoutDiprosesOlehNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -18922,11 +19196,11 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     masukanVerifikasi?: MasukanWargaUncheckedUpdateManyWithoutDiverifikasiOlehNestedInput
     rekomendasiDiproses?: RekomendasiUncheckedUpdateManyWithoutDiprosesOlehNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     kegiatanRapat?: KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehNestedInput
+    dataMaster?: DataMasterUncheckedUpdateManyWithoutDiprosesOlehNestedInput
   }
 
   export type DomainIsuCreateWithoutKegiatanRapatInput = {
@@ -18969,11 +19243,11 @@ export namespace Prisma {
     updatedAt?: Date | string
     emailVerified?: boolean
     image?: string | null
-    phoneNumber?: string | null
     masukanVerifikasi?: MasukanWargaCreateNestedManyWithoutDiverifikasiOlehInput
     rekomendasiDiproses?: RekomendasiCreateNestedManyWithoutDiprosesOlehInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
+    dataMaster?: DataMasterCreateNestedManyWithoutDiprosesOlehInput
   }
 
   export type UserUncheckedCreateWithoutKegiatanRapatInput = {
@@ -18987,11 +19261,11 @@ export namespace Prisma {
     updatedAt?: Date | string
     emailVerified?: boolean
     image?: string | null
-    phoneNumber?: string | null
     masukanVerifikasi?: MasukanWargaUncheckedCreateNestedManyWithoutDiverifikasiOlehInput
     rekomendasiDiproses?: RekomendasiUncheckedCreateNestedManyWithoutDiprosesOlehInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    dataMaster?: DataMasterUncheckedCreateNestedManyWithoutDiprosesOlehInput
   }
 
   export type UserCreateOrConnectWithoutKegiatanRapatInput = {
@@ -19096,11 +19370,11 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     masukanVerifikasi?: MasukanWargaUpdateManyWithoutDiverifikasiOlehNestedInput
     rekomendasiDiproses?: RekomendasiUpdateManyWithoutDiprosesOlehNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
+    dataMaster?: DataMasterUpdateManyWithoutDiprosesOlehNestedInput
   }
 
   export type UserUncheckedUpdateWithoutKegiatanRapatInput = {
@@ -19114,11 +19388,11 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     masukanVerifikasi?: MasukanWargaUncheckedUpdateManyWithoutDiverifikasiOlehNestedInput
     rekomendasiDiproses?: RekomendasiUncheckedUpdateManyWithoutDiprosesOlehNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    dataMaster?: DataMasterUncheckedUpdateManyWithoutDiprosesOlehNestedInput
   }
 
   export type RekomendasiUpsertWithWhereUniqueWithoutKegiatanRapatInput = {
@@ -19157,6 +19431,7 @@ export namespace Prisma {
     lokasiRt?: number | null
     lokasiRw?: number | null
     sumberData?: string | null
+    diprosesOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -19237,6 +19512,7 @@ export namespace Prisma {
     sumberData?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    diprosesOleh?: UserUpdateOneWithoutDataMasterNestedInput
   }
 
   export type DataMasterUncheckedUpdateWithoutDomainIsuInput = {
@@ -19247,6 +19523,7 @@ export namespace Prisma {
     lokasiRt?: NullableIntFieldUpdateOperationsInput | number | null
     lokasiRw?: NullableIntFieldUpdateOperationsInput | number | null
     sumberData?: NullableStringFieldUpdateOperationsInput | string | null
+    diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -19259,6 +19536,7 @@ export namespace Prisma {
     lokasiRt?: NullableIntFieldUpdateOperationsInput | number | null
     lokasiRw?: NullableIntFieldUpdateOperationsInput | number | null
     sumberData?: NullableStringFieldUpdateOperationsInput | string | null
+    diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -19416,6 +19694,19 @@ export namespace Prisma {
     aiModel?: string | null
     aiPromptHash?: string | null
     aiProcessedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DataMasterCreateManyDiprosesOlehInput = {
+    id?: string
+    domainIsuId: string
+    namaAtribut: string
+    nilai: string
+    jumlah?: number | null
+    lokasiRt?: number | null
+    lokasiRw?: number | null
+    sumberData?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -19629,6 +19920,45 @@ export namespace Prisma {
     aiModel?: NullableStringFieldUpdateOperationsInput | string | null
     aiPromptHash?: NullableStringFieldUpdateOperationsInput | string | null
     aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DataMasterUpdateWithoutDiprosesOlehInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    namaAtribut?: StringFieldUpdateOperationsInput | string
+    nilai?: StringFieldUpdateOperationsInput | string
+    jumlah?: NullableIntFieldUpdateOperationsInput | number | null
+    lokasiRt?: NullableIntFieldUpdateOperationsInput | number | null
+    lokasiRw?: NullableIntFieldUpdateOperationsInput | number | null
+    sumberData?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    domainIsu?: DomainIsuUpdateOneRequiredWithoutDataMasterNestedInput
+  }
+
+  export type DataMasterUncheckedUpdateWithoutDiprosesOlehInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    domainIsuId?: StringFieldUpdateOperationsInput | string
+    namaAtribut?: StringFieldUpdateOperationsInput | string
+    nilai?: StringFieldUpdateOperationsInput | string
+    jumlah?: NullableIntFieldUpdateOperationsInput | number | null
+    lokasiRt?: NullableIntFieldUpdateOperationsInput | number | null
+    lokasiRw?: NullableIntFieldUpdateOperationsInput | number | null
+    sumberData?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DataMasterUncheckedUpdateManyWithoutDiprosesOlehInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    domainIsuId?: StringFieldUpdateOperationsInput | string
+    namaAtribut?: StringFieldUpdateOperationsInput | string
+    nilai?: StringFieldUpdateOperationsInput | string
+    jumlah?: NullableIntFieldUpdateOperationsInput | number | null
+    lokasiRt?: NullableIntFieldUpdateOperationsInput | number | null
+    lokasiRw?: NullableIntFieldUpdateOperationsInput | number | null
+    sumberData?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

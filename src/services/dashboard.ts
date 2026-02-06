@@ -15,11 +15,11 @@ export const dashboardService = {
       }),
 
       prisma.masukanWarga.count({
-        where: { status: "MENUNGGU_VERIFIKASI" },
+        where: { status: "MENUNGGU" },
       }),
 
       prisma.masukanWarga.count({
-        where: { status: "DITERIMA" },
+        where: { status: "DIVERIFIKASI" },
       }),
 
       prisma.masukanWarga.count({
@@ -47,20 +47,20 @@ export const dashboardService = {
         prisma.masukanWarga.findMany({
           take: 3,
           orderBy: { updatedAt: "desc" },
-          where: { verifiedByUserId: { not: null } },
+          where: { diverifikasiOlehId: { not: null } },
           select: {
             id: true,
             updatedAt: true,
-            verifiedBy: { select: { name: true } },
+            diverifikasiOleh: { select: { name: true } },
           },
         }),
         prisma.rekomendasi.findMany({
           take: 3,
-          orderBy: { tanggalProses: "desc" },
+          orderBy: { createdAt: "desc" },
           select: {
             id: true,
-            tanggalProses: true,
-            processedBy: { select: { name: true } },
+            createdAt: true,
+            diprosesOleh: { select: { name: true } },
           },
         }),
         prisma.dataMaster.findMany({
@@ -69,7 +69,7 @@ export const dashboardService = {
           select: {
             id: true,
             namaAtribut: true,
-            updatedBy: { select: { name: true } },
+            diprosesOleh: { select: { name: true } },
             updatedAt: true,
           },
         }),
@@ -80,17 +80,19 @@ export const dashboardService = {
         }),
       ]);
 
+    console.log(dataMaster);
+
     const activities = [
       ...verifikasi.map((v) => ({
-        title: `Verifikasi masukan warga oleh ${v.verifiedBy?.name || "Anonim"}`,
+        title: `Verifikasi masukan warga oleh ${v.diverifikasiOleh?.name || "Anonim"}`,
         time: v.updatedAt,
       })),
       ...rekomendasi.map((r) => ({
-        title: `Rekomendasi baru diproses oleh ${r.processedBy?.name || "Admin"}`,
-        time: r.tanggalProses,
+        title: `Rekomendasi baru diproses oleh ${r.diprosesOleh?.name || "Admin"}`,
+        time: r.createdAt,
       })),
       ...dataMaster.map((d) => ({
-        title: `Data master "${d.namaAtribut}" diperbarui oleh ${d.updatedBy?.name}`,
+        title: `Data master "${d.namaAtribut}" diperbarui oleh ${d.diprosesOleh?.name}`,
         time: d.updatedAt,
       })),
       ...penggunaBaru.map((u) => ({
@@ -108,9 +110,9 @@ export const dashboardService = {
   getActivityStats: async () => {
     const [masukanAccepted, masukanRejected, masukanWaiting] =
       await Promise.all([
-        prisma.masukanWarga.count({ where: { status: "DITERIMA" } }),
+        prisma.masukanWarga.count({ where: { status: "DIVERIFIKASI" } }),
         prisma.masukanWarga.count({ where: { status: "DITOLAK" } }),
-        prisma.masukanWarga.count({ where: { status: "MENUNGGU_VERIFIKASI" } }),
+        prisma.masukanWarga.count({ where: { status: "MENUNGGU" } }),
       ]);
 
     return {
@@ -148,8 +150,8 @@ export const dashboardService = {
       const monthData = months.find((x) => x.month === monthName);
       if (!monthData) return;
 
-      if (m.status === "MENUNGGU_VERIFIKASI") monthData.waiting++;
-      if (m.status === "DITERIMA") monthData.accepted++;
+      if (m.status === "MENUNGGU") monthData.waiting++;
+      if (m.status === "DIVERIFIKASI") monthData.accepted++;
       if (m.status === "DITOLAK") monthData.rejected++;
     });
 
@@ -158,12 +160,12 @@ export const dashboardService = {
 
   getDataMasterStats: async () => {
     const masterCategory = await prisma.dataMaster.groupBy({
-      by: ["jenisData"], // hanya field yang ada di model
+      by: ["domainIsuId"], // hanya field yang ada di model
       _count: { id: true },
     });
 
     return masterCategory.map((c) => ({
-      name: c.jenisData,
+      name: c.domainIsuId,
       value: c._count?.id ?? 0, // fallback 0 kalau undefined
     }));
   },

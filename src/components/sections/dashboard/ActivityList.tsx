@@ -18,6 +18,7 @@ export default function ActivityList() {
     isLoading,
     error,
   } = useGet("/protected/dashboard/admin/activities");
+  console.log(activities);
 
   return (
     <Card className="border border-gray-200 hover:shadow-md transition-all">

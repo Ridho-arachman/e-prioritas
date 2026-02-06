@@ -69,10 +69,10 @@ model User {
   rekomendasiDiproses Rekomendasi[]  @relation("PemrosesRekomendasi")
   emailVerified       Boolean        @default(false)
   image               String?
-  phoneNumber         String?
   sessions            Session[]
   accounts            Account[]
   kegiatanRapat       KegiatanRapat[]
+  dataMaster          DataMaster[]
 
   @@map("user")
 }
@@ -120,6 +120,8 @@ model DataMaster {
   lokasiRw Int?
 
   sumberData String? @db.VarChar(100) // opsional: BPS, Survey Internal, dll
+  diprosesOlehId String?
+  diprosesOleh   User?   @relation(fields: [diprosesOlehId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

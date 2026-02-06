@@ -139,8 +139,7 @@ exports.Prisma.UserScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   emailVerified: 'emailVerified',
-  image: 'image',
-  phoneNumber: 'phoneNumber'
+  image: 'image'
 };
 
 exports.Prisma.MasukanWargaScalarFieldEnum = {
@@ -165,6 +164,7 @@ exports.Prisma.DataMasterScalarFieldEnum = {
   lokasiRt: 'lokasiRt',
   lokasiRw: 'lokasiRw',
   sumberData: 'sumberData',
+  diprosesOlehId: 'diprosesOlehId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

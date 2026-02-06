@@ -1,27 +1,27 @@
-import { createKategori } from "./factories/kategori.factory";
-import { createDataMaster } from "./factories/data-master.factory";
-import { createMasukanWarga } from "./factories/masukan-warga.factory";
-import { createRekomendasi } from "./factories/rekomendasi.factory";
+import "dotenv/config";
 import prisma from "@/lib/prisma";
-
+import {
+  dataMasterFactory,
+  domainIsuFactory,
+  kegiatanRapatFactory,
+  masukanWargaFactory,
+  rekomendasiFactory,
+} from "./factories";
 async function main() {
   console.log("🌱 Seeding with faker...");
 
-  // 1. Kategori
-  const kategori = await createKategori();
+  const domains = await domainIsuFactory();
+  const domainIds = domains.map((d) => d.id);
 
-  // 2. Data master (beberapa)
-  await Promise.all(Array.from({ length: 5 }).map(() => createDataMaster()));
+  const USER_ID = "y4YXDIOJLPSjG0H1zkg7QfW3AKUhBtWF";
 
-  // 3. Masukan warga
-  const masukans = await Promise.all(
-    Array.from({ length: 4 }).map(() => createMasukanWarga(kategori.id)),
-  );
+  await dataMasterFactory(domainIds, USER_ID);
+  await masukanWargaFactory(domainIds);
 
-  // 4. Rekomendasi
-  await createRekomendasi(masukans.map((m) => m.id));
+  const rapat = await kegiatanRapatFactory(USER_ID, domainIds[0]);
+  await rekomendasiFactory(rapat.id, domainIds[0]);
 
-  console.log("✅ Faker seed selesai");
+  console.log("✅ Seed selesai");
 }
 
 main()

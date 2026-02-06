@@ -210,19 +210,11 @@ export const auth = betterAuth({
   },
 
   user: {
-    fields: {
-      image: undefined,
-    },
     additionalFields: {
       role: {
         type: "string",
         required: false,
         defaultValue: "PERANGKAT_DESA",
-        input: true,
-      },
-      phoneNumber: {
-        type: "string",
-        required: false,
         input: true,
       },
       jabatan: {
@@ -242,11 +234,6 @@ export const auth = betterAuth({
       role: {
         type: "string",
         required: false,
-      },
-      phoneNumber: {
-        type: "string",
-        required: false,
-        input: true,
       },
       jabatan: {
         type: "string",

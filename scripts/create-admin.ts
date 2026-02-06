@@ -33,7 +33,6 @@ const main = async () => {
       password,
       role,
       jabatan,
-      phoneNumber,
       callbackURL: `${config.appUrl}/verify-success`,
     },
   });

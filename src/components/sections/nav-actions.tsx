@@ -77,7 +77,11 @@ export function NavActions() {
       </div>
 
       <Popover open={isOpen} onOpenChange={setIsOpen}>
-        <PopoverTrigger asChild className="cursor-pointer">
+        <PopoverTrigger
+          asChild
+          className="cursor-pointer"
+          suppressHydrationWarning
+        >
           <Button
             variant="ghost"
             size="icon"
@@ -100,6 +104,7 @@ export function NavActions() {
         <PopoverContent
           className="w-64 overflow-hidden rounded-lg p-0"
           align="end"
+          suppressHydrationWarning
         >
           {/* <div className="p-4 border-b flex items-center gap-3">
             <Avatar className="h-12 w-12">
