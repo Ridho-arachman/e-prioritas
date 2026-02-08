@@ -24,9 +24,29 @@ export const createUserPerangkatSchema = z
     jabatan: z.string().optional(),
     isActive: z.boolean(),
     role: z.enum(Role),
-    phoneNumber: z
-      .string()
-      .regex(/^(\+62|62|0)8[1-9][0-9]{6,10}$/, "Nomor HP tidak valid"),
+    image: z
+      .instanceof(File)
+      .optional()
+      .refine(
+        (file) => {
+          if (!file) return true;
+          const validTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/jpg",
+            "image/webp",
+          ];
+          return validTypes.includes(file.type);
+        },
+        { message: "Format gambar harus JPG, PNG, atau WEBP" },
+      )
+      .refine(
+        (file) => {
+          if (!file) return true;
+          return file.size <= 5 * 1024 * 1024; // Max 5MB
+        },
+        { message: "Ukuran gambar maksimal 5MB" },
+      ),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],
@@ -43,9 +63,29 @@ export const updateUserPerangkatSchema = z.object({
   jabatan: z.string().min(1, "Jabatan tidak boleh kosong").trim(),
   isActive: z.boolean(),
   role: z.enum(["LURAH", "PERANGKAT_DESA"]),
-  phoneNumber: z
-    .string()
-    .regex(/^(\+62|62|0)8[1-9][0-9]{6,10}$/, "Nomor HP tidak valid"),
+  image: z
+    .instanceof(File)
+    .optional()
+    .refine(
+      (file) => {
+        if (!file) return true;
+        const validTypes = [
+          "image/jpeg",
+          "image/png",
+          "image/jpg",
+          "image/webp",
+        ];
+        return validTypes.includes(file.type);
+      },
+      { message: "Format gambar harus JPG, PNG, atau WEBP" },
+    )
+    .refine(
+      (file) => {
+        if (!file) return true;
+        return file.size <= 5 * 1024 * 1024; // Max 5MB
+      },
+      { message: "Ukuran gambar maksimal 5MB" },
+    ),
 });
 
 export const deleteUserPerangkatSchema = z.object({

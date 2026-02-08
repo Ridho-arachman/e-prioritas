@@ -11,6 +11,7 @@ import { Role } from "@/app/generated/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { handleBetterAuthError } from "@/lib/handleBetterAuthError";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
 const GET = async (req: NextRequest) => {
   const allowedRoles: Role[] = ["ADMIN"];
@@ -111,13 +112,73 @@ const POST = async (req: NextRequest) => {
   }
 
   try {
-    const body = await req.json();
-    const parsed = createUserPerangkatSchema.safeParse(body);
+    // ✅ Parse FormData (bukan JSON)
+    const formData = await req.formData();
+
+    // ✅ Ambil data dari FormData
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+    const role = formData.get("role") as "PERANGKAT_DESA" | "LURAH";
+    const jabatan = formData.get("jabatan") as string | null;
+    const isActive = formData.get("isActive") === "true";
+    const imageFile = formData.get("image") as File | null;
+
+    // ✅ Validasi dengan Zod
+    const parsed = createUserPerangkatSchema.safeParse({
+      name,
+      email,
+      password,
+      confirmPassword,
+      role,
+      jabatan: jabatan || undefined,
+      isActive,
+      image: imageFile || undefined,
+    });
+
     if (!parsed.success) return handleZodValidation(parsed);
 
-    const { confirmPassword, ...data } = parsed.data;
+    // ✅ Upload gambar ke Cloudinary jika ada
+    let imageUrl: string | undefined;
 
-    const user = await userService.create(data);
+    if (imageFile) {
+      try {
+        // Baca file sebagai buffer
+        const bytes = await imageFile.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+
+        // Upload ke Cloudinary
+        const uploadResult = await uploadToCloudinary(
+          buffer,
+          "perangkat-profiles",
+          `perangkat_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+        );
+
+        imageUrl = uploadResult.url;
+      } catch (uploadError) {
+        console.error("Cloudinary upload error:", uploadError);
+        return handleResponse({
+          success: false,
+          message: "Gagal mengupload gambar",
+          status: 500,
+        });
+      }
+    }
+
+    // ✅ Prepare data untuk create user
+    const userData = {
+      name,
+      email,
+      password,
+      isActive,
+      role,
+      jabatan: jabatan || undefined,
+      image: imageUrl, // URL dari Cloudinary
+    };
+
+    // ✅ Create user
+    const user = await userService.create(userData);
 
     return handleResponse({
       success: true,
@@ -126,14 +187,12 @@ const POST = async (req: NextRequest) => {
       status: 201,
     });
   } catch (error) {
-    const betterAuthErr = handleBetterAuthError(error);
-    console.log(betterAuthErr);
-
-    if (betterAuthErr) {
+    const prismaResponse = handlePrismaError(error);
+    if (prismaResponse) {
       return handleResponse({
         success: false,
-        message: betterAuthErr.message,
-        status: betterAuthErr.status,
+        message: prismaResponse.message,
+        status: prismaResponse.status,
       });
     }
 

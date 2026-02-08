@@ -10,7 +10,14 @@ import { createUserPerangkatSchema } from "@/schema/userPerangkatSchema";
 import { notifier } from "../../../lib/ToastNotifier";
 import { useRouter } from "next/navigation";
 import { Spinner } from "../../ui/spinner";
-import { Eye, EyeClosed } from "lucide-react";
+import {
+  Eye,
+  EyeClosed,
+  Image as ImageIcon,
+  Trash,
+  Upload,
+  FileImage,
+} from "lucide-react";
 import { useState, useCallback, useEffect, useMemo } from "react";
 import {
   Field,
@@ -40,6 +47,8 @@ export default function PerangkatFormAdd() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [hasSyncedDraft, setHasSyncedDraft] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const { post, loading } = usePost(`/protected/perangkat`);
 
   // Store functions
@@ -60,7 +69,6 @@ export default function PerangkatFormAdd() {
     () => ({
       name: "",
       email: "",
-      phoneNumber: "",
       role: "PERANGKAT_DESA" as const,
       jabatan: "",
       password: "",
@@ -83,7 +91,7 @@ export default function PerangkatFormAdd() {
     // Tunggu store hydrated dan ada draft
     if (isHydrated && draft) {
       const hasDraftData =
-        draft.name || draft.email || draft.phoneNumber || draft.jabatan;
+        draft.name || draft.email || draft.jabatan || draft.imagePreview;
 
       if (hasDraftData) {
         console.log("Syncing draft data to form...", draft);
@@ -91,11 +99,16 @@ export default function PerangkatFormAdd() {
         // Gunakan setValue individual, bukan reset() untuk menghindari re-render besar
         if (draft.name) form.setValue("name", draft.name);
         if (draft.email) form.setValue("email", draft.email);
-        if (draft.phoneNumber) form.setValue("phoneNumber", draft.phoneNumber);
         if (draft.role) form.setValue("role", draft.role);
         if (draft.jabatan) form.setValue("jabatan", draft.jabatan);
         if (draft.isActive !== undefined)
           form.setValue("isActive", draft.isActive);
+
+        // ✅ Sync image preview dari draft
+        if (draft.imagePreview) {
+          setImagePreview(draft.imagePreview);
+          console.log("Image preview loaded from draft");
+        }
 
         setHasSyncedDraft(true);
         notifier.info("Draft Dimuat", "Data draft sebelumnya telah dimuat");
@@ -113,14 +126,17 @@ export default function PerangkatFormAdd() {
       updateDraft({
         name: safeData?.name || "",
         email: safeData?.email || "",
-        phoneNumber: safeData?.phoneNumber || "",
         role: safeData?.role || "PERANGKAT_DESA",
         jabatan: safeData?.jabatan || "",
         isActive: safeData?.isActive ?? true,
+        // ✅ Simpan image preview ke draft (base64)
+        imagePreview: imagePreview || undefined,
+        imageFileName: imageFile?.name,
+        imageSize: imageFile?.size,
       });
     },
     {
-      skipFields: ["password", "confirmPassword"],
+      skipFields: ["password", "confirmPassword", "image"],
       waitTime: 800,
       isActive: !isSubmitting && isMounted,
     },
@@ -135,10 +151,65 @@ export default function PerangkatFormAdd() {
     }
   }, [role, form, isMounted]);
 
+  // Handler untuk image upload
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validasi ukuran
+      if (file.size > 5 * 1024 * 1024) {
+        notifier.error("Error", "Ukuran gambar maksimal 5MB");
+        return;
+      }
+
+      // Validasi tipe
+      const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+      if (!validTypes.includes(file.type)) {
+        notifier.error("Error", "Format gambar harus JPG, PNG, atau WEBP");
+        return;
+      }
+
+      setImageFile(file);
+
+      // Preview image (base64)
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result as string;
+        setImagePreview(base64);
+
+        // ✅ Simpan ke draft
+        updateDraft({
+          imagePreview: base64,
+          imageFileName: file.name,
+          imageSize: file.size,
+        });
+      };
+      reader.readAsDataURL(file);
+
+      // Set value ke form
+      form.setValue("image", file);
+    }
+  };
+
+  // Handler untuk hapus gambar
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    form.setValue("image", undefined);
+
+    // ✅ Clear dari draft
+    updateDraft({
+      imagePreview: undefined,
+      imageFileName: undefined,
+      imageSize: undefined,
+    });
+  };
+
   // Handler untuk reset dengan clear draft
   const handleReset = useCallback(() => {
     form.reset(defaultValues);
     clearDraft();
+    setImageFile(null);
+    setImagePreview(null);
     setHasSyncedDraft(false);
     notifier.info("Reset", "Form telah direset dan draft dihapus");
   }, [form, clearDraft, defaultValues]);
@@ -146,7 +217,30 @@ export default function PerangkatFormAdd() {
   async function onSubmit(data: z.infer<typeof createUserPerangkatSchema>) {
     setIsSubmitting(true);
     try {
-      const res = await post(data);
+      // Buat FormData untuk upload file
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("email", data.email);
+      formData.append("password", data.password);
+      formData.append("confirmPassword", data.confirmPassword);
+      formData.append("role", data.role);
+      formData.append("isActive", data.isActive.toString());
+
+      if (data.jabatan) {
+        formData.append("jabatan", data.jabatan);
+      }
+
+      if (imageFile) {
+        formData.append("image", imageFile);
+      }
+
+      // Kirim FormData (bukan JSON)
+      const res = await post(formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
       notifier.success(
         "Berhasil",
         res?.message || "Perangkat desa berhasil ditambahkan",
@@ -174,8 +268,13 @@ export default function PerangkatFormAdd() {
   // Cek apakah ada draft data
   const hasDraft = useMemo(() => {
     if (!draft || !isMounted) return false;
-    return !!(draft.name || draft.email || draft.phoneNumber || draft.jabatan);
+    return !!(draft.name || draft.email || draft.jabatan || draft.imagePreview);
   }, [draft, isMounted]);
+
+  // Cek apakah ada image draft
+  const hasImageDraft = useMemo(() => {
+    return !!draft?.imagePreview;
+  }, [draft]);
 
   if (!isMounted) {
     return (
@@ -200,23 +299,28 @@ export default function PerangkatFormAdd() {
             <Skeleton className="h-10 w-full" />
           </div>
 
-          {/* Nomor HP */}
-          <div className="space-y-2">
-            <Skeleton className="h-5 w-28" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-4 w-40" />
-          </div>
-
           {/* Role Select */}
           <div className="space-y-2">
             <Skeleton className="h-5 w-16" />
             <Skeleton className="h-10 w-full" />
           </div>
 
-          {/* Jabatan (conditional) */}
+          {/* Jabatan */}
           <div className="space-y-2">
             <Skeleton className="h-5 w-24" />
             <Skeleton className="h-10 w-full" />
+          </div>
+
+          {/* Image Upload */}
+          <div className="space-y-2">
+            <Skeleton className="h-5 w-24" />
+            <div className="flex gap-4">
+              <Skeleton className="h-32 w-32 rounded-lg" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-4 w-40" />
+              </div>
+            </div>
           </div>
 
           {/* Password */}
@@ -252,13 +356,6 @@ export default function PerangkatFormAdd() {
         <div className="flex justify-end gap-2 pt-4">
           <Skeleton className="h-10 w-36 rounded-md" />
           <Skeleton className="h-10 w-44 rounded-md" />
-        </div>
-
-        {/* Footer Info */}
-        <div className="mt-6 space-y-2 pt-4 border-t">
-          <Skeleton className="h-4 w-full max-w-lg" />
-          <Skeleton className="h-4 w-full max-w-md" />
-          <Skeleton className="h-4 w-full max-w-sm" />
         </div>
       </div>
     );
@@ -339,31 +436,6 @@ export default function PerangkatFormAdd() {
           )}
         />
 
-        {/* Nomor HP */}
-        <Controller
-          control={form.control}
-          name="phoneNumber"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>
-                Nomor HP{" "}
-                {draft?.phoneNumber && isHydrated && (
-                  <span className="text-green-600 text-xs">
-                    • Draft tersimpan
-                  </span>
-                )}
-              </FieldLabel>
-              <Input
-                {...field}
-                readOnly={isLoading}
-                placeholder="08xxxxxxxxxx"
-              />
-              <FieldDescription>Format: 08xxxx / +628xxxx</FieldDescription>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-
         {/* Role */}
         <Controller
           control={form.control}
@@ -416,6 +488,120 @@ export default function PerangkatFormAdd() {
             )}
           />
         )}
+
+        {/* Upload Gambar */}
+        <Controller
+          control={form.control}
+          name="image"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel>
+                Foto Profil{" "}
+                {hasImageDraft && isHydrated && (
+                  <span className="text-green-600 text-xs">
+                    • Draft tersimpan
+                  </span>
+                )}
+              </FieldLabel>
+              <div className="flex flex-col md:flex-row gap-4">
+                {/* Preview Image */}
+                <div className="flex-1">
+                  {imagePreview ? (
+                    <div className="relative w-full aspect-square border-2 border-dashed rounded-lg overflow-hidden">
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-2 right-2 cursor-pointer"
+                        onClick={handleRemoveImage}
+                        disabled={isLoading}
+                      >
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                      {hasImageDraft && isHydrated && (
+                        <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                          <FileImage className="h-3 w-3 inline mr-1" />
+                          Draft tersimpan
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="w-full aspect-square border-2 border-dashed rounded-lg flex items-center justify-center bg-muted/30">
+                      <div className="text-center">
+                        <ImageIcon className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
+                        <p className="text-sm text-muted-foreground">
+                          Belum ada foto
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Upload Button & Info */}
+                <div className="flex-1 space-y-3">
+                  <Input
+                    type="file"
+                    accept="image/jpeg,image/png,image/jpg,image/webp"
+                    onChange={(e) => {
+                      handleImageChange(e);
+                      field.onChange(e.target.files?.[0]);
+                    }}
+                    disabled={isLoading}
+                    className="cursor-pointer"
+                  />
+                  <div className="space-y-1">
+                    <FieldDescription className="text-sm">
+                      <span className="font-medium">Format:</span> JPG, PNG,
+                      WEBP
+                    </FieldDescription>
+                    <FieldDescription className="text-sm">
+                      <span className="font-medium">Ukuran maksimal:</span> 5MB
+                    </FieldDescription>
+                    <FieldDescription className="text-sm">
+                      <span className="font-medium">Rasio:</span> 1:1 (Square)
+                    </FieldDescription>
+                  </div>
+
+                  {/* Info Draft Image */}
+                  {hasImageDraft && isHydrated && draft?.imageFileName && (
+                    <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <FileImage className="h-4 w-4 text-blue-600 mt-0.5" />
+                        <div className="text-sm">
+                          <p className="font-medium text-blue-700">
+                            {draft.imageFileName}
+                          </p>
+                          <p className="text-xs text-blue-600">
+                            {draft.imageSize
+                              ? (draft.imageSize / 1024).toFixed(1)
+                              : 0}{" "}
+                            KB
+                            {draft.imageSize &&
+                              draft.imageSize > 1024 * 1024 && (
+                                <span className="text-red-600 ml-1">
+                                  (Melebihi batas, pilih ulang)
+                                </span>
+                              )}
+                          </p>
+                          <p className="text-xs text-blue-500 mt-1">
+                            ⚠️ Gambar draft akan hilang jika halaman direfresh.
+                            Pilih ulang file untuk memastikan upload.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
         {/* Password */}
         <Controller
@@ -534,6 +720,10 @@ export default function PerangkatFormAdd() {
         </p>
         <p className="text-xs text-muted-foreground">
           💾 Draft tetap tersimpan meskipun halaman direfresh.
+        </p>
+        <p className="text-xs text-muted-foreground">
+          📸 Gambar disimpan sebagai preview (base64). Pilih ulang file gambar
+          sebelum submit untuk memastikan upload berhasil.
         </p>
       </div>
     </>

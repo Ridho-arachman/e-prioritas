@@ -57,10 +57,10 @@ export function usePut<T = any>(url: string) {
 export function usePatch<T = any>(url: string) {
   const [loading, setLoading] = useState(false);
 
-  async function patch(body: any): Promise<T> {
+  async function patch(body: any, config?: AxiosRequestConfig): Promise<T> {
     setLoading(true);
     try {
-      const res = await api.patch(url, body);
+      const res = await api.patch(url, body, config);
       return res.data;
     } finally {
       setLoading(false);

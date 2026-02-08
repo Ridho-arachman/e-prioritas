@@ -1,59 +1,65 @@
-// stores/perangkatFormAddDraft.ts
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface PerangkatFormDraft {
+interface PerangkatDraft {
   name: string;
   email: string;
-  phoneNumber: string;
-  role: "PERANGKAT_DESA" | "LURAH" | "";
+  role: "PERANGKAT_DESA" | "LURAH";
   jabatan: string;
   isActive: boolean;
+  imagePreview?: string | null;
+  imageFileName?: string;
+  imageSize?: number;
 }
 
-interface PerangkatFormDraftStore {
-  data: PerangkatFormDraft;
-  updateDraft: (data: Partial<PerangkatFormDraft>) => void;
+interface PerangkatDraftStore {
+  data: PerangkatDraft | null;
+  isHydrated: boolean;
+  updateDraft: (data: Partial<PerangkatDraft>) => void;
   clearDraft: () => void;
-  lastSaved: string | null;
-  isHydrated: boolean; // 🔥 NEW: Untuk tahu kapan data sudah di-load
 }
 
-const initialData: PerangkatFormDraft = {
-  name: "",
-  email: "",
-  phoneNumber: "",
-  role: "",
-  jabatan: "",
-  isActive: true,
-};
-
-export const usePerangkatDraftStore = create<PerangkatFormDraftStore>()(
+export const usePerangkatDraftStore = create<PerangkatDraftStore>()(
   persist(
     (set) => ({
-      data: initialData,
-      lastSaved: null,
-      isHydrated: false, // 🔥 Default false
-
-      updateDraft: (newData) =>
+      data: null,
+      isHydrated: false,
+      updateDraft: (partialData) =>
         set((state) => ({
-          data: { ...state.data, ...newData },
-          lastSaved: new Date().toISOString(),
+          data: state.data
+            ? { ...state.data, ...partialData }
+            : {
+                name: "",
+                email: "",
+                role: "PERANGKAT_DESA",
+                jabatan: "",
+                isActive: true,
+                ...partialData,
+              },
+          isHydrated: true, // ✅ Set hydrated saat update
         })),
-
-      clearDraft: () =>
-        set({
-          data: initialData,
-          lastSaved: null,
-        }),
+      clearDraft: () => set({ data: null, isHydrated: true }),
     }),
     {
-      name: "perangkat-form-draft",
-      onRehydrateStorage: () => (state) => {
-        // 🔥 Set hydrated jadi true setelah data di-load
-        if (state) {
-          state.isHydrated = true;
+      name: "perangkat-draft-storage",
+      // ✅ onRehydrateStorage untuk set flag setelah load
+      onRehydrateStorage: () => (state, error) => {
+        if (error) {
+          console.error("Rehydrate error:", error);
         }
+      },
+      // ✅ Custom storage untuk handle hydration flag
+      storage: {
+        getItem: async (name) => {
+          const str = localStorage.getItem(name);
+          return str ? JSON.parse(str) : null;
+        },
+        setItem: async (name, value) => {
+          localStorage.setItem(name, JSON.stringify(value));
+        },
+        removeItem: async (name) => {
+          localStorage.removeItem(name);
+        },
       },
     },
   ),

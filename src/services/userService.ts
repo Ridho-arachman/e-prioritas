@@ -1,8 +1,7 @@
-import { Prisma } from "@/app/generated/prisma";
 import { config } from "@/config";
 import { auth } from "@/lib/auth";
+import { deleteFromCloudinary } from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
-import { headers } from "next/headers";
 
 interface GetAllPerangkatParams {
   q?: string;
@@ -10,7 +9,6 @@ interface GetAllPerangkatParams {
   page?: number; // halaman saat ini
   perPage?: number; // jumlah item per halaman
 }
-type updateDataSchema = Prisma.UserUpdateInput;
 
 export const userService = {
   create: async (data: {
@@ -18,7 +16,7 @@ export const userService = {
     name: string;
     password: string;
     jabatan?: string;
-    phoneNumber: string;
+    image?: string;
     rememberMe?: boolean;
     role?: string;
     isActive?: boolean;
@@ -30,7 +28,7 @@ export const userService = {
         password: data.password,
         role: data.role || "PERANGKAT_DESA",
         jabatan: data.jabatan,
-        phoneNumber: data.phoneNumber,
+        image: data.image,
         isActive: data.isActive,
         callbackURL: `${config.appUrl}/verify-success`,
       },
@@ -42,9 +40,26 @@ export const userService = {
     isActive,
     page = 1,
     perPage = 10,
-  }: GetAllPerangkatParams) => {
+    sortBy = "name", // default sort by name
+    sortOrder = "asc", // default ascending order
+  }: GetAllPerangkatParams & {
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }) => {
     const skip = (page - 1) * perPage;
     const take = perPage;
+
+    // Validasi dan mapping field sorting
+    const validSortFields = [
+      "id",
+      "name",
+      "email",
+      "jabatan",
+      "createdAt",
+      "updatedAt",
+    ];
+    const sortField = validSortFields.includes(sortBy) ? sortBy : "name";
+    const order = sortOrder === "desc" ? "desc" : "asc";
 
     // Hitung total data (optional, buat total halaman)
     const total = await prisma.user.count({
@@ -88,7 +103,7 @@ export const userService = {
         ],
       },
       omit: { role: true },
-      orderBy: { name: "asc" },
+      orderBy: { [sortField]: order },
       skip,
       take,
     });
@@ -100,6 +115,8 @@ export const userService = {
         page,
         perPage,
         totalPages: Math.ceil(total / perPage),
+        sortBy: sortField,
+        sortOrder: order,
       },
     };
   },
@@ -118,26 +135,41 @@ export const userService = {
   },
 
   update: async (data: any, userId: string) => {
-    const { email, ...safeData } = data;
+    const { email, image, ...safeData } = data;
 
-    const user = await prisma.user.findUnique({
+    // ✅ Ambil user lama untuk cek image lama
+    const oldUser = await prisma.user.findUnique({
       where: { id: userId },
-      select: { email: true },
+      select: { email: true, image: true },
     });
 
-    if (data.email && data.email !== user?.email) {
-      return prisma.user.update({
-        where: { id: userId },
-        data: {
-          ...data,
-          emailVerified: false,
-        },
-      });
+    // ✅ Jika ada perubahan email, reset emailVerified
+    if (email && email !== oldUser?.email) {
+      safeData.emailVerified = false;
+    }
+
+    // ✅ Handle image deletion
+    if (image === null && oldUser?.image) {
+      // Hapus image lama dari Cloudinary
+      try {
+        // Extract public_id dari URL Cloudinary
+        const publicIdMatch = oldUser.image.match(/\/([^\/]+)\.[^\/]+$/);
+        if (publicIdMatch) {
+          const publicId = `perangkat-profiles/${publicIdMatch[1]}`;
+          await deleteFromCloudinary(publicId);
+        }
+      } catch (error) {
+        console.error("Failed to delete old image from Cloudinary:", error);
+        // Lanjutkan meskipun gagal delete, jangan block update
+      }
     }
 
     return prisma.user.update({
       where: { id: userId },
-      data: safeData,
+      data: {
+        ...safeData,
+        image: image, // Bisa null (hapus) atau string (update)
+      },
     });
   },
 

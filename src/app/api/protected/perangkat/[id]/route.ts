@@ -97,29 +97,84 @@ const PATCH = async (
   }
 
   try {
-    // NGGAMBIL REQ BODY & PARAM
     const { id } = await ctx.params;
-    const body = await req.json();
 
-    // VALIDASI REQ BODY & PARAM
-    const parsed = updateUserPerangkatSchema.safeParse(body);
+    // ✅ Parse FormData (bukan JSON)
+    const formData = await req.formData();
+
+    // ✅ Ambil data dari FormData
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const role = formData.get("role") as "PERANGKAT_DESA" | "LURAH";
+    const jabatan = formData.get("jabatan") as string;
+    const isActive = formData.get("isActive") === "true";
+    const imageFile = formData.get("image") as File | null;
+    const removeImage = formData.get("removeImage") === "true";
+
+    // ✅ Validasi ID
     const parsedId = detailUserPerangkatSchema.safeParse({ id });
     if (!parsedId.success) return handleZodValidation(parsedId);
-    if (!parsed.success) return handleZodValidation(parsed);
-
     const userId = parsedId.data.id;
-    const data = parsed.data;
 
-    const kategori = await userService.update(data, userId);
+    // ✅ Upload gambar ke Cloudinary jika ada
+    let imageUrl: string | undefined;
+    let shouldRemoveImage = false;
+
+    if (removeImage) {
+      shouldRemoveImage = true;
+    } else if (imageFile) {
+      try {
+        // Baca file sebagai buffer
+        const bytes = await imageFile.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+
+        // Upload ke Cloudinary
+        const uploadResult = await uploadToCloudinary(
+          buffer,
+          "perangkat-profiles",
+          `perangkat_${userId}_${Date.now()}`,
+        );
+
+        imageUrl = uploadResult.url;
+      } catch (uploadError) {
+        console.error("Cloudinary upload error:", uploadError);
+        return handleResponse({
+          success: false,
+          message: "Gagal mengupload gambar",
+          status: 500,
+        });
+      }
+    }
+
+    // ✅ Prepare data untuk update
+    const updateData: any = {
+      name,
+      email,
+      role,
+      jabatan,
+      isActive,
+    };
+
+    // ✅ Tambahkan image jika ada perubahan
+    if (shouldRemoveImage) {
+      updateData.image = null;
+    } else if (imageUrl) {
+      updateData.image = imageUrl;
+    }
+
+    // ✅ Update user
+    const user = await userService.update(updateData, userId);
 
     return handleResponse({
       success: true,
       message: "Data perangkat desa berhasil diupdate",
-      data: kategori,
+      data: user,
       status: 200,
     });
   } catch (err) {
-    //PRISMA ERROR
+    console.error("Update perangkat error:", err);
+
+    // PRISMA ERROR
     const prismaResponse = handlePrismaError(err);
     if (prismaResponse) {
       return handleResponse({
@@ -129,7 +184,7 @@ const PATCH = async (
       });
     }
 
-    //SERVER ERROR
+    // SERVER ERROR
     return handleResponse({
       success: false,
       message: "Terjadi error pada server",
