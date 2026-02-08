@@ -148,6 +148,8 @@ export default function PerangkatFormAdd() {
 
     if (role === "LURAH") {
       form.setValue("jabatan", "Lurah");
+    } else {
+      form.setValue("jabatan", "");
     }
   }, [role, form, isMounted]);
 
@@ -251,9 +253,8 @@ export default function PerangkatFormAdd() {
 
       router.back();
     } catch (err) {
-      console.log(err);
-
       const error = err as AxiosError<ApiError>;
+      console.log(err);
       notifier.error(
         "Gagal",
         error?.response?.data?.message || "Terjadi kesalahan pada server",
@@ -615,7 +616,7 @@ export default function PerangkatFormAdd() {
                   {...field}
                   type={showPassword ? "text" : "password"}
                   readOnly={isLoading}
-                  placeholder="Masukkan password baru"
+                  placeholder="Masukkan password"
                 />
                 <Button
                   type="button"

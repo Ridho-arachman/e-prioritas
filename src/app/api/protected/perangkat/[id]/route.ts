@@ -11,7 +11,9 @@ import {
 import { Role } from "@/app/generated/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { api } from "@/lib/api";
+import { deleteFromCloudinary, uploadToCloudinary } from "@/lib/cloudinary";
+import prisma from "@/lib/prisma";
+import { safeDeleteCloudinaryImage } from "@/lib/cloudinaryCrudHelper";
 
 const GET = async (
   _req: NextRequest,
@@ -217,28 +219,39 @@ const DELETE = async (
   }
 
   try {
-    // NGGAMBIL PARAM
     const { id } = await ctx.params;
 
-    // VALIDASI REQ PARAM
     const parsedId = deleteUserPerangkatSchema.safeParse({ id });
     if (!parsedId.success) return handleZodValidation(parsedId);
-
-    // JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
     const userId = parsedId.data.id;
 
-    // HAPUS DATA perangkat desa KE DATABASE
-    const kategori = await userService.deleteById(userId);
+    const existingUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, image: true, name: true },
+    });
 
-    // JIKA DATA perangkat desa TIDAK DITEMUKAN
+    if (!existingUser) {
+      return handleResponse({
+        success: false,
+        message: "Data perangkat desa tidak ditemukan",
+        status: 404,
+      });
+    }
+
+    if (existingUser.image && existingUser.image.includes("cloudinary.com")) {
+      await safeDeleteCloudinaryImage(existingUser.image);
+    }
+
+    const deletedUser = await userService.deleteById(userId);
+
     return handleResponse({
       success: true,
-      message: "Data perangkat desa berhasil dihapus",
-      data: kategori,
+      message: `Data perangkat desa "${existingUser.name}" berhasil dihapus`,
+      data: deletedUser,
       status: 200,
     });
   } catch (err) {
-    //PRISMA ERROR
+    // PRISMA ERROR
     const prismaResponse = handlePrismaError(err);
     if (prismaResponse) {
       return handleResponse({
@@ -248,10 +261,11 @@ const DELETE = async (
       });
     }
 
-    //SERVER ERROR
+    // SERVER ERROR
+    console.error("DELETE perangkat error:", err);
     return handleResponse({
       success: false,
-      message: "Terjadi error pada server",
+      message: "Terjadi error pada server saat menghapus data",
       status: 500,
     });
   }

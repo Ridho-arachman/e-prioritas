@@ -11,7 +11,7 @@ import { Role } from "@/app/generated/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { handleBetterAuthError } from "@/lib/handleBetterAuthError";
-import { uploadToCloudinary } from "@/lib/cloudinary";
+import { deleteFromCloudinary, uploadToCloudinary } from "@/lib/cloudinary";
 
 const GET = async (req: NextRequest) => {
   const allowedRoles: Role[] = ["ADMIN"];
@@ -37,6 +37,8 @@ const GET = async (req: NextRequest) => {
     const searchParams = req.nextUrl.searchParams;
     const q = searchParams.get("q") || "";
     const isActive = searchParams.get("isActive") || undefined;
+    const sortBy = searchParams.get("sortBy") || undefined;
+    const sortOrder = searchParams.get("sortOrder");
     const page = parseInt(searchParams.get("page") || "1");
     const perPage = parseInt(searchParams.get("perPage") || "10");
 
@@ -49,6 +51,8 @@ const GET = async (req: NextRequest) => {
     const { data, meta } = await userService.getAllPerangkat({
       q: queryUser,
       isActive: isActiveParam,
+      sortBy,
+      sortOrder,
       page,
       perPage,
     });
@@ -111,11 +115,12 @@ const POST = async (req: NextRequest) => {
     });
   }
 
+  let imageUrl: string | undefined;
+  let cloudinaryPublicId: string | undefined;
+
   try {
-    // ✅ Parse FormData (bukan JSON)
     const formData = await req.formData();
 
-    // ✅ Ambil data dari FormData
     const name = formData.get("name") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
@@ -125,7 +130,6 @@ const POST = async (req: NextRequest) => {
     const isActive = formData.get("isActive") === "true";
     const imageFile = formData.get("image") as File | null;
 
-    // ✅ Validasi dengan Zod
     const parsed = createUserPerangkatSchema.safeParse({
       name,
       email,
@@ -138,9 +142,6 @@ const POST = async (req: NextRequest) => {
     });
 
     if (!parsed.success) return handleZodValidation(parsed);
-
-    // ✅ Upload gambar ke Cloudinary jika ada
-    let imageUrl: string | undefined;
 
     if (imageFile) {
       try {
@@ -156,6 +157,9 @@ const POST = async (req: NextRequest) => {
         );
 
         imageUrl = uploadResult.url;
+        cloudinaryPublicId = uploadResult.public_id;
+
+        console.log(`Image uploaded successfully: ${cloudinaryPublicId}`);
       } catch (uploadError) {
         console.error("Cloudinary upload error:", uploadError);
         return handleResponse({
@@ -166,7 +170,6 @@ const POST = async (req: NextRequest) => {
       }
     }
 
-    // ✅ Prepare data untuk create user
     const userData = {
       name,
       email,
@@ -174,10 +177,9 @@ const POST = async (req: NextRequest) => {
       isActive,
       role,
       jabatan: jabatan || undefined,
-      image: imageUrl, // URL dari Cloudinary
+      image: imageUrl,
     };
 
-    // ✅ Create user
     const user = await userService.create(userData);
 
     return handleResponse({
@@ -187,12 +189,16 @@ const POST = async (req: NextRequest) => {
       status: 201,
     });
   } catch (error) {
-    const prismaResponse = handlePrismaError(error);
-    if (prismaResponse) {
+    if (cloudinaryPublicId) {
+      await deleteFromCloudinary(cloudinaryPublicId);
+    }
+
+    const betterAuthErr = handleBetterAuthError(error);
+    if (betterAuthErr) {
       return handleResponse({
         success: false,
-        message: prismaResponse.message,
-        status: prismaResponse.status,
+        message: betterAuthErr.message,
+        status: betterAuthErr.status,
       });
     }
 
