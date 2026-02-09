@@ -1,8 +1,13 @@
-import { StatusKategori } from "@/app/generated/prisma";
 import z from "zod";
 
 export const kategoriSchema = z.object({
-  namaKategori: z
+  code: z
+    .string("Code harus teks")
+    .trim()
+    .min(1, "Code tidak boleh kosong")
+    .max(50, "Code maksimal 50 karakter")
+    .uppercase("Code harus huruf kapital"),
+  nama: z
     .string("Nama kategori harus teks")
     .trim()
     .min(2, "Nama kategori tidak boleh kosong")
@@ -10,8 +15,8 @@ export const kategoriSchema = z.object({
   deskripsi: z
     .string("Deskripsi harus berupa teks")
     .trim()
-    .min(1, "Deskripsi tidak boleh kosong"),
-  status: z.nativeEnum(StatusKategori, { message: "Status tidak valid" }),
+    .min(1, "Deskripsi tidak boleh kosong")
+    .max(500, "Deskripsi maksimal 500 karakter"),
 });
 
 export const kategoriByIdSchema = z.object({
@@ -22,7 +27,7 @@ export const kategoriByIdSchema = z.object({
 });
 
 export const kategoriQuerySchema = z.object({
-  namaKategori: z
+  nama: z
     .string("Nama kategori harus teks")
     .max(255, "Nama kategori maksimal 255 karakter")
     .optional(),

@@ -13,10 +13,9 @@ import {
   ArrowUp,
   ArrowDown,
   SlidersHorizontal,
-  Image as ImageIcon,
 } from "lucide-react";
 import { useDebounce } from "use-debounce";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { notifier } from "../../../lib/ToastNotifier";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -39,7 +38,6 @@ import { useQueryState } from "nuqs";
 import { buildQuery } from "@/utils/query";
 import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
-import { ApiError } from "@google/genai";
 import { Spinner } from "@/components/ui/spinner";
 import {
   AlertDialog,
@@ -50,7 +48,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
   Dialog,
@@ -58,7 +55,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import {
@@ -93,6 +89,7 @@ export default function ListTablePerangkat() {
   const router = useRouter();
   const [selectedDeleteId, setSelectedDeleteId] = useState<string | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   // Query states
   const [q, setQ] = useQueryState("q", { defaultValue: "" });
@@ -140,6 +137,10 @@ export default function ListTablePerangkat() {
   const hasSignificantFilter =
     (debouncedQ?.trim() !== "" && debouncedQ !== undefined) || active !== "";
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const handleDelete = async () => {
     if (!selectedDeleteId) return;
     try {
@@ -149,7 +150,7 @@ export default function ListTablePerangkat() {
       notifier.success("Berhasil", res?.message);
       mutate();
     } catch (error) {
-      const err = error as AxiosError<ApiError>;
+      const err = error as AxiosError<{ message: string }>;
       notifier.error("Gagal", err?.response?.data?.message);
     } finally {
       setSelectedDeleteId(null);
@@ -164,7 +165,7 @@ export default function ListTablePerangkat() {
         res?.message || "Verifikasi email berhasil dikirim",
       );
     } catch (error) {
-      const err = error as AxiosError<ApiError>;
+      const err = error as AxiosError<{ message: string }>;
       notifier.error("Gagal", err?.response?.data?.message);
     }
   };
@@ -190,12 +191,100 @@ export default function ListTablePerangkat() {
   const hasActiveFilters =
     active !== "" || sortBy !== "name" || sortOrder !== "asc";
 
+  // Tampilkan loading atau versi sederhana saat belum mounted (SSR)
+  if (!isMounted) {
+    return (
+      <div className="p-4 md:p-6">
+        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-4">
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="animate-pulse bg-muted h-10 w-40 rounded"></div>
+            <div className="animate-pulse bg-muted h-10 w-32 rounded"></div>
+          </div>
+          <div className="flex gap-2">
+            <div className="animate-pulse bg-muted h-10 w-40 rounded"></div>
+            <div className="animate-pulse bg-muted h-10 w-10 rounded"></div>
+          </div>
+        </div>
+
+        {/* Skeleton yang valid secara HTML */}
+        <div className="hidden md:block">
+          <div className="border rounded-lg overflow-hidden">
+            <div className="grid grid-cols-9 gap-4 p-4 border-b bg-muted/50">
+              {[...Array(9)].map((_, i) => (
+                <div
+                  key={i}
+                  className="animate-pulse bg-muted h-6 rounded"
+                ></div>
+              ))}
+            </div>
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="grid grid-cols-9 gap-4 p-4 border-b">
+                {[...Array(9)].map((_, j) => (
+                  <div
+                    key={j}
+                    className="animate-pulse bg-muted h-6 rounded"
+                  ></div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Mobile Skeleton */}
+        <div className="md:hidden space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <div
+              key={i}
+              className="animate-pulse bg-muted rounded-lg h-24"
+            ></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        open={!!selectedDeleteId}
+        onOpenChange={(open) => {
+          if (!open) setSelectedDeleteId(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus perangkat desa?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Data akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="cursor-pointer">
+              Batal
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={deleteLoading}
+              className="cursor-pointer"
+            >
+              {deleteLoading ? (
+                <>
+                  <Spinner className="mr-2 h-4 w-4" /> Menghapus...
+                </>
+              ) : (
+                "Hapus"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <CardHeader className="space-y-4">
         <div className="mb-4 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
           {/* Left Section - Actions */}
-          <div className="flex flex-col lg:flex-row gap-4 suppressHydrationWarning">
+          <div className="flex flex-col lg:flex-row gap-4">
             <Link href="/admin/kelola-perangkat/add">
               <Button className="cursor-pointer">
                 <Plus className="mr-2 h-4 w-4" /> Tambah Perangkat
@@ -204,18 +293,20 @@ export default function ListTablePerangkat() {
 
             {/* Filter Button */}
             <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" className="cursor-pointer">
-                  <Filter className="mr-2 h-4 w-4" />
-                  Filter & Sort
-                  {hasActiveFilters && (
-                    <Badge variant="secondary" className="ml-2">
-                      {active !== "" ? 1 : 0} +{" "}
-                      {sortBy !== "name" || sortOrder !== "asc" ? 1 : 0}
-                    </Badge>
-                  )}
-                </Button>
-              </DialogTrigger>
+              <Button
+                variant="outline"
+                className="cursor-pointer"
+                onClick={() => setIsFilterOpen(true)}
+              >
+                <Filter className="mr-2 h-4 w-4" />
+                Filter & Sort
+                {hasActiveFilters && (
+                  <Badge variant="secondary" className="ml-2">
+                    {active !== "" ? 1 : 0} +{" "}
+                    {sortBy !== "name" || sortOrder !== "asc" ? 1 : 0}
+                  </Badge>
+                )}
+              </Button>
 
               <DialogContent className="sm:max-w-106.25">
                 <DialogHeader>
@@ -264,7 +355,7 @@ export default function ListTablePerangkat() {
                   {/* Sorting Section */}
                   <div className="grid gap-2">
                     <Label>Urutkan Berdasarkan</Label>
-                    <Select value={sortBy} onValueChange={handleSortChange}>
+                    <Select value={sortBy} onValueChange={setSortBy}>
                       <SelectTrigger>
                         <SelectValue placeholder="Pilih kolom" />
                       </SelectTrigger>
@@ -326,13 +417,15 @@ export default function ListTablePerangkat() {
               placeholder="Cari Nama / Jabatan / Email..."
               className="cursor-pointer min-w-62.5"
             />
-            <Button
-              variant="outline"
-              onClick={() => setQ("")}
-              className="cursor-pointer"
-            >
-              <XIcon className="h-4 w-4" />
-            </Button>
+            {q && (
+              <Button
+                variant="outline"
+                onClick={() => setQ("")}
+                className="cursor-pointer"
+              >
+                <XIcon className="h-4 w-4" />
+              </Button>
+            )}
           </div>
         </div>
 
@@ -370,228 +463,211 @@ export default function ListTablePerangkat() {
       </CardHeader>
 
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-center w-12">No</TableHead>
-              <TableHead className="text-center w-16">Foto</TableHead>
-              <TableHead
-                className="text-center cursor-pointer hover:bg-muted/50"
-                onClick={() => handleSortChange("name")}
-              >
-                <div className="flex items-center justify-center gap-1">
-                  Nama
-                  {sortBy === "name" &&
-                    (sortOrder === "asc" ? (
-                      <ArrowUp className="h-3 w-3" />
-                    ) : (
-                      <ArrowDown className="h-3 w-3" />
-                    ))}
-                </div>
-              </TableHead>
-              <TableHead
-                className="text-center cursor-pointer hover:bg-muted/50"
-                onClick={() => handleSortChange("email")}
-              >
-                <div className="flex items-center justify-center gap-1">
-                  Email
-                  {sortBy === "email" &&
-                    (sortOrder === "asc" ? (
-                      <ArrowUp className="h-3 w-3" />
-                    ) : (
-                      <ArrowDown className="h-3 w-3" />
-                    ))}
-                </div>
-              </TableHead>
-              <TableHead
-                className="text-center cursor-pointer hover:bg-muted/50"
-                onClick={() => handleSortChange("jabatan")}
-              >
-                <div className="flex items-center justify-center gap-1">
-                  Jabatan
-                  {sortBy === "jabatan" &&
-                    (sortOrder === "asc" ? (
-                      <ArrowUp className="h-3 w-3" />
-                    ) : (
-                      <ArrowDown className="h-3 w-3" />
-                    ))}
-                </div>
-              </TableHead>
-              <TableHead className="text-center">Aktif</TableHead>
-              <TableHead className="text-center">Email Verified</TableHead>
-              <TableHead
-                className="text-center cursor-pointer hover:bg-muted/50"
-                onClick={() => handleSortChange("createdAt")}
-              >
-                <div className="flex items-center justify-center gap-1">
-                  Tanggal Dibuat
-                  {sortBy === "createdAt" &&
-                    (sortOrder === "asc" ? (
-                      <ArrowUp className="h-3 w-3" />
-                    ) : (
-                      <ArrowDown className="h-3 w-3" />
-                    ))}
-                </div>
-              </TableHead>
-              <TableHead className="text-center w-40">Aksi</TableHead>
-            </TableRow>
-          </TableHeader>
-
-          <TableBody>
-            {isLoading && !data && <TableSkeleton rows={5} />}
-            {error && <DataError message={error?.message} />}
-
-            {data?.length === 0 && !hasSignificantFilter && (
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={9}>
-                  <DataKosong />
-                </TableCell>
-              </TableRow>
-            )}
-
-            {data?.length === 0 && hasSignificantFilter && (
-              <TableRow>
-                <TableCell colSpan={9}>
-                  <DataTidakDitemukan />
-                </TableCell>
-              </TableRow>
-            )}
-
-            {data?.length > 0 &&
-              data?.map((item: any, index: number) => (
-                <TableRow
-                  key={item.id}
-                  className="cursor-pointer hover:bg-muted/50 transition-colors"
-                  onClick={() =>
-                    router.push(`/admin/kelola-perangkat/${item.id}`)
-                  }
+                <TableHead className="text-center w-12">No</TableHead>
+                <TableHead className="text-center w-16">Foto</TableHead>
+                <TableHead
+                  className="text-center cursor-pointer hover:bg-muted/50"
+                  onClick={() => handleSortChange("name")}
                 >
-                  <TableCell className={cellCenter}>
-                    {(pageNumber - 1) * perPageNumber + index + 1}
-                  </TableCell>
-
-                  {/* Kolom Foto dengan Avatar Fallback */}
-                  <TableCell className="text-center align-middle">
-                    <div className="flex justify-center">
-                      <Avatar className="h-10 w-10 border-2 border-muted">
-                        <AvatarImage
-                          src={item.image || undefined}
-                          alt={item.name}
-                          className={cn(
-                            "object-cover",
-                            !item.image && "hidden",
-                          )}
-                        />
-                        <AvatarFallback className="bg-linear-to-br from-primary to-primary/70 text-white font-medium">
-                          {getInitials(item.name)}
-                        </AvatarFallback>
-                      </Avatar>
-                    </div>
-                  </TableCell>
-
-                  <TableCell className={cellCenter}>{item.name}</TableCell>
-                  <TableCell className={cellCenter}>{item.email}</TableCell>
-                  <TableCell className={cellCenter}>{item.jabatan}</TableCell>
-                  <TableCell className="align-middle">
-                    <div className="flex items-center justify-center">
-                      {item.isActive ? (
-                        <Badge variant="default">Aktif</Badge>
+                  <div className="flex items-center justify-center gap-1">
+                    Nama
+                    {sortBy === "name" &&
+                      (sortOrder === "asc" ? (
+                        <ArrowUp className="h-3 w-3" />
                       ) : (
-                        <Badge variant="destructive">Non Aktif</Badge>
-                      )}
-                    </div>
-                  </TableCell>
-
-                  <TableCell className="align-middle">
-                    <div className="flex items-center justify-center">
-                      {item.emailVerified ? (
-                        <Badge variant="default">Terverifikasi</Badge>
+                        <ArrowDown className="h-3 w-3" />
+                      ))}
+                  </div>
+                </TableHead>
+                <TableHead
+                  className="text-center cursor-pointer hover:bg-muted/50"
+                  onClick={() => handleSortChange("email")}
+                >
+                  <div className="flex items-center justify-center gap-1">
+                    Email
+                    {sortBy === "email" &&
+                      (sortOrder === "asc" ? (
+                        <ArrowUp className="h-3 w-3" />
                       ) : (
-                        <Badge variant="outline">Belum</Badge>
-                      )}
-                    </div>
-                  </TableCell>
+                        <ArrowDown className="h-3 w-3" />
+                      ))}
+                  </div>
+                </TableHead>
+                <TableHead
+                  className="text-center cursor-pointer hover:bg-muted/50"
+                  onClick={() => handleSortChange("jabatan")}
+                >
+                  <div className="flex items-center justify-center gap-1">
+                    Jabatan
+                    {sortBy === "jabatan" &&
+                      (sortOrder === "asc" ? (
+                        <ArrowUp className="h-3 w-3" />
+                      ) : (
+                        <ArrowDown className="h-3 w-3" />
+                      ))}
+                  </div>
+                </TableHead>
+                <TableHead className="text-center">Aktif</TableHead>
+                <TableHead className="text-center">Email Verified</TableHead>
+                <TableHead
+                  className="text-center cursor-pointer hover:bg-muted/50"
+                  onClick={() => handleSortChange("createdAt")}
+                >
+                  <div className="flex items-center justify-center gap-1">
+                    Tanggal Dibuat
+                    {sortBy === "createdAt" &&
+                      (sortOrder === "asc" ? (
+                        <ArrowUp className="h-3 w-3" />
+                      ) : (
+                        <ArrowDown className="h-3 w-3" />
+                      ))}
+                  </div>
+                </TableHead>
+                <TableHead className="text-center w-40">Aksi</TableHead>
+              </TableRow>
+            </TableHeader>
 
-                  <TableCell className={cellCenter}>
-                    {new Date(item.createdAt).toLocaleDateString("id-ID", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </TableCell>
+            <TableBody>
+              {isLoading && !data && <TableSkeleton rows={5} />}
 
-                  {/* 🔥 AKSI — EVENT DIPUTUS DI SINI */}
-                  <TableCell onClick={(e) => e.stopPropagation()}>
-                    <div className="flex justify-center gap-2">
-                      <Button
-                        size="sm"
-                        onClick={() =>
-                          router.push(`/admin/kelola-perangkat/${item.id}/edit`)
-                        }
-                        className="cursor-pointer"
-                      >
-                        Edit
-                      </Button>
-
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => setSelectedDeleteId(item.id)}
-                            className="cursor-pointer"
-                          >
-                            <Trash className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Hapus perangkat desa?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Data <b>{item.name}</b> akan dihapus permanen.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-
-                          <AlertDialogFooter>
-                            <AlertDialogCancel className="cursor-pointer">
-                              Batal
-                            </AlertDialogCancel>
-                            <AlertDialogAction
-                              variant="destructive"
-                              onClick={handleDelete}
-                              disabled={deleteLoading}
-                              className="cursor-pointer"
-                            >
-                              {deleteLoading ? (
-                                <>
-                                  <Spinner /> Menghapus...
-                                </>
-                              ) : (
-                                "Hapus"
-                              )}
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={item.emailVerified || verifyLoading}
-                        onClick={() => handleVerify(item.email)}
-                        className="cursor-pointer"
-                      >
-                        <Send className="mr-1 h-4 w-4" /> Verify
-                      </Button>
-                    </div>
+              {error && (
+                <TableRow>
+                  <TableCell colSpan={9} className="text-center">
+                    <DataError message={error?.message} />
                   </TableCell>
                 </TableRow>
-              ))}
-          </TableBody>
-        </Table>
+              )}
+
+              {data?.length === 0 && !hasSignificantFilter && (
+                <TableRow>
+                  <TableCell colSpan={9} className="text-center">
+                    <DataKosong />
+                  </TableCell>
+                </TableRow>
+              )}
+
+              {data?.length === 0 && hasSignificantFilter && (
+                <TableRow>
+                  <TableCell colSpan={9} className="text-center">
+                    <DataTidakDitemukan />
+                  </TableCell>
+                </TableRow>
+              )}
+
+              {data?.length > 0 &&
+                data?.map((item: any, index: number) => (
+                  <TableRow
+                    key={item.id}
+                    className="cursor-pointer hover:bg-muted/50 transition-colors"
+                    onClick={() =>
+                      router.push(`/admin/kelola-perangkat/${item.id}`)
+                    }
+                  >
+                    <TableCell className={cellCenter}>
+                      {(pageNumber - 1) * perPageNumber + index + 1}
+                    </TableCell>
+
+                    {/* Kolom Foto dengan Avatar Fallback */}
+                    <TableCell className="text-center align-middle">
+                      <div className="flex justify-center">
+                        <Avatar className="h-10 w-10 border-2 border-muted">
+                          <AvatarImage
+                            src={item.image || undefined}
+                            alt={item.name}
+                            className={cn(
+                              "object-cover",
+                              !item.image && "hidden",
+                            )}
+                          />
+                          <AvatarFallback className="bg-linear-to-br from-primary to-primary/70 text-white font-medium">
+                            {getInitials(item.name)}
+                          </AvatarFallback>
+                        </Avatar>
+                      </div>
+                    </TableCell>
+
+                    <TableCell className={cellCenter}>{item.name}</TableCell>
+                    <TableCell className={cellCenter}>{item.email}</TableCell>
+                    <TableCell className={cellCenter}>{item.jabatan}</TableCell>
+                    <TableCell className="align-middle">
+                      <div className="flex items-center justify-center">
+                        {item.isActive ? (
+                          <Badge variant="default">Aktif</Badge>
+                        ) : (
+                          <Badge variant="destructive">Non Aktif</Badge>
+                        )}
+                      </div>
+                    </TableCell>
+
+                    <TableCell className="align-middle">
+                      <div className="flex items-center justify-center">
+                        {item.emailVerified ? (
+                          <Badge variant="default">Terverifikasi</Badge>
+                        ) : (
+                          <Badge variant="outline">Belum</Badge>
+                        )}
+                      </div>
+                    </TableCell>
+
+                    <TableCell className={cellCenter}>
+                      {new Date(item.createdAt).toLocaleDateString("id-ID", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </TableCell>
+
+                    {/* 🔥 AKSI — EVENT DIPUTUS DI SINI */}
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <div className="flex justify-center gap-2">
+                        <Button
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(
+                              `/admin/kelola-perangkat/${item.id}/edit`,
+                            );
+                          }}
+                          className="cursor-pointer"
+                        >
+                          Edit
+                        </Button>
+
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedDeleteId(item.id);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={item.emailVerified || verifyLoading}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleVerify(item.email);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <Send className="mr-1 h-4 w-4" /> Verify
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </div>
 
         <div className="flex justify-between items-center mt-4">
           <div className="text-sm text-muted-foreground">

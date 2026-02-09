@@ -38,7 +38,7 @@ const GET = async (req: NextRequest) => {
     const q = searchParams.get("q") || "";
     const isActive = searchParams.get("isActive") || undefined;
     const sortBy = searchParams.get("sortBy") || undefined;
-    const sortOrder = searchParams.get("sortOrder");
+    const sortOrder = searchParams.get("sortOrder") as "asc" | "desc";
     const page = parseInt(searchParams.get("page") || "1");
     const perPage = parseInt(searchParams.get("perPage") || "10");
 

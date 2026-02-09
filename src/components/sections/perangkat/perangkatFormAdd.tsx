@@ -118,7 +118,6 @@ export default function PerangkatFormAdd() {
 
   const role = useWatch({ name: "role", control: form.control });
 
-  // Auto-save persist - hanya di client side
   useFormPersist(
     form.watch,
     (safeData) => {
@@ -129,7 +128,6 @@ export default function PerangkatFormAdd() {
         role: safeData?.role || "PERANGKAT_DESA",
         jabatan: safeData?.jabatan || "",
         isActive: safeData?.isActive ?? true,
-        // ✅ Simpan image preview ke draft (base64)
         imagePreview: imagePreview || undefined,
         imageFileName: imageFile?.name,
         imageSize: imageFile?.size,

@@ -1,44 +1,36 @@
 import { Prisma } from "@/app/generated/prisma";
 import prisma from "@/lib/prisma";
 
-type createDataSchema = Prisma.KategoriCreateInput;
-type updateDataSchema = Prisma.KategoriUpdateInput;
+type createDataSchema = Prisma.DomainIsuCreateInput;
+type updateDataSchema = Prisma.DomainIsuUpdateInput;
 
 type GetAllKategoriParams = {
-  namaKategori?: string;
+  nama?: string;
   page?: number;
   perPage?: number;
 };
 
 export const kategoriService = {
   create: async (data: createDataSchema) => {
-    return prisma.kategori.create({ data });
+    return prisma.domainIsu.create({ data });
   },
 
-  getAll: async ({
-    namaKategori,
-    page = 1,
-    perPage = 10,
-  }: GetAllKategoriParams) => {
+  getAll: async ({ nama, page = 1, perPage = 10 }: GetAllKategoriParams) => {
     const skip = (page - 1) * perPage;
     const take = perPage;
 
     // Hitung total kategori sesuai filter
-    const total = await prisma.kategori.count({
-      where: namaKategori
-        ? { namaKategori: { contains: namaKategori, mode: "insensitive" } }
-        : {},
+    const total = await prisma.domainIsu.count({
+      where: nama ? { nama: { contains: nama, mode: "insensitive" } } : {},
     });
 
     // Ambil data dengan pagination dan _count masukanWarga
-    const data = await prisma.kategori.findMany({
-      where: namaKategori
-        ? { namaKategori: { contains: namaKategori, mode: "insensitive" } }
-        : {},
-      orderBy: { namaKategori: "asc" },
+    const data = await prisma.domainIsu.findMany({
+      where: nama ? { nama: { contains: nama, mode: "insensitive" } } : {},
+      orderBy: { nama: "asc" },
       skip,
       take,
-      include: { _count: { select: { masukanWarga: true } } },
+      include: { _count: { select: { masukan: true } } },
     });
 
     return {
@@ -53,13 +45,13 @@ export const kategoriService = {
   },
 
   getById: async (kategoriId?: string) => {
-    return prisma.kategori.findUniqueOrThrow({
+    return prisma.domainIsu.findUniqueOrThrow({
       where: { id: kategoriId },
     });
   },
 
   update: async (kategoriId: string, data: updateDataSchema) => {
-    return prisma.kategori.update({
+    return prisma.domainIsu.update({
       where: {
         id: kategoriId,
       },
@@ -68,7 +60,19 @@ export const kategoriService = {
   },
 
   deleteById: async (kategoriId: string) => {
-    return prisma.kategori.delete({
+    // Pertama, cek apakah ada data terkait di MasukanWarga
+    const relatedData = await prisma.masukanWarga.findFirst({
+      where: {
+        domainIsuId: kategoriId,
+      },
+    });
+
+    // Jika ada data terkait, lempar error khusus
+    if (relatedData) {
+      throw new Error("DATA_HAS_RELATIONS");
+    }
+
+    return prisma.domainIsu.delete({
       where: {
         id: kategoriId,
       },

@@ -38,9 +38,9 @@ export function KategoriFormEdit() {
   const form = useForm<z.infer<typeof kategoriSchema>>({
     resolver: zodResolver(kategoriSchema),
     defaultValues: {
-      namaKategori: "",
+      code: "",
+      nama: "",
       deskripsi: "",
-      status: "AKTIF",
     },
   });
 
@@ -50,9 +50,9 @@ export function KategoriFormEdit() {
   useEffect(() => {
     if (data) {
       form.reset({
-        namaKategori: data?.namaKategori,
+        nama: data?.nama,
         deskripsi: data?.deskripsi,
-        status: data?.status,
+        code: data?.code,
       });
     }
   }, [data, form]);
@@ -106,7 +106,26 @@ export function KategoriFormEdit() {
       <div className="space-y-6">
         {/* Nama Kategori */}
         <Controller
-          name="namaKategori"
+          name="code"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field>
+              <Label htmlFor="code">Code Kategori</Label>
+              <Input
+                {...field}
+                id="code"
+                placeholder="Contoh: Infrastruktur, Kesehatan..."
+                disabled={loading}
+                aria-invalid={fieldState.invalid}
+              />
+              {fieldState.invalid && (
+                <FieldError>{fieldState.error?.message}</FieldError>
+              )}
+            </Field>
+          )}
+        />
+        <Controller
+          name="nama"
           control={form.control}
           render={({ field, fieldState }) => (
             <Field>
@@ -140,35 +159,6 @@ export function KategoriFormEdit() {
                 disabled={loading}
                 aria-invalid={fieldState.invalid}
               />
-              {fieldState.invalid && (
-                <FieldError>{fieldState.error?.message}</FieldError>
-              )}
-            </Field>
-          )}
-        />
-
-        {/* Status */}
-        <Controller
-          name="status"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field>
-              <Label htmlFor="status">Status</Label>
-              <Select
-                onValueChange={field.onChange}
-                value={field.value}
-                defaultValue={field.value}
-                disabled={loading}
-                key={field.value}
-              >
-                <SelectTrigger className="w-60">
-                  <SelectValue placeholder="Pilih status kategori" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="AKTIF">Aktif</SelectItem>
-                  <SelectItem value="NON_AKTIF">Nonaktif</SelectItem>
-                </SelectContent>
-              </Select>
               {fieldState.invalid && (
                 <FieldError>{fieldState.error?.message}</FieldError>
               )}

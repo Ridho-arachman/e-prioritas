@@ -1,5 +1,5 @@
 import { handleResponse } from "@/lib/handleResponse";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { handlePrismaError } from "@/lib/handlePrismaError";
 import { kategoriService } from "@/services/kategoriService";
 import { handleZodValidation } from "@/lib/handleZodValidation";
@@ -30,18 +30,18 @@ const GET = async (req: NextRequest) => {
 
   try {
     const searchParams = req.nextUrl.searchParams;
-    const namaKategori = searchParams.get("q") || "";
+    const nama = searchParams.get("q") || "";
     const page = parseInt(searchParams.get("page") || "1");
     const perPage = parseInt(searchParams.get("perPage") || "10");
 
-    const parsed = kategoriQuerySchema.safeParse({ namaKategori });
+    const parsed = kategoriQuerySchema.safeParse({ nama });
     console.log(parsed);
     if (!parsed.success) return handleZodValidation(parsed);
 
-    const namaKategoriParam = parsed.data.namaKategori;
+    const namaParam = parsed.data.nama;
 
     const { data, meta } = await kategoriService.getAll({
-      namaKategori: namaKategoriParam,
+      nama: namaParam,
       page,
       perPage,
     });
@@ -49,7 +49,7 @@ const GET = async (req: NextRequest) => {
     if (data.length === 0) {
       return handleResponse({
         success: true,
-        message: namaKategori
+        message: nama
           ? "Data kategori tidak ditemukan"
           : "Data kategori masih kosong",
         status: 200,
@@ -113,13 +113,13 @@ const POST = async (req: NextRequest) => {
     if (!parsed.success) return handleZodValidation(parsed);
 
     //JIKA VALIDASI BERHASIL, AMBIL DATA YANG SUDAH DI PARSE
-    const { namaKategori, deskripsi, status } = parsed.data;
+    const { nama, deskripsi, code } = parsed.data;
 
     //SIMPAN DATA KATEGORI KE DATABASE
     const kategori = await kategoriService.create({
-      namaKategori,
+      nama,
       deskripsi,
-      status,
+      code,
     });
 
     return handleResponse({

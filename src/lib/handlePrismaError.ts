@@ -7,6 +7,8 @@ interface PrismaErrorResponse {
 
 export function handlePrismaError(error: any): PrismaErrorResponse | null {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    console.log(error);
+
     // Sekarang TypeScript tahu `error.code` valid
     switch (error.code) {
       case "P2002":
@@ -60,6 +62,13 @@ export function handlePrismaError(error: any): PrismaErrorResponse | null {
       default:
         return { status: 500, message: `Error Prisma (${error.code})` };
     }
+  }
+  if (error.message === "DATA_HAS_RELATIONS") {
+    return {
+      status: 400,
+      message:
+        "Data ini memiliki relasi dengan data lain. Hapus data terkait terlebih dahulu atau putuskan relasi sebelum menghapus",
+    };
   }
 
   // Kalau bukan error Prisma
