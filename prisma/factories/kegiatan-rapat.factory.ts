@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { faker } from "@faker-js/faker";
+import { fakerID_ID as faker } from "@faker-js/faker";
 
 export async function kegiatanRapatFactory(
   dibuatOlehId: string,

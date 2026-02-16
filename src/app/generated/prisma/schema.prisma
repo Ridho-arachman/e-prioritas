@@ -81,16 +81,19 @@ model User {
 //////////////////////////
 
 model MasukanWarga {
-  id        String @id @default(cuid())
-  judul     String @db.VarChar(255)
-  deskripsi String
-  lokasiRt  Int
-  lokasiRw  Int
+  id           String  @id @default(cuid())
+  namaPengirim String? @db.VarChar(255)
+  nomorHp      String? @db.VarChar(15)
+  judul        String  @db.VarChar(255)
+  deskripsi    String
+  lokasiRt     String  @db.VarChar(3)
+  lokasiRw     String  @db.VarChar(3)
 
   domainIsuId String
   domainIsu   DomainIsu @relation(fields: [domainIsuId], references: [id])
 
-  status StatusMasukan @default(MENUNGGU)
+  status          StatusMasukan @default(MENUNGGU)
+  alasanPenolakan String?       @db.Text
 
   diverifikasiOlehId String?
   diverifikasiOleh   User?   @relation("VerifikatorMasukan", fields: [diverifikasiOlehId], references: [id])

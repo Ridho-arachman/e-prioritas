@@ -69,6 +69,8 @@ export function LoginForm({
       if (res.data.user.role === "ADMIN") router.push("/admin");
     } catch (error) {
       const err = error as AxiosError<ApiError>;
+      console.log(err);
+
       notifier.error(
         "Login Gagal",
         err.response?.data.message ?? "Terjadi kesalahan",

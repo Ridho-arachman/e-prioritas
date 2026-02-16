@@ -1,10 +1,8 @@
 import MasukanListTable from "@/components/sections/masukan/listTableMasukan";
 
-import React from "react";
-
 const page = () => {
   return (
-    <div className="p-6">
+    <div className="min-w-0 overflow-hidden">
       <MasukanListTable />
     </div>
   );

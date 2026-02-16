@@ -4400,30 +4400,21 @@ export namespace Prisma {
 
   export type AggregateMasukanWarga = {
     _count: MasukanWargaCountAggregateOutputType | null
-    _avg: MasukanWargaAvgAggregateOutputType | null
-    _sum: MasukanWargaSumAggregateOutputType | null
     _min: MasukanWargaMinAggregateOutputType | null
     _max: MasukanWargaMaxAggregateOutputType | null
   }
 
-  export type MasukanWargaAvgAggregateOutputType = {
-    lokasiRt: number | null
-    lokasiRw: number | null
-  }
-
-  export type MasukanWargaSumAggregateOutputType = {
-    lokasiRt: number | null
-    lokasiRw: number | null
-  }
-
   export type MasukanWargaMinAggregateOutputType = {
     id: string | null
+    namaPengirim: string | null
+    nomorHp: string | null
     judul: string | null
     deskripsi: string | null
-    lokasiRt: number | null
-    lokasiRw: number | null
+    lokasiRt: string | null
+    lokasiRw: string | null
     domainIsuId: string | null
     status: $Enums.StatusMasukan | null
+    alasanPenolakan: string | null
     diverifikasiOlehId: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -4431,12 +4422,15 @@ export namespace Prisma {
 
   export type MasukanWargaMaxAggregateOutputType = {
     id: string | null
+    namaPengirim: string | null
+    nomorHp: string | null
     judul: string | null
     deskripsi: string | null
-    lokasiRt: number | null
-    lokasiRw: number | null
+    lokasiRt: string | null
+    lokasiRw: string | null
     domainIsuId: string | null
     status: $Enums.StatusMasukan | null
+    alasanPenolakan: string | null
     diverifikasiOlehId: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -4444,12 +4438,15 @@ export namespace Prisma {
 
   export type MasukanWargaCountAggregateOutputType = {
     id: number
+    namaPengirim: number
+    nomorHp: number
     judul: number
     deskripsi: number
     lokasiRt: number
     lokasiRw: number
     domainIsuId: number
     status: number
+    alasanPenolakan: number
     diverifikasiOlehId: number
     createdAt: number
     updatedAt: number
@@ -4457,24 +4454,17 @@ export namespace Prisma {
   }
 
 
-  export type MasukanWargaAvgAggregateInputType = {
-    lokasiRt?: true
-    lokasiRw?: true
-  }
-
-  export type MasukanWargaSumAggregateInputType = {
-    lokasiRt?: true
-    lokasiRw?: true
-  }
-
   export type MasukanWargaMinAggregateInputType = {
     id?: true
+    namaPengirim?: true
+    nomorHp?: true
     judul?: true
     deskripsi?: true
     lokasiRt?: true
     lokasiRw?: true
     domainIsuId?: true
     status?: true
+    alasanPenolakan?: true
     diverifikasiOlehId?: true
     createdAt?: true
     updatedAt?: true
@@ -4482,12 +4472,15 @@ export namespace Prisma {
 
   export type MasukanWargaMaxAggregateInputType = {
     id?: true
+    namaPengirim?: true
+    nomorHp?: true
     judul?: true
     deskripsi?: true
     lokasiRt?: true
     lokasiRw?: true
     domainIsuId?: true
     status?: true
+    alasanPenolakan?: true
     diverifikasiOlehId?: true
     createdAt?: true
     updatedAt?: true
@@ -4495,12 +4488,15 @@ export namespace Prisma {
 
   export type MasukanWargaCountAggregateInputType = {
     id?: true
+    namaPengirim?: true
+    nomorHp?: true
     judul?: true
     deskripsi?: true
     lokasiRt?: true
     lokasiRw?: true
     domainIsuId?: true
     status?: true
+    alasanPenolakan?: true
     diverifikasiOlehId?: true
     createdAt?: true
     updatedAt?: true
@@ -4545,18 +4541,6 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Select which fields to average
-    **/
-    _avg?: MasukanWargaAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: MasukanWargaSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
      * Select which fields to find the minimum value
     **/
     _min?: MasukanWargaMinAggregateInputType
@@ -4587,26 +4571,25 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: MasukanWargaCountAggregateInputType | true
-    _avg?: MasukanWargaAvgAggregateInputType
-    _sum?: MasukanWargaSumAggregateInputType
     _min?: MasukanWargaMinAggregateInputType
     _max?: MasukanWargaMaxAggregateInputType
   }
 
   export type MasukanWargaGroupByOutputType = {
     id: string
+    namaPengirim: string | null
+    nomorHp: string | null
     judul: string
     deskripsi: string
-    lokasiRt: number
-    lokasiRw: number
+    lokasiRt: string
+    lokasiRw: string
     domainIsuId: string
     status: $Enums.StatusMasukan
+    alasanPenolakan: string | null
     diverifikasiOlehId: string | null
     createdAt: Date
     updatedAt: Date
     _count: MasukanWargaCountAggregateOutputType | null
-    _avg: MasukanWargaAvgAggregateOutputType | null
-    _sum: MasukanWargaSumAggregateOutputType | null
     _min: MasukanWargaMinAggregateOutputType | null
     _max: MasukanWargaMaxAggregateOutputType | null
   }
@@ -4627,12 +4610,15 @@ export namespace Prisma {
 
   export type MasukanWargaSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    namaPengirim?: boolean
+    nomorHp?: boolean
     judul?: boolean
     deskripsi?: boolean
     lokasiRt?: boolean
     lokasiRw?: boolean
     domainIsuId?: boolean
     status?: boolean
+    alasanPenolakan?: boolean
     diverifikasiOlehId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -4644,12 +4630,15 @@ export namespace Prisma {
 
   export type MasukanWargaSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    namaPengirim?: boolean
+    nomorHp?: boolean
     judul?: boolean
     deskripsi?: boolean
     lokasiRt?: boolean
     lokasiRw?: boolean
     domainIsuId?: boolean
     status?: boolean
+    alasanPenolakan?: boolean
     diverifikasiOlehId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -4659,12 +4648,15 @@ export namespace Prisma {
 
   export type MasukanWargaSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    namaPengirim?: boolean
+    nomorHp?: boolean
     judul?: boolean
     deskripsi?: boolean
     lokasiRt?: boolean
     lokasiRw?: boolean
     domainIsuId?: boolean
     status?: boolean
+    alasanPenolakan?: boolean
     diverifikasiOlehId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -4674,18 +4666,21 @@ export namespace Prisma {
 
   export type MasukanWargaSelectScalar = {
     id?: boolean
+    namaPengirim?: boolean
+    nomorHp?: boolean
     judul?: boolean
     deskripsi?: boolean
     lokasiRt?: boolean
     lokasiRw?: boolean
     domainIsuId?: boolean
     status?: boolean
+    alasanPenolakan?: boolean
     diverifikasiOlehId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type MasukanWargaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "judul" | "deskripsi" | "lokasiRt" | "lokasiRw" | "domainIsuId" | "status" | "diverifikasiOlehId" | "createdAt" | "updatedAt", ExtArgs["result"]["masukanWarga"]>
+  export type MasukanWargaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "namaPengirim" | "nomorHp" | "judul" | "deskripsi" | "lokasiRt" | "lokasiRw" | "domainIsuId" | "status" | "alasanPenolakan" | "diverifikasiOlehId" | "createdAt" | "updatedAt", ExtArgs["result"]["masukanWarga"]>
   export type MasukanWargaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
     diverifikasiOleh?: boolean | MasukanWarga$diverifikasiOlehArgs<ExtArgs>
@@ -4710,12 +4705,15 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      namaPengirim: string | null
+      nomorHp: string | null
       judul: string
       deskripsi: string
-      lokasiRt: number
-      lokasiRw: number
+      lokasiRt: string
+      lokasiRw: string
       domainIsuId: string
       status: $Enums.StatusMasukan
+      alasanPenolakan: string | null
       diverifikasiOlehId: string | null
       createdAt: Date
       updatedAt: Date
@@ -5146,12 +5144,15 @@ export namespace Prisma {
    */
   interface MasukanWargaFieldRefs {
     readonly id: FieldRef<"MasukanWarga", 'String'>
+    readonly namaPengirim: FieldRef<"MasukanWarga", 'String'>
+    readonly nomorHp: FieldRef<"MasukanWarga", 'String'>
     readonly judul: FieldRef<"MasukanWarga", 'String'>
     readonly deskripsi: FieldRef<"MasukanWarga", 'String'>
-    readonly lokasiRt: FieldRef<"MasukanWarga", 'Int'>
-    readonly lokasiRw: FieldRef<"MasukanWarga", 'Int'>
+    readonly lokasiRt: FieldRef<"MasukanWarga", 'String'>
+    readonly lokasiRw: FieldRef<"MasukanWarga", 'String'>
     readonly domainIsuId: FieldRef<"MasukanWarga", 'String'>
     readonly status: FieldRef<"MasukanWarga", 'StatusMasukan'>
+    readonly alasanPenolakan: FieldRef<"MasukanWarga", 'String'>
     readonly diverifikasiOlehId: FieldRef<"MasukanWarga", 'String'>
     readonly createdAt: FieldRef<"MasukanWarga", 'DateTime'>
     readonly updatedAt: FieldRef<"MasukanWarga", 'DateTime'>
@@ -13657,12 +13658,15 @@ export namespace Prisma {
 
   export const MasukanWargaScalarFieldEnum: {
     id: 'id',
+    namaPengirim: 'namaPengirim',
+    nomorHp: 'nomorHp',
     judul: 'judul',
     deskripsi: 'deskripsi',
     lokasiRt: 'lokasiRt',
     lokasiRw: 'lokasiRw',
     domainIsuId: 'domainIsuId',
     status: 'status',
+    alasanPenolakan: 'alasanPenolakan',
     diverifikasiOlehId: 'diverifikasiOlehId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -13876,20 +13880,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Int'
-   */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-  /**
-   * Reference to a field of type 'Int[]'
-   */
-  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
-
-
-  /**
    * Reference to a field of type 'StatusMasukan'
    */
   export type EnumStatusMasukanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StatusMasukan'>
@@ -13900,6 +13890,20 @@ export namespace Prisma {
    * Reference to a field of type 'StatusMasukan[]'
    */
   export type ListEnumStatusMasukanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StatusMasukan[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int'
+   */
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int[]'
+   */
+  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
 
@@ -14117,12 +14121,15 @@ export namespace Prisma {
     OR?: MasukanWargaWhereInput[]
     NOT?: MasukanWargaWhereInput | MasukanWargaWhereInput[]
     id?: StringFilter<"MasukanWarga"> | string
+    namaPengirim?: StringNullableFilter<"MasukanWarga"> | string | null
+    nomorHp?: StringNullableFilter<"MasukanWarga"> | string | null
     judul?: StringFilter<"MasukanWarga"> | string
     deskripsi?: StringFilter<"MasukanWarga"> | string
-    lokasiRt?: IntFilter<"MasukanWarga"> | number
-    lokasiRw?: IntFilter<"MasukanWarga"> | number
+    lokasiRt?: StringFilter<"MasukanWarga"> | string
+    lokasiRw?: StringFilter<"MasukanWarga"> | string
     domainIsuId?: StringFilter<"MasukanWarga"> | string
     status?: EnumStatusMasukanFilter<"MasukanWarga"> | $Enums.StatusMasukan
+    alasanPenolakan?: StringNullableFilter<"MasukanWarga"> | string | null
     diverifikasiOlehId?: StringNullableFilter<"MasukanWarga"> | string | null
     createdAt?: DateTimeFilter<"MasukanWarga"> | Date | string
     updatedAt?: DateTimeFilter<"MasukanWarga"> | Date | string
@@ -14133,12 +14140,15 @@ export namespace Prisma {
 
   export type MasukanWargaOrderByWithRelationInput = {
     id?: SortOrder
+    namaPengirim?: SortOrderInput | SortOrder
+    nomorHp?: SortOrderInput | SortOrder
     judul?: SortOrder
     deskripsi?: SortOrder
     lokasiRt?: SortOrder
     lokasiRw?: SortOrder
     domainIsuId?: SortOrder
     status?: SortOrder
+    alasanPenolakan?: SortOrderInput | SortOrder
     diverifikasiOlehId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -14152,12 +14162,15 @@ export namespace Prisma {
     AND?: MasukanWargaWhereInput | MasukanWargaWhereInput[]
     OR?: MasukanWargaWhereInput[]
     NOT?: MasukanWargaWhereInput | MasukanWargaWhereInput[]
+    namaPengirim?: StringNullableFilter<"MasukanWarga"> | string | null
+    nomorHp?: StringNullableFilter<"MasukanWarga"> | string | null
     judul?: StringFilter<"MasukanWarga"> | string
     deskripsi?: StringFilter<"MasukanWarga"> | string
-    lokasiRt?: IntFilter<"MasukanWarga"> | number
-    lokasiRw?: IntFilter<"MasukanWarga"> | number
+    lokasiRt?: StringFilter<"MasukanWarga"> | string
+    lokasiRw?: StringFilter<"MasukanWarga"> | string
     domainIsuId?: StringFilter<"MasukanWarga"> | string
     status?: EnumStatusMasukanFilter<"MasukanWarga"> | $Enums.StatusMasukan
+    alasanPenolakan?: StringNullableFilter<"MasukanWarga"> | string | null
     diverifikasiOlehId?: StringNullableFilter<"MasukanWarga"> | string | null
     createdAt?: DateTimeFilter<"MasukanWarga"> | Date | string
     updatedAt?: DateTimeFilter<"MasukanWarga"> | Date | string
@@ -14168,20 +14181,21 @@ export namespace Prisma {
 
   export type MasukanWargaOrderByWithAggregationInput = {
     id?: SortOrder
+    namaPengirim?: SortOrderInput | SortOrder
+    nomorHp?: SortOrderInput | SortOrder
     judul?: SortOrder
     deskripsi?: SortOrder
     lokasiRt?: SortOrder
     lokasiRw?: SortOrder
     domainIsuId?: SortOrder
     status?: SortOrder
+    alasanPenolakan?: SortOrderInput | SortOrder
     diverifikasiOlehId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: MasukanWargaCountOrderByAggregateInput
-    _avg?: MasukanWargaAvgOrderByAggregateInput
     _max?: MasukanWargaMaxOrderByAggregateInput
     _min?: MasukanWargaMinOrderByAggregateInput
-    _sum?: MasukanWargaSumOrderByAggregateInput
   }
 
   export type MasukanWargaScalarWhereWithAggregatesInput = {
@@ -14189,12 +14203,15 @@ export namespace Prisma {
     OR?: MasukanWargaScalarWhereWithAggregatesInput[]
     NOT?: MasukanWargaScalarWhereWithAggregatesInput | MasukanWargaScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"MasukanWarga"> | string
+    namaPengirim?: StringNullableWithAggregatesFilter<"MasukanWarga"> | string | null
+    nomorHp?: StringNullableWithAggregatesFilter<"MasukanWarga"> | string | null
     judul?: StringWithAggregatesFilter<"MasukanWarga"> | string
     deskripsi?: StringWithAggregatesFilter<"MasukanWarga"> | string
-    lokasiRt?: IntWithAggregatesFilter<"MasukanWarga"> | number
-    lokasiRw?: IntWithAggregatesFilter<"MasukanWarga"> | number
+    lokasiRt?: StringWithAggregatesFilter<"MasukanWarga"> | string
+    lokasiRw?: StringWithAggregatesFilter<"MasukanWarga"> | string
     domainIsuId?: StringWithAggregatesFilter<"MasukanWarga"> | string
     status?: EnumStatusMasukanWithAggregatesFilter<"MasukanWarga"> | $Enums.StatusMasukan
+    alasanPenolakan?: StringNullableWithAggregatesFilter<"MasukanWarga"> | string | null
     diverifikasiOlehId?: StringNullableWithAggregatesFilter<"MasukanWarga"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"MasukanWarga"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"MasukanWarga"> | Date | string
@@ -14970,11 +14987,14 @@ export namespace Prisma {
 
   export type MasukanWargaCreateInput = {
     id?: string
+    namaPengirim?: string | null
+    nomorHp?: string | null
     judul: string
     deskripsi: string
-    lokasiRt: number
-    lokasiRw: number
+    lokasiRt: string
+    lokasiRw: string
     status?: $Enums.StatusMasukan
+    alasanPenolakan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     domainIsu: DomainIsuCreateNestedOneWithoutMasukanInput
@@ -14984,12 +15004,15 @@ export namespace Prisma {
 
   export type MasukanWargaUncheckedCreateInput = {
     id?: string
+    namaPengirim?: string | null
+    nomorHp?: string | null
     judul: string
     deskripsi: string
-    lokasiRt: number
-    lokasiRw: number
+    lokasiRt: string
+    lokasiRw: string
     domainIsuId: string
     status?: $Enums.StatusMasukan
+    alasanPenolakan?: string | null
     diverifikasiOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -14998,11 +15021,14 @@ export namespace Prisma {
 
   export type MasukanWargaUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    namaPengirim?: NullableStringFieldUpdateOperationsInput | string | null
+    nomorHp?: NullableStringFieldUpdateOperationsInput | string | null
     judul?: StringFieldUpdateOperationsInput | string
     deskripsi?: StringFieldUpdateOperationsInput | string
-    lokasiRt?: IntFieldUpdateOperationsInput | number
-    lokasiRw?: IntFieldUpdateOperationsInput | number
+    lokasiRt?: StringFieldUpdateOperationsInput | string
+    lokasiRw?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
+    alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     domainIsu?: DomainIsuUpdateOneRequiredWithoutMasukanNestedInput
@@ -15012,12 +15038,15 @@ export namespace Prisma {
 
   export type MasukanWargaUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    namaPengirim?: NullableStringFieldUpdateOperationsInput | string | null
+    nomorHp?: NullableStringFieldUpdateOperationsInput | string | null
     judul?: StringFieldUpdateOperationsInput | string
     deskripsi?: StringFieldUpdateOperationsInput | string
-    lokasiRt?: IntFieldUpdateOperationsInput | number
-    lokasiRw?: IntFieldUpdateOperationsInput | number
+    lokasiRt?: StringFieldUpdateOperationsInput | string
+    lokasiRw?: StringFieldUpdateOperationsInput | string
     domainIsuId?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
+    alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     diverifikasiOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -15026,12 +15055,15 @@ export namespace Prisma {
 
   export type MasukanWargaCreateManyInput = {
     id?: string
+    namaPengirim?: string | null
+    nomorHp?: string | null
     judul: string
     deskripsi: string
-    lokasiRt: number
-    lokasiRw: number
+    lokasiRt: string
+    lokasiRw: string
     domainIsuId: string
     status?: $Enums.StatusMasukan
+    alasanPenolakan?: string | null
     diverifikasiOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -15039,23 +15071,29 @@ export namespace Prisma {
 
   export type MasukanWargaUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    namaPengirim?: NullableStringFieldUpdateOperationsInput | string | null
+    nomorHp?: NullableStringFieldUpdateOperationsInput | string | null
     judul?: StringFieldUpdateOperationsInput | string
     deskripsi?: StringFieldUpdateOperationsInput | string
-    lokasiRt?: IntFieldUpdateOperationsInput | number
-    lokasiRw?: IntFieldUpdateOperationsInput | number
+    lokasiRt?: StringFieldUpdateOperationsInput | string
+    lokasiRw?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
+    alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type MasukanWargaUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    namaPengirim?: NullableStringFieldUpdateOperationsInput | string | null
+    nomorHp?: NullableStringFieldUpdateOperationsInput | string | null
     judul?: StringFieldUpdateOperationsInput | string
     deskripsi?: StringFieldUpdateOperationsInput | string
-    lokasiRt?: IntFieldUpdateOperationsInput | number
-    lokasiRw?: IntFieldUpdateOperationsInput | number
+    lokasiRt?: StringFieldUpdateOperationsInput | string
+    lokasiRw?: StringFieldUpdateOperationsInput | string
     domainIsuId?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
+    alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     diverifikasiOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -15934,17 +15972,6 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
-  }
-
   export type EnumStatusMasukanFilter<$PrismaModel = never> = {
     equals?: $Enums.StatusMasukan | EnumStatusMasukanFieldRefInput<$PrismaModel>
     in?: $Enums.StatusMasukan[] | ListEnumStatusMasukanFieldRefInput<$PrismaModel>
@@ -15974,30 +16001,31 @@ export namespace Prisma {
 
   export type MasukanWargaCountOrderByAggregateInput = {
     id?: SortOrder
+    namaPengirim?: SortOrder
+    nomorHp?: SortOrder
     judul?: SortOrder
     deskripsi?: SortOrder
     lokasiRt?: SortOrder
     lokasiRw?: SortOrder
     domainIsuId?: SortOrder
     status?: SortOrder
+    alasanPenolakan?: SortOrder
     diverifikasiOlehId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
-  export type MasukanWargaAvgOrderByAggregateInput = {
-    lokasiRt?: SortOrder
-    lokasiRw?: SortOrder
-  }
-
   export type MasukanWargaMaxOrderByAggregateInput = {
     id?: SortOrder
+    namaPengirim?: SortOrder
+    nomorHp?: SortOrder
     judul?: SortOrder
     deskripsi?: SortOrder
     lokasiRt?: SortOrder
     lokasiRw?: SortOrder
     domainIsuId?: SortOrder
     status?: SortOrder
+    alasanPenolakan?: SortOrder
     diverifikasiOlehId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -16005,36 +16033,18 @@ export namespace Prisma {
 
   export type MasukanWargaMinOrderByAggregateInput = {
     id?: SortOrder
+    namaPengirim?: SortOrder
+    nomorHp?: SortOrder
     judul?: SortOrder
     deskripsi?: SortOrder
     lokasiRt?: SortOrder
     lokasiRw?: SortOrder
     domainIsuId?: SortOrder
     status?: SortOrder
+    alasanPenolakan?: SortOrder
     diverifikasiOlehId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-  }
-
-  export type MasukanWargaSumOrderByAggregateInput = {
-    lokasiRt?: SortOrder
-    lokasiRw?: SortOrder
-  }
-
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type EnumStatusMasukanWithAggregatesFilter<$PrismaModel = never> = {
@@ -16993,14 +17003,6 @@ export namespace Prisma {
     connect?: RekomendasiMasukanWhereUniqueInput | RekomendasiMasukanWhereUniqueInput[]
   }
 
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
-  }
-
   export type EnumStatusMasukanFieldUpdateOperationsInput = {
     set?: $Enums.StatusMasukan
   }
@@ -17469,33 +17471,6 @@ export namespace Prisma {
     not?: NestedEnumStatusMasukanFilter<$PrismaModel> | $Enums.StatusMasukan
   }
 
-  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
-  }
-
-  export type NestedFloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatFilter<$PrismaModel> | number
-  }
-
   export type NestedEnumStatusMasukanWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.StatusMasukan | EnumStatusMasukanFieldRefInput<$PrismaModel>
     in?: $Enums.StatusMasukan[] | ListEnumStatusMasukanFieldRefInput<$PrismaModel>
@@ -17531,6 +17506,17 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
   }
 
   export type NestedEnumStatusRekomendasiFilter<$PrismaModel = never> = {
@@ -17629,11 +17615,14 @@ export namespace Prisma {
 
   export type MasukanWargaCreateWithoutDomainIsuInput = {
     id?: string
+    namaPengirim?: string | null
+    nomorHp?: string | null
     judul: string
     deskripsi: string
-    lokasiRt: number
-    lokasiRw: number
+    lokasiRt: string
+    lokasiRw: string
     status?: $Enums.StatusMasukan
+    alasanPenolakan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     diverifikasiOleh?: UserCreateNestedOneWithoutMasukanVerifikasiInput
@@ -17642,11 +17631,14 @@ export namespace Prisma {
 
   export type MasukanWargaUncheckedCreateWithoutDomainIsuInput = {
     id?: string
+    namaPengirim?: string | null
+    nomorHp?: string | null
     judul: string
     deskripsi: string
-    lokasiRt: number
-    lokasiRw: number
+    lokasiRt: string
+    lokasiRw: string
     status?: $Enums.StatusMasukan
+    alasanPenolakan?: string | null
     diverifikasiOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -17800,12 +17792,15 @@ export namespace Prisma {
     OR?: MasukanWargaScalarWhereInput[]
     NOT?: MasukanWargaScalarWhereInput | MasukanWargaScalarWhereInput[]
     id?: StringFilter<"MasukanWarga"> | string
+    namaPengirim?: StringNullableFilter<"MasukanWarga"> | string | null
+    nomorHp?: StringNullableFilter<"MasukanWarga"> | string | null
     judul?: StringFilter<"MasukanWarga"> | string
     deskripsi?: StringFilter<"MasukanWarga"> | string
-    lokasiRt?: IntFilter<"MasukanWarga"> | number
-    lokasiRw?: IntFilter<"MasukanWarga"> | number
+    lokasiRt?: StringFilter<"MasukanWarga"> | string
+    lokasiRw?: StringFilter<"MasukanWarga"> | string
     domainIsuId?: StringFilter<"MasukanWarga"> | string
     status?: EnumStatusMasukanFilter<"MasukanWarga"> | $Enums.StatusMasukan
+    alasanPenolakan?: StringNullableFilter<"MasukanWarga"> | string | null
     diverifikasiOlehId?: StringNullableFilter<"MasukanWarga"> | string | null
     createdAt?: DateTimeFilter<"MasukanWarga"> | Date | string
     updatedAt?: DateTimeFilter<"MasukanWarga"> | Date | string
@@ -17914,11 +17909,14 @@ export namespace Prisma {
 
   export type MasukanWargaCreateWithoutDiverifikasiOlehInput = {
     id?: string
+    namaPengirim?: string | null
+    nomorHp?: string | null
     judul: string
     deskripsi: string
-    lokasiRt: number
-    lokasiRw: number
+    lokasiRt: string
+    lokasiRw: string
     status?: $Enums.StatusMasukan
+    alasanPenolakan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     domainIsu: DomainIsuCreateNestedOneWithoutMasukanInput
@@ -17927,12 +17925,15 @@ export namespace Prisma {
 
   export type MasukanWargaUncheckedCreateWithoutDiverifikasiOlehInput = {
     id?: string
+    namaPengirim?: string | null
+    nomorHp?: string | null
     judul: string
     deskripsi: string
-    lokasiRt: number
-    lokasiRw: number
+    lokasiRt: string
+    lokasiRw: string
     domainIsuId: string
     status?: $Enums.StatusMasukan
+    alasanPenolakan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     rekomendasiLinks?: RekomendasiMasukanUncheckedCreateNestedManyWithoutMasukanInput
@@ -18920,11 +18921,14 @@ export namespace Prisma {
 
   export type MasukanWargaCreateWithoutRekomendasiLinksInput = {
     id?: string
+    namaPengirim?: string | null
+    nomorHp?: string | null
     judul: string
     deskripsi: string
-    lokasiRt: number
-    lokasiRw: number
+    lokasiRt: string
+    lokasiRw: string
     status?: $Enums.StatusMasukan
+    alasanPenolakan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     domainIsu: DomainIsuCreateNestedOneWithoutMasukanInput
@@ -18933,12 +18937,15 @@ export namespace Prisma {
 
   export type MasukanWargaUncheckedCreateWithoutRekomendasiLinksInput = {
     id?: string
+    namaPengirim?: string | null
+    nomorHp?: string | null
     judul: string
     deskripsi: string
-    lokasiRt: number
-    lokasiRw: number
+    lokasiRt: string
+    lokasiRw: string
     domainIsuId: string
     status?: $Enums.StatusMasukan
+    alasanPenolakan?: string | null
     diverifikasiOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -19003,11 +19010,14 @@ export namespace Prisma {
 
   export type MasukanWargaUpdateWithoutRekomendasiLinksInput = {
     id?: StringFieldUpdateOperationsInput | string
+    namaPengirim?: NullableStringFieldUpdateOperationsInput | string | null
+    nomorHp?: NullableStringFieldUpdateOperationsInput | string | null
     judul?: StringFieldUpdateOperationsInput | string
     deskripsi?: StringFieldUpdateOperationsInput | string
-    lokasiRt?: IntFieldUpdateOperationsInput | number
-    lokasiRw?: IntFieldUpdateOperationsInput | number
+    lokasiRt?: StringFieldUpdateOperationsInput | string
+    lokasiRw?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
+    alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     domainIsu?: DomainIsuUpdateOneRequiredWithoutMasukanNestedInput
@@ -19016,12 +19026,15 @@ export namespace Prisma {
 
   export type MasukanWargaUncheckedUpdateWithoutRekomendasiLinksInput = {
     id?: StringFieldUpdateOperationsInput | string
+    namaPengirim?: NullableStringFieldUpdateOperationsInput | string | null
+    nomorHp?: NullableStringFieldUpdateOperationsInput | string | null
     judul?: StringFieldUpdateOperationsInput | string
     deskripsi?: StringFieldUpdateOperationsInput | string
-    lokasiRt?: IntFieldUpdateOperationsInput | number
-    lokasiRw?: IntFieldUpdateOperationsInput | number
+    lokasiRt?: StringFieldUpdateOperationsInput | string
+    lokasiRw?: StringFieldUpdateOperationsInput | string
     domainIsuId?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
+    alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     diverifikasiOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19413,11 +19426,14 @@ export namespace Prisma {
 
   export type MasukanWargaCreateManyDomainIsuInput = {
     id?: string
+    namaPengirim?: string | null
+    nomorHp?: string | null
     judul: string
     deskripsi: string
-    lokasiRt: number
-    lokasiRw: number
+    lokasiRt: string
+    lokasiRw: string
     status?: $Enums.StatusMasukan
+    alasanPenolakan?: string | null
     diverifikasiOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -19466,11 +19482,14 @@ export namespace Prisma {
 
   export type MasukanWargaUpdateWithoutDomainIsuInput = {
     id?: StringFieldUpdateOperationsInput | string
+    namaPengirim?: NullableStringFieldUpdateOperationsInput | string | null
+    nomorHp?: NullableStringFieldUpdateOperationsInput | string | null
     judul?: StringFieldUpdateOperationsInput | string
     deskripsi?: StringFieldUpdateOperationsInput | string
-    lokasiRt?: IntFieldUpdateOperationsInput | number
-    lokasiRw?: IntFieldUpdateOperationsInput | number
+    lokasiRt?: StringFieldUpdateOperationsInput | string
+    lokasiRw?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
+    alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     diverifikasiOleh?: UserUpdateOneWithoutMasukanVerifikasiNestedInput
@@ -19479,11 +19498,14 @@ export namespace Prisma {
 
   export type MasukanWargaUncheckedUpdateWithoutDomainIsuInput = {
     id?: StringFieldUpdateOperationsInput | string
+    namaPengirim?: NullableStringFieldUpdateOperationsInput | string | null
+    nomorHp?: NullableStringFieldUpdateOperationsInput | string | null
     judul?: StringFieldUpdateOperationsInput | string
     deskripsi?: StringFieldUpdateOperationsInput | string
-    lokasiRt?: IntFieldUpdateOperationsInput | number
-    lokasiRw?: IntFieldUpdateOperationsInput | number
+    lokasiRt?: StringFieldUpdateOperationsInput | string
+    lokasiRw?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
+    alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     diverifikasiOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19492,11 +19514,14 @@ export namespace Prisma {
 
   export type MasukanWargaUncheckedUpdateManyWithoutDomainIsuInput = {
     id?: StringFieldUpdateOperationsInput | string
+    namaPengirim?: NullableStringFieldUpdateOperationsInput | string | null
+    nomorHp?: NullableStringFieldUpdateOperationsInput | string | null
     judul?: StringFieldUpdateOperationsInput | string
     deskripsi?: StringFieldUpdateOperationsInput | string
-    lokasiRt?: IntFieldUpdateOperationsInput | number
-    lokasiRw?: IntFieldUpdateOperationsInput | number
+    lokasiRt?: StringFieldUpdateOperationsInput | string
+    lokasiRw?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
+    alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     diverifikasiOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19631,12 +19656,15 @@ export namespace Prisma {
 
   export type MasukanWargaCreateManyDiverifikasiOlehInput = {
     id?: string
+    namaPengirim?: string | null
+    nomorHp?: string | null
     judul: string
     deskripsi: string
-    lokasiRt: number
-    lokasiRw: number
+    lokasiRt: string
+    lokasiRw: string
     domainIsuId: string
     status?: $Enums.StatusMasukan
+    alasanPenolakan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -19713,11 +19741,14 @@ export namespace Prisma {
 
   export type MasukanWargaUpdateWithoutDiverifikasiOlehInput = {
     id?: StringFieldUpdateOperationsInput | string
+    namaPengirim?: NullableStringFieldUpdateOperationsInput | string | null
+    nomorHp?: NullableStringFieldUpdateOperationsInput | string | null
     judul?: StringFieldUpdateOperationsInput | string
     deskripsi?: StringFieldUpdateOperationsInput | string
-    lokasiRt?: IntFieldUpdateOperationsInput | number
-    lokasiRw?: IntFieldUpdateOperationsInput | number
+    lokasiRt?: StringFieldUpdateOperationsInput | string
+    lokasiRw?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
+    alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     domainIsu?: DomainIsuUpdateOneRequiredWithoutMasukanNestedInput
@@ -19726,12 +19757,15 @@ export namespace Prisma {
 
   export type MasukanWargaUncheckedUpdateWithoutDiverifikasiOlehInput = {
     id?: StringFieldUpdateOperationsInput | string
+    namaPengirim?: NullableStringFieldUpdateOperationsInput | string | null
+    nomorHp?: NullableStringFieldUpdateOperationsInput | string | null
     judul?: StringFieldUpdateOperationsInput | string
     deskripsi?: StringFieldUpdateOperationsInput | string
-    lokasiRt?: IntFieldUpdateOperationsInput | number
-    lokasiRw?: IntFieldUpdateOperationsInput | number
+    lokasiRt?: StringFieldUpdateOperationsInput | string
+    lokasiRw?: StringFieldUpdateOperationsInput | string
     domainIsuId?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
+    alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     rekomendasiLinks?: RekomendasiMasukanUncheckedUpdateManyWithoutMasukanNestedInput
@@ -19739,12 +19773,15 @@ export namespace Prisma {
 
   export type MasukanWargaUncheckedUpdateManyWithoutDiverifikasiOlehInput = {
     id?: StringFieldUpdateOperationsInput | string
+    namaPengirim?: NullableStringFieldUpdateOperationsInput | string | null
+    nomorHp?: NullableStringFieldUpdateOperationsInput | string | null
     judul?: StringFieldUpdateOperationsInput | string
     deskripsi?: StringFieldUpdateOperationsInput | string
-    lokasiRt?: IntFieldUpdateOperationsInput | number
-    lokasiRw?: IntFieldUpdateOperationsInput | number
+    lokasiRt?: StringFieldUpdateOperationsInput | string
+    lokasiRw?: StringFieldUpdateOperationsInput | string
     domainIsuId?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
+    alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

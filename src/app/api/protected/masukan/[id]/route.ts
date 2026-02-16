@@ -6,12 +6,12 @@ import {
   masukanWargaByIdSchema,
 } from "@/schema/masukanWarga";
 import { masukanWargaService } from "@/services/masukanWargaService";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { Role } from "@/app/generated/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
-const PATCH = async (
+const POST = async (
   req: NextRequest,
   ctx: RouteContext<"/api/protected/masukan/[id]">,
 ) => {
@@ -43,16 +43,22 @@ const PATCH = async (
 
     //VALIDASI
     const parsed = editStatusMasukanWargaSchema.safeParse({
-      verifiedByUserId: session.user.id,
+      diverifikasiOlehId: session.user.id,
       ...body,
     });
+
     const parsedId = masukanWargaByIdSchema.safeParse({ id });
+
     if (!parsedId.success) return handleZodValidation(parsedId);
     if (!parsed.success) return handleZodValidation(parsed);
 
     //JIKA VALIDASI BERHASIL
     const data = parsed.data;
     const masukanId = parsedId.data.id;
+
+    if (data.status === "MENUNGGU") {
+      data.diverifikasiOlehId = "";
+    }
 
     //UPDATE
     const masukan = await masukanWargaService.update(masukanId, data);
@@ -146,4 +152,4 @@ const GET = async (
   }
 };
 
-export { PATCH, GET };
+export { POST, GET };

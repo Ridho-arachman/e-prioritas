@@ -4,7 +4,6 @@ import { handleBetterAuthError } from "@/lib/handleBetterAuthError";
 import { handleResponse } from "@/lib/handleResponse";
 import { handleZodValidation } from "@/lib/handleZodValidation";
 import { loginSchema } from "@/schema/login";
-import { headers } from "next/headers";
 import { NextRequest } from "next/server";
 
 export const POST = async (req: NextRequest) => {

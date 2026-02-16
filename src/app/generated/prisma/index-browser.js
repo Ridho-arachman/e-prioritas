@@ -144,12 +144,15 @@ exports.Prisma.UserScalarFieldEnum = {
 
 exports.Prisma.MasukanWargaScalarFieldEnum = {
   id: 'id',
+  namaPengirim: 'namaPengirim',
+  nomorHp: 'nomorHp',
   judul: 'judul',
   deskripsi: 'deskripsi',
   lokasiRt: 'lokasiRt',
   lokasiRw: 'lokasiRw',
   domainIsuId: 'domainIsuId',
   status: 'status',
+  alasanPenolakan: 'alasanPenolakan',
   diverifikasiOlehId: 'diverifikasiOlehId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

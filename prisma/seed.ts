@@ -10,6 +10,15 @@ import {
 async function main() {
   console.log("🌱 Seeding with faker...");
 
+  await prisma.$transaction(async (tx) => {
+    // Semua operasi dalam transaction
+    await tx.rekomendasi.deleteMany();
+    await tx.kegiatanRapat.deleteMany();
+    await tx.masukanWarga.deleteMany();
+    await tx.dataMaster.deleteMany();
+    await tx.domainIsu.deleteMany();
+  });
+
   const domains = await domainIsuFactory();
   const domainIds = domains.map((d) => d.id);
 

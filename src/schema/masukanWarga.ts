@@ -1,4 +1,4 @@
-import { MasukanStatus } from "@prisma/client";
+import { StatusMasukan } from "@/app/generated/prisma";
 import z from "zod";
 
 export const createMasukanWargaSchema = z.object({
@@ -7,10 +7,17 @@ export const createMasukanWargaSchema = z.object({
     .trim()
     .min(1, "Nama pengirim tidak boleh kosong")
     .max(255, "Nama pengirim maksimal 255 karakter"),
-  emailPengirim: z
-    .string("Email pengirim harus teks")
+  nomorHp: z
+    .string()
     .trim()
-    .email("Format email tidak valid"),
+    .min(10, "Minimal 10 digit")
+    .max(13, "Maksimal 13 digit")
+    .regex(/^08[0-9]{8,11}$/, "Format harus 08xxxxxxxxx"),
+  judul: z
+    .string()
+    .trim()
+    .min(1, "Judul tidak boleh kosong")
+    .max(255, "Judul maksimal 255 karakter"),
   lokasiRt: z
     .string("Lokasi RT harus teks")
     .trim()
@@ -21,22 +28,19 @@ export const createMasukanWargaSchema = z.object({
     .trim()
     .min(1, "Lokasi RW tidak boleh kosong")
     .max(3, "Lokasi RW maksimal 3 karakter"),
-  deskripsiMasukan: z
+  deskripsi: z
     .string("Deskripsi masukan harus teks")
     .trim()
     .min(1, "Deskripsi masukan tidak boleh kosong"),
-  kategoriId: z
+  domainIsuId: z
     .string("Kategori id harus teks")
     .trim()
     .cuid("Kategori id tidak valid"),
 });
 
 export const editStatusMasukanWargaSchema = z.object({
-  status: z.nativeEnum(MasukanStatus, { message: "Status tidak valid" }),
-  verifiedByUserId: z
-    .string("ID user wajib diisi")
-    .trim()
-    .cuid("ID user tidak valid"),
+  status: z.nativeEnum(StatusMasukan, { message: "Status tidak valid" }),
+  diverifikasiOlehId: z.string("ID user wajib diisi").trim(),
   alasanPenolakan: z
     .string("Alasan penolakan")
     .trim()
@@ -45,42 +49,34 @@ export const editStatusMasukanWargaSchema = z.object({
 });
 
 export const masukanWargaByIdSchema = z.object({
-  id: z
-    .string("Id kategori wajib diisi")
-    .trim()
-    .cuid("Id kategori tidak valid"),
+  id: z.string("Id kategori wajib diisi").trim(),
 });
 
 export const masukanWargaQuerySchema = z.object({
   q: z.string().optional(),
   status: z
-    .nativeEnum(MasukanStatus, { message: "Status tidak valid" })
+    .nativeEnum(StatusMasukan, { message: "Status tidak valid" })
     .optional(),
-
-  kategoriId: z
+  domainIsuId: z
     .string()
     .optional()
     .refine((val) => !val || /^c[a-z0-9]{24}$/i.test(val), {
-      message: "ID kategori tidak valid (harus berupa cuid)",
+      message: "ID domain isu tidak valid",
     }),
-
-  verifiedByUserId: z
+  diverifikasiOlehId: z
     .string()
     .optional()
     .refine((val) => !val || /^c[a-z0-9]{24}$/i.test(val), {
-      message: "ID user tidak valid (harus berupa cuid)",
+      message: "ID user tidak valid",
     }),
-
   createdAt: z
     .string()
-    .optional()
-    .refine(
-      (val) =>
-        !val ||
-        /^\d{4}-\d{2}-\d{2}(?:\s\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?)?$/.test(val),
-      {
-        message:
-          "Format tanggal tidak valid (gunakan YYYY-MM-DD atau YYYY-MM-DD HH:mm:ss)",
-      }
-    ),
+    .regex(/^\d{4}-\d{2}-\d{2}$/, {
+      message: "Format tanggal harus YYYY-MM-DD",
+    })
+    .optional(),
+  page: z.coerce.number().int().positive().optional().default(1),
+  perPage: z.coerce.number().int().positive().max(100).optional().default(10),
+  sortBy: z.string().optional().default("createdAt"),
+  sortOrder: z.enum(["asc", "desc"]).optional().default("desc"),
 });
