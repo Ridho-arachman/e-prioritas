@@ -1,3 +1,4 @@
+import { Prisma } from "@/app/generated/prisma";
 import prisma from "@/lib/prisma";
 
 // Tipe input untuk create disesuaikan dengan model DataMaster
@@ -24,24 +25,44 @@ type UpdateDataInput = {
   diprosesOlehId?: string | null;
 };
 
+export type DataMasterGetAllParams = {
+  // Filter
+  domainIsuId?: string;
+  namaAtribut?: string;
+  nilai?: string;
+  jumlahMin?: number;
+  jumlahMax?: number;
+  lokasiRt?: number;
+  lokasiRw?: number;
+  sumberData?: string;
+  diprosesOlehId?: string;
+  createdAtFrom?: Date;
+  createdAtTo?: Date;
+  updatedAtFrom?: Date;
+  updatedAtTo?: Date;
+  search?: string; // pencarian umum di namaAtribut, nilai, sumberData
+
+  // Sorting
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+
+  // Pagination (gunakan page & limit atau skip & take)
+  page?: number;
+  limit?: number;
+  skip?: number;
+  take?: number;
+};
+
 export const dataMasterService = {
   create: async (input: CreateDataInput) => {
     const { diprosesOlehId, ...rest } = input;
 
-    // Siapkan data dengan koneksi ke User jika diprosesOlehId diberikan
-    const data: any = {
-      ...rest,
-    };
-
-    if (diprosesOlehId) {
-      data.diprosesOleh = {
-        connect: { id: diprosesOlehId },
-      };
-    }
-
     return prisma.dataMaster.create({
-      data,
-      include: { diprosesOleh: { select: { name: true } } }, // opsional, untuk langsung mengambil relasi
+      data: {
+        ...rest,
+        diprosesOlehId: diprosesOlehId, // langsung isi foreign key
+      },
+      include: { diprosesOleh: { select: { name: true } } },
     });
   },
 
@@ -58,15 +79,122 @@ export const dataMasterService = {
     });
   },
 
-  getAll: async (where?: any) => {
-    return prisma.dataMaster.findMany({
-      where,
-      include: {
-        diprosesOleh: { select: { name: true } }, // relasi ke pemroses
-        domainIsu: { select: { nama: true } }, // opsional, tampilkan nama domain
-      },
-      orderBy: { updatedAt: "desc" },
-    });
+  getAll: async (params?: DataMasterGetAllParams) => {
+    const {
+      // Filter
+      domainIsuId,
+      namaAtribut,
+      nilai,
+      jumlahMin,
+      jumlahMax,
+      lokasiRt,
+      lokasiRw,
+      sumberData,
+      diprosesOlehId,
+      createdAtFrom,
+      createdAtTo,
+      updatedAtFrom,
+      updatedAtTo,
+      search,
+      // Sorting
+      sortBy = "updatedAt",
+      sortOrder = "desc",
+      // Pagination
+      page = 1,
+      limit = 10,
+      skip,
+      take,
+    } = params || {};
+
+    // Bangun where clause
+    const where: Prisma.DataMasterWhereInput = {};
+
+    if (domainIsuId) {
+      where.domainIsuId = domainIsuId;
+    }
+
+    if (namaAtribut) {
+      where.namaAtribut = { contains: namaAtribut, mode: "insensitive" };
+    }
+
+    if (nilai) {
+      where.nilai = { contains: nilai, mode: "insensitive" };
+    }
+
+    if (jumlahMin !== undefined || jumlahMax !== undefined) {
+      where.jumlah = {};
+      if (jumlahMin !== undefined) where.jumlah.gte = jumlahMin;
+      if (jumlahMax !== undefined) where.jumlah.lte = jumlahMax;
+    }
+
+    if (lokasiRt !== undefined) {
+      where.lokasiRt = lokasiRt;
+    }
+
+    if (lokasiRw !== undefined) {
+      where.lokasiRw = lokasiRw;
+    }
+
+    if (sumberData) {
+      where.sumberData = { contains: sumberData, mode: "insensitive" };
+    }
+
+    if (diprosesOlehId) {
+      where.diprosesOlehId = diprosesOlehId;
+    }
+
+    if (createdAtFrom || createdAtTo) {
+      where.createdAt = {};
+      if (createdAtFrom) where.createdAt.gte = createdAtFrom;
+      if (createdAtTo) where.createdAt.lte = createdAtTo;
+    }
+
+    if (updatedAtFrom || updatedAtTo) {
+      where.updatedAt = {};
+      if (updatedAtFrom) where.updatedAt.gte = updatedAtFrom;
+      if (updatedAtTo) where.updatedAt.lte = updatedAtTo;
+    }
+
+    // Pencarian umum (OR)
+    if (search) {
+      where.OR = [
+        { namaAtribut: { contains: search, mode: "insensitive" } },
+        { nilai: { contains: search, mode: "insensitive" } },
+        { sumberData: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
+    // Sorting
+    const orderBy: Prisma.DataMasterOrderByWithRelationInput = {
+      [sortBy]: sortOrder,
+    };
+
+    // Pagination: hitung skip & take
+    const computedSkip = skip ?? (page - 1) * limit;
+    const computedTake = take ?? limit;
+
+    // Eksekusi query (data + total count)
+    const [data, total] = await prisma.$transaction([
+      prisma.dataMaster.findMany({
+        where,
+        orderBy,
+        skip: computedSkip,
+        take: computedTake,
+        include: {
+          diprosesOleh: { select: { name: true } },
+          domainIsu: { select: { nama: true } },
+        },
+      }),
+      prisma.dataMaster.count({ where }),
+    ]);
+
+    return {
+      data,
+      total,
+      page,
+      limit: computedTake,
+      totalPages: Math.ceil(total / computedTake),
+    };
   },
 
   getById: async (id: string) => {

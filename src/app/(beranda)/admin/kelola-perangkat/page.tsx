@@ -8,7 +8,7 @@ export default function PerangkatListPage() {
       <h1 className="text-xl md:text-3xl font-bold font-sans flex items-center gap-2 mb-6">
         👥 Kelola Akun Perangkat Desa
       </h1>
-      <Card className=" min-w-0 overflow-hidden">
+      <Card className="min-w-0 overflow-hidden">
         <ListTablePerangkat />
       </Card>
       {/* <Card className="md:hidden">

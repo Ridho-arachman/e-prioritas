@@ -58,6 +58,8 @@ export const POST = async (req: NextRequest) => {
       status: 201,
     });
   } catch (err) {
+    console.log(err);
+
     const prismaResponse = handlePrismaError(err);
     if (prismaResponse) {
       return handleResponse({
@@ -97,6 +99,8 @@ export const GET = async (req: NextRequest) => {
 
   try {
     const searchParams = req.nextUrl.searchParams;
+
+    // Parameter filter (existing)
     const q = searchParams.get("q") || undefined;
     const domainIsuId = searchParams.get("domainIsuId") || undefined;
     const lokasiRt = searchParams.get("lokasiRt") || undefined;
@@ -104,6 +108,14 @@ export const GET = async (req: NextRequest) => {
     const nilai = searchParams.get("nilai") || undefined;
     const updatedAt = searchParams.get("updatedAt") || undefined;
 
+    // Parameter sorting & pagination
+    const sortBy = searchParams.get("sortBy") || "updatedAt";
+    const sortOrder =
+      (searchParams.get("sortOrder") as "asc" | "desc") || "desc";
+    const page = Number(searchParams.get("page")) || 1;
+    const limit = Number(searchParams.get("limit")) || 10;
+
+    // Validasi filter dengan schema yang sudah ada
     const parsed = dataMasterQuerySchema.safeParse({
       q,
       domainIsuId,
@@ -117,8 +129,9 @@ export const GET = async (req: NextRequest) => {
 
     const data = parsed.data;
 
-    // Filter berdasarkan tanggal (jika ada)
-    let updatedAtFilter = {};
+    // Bangun filter tanggal
+    let updatedAtFrom: Date | undefined;
+    let updatedAtTo: Date | undefined;
     if (data.updatedAt) {
       if (!dayjs(data.updatedAt, "YYYY-MM-DD", true).isValid()) {
         return handleResponse({
@@ -128,59 +141,53 @@ export const GET = async (req: NextRequest) => {
         });
       }
 
-      const start = dayjs
+      updatedAtFrom = dayjs
         .tz(`${data.updatedAt} 00:00:00`, "Asia/Jakarta")
         .utc()
         .toDate();
-      const end = dayjs
+      updatedAtTo = dayjs
         .tz(`${data.updatedAt} 23:59:59`, "Asia/Jakarta")
         .utc()
         .toDate();
-
-      updatedAtFilter = {
-        updatedAt: {
-          gte: start,
-          lte: end,
-        },
-      };
     }
 
-    // Bangun where clause
-    const where: any = {
-      AND: [
-        // Pencarian teks (case-insensitive) di namaAtribut
-        data.q
-          ? {
-              namaAtribut: {
-                contains: data.q,
-                mode: "insensitive",
-              },
-            }
-          : {},
-        data.domainIsuId ? { domainIsuId: data.domainIsuId } : {},
-        data.lokasiRt !== undefined ? { lokasiRt: data.lokasiRt } : {},
-        data.lokasiRw !== undefined ? { lokasiRw: data.lokasiRw } : {},
-        data.nilai
-          ? { nilai: { contains: data.nilai, mode: "insensitive" } }
-          : {},
-        updatedAtFilter,
-      ].filter((cond) => Object.keys(cond).length > 0), // hapus kondisi kosong
-    };
+    // Panggil service dengan semua parameter
+    const result = await dataMasterService.getAll({
+      // Filter
+      search: data.q,
+      domainIsuId: data.domainIsuId,
+      lokasiRt: data.lokasiRt,
+      lokasiRw: data.lokasiRw,
+      nilai: data.nilai,
+      updatedAtFrom,
+      updatedAtTo,
+      // Sorting
+      sortBy,
+      sortOrder,
+      // Pagination
+      page,
+      limit,
+    });
 
-    const dataMaster = await dataMasterService.getAll(where);
-
-    if (dataMaster.length === 0) {
+    if (result.data.length === 0) {
       return handleResponse({
         success: true,
         message: "Data Master Masih Kosong",
-        status: 404,
+        data: [],
+        status: 200,
       });
     }
 
     return handleResponse({
       success: true,
       message: "Data Berhasil Ditemukan",
-      data: dataMaster,
+      data: result.data,
+      meta: {
+        total: result.total,
+        page: result.page,
+        limit: result.limit,
+        totalPages: result.totalPages,
+      },
       status: 200,
     });
   } catch (err) {

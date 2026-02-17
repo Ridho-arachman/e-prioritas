@@ -8,27 +8,16 @@ const stringToNumber = (val: unknown) => {
 };
 
 export const dataMasterSchema = z.object({
-  domainIsuId: z.string().cuid("Domain Isu ID tidak valid"), // wajib
-  namaAtribut: z
-    .string("Nama atribut harus teks")
-    .trim()
-    .min(1, "Nama atribut tidak boleh kosong"),
-  nilai: z.string("Nilai harus teks").trim().min(1, "Nilai tidak boleh kosong"),
+  domainIsuId: z.string().cuid("Domain Isu ID tidak valid"),
+  namaAtribut: z.string().min(1, "Nama atribut tidak boleh kosong"),
+  nilai: z.string().min(1, "Nilai tidak boleh kosong"),
 
-  // Opsional: konversi string ke integer, jika tidak dikirim atau kosong jadi null
-  lokasiRt: z
-    .preprocess(stringToNumber, z.number().int().min(1).max(999).nullable())
-    .optional(),
+  // Langsung terima number atau null (tanpa preprocess)
+  lokasiRt: z.number().int().min(1).max(999).nullable().optional(),
+  lokasiRw: z.number().int().min(1).max(999).nullable().optional(),
+  jumlah: z.number().int().min(0).nullable().optional(),
 
-  lokasiRw: z
-    .preprocess(stringToNumber, z.number().int().min(1).max(999).nullable())
-    .optional(),
-
-  jumlah: z
-    .preprocess(stringToNumber, z.number().int().min(0).nullable())
-    .optional(),
-
-  sumberData: z.string("Sumber data harus teks").trim().optional().nullable(),
+  sumberData: z.string().nullable().optional(),
 });
 
 // Schema untuk query parameters (GET)
