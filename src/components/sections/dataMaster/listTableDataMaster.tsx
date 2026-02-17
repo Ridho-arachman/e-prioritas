@@ -34,25 +34,18 @@ import {
 } from "@/components/ui/select";
 
 import { notifier } from "@/lib/ToastNotifier";
-import {
-  useCreateDataMasterMany,
-  useDeleteDataMaster,
-  useGetAllDataMaster,
-} from "@/hooks/api/useDataMaster";
-import { DataMaster, JenisDataMaster } from "@prisma/client";
 import { Badge } from "../../ui/badge";
-import { getNilaiBadge } from "@/utils/getNilaiBadge";
 import { Skeleton } from "../../ui/skeleton";
-import {
-  dataMasterArraySchema,
-  dataMasterQuerySchema,
-} from "@/schema/dataMasterSchema";
+import { dataMasterArraySchema } from "@/schema/dataMasterSchema";
 import * as XLSX from "xlsx";
+import { useDelete, useGet, usePost } from "@/hooks/useApi";
 
-type DataMasterWithUser = DataMaster & {
-  updatedBy?: {
-    name: string | null;
-  } | null;
+// Tipe data dari Prisma (asumsi)
+import { DataMaster, DomainIsu, User } from "@/app/generated/prisma";
+
+type DataMasterWithRelations = DataMaster & {
+  domainIsu: Pick<DomainIsu, "nama">;
+  diprosesOleh: Pick<User, "name"> | null;
 };
 
 export default function ListTableDataMaster() {
@@ -61,8 +54,8 @@ export default function ListTableDataMaster() {
 
   // === STATE ===
   const [q, setQ] = useState(searchParams.get("q") || "");
-  const [jenisData, setJenisData] = useState<string | undefined>(
-    searchParams.get("jenisData") || undefined,
+  const [domainIsuId, setDomainIsuId] = useState<string | undefined>(
+    searchParams.get("domainIsuId") || undefined,
   );
   const [lokasiRt, setLokasiRt] = useState<string | undefined>(
     searchParams.get("lokasiRt") || undefined,
@@ -80,46 +73,50 @@ export default function ListTableDataMaster() {
 
   const [value] = useDebounce(q, 500);
 
-  // === API HOOK ===
+  // === API HOOKS ===
   const {
     data: response,
     isLoading,
     error,
-    refresh,
-  } = useGetAllDataMaster(
-    value,
-    jenisData,
-    lokasiRt,
-    lokasiRw,
-    nilai,
-    updatedAt,
+    mutate: refresh,
+  } = useGet(`/protected/data-master`);
+  const { del, loading: deleteLoading } = useDelete();
+  const { post: executeCreateMany, loading: loadingCreateMany } = usePost(
+    `/protected/data-master/bulk`,
   );
-  const { error: errorDelete, execute, loading } = useDeleteDataMaster();
-  const {
-    error: errorCreateMany,
-    execute: executeCreateMany,
-    loading: loadingCreateMany,
-  } = useCreateDataMasterMany();
 
-  const data: DataMasterWithUser[] = response?.data ?? [];
+  // Ambil data domain isu untuk dropdown filter (opsional)
+  const { data: domainResponse } = useGet(`/protected/domain-isu`); // sesuaikan endpoint
+  const domainList = domainResponse ?? [];
+
+  const data: DataMasterWithRelations[] = response ?? [];
 
   // === URL PARAM SYNC ===
   useEffect(() => {
     const params = new URLSearchParams();
     if (value) params.set("q", value);
-    if (jenisData) params.set("jenisData", jenisData);
+    if (domainIsuId) params.set("domainIsuId", domainIsuId);
     if (lokasiRt) params.set("lokasiRt", lokasiRt);
     if (lokasiRw) params.set("lokasiRw", lokasiRw);
     if (nilai) params.set("nilai", nilai);
-    if (updatedAt) params.set("updatedAt", updatedAt); // ⬅️ Tambahkan ini
+    if (updatedAt) params.set("updatedAt", updatedAt);
 
     router.replace(`?${params.toString()}`);
     refresh();
-  }, [value, jenisData, lokasiRt, lokasiRw, nilai, updatedAt]); // ⬅️ Tambahkan updatedAt di dependency
+  }, [
+    value,
+    domainIsuId,
+    lokasiRt,
+    lokasiRw,
+    nilai,
+    updatedAt,
+    router,
+    refresh,
+  ]);
 
   // === FILTER HANDLER ===
   const handleResetFilter = () => {
-    setJenisData(undefined);
+    setDomainIsuId(undefined);
     setLokasiRt(undefined);
     setLokasiRw(undefined);
     setNilai(undefined);
@@ -138,64 +135,70 @@ export default function ListTableDataMaster() {
     if (!file) return;
 
     try {
-      // baca excel
       const buffer = await file.arrayBuffer();
       const workbook = XLSX.read(buffer);
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const json = XLSX.utils.sheet_to_json(sheet);
 
+      // Normalisasi data dari excel
       const normalized = json.map((row: any) => ({
-        ...row,
-        nilai: String(row.nilai ?? ""),
-        lokasiRt:
-          row.lokasiRt !== undefined
-            ? String(row.lokasiRt).padStart(2, "0")
-            : "",
-        lokasiRw:
-          row.lokasiRw !== undefined
-            ? String(row.lokasiRw).padStart(2, "0")
-            : "",
+        domainIsuId: String(row.domainIsuId || ""),
+        namaAtribut: String(row.namaAtribut || ""),
+        nilai: String(row.nilai || ""),
+        lokasiRt: row.lokasiRt !== undefined ? Number(row.lokasiRt) : null,
+        lokasiRw: row.lokasiRw !== undefined ? Number(row.lokasiRw) : null,
+        jumlah: row.jumlah !== undefined ? Number(row.jumlah) : null,
+        sumberData: row.sumberData || null,
       }));
 
-      // validasi pakai Zod
+      // Validasi dengan Zod
       const parsed = dataMasterArraySchema.safeParse(normalized);
       if (!parsed.success) {
         console.error(parsed.error);
-        alert("Format Excel tidak sesuai. Lihat console.");
+        alert("Format Excel tidak sesuai. Periksa kembali kolom-kolomnya.");
         e.target.value = "";
         return;
       }
 
-      // kirim ke backend
-      const { data: res, error } = await executeCreateMany(
-        "/protected/data-master/import",
-        {
-          data: parsed.data,
-        },
-        {},
-        "/protected/data-master/import",
-      );
-      if (error) {
-        notifier.error(error);
+      // Kirim ke backend
+      const res = await executeCreateMany({
+        data: parsed.data,
+      });
+
+      if (res?.error) {
+        notifier.error(res.error);
         e.target.value = "";
         return;
       }
+
       notifier.success(res?.message || "Data master berhasil diimport.");
       refresh();
       e.target.value = "";
     } catch (error) {
-      e.target.value = "";
       console.error(error);
       alert("Terjadi error saat import.");
+      e.target.value = "";
     }
   }
 
+  // Handler hapus
+  const handleDelete = async (id: string) => {
+    if (!confirm("Yakin ingin menghapus data ini?")) return;
+
+    const { data: res, error } = await del(`/protected/data-master/${id}`);
+    if (error) {
+      notifier.error(error);
+      return;
+    }
+    notifier.success(res?.message || "Data master berhasil dihapus.");
+    refresh();
+  };
+
   return (
     <CardContent>
-      {/* === Header (Search + Filter Button) === */}
+      {/* Header: Search + Filter */}
       <div>
         <div className="mb-4 flex items-center justify-between">
-          {/* Search */}
           <div className="flex gap-2">
             <Input
               placeholder="Cari nama atribut"
@@ -208,7 +211,6 @@ export default function ListTableDataMaster() {
             </Button>
           </div>
 
-          {/* Filter */}
           <Dialog open={openFilter} onOpenChange={setOpenFilter}>
             <DialogTrigger asChild>
               <Button variant="outline" className="flex items-center gap-2">
@@ -223,20 +225,20 @@ export default function ListTableDataMaster() {
               </DialogHeader>
 
               <div className="space-y-4 py-4">
-                {/* Jenis Data */}
+                {/* Domain Isu */}
                 <div>
-                  <label className="text-sm font-medium">Jenis Data</label>
+                  <label className="text-sm font-medium">Domain Isu</label>
                   <Select
-                    onValueChange={(val) => setJenisData(val)}
-                    value={jenisData}
+                    onValueChange={(val) => setDomainIsuId(val)}
+                    value={domainIsuId}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Pilih jenis data" />
+                      <SelectValue placeholder="Pilih domain isu" />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.keys(JenisDataMaster).map((key) => (
-                        <SelectItem key={key} value={key}>
-                          {key}
+                      {domainList.map((domain: any) => (
+                        <SelectItem key={domain.id} value={domain.id}>
+                          {domain.nama}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -247,10 +249,12 @@ export default function ListTableDataMaster() {
                 <div>
                   <label className="text-sm font-medium">RT</label>
                   <Input
-                    placeholder="Contoh: 001"
+                    placeholder="Contoh: 1"
                     value={lokasiRt || ""}
                     onChange={(e) => setLokasiRt(e.target.value)}
-                    maxLength={3}
+                    type="number"
+                    min={1}
+                    max={999}
                   />
                 </div>
 
@@ -258,30 +262,23 @@ export default function ListTableDataMaster() {
                 <div>
                   <label className="text-sm font-medium">RW</label>
                   <Input
-                    placeholder="Contoh: 005"
+                    placeholder="Contoh: 5"
                     value={lokasiRw || ""}
                     onChange={(e) => setLokasiRw(e.target.value)}
-                    maxLength={3}
+                    type="number"
+                    min={1}
+                    max={999}
                   />
                 </div>
 
-                {/* Nilai */}
+                {/* Nilai (pencarian teks) */}
                 <div>
-                  <label className="text-sm font-medium">
-                    Nilai Kepentingan
-                  </label>
-                  <Select onValueChange={(val) => setNilai(val)} value={nilai}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih tingkat kepentingan" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">1 - Tidak Penting</SelectItem>
-                      <SelectItem value="2">2 - Kurang Penting</SelectItem>
-                      <SelectItem value="3">3 - Cukup Penting</SelectItem>
-                      <SelectItem value="4">4 - Penting</SelectItem>
-                      <SelectItem value="5">5 - Sangat Penting</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <label className="text-sm font-medium">Nilai (teks)</label>
+                  <Input
+                    placeholder="Cari nilai..."
+                    value={nilai || ""}
+                    onChange={(e) => setNilai(e.target.value)}
+                  />
                 </div>
 
                 {/* Updated At */}
@@ -306,6 +303,8 @@ export default function ListTableDataMaster() {
             </DialogContent>
           </Dialog>
         </div>
+
+        {/* Tombol aksi */}
         <div className="flex justify-end">
           <Link href="/admin/kelola-data/add">
             <Button className="cursor-pointer">
@@ -327,17 +326,19 @@ export default function ListTableDataMaster() {
         </div>
       </div>
 
-      {/* === Table === */}
+      {/* Tabel Data Master */}
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>No</TableHead>
-            <TableHead>Jenis Data</TableHead>
+            <TableHead>Domain Isu</TableHead>
             <TableHead>Nama Atribut</TableHead>
             <TableHead>Nilai</TableHead>
             <TableHead>RT</TableHead>
             <TableHead>RW</TableHead>
-            <TableHead>Diperbarui Oleh</TableHead>
+            <TableHead>Jumlah</TableHead>
+            <TableHead>Sumber Data</TableHead>
+            <TableHead>Diproses Oleh</TableHead>
             <TableHead>Diperbarui Pada</TableHead>
             <TableHead>Aksi</TableHead>
           </TableRow>
@@ -345,6 +346,7 @@ export default function ListTableDataMaster() {
 
         <TableBody>
           {isLoading ? (
+            // Skeleton loading
             [...Array(5)].map((_, i) => (
               <TableRow key={i}>
                 <TableCell>
@@ -366,6 +368,12 @@ export default function ListTableDataMaster() {
                   <Skeleton className="h-4 w-12" />
                 </TableCell>
                 <TableCell>
+                  <Skeleton className="h-4 w-12" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-24" />
+                </TableCell>
+                <TableCell>
                   <Skeleton className="h-4 w-32" />
                 </TableCell>
                 <TableCell>
@@ -379,7 +387,7 @@ export default function ListTableDataMaster() {
             ))
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={9} className="text-center text-red-500">
+              <TableCell colSpan={11} className="text-center text-red-500">
                 {error.response?.status === 403
                   ? "Anda tidak memiliki akses untuk melihat data ini."
                   : error.response?.data?.message ||
@@ -390,18 +398,16 @@ export default function ListTableDataMaster() {
             data.map((item, i) => (
               <TableRow key={item.id}>
                 <TableCell>{i + 1}</TableCell>
-                <TableCell>{item.jenisData}</TableCell>
+                <TableCell>{item.domainIsu?.nama || "-"}</TableCell>
                 <TableCell>{item.namaAtribut}</TableCell>
                 <TableCell>
-                  {(() => {
-                    const { label, variant } = getNilaiBadge(item.nilai);
-                    return <Badge variant={variant}>{label}</Badge>;
-                  })()}
+                  <Badge variant="outline">{item.nilai}</Badge>
                 </TableCell>
-
-                <TableCell>{item.lokasiRt || "-"}</TableCell>
-                <TableCell>{item.lokasiRw || "-"}</TableCell>
-                <TableCell>{item.updatedBy?.name ?? "-"}</TableCell>
+                <TableCell>{item.lokasiRt ?? "-"}</TableCell>
+                <TableCell>{item.lokasiRw ?? "-"}</TableCell>
+                <TableCell>{item.jumlah ?? "-"}</TableCell>
+                <TableCell>{item.sumberData || "-"}</TableCell>
+                <TableCell>{item.diprosesOleh?.name ?? "-"}</TableCell>
                 <TableCell>
                   {new Date(item.updatedAt).toLocaleDateString("id-ID")}
                 </TableCell>
@@ -414,22 +420,8 @@ export default function ListTableDataMaster() {
                   <Button
                     variant="destructive"
                     size="sm"
-                    onClick={async () => {
-                      const { data: res, error } = await execute(
-                        `/protected/data-master/${item.id}`,
-                        {},
-                        {},
-                        `/protected/data-master/${item.id}`,
-                      );
-                      if (error) {
-                        notifier.error(error);
-                        return;
-                      }
-                      notifier.success(
-                        res?.message || "Data master berhasil dihapus.",
-                      );
-                      refresh();
-                    }}
+                    onClick={() => handleDelete(item.id)}
+                    disabled={deleteLoading}
                   >
                     Hapus
                   </Button>
@@ -439,7 +431,7 @@ export default function ListTableDataMaster() {
           ) : (
             <TableRow>
               <TableCell
-                colSpan={9}
+                colSpan={11}
                 className="text-center text-muted-foreground"
               >
                 Tidak ada data ditemukan.

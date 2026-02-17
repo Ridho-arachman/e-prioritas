@@ -54,6 +54,9 @@ export default function ChartsSection() {
 
   const { monthlyData, dataMasterCategory } = data;
 
+  console.log("Monthly Data:", monthlyData);
+  console.log("Data Master Category:", dataMasterCategory);
+
   return (
     <div className="grid md:grid-cols-2 gap-6">
       {/* Line Chart */}

@@ -63,12 +63,7 @@ export const masukanWargaQuerySchema = z.object({
     .refine((val) => !val || /^c[a-z0-9]{24}$/i.test(val), {
       message: "ID domain isu tidak valid",
     }),
-  diverifikasiOlehId: z
-    .string()
-    .optional()
-    .refine((val) => !val || /^c[a-z0-9]{24}$/i.test(val), {
-      message: "ID user tidak valid",
-    }),
+  diverifikasiOlehId: z.string().optional(),
   createdAt: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, {

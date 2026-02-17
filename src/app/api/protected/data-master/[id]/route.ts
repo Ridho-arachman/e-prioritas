@@ -1,21 +1,21 @@
 import { handleResponse } from "@/lib/handleResponse";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { handlePrismaError } from "@/lib/handlePrismaError";
 import { handleZodValidation } from "@/lib/handleZodValidation";
-import { deleteUserPerangkatSchema } from "@/schema/userPerangkatSchema";
 import { dataMasterService } from "@/services/dataMasterService";
 import {
-  dataMasterQueryById,
-  dataMasterSchema,
+  dataMasterParamSchema, // schema untuk validasi ID
+  dataMasterSchema, // schema untuk create (bisa dipartial untuk update)
 } from "@/schema/dataMasterSchema";
 import { Role } from "@/app/generated/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
-const GET = async (
-  _req: NextRequest,
-  ctx: RouteContext<"/api/protected/data-master/[id]">,
-) => {
+// Tipe context untuk params (sesuaikan jika diperlukan)
+type Params = { id: string };
+type RouteContext = { params: Params };
+
+export const GET = async (_req: NextRequest, ctx: RouteContext) => {
   const allowedRoles: Role[] = ["ADMIN"];
   const session = await auth.api.getSession({ headers: await headers() });
 
@@ -36,17 +36,13 @@ const GET = async (
   }
 
   try {
-    // VALIDASI PARAM ID
     const { id } = await ctx.params;
-    const parsedId = dataMasterQueryById.safeParse({ id });
+    const parsedId = dataMasterParamSchema.safeParse({ id });
     if (!parsedId.success) return handleZodValidation(parsedId);
 
     const dataMasterId = parsedId.data.id;
-
-    //AMBIL DATA perangkat desa DARI DATABASE BERDASARKAN ID
     const data = await dataMasterService.getById(dataMasterId);
 
-    //JIKA DATA ADA
     return handleResponse({
       success: true,
       message: "Data Master berhasil diambil",
@@ -54,7 +50,6 @@ const GET = async (
       status: 200,
     });
   } catch (err) {
-    //PRISMA ERROR
     const prismaResponse = handlePrismaError(err);
     if (prismaResponse) {
       return handleResponse({
@@ -64,7 +59,6 @@ const GET = async (
       });
     }
 
-    //SERVER ERROR
     return handleResponse({
       success: false,
       message: "Terjadi error pada server",
@@ -73,10 +67,7 @@ const GET = async (
   }
 };
 
-const PUT = async (
-  req: NextRequest,
-  ctx: RouteContext<"/api/protected/data-master/[id]">,
-) => {
+export const PUT = async (req: NextRequest, ctx: RouteContext) => {
   const allowedRoles: Role[] = ["ADMIN"];
   const session = await auth.api.getSession({ headers: await headers() });
 
@@ -97,22 +88,29 @@ const PUT = async (
   }
 
   try {
-    // NGGAMBIL REQ BODY & PARAM
     const { id } = await ctx.params;
     const body = await req.json();
 
-    // VALIDASI REQ BODY & PARAM
-    const parsed = dataMasterSchema.safeParse(body);
-    const parsedId = dataMasterQueryById.safeParse({ id });
-
+    // Validasi ID
+    const parsedId = dataMasterParamSchema.safeParse({ id });
     if (!parsedId.success) return handleZodValidation(parsedId);
-    if (!parsed.success) return handleZodValidation(parsed);
 
-    // SIMPAN DATA perangkat desa KE DATABASE
+    // Untuk update, semua field bersifat opsional → gunakan partial dari schema
+    const updateSchema = dataMasterSchema.partial();
+    const parsedBody = updateSchema.safeParse(body);
+    if (!parsedBody.success) return handleZodValidation(parsedBody);
+
+    // Tambahkan informasi user yang melakukan update
+    const updateData = {
+      ...parsedBody.data,
+      diprosesOlehId: session.user.id, // catat siapa yang terakhir mengubah
+    };
+
     const dataMaster = await dataMasterService.update(
       parsedId.data.id,
-      parsed.data,
+      updateData,
     );
+
     return handleResponse({
       success: true,
       message: "Data Master berhasil diupdate",
@@ -120,7 +118,6 @@ const PUT = async (
       status: 200,
     });
   } catch (err) {
-    //PRISMA ERROR
     const prismaResponse = handlePrismaError(err);
     if (prismaResponse) {
       return handleResponse({
@@ -130,7 +127,6 @@ const PUT = async (
       });
     }
 
-    //SERVER ERROR
     return handleResponse({
       success: false,
       message: "Terjadi error pada server",
@@ -139,10 +135,7 @@ const PUT = async (
   }
 };
 
-const DELETE = async (
-  _req: NextRequest,
-  ctx: RouteContext<"/api/protected/data-master/[id]">,
-) => {
+export const DELETE = async (_req: NextRequest, ctx: RouteContext) => {
   const allowedRoles: Role[] = ["ADMIN"];
   const session = await auth.api.getSession({ headers: await headers() });
 
@@ -164,12 +157,10 @@ const DELETE = async (
 
   try {
     const { id } = await ctx.params;
-
-    const parsedId = deleteUserPerangkatSchema.safeParse({ id });
+    const parsedId = dataMasterParamSchema.safeParse({ id });
     if (!parsedId.success) return handleZodValidation(parsedId);
 
     const dataMasterId = parsedId.data.id;
-
     const dataMaster = await dataMasterService.deleteById(dataMasterId);
 
     return handleResponse({
@@ -179,7 +170,6 @@ const DELETE = async (
       status: 200,
     });
   } catch (err) {
-    //PRISMA ERROR
     const prismaResponse = handlePrismaError(err);
     if (prismaResponse) {
       return handleResponse({
@@ -189,7 +179,6 @@ const DELETE = async (
       });
     }
 
-    //SERVER ERROR
     return handleResponse({
       success: false,
       message: "Terjadi error pada server",
@@ -197,5 +186,3 @@ const DELETE = async (
     });
   }
 };
-
-export { PUT, DELETE, GET };

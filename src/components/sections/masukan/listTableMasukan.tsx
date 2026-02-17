@@ -149,10 +149,7 @@ export default function MasukanListTable() {
   );
 
   // DATA DOMAIN ISU untuk filter
-  const { data: kategori } = useGet("/protected/domain-isu");
-
-  // DATA USER untuk filter verifikator
-  const { data: resUser } = useGet("/protected/user?role=ADMIN,VERIFIKATOR");
+  const { data: kategori } = useGet("/protected/kategori");
 
   const { del: deleteMasukan, loading: deleteLoading } = useDelete();
 
@@ -439,8 +436,9 @@ export default function MasukanListTable() {
                       <SelectContent>
                         <SelectItem value="ALL">Semua Status</SelectItem>
                         <SelectItem value="MENUNGGU">Menunggu</SelectItem>
-                        <SelectItem value="DIPROSES">Diproses</SelectItem>
-                        <SelectItem value="SELESAI">Selesai</SelectItem>
+                        <SelectItem value="DIVERIFIKASI">
+                          Diverifikasi
+                        </SelectItem>
                         <SelectItem value="DITOLAK">Ditolak</SelectItem>
                       </SelectContent>
                     </Select>
@@ -464,30 +462,6 @@ export default function MasukanListTable() {
                         {kategori?.map((item: any) => (
                           <SelectItem key={item?.id} value={item?.id}>
                             {item?.nama || item?.namaDomain}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Verifikator Filter */}
-                  <div className="grid gap-2">
-                    <Label>Verifikator</Label>
-                    <Select
-                      value={diverifikasiOlehId || "ALL"}
-                      onValueChange={(v) => {
-                        setDiverifikasiOlehId(v === "ALL" ? "" : v);
-                        setPage("1"); // Reset page when verifikator changes
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih verifikator" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ALL">Semua Verifikator</SelectItem>
-                        {resUser?.data?.map((item: any) => (
-                          <SelectItem key={item?.id} value={item?.id}>
-                            {item?.name || item?.username}
                           </SelectItem>
                         ))}
                       </SelectContent>

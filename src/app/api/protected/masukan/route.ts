@@ -86,7 +86,7 @@ export const GET = async (req: NextRequest) => {
       status: 200,
     });
   } catch (error) {
-    console.error("Error fetching masukan:", error);
+    console.log("Error fetching masukan:", error);
 
     const prismaResponse = handlePrismaError(error);
     if (prismaResponse) {

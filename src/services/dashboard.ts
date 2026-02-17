@@ -159,14 +159,26 @@ export const dashboardService = {
   },
 
   getDataMasterStats: async () => {
-    const masterCategory = await prisma.dataMaster.groupBy({
-      by: ["domainIsuId"], // hanya field yang ada di model
+    // 1. Hitung jumlah data per domainIsuId
+    const stats = await prisma.dataMaster.groupBy({
+      by: ["domainIsuId"],
       _count: { id: true },
     });
 
-    return masterCategory.map((c) => ({
-      name: c.domainIsuId,
-      value: c._count?.id ?? 0, // fallback 0 kalau undefined
+    // 2. Ambil semua domain yang muncul di hasil statistik
+    const domainIds = stats.map((s) => s.domainIsuId);
+    const domains = await prisma.domainIsu.findMany({
+      where: { id: { in: domainIds } },
+      select: { id: true, nama: true }, // atau gunakan 'code' jika lebih cocok
+    });
+
+    // 3. Buat mapping dari id ke nama
+    const domainMap = Object.fromEntries(domains.map((d) => [d.id, d.nama]));
+
+    // 4. Gabungkan hasilnya
+    return stats.map((s) => ({
+      name: domainMap[s.domainIsuId] || s.domainIsuId, // fallback ke ID jika nama tidak ditemukan (seharusnya tidak terjadi)
+      value: s._count.id,
     }));
   },
 };
