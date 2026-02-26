@@ -150,10 +150,14 @@ exports.Prisma.MasukanWargaScalarFieldEnum = {
   deskripsi: 'deskripsi',
   lokasiRt: 'lokasiRt',
   lokasiRw: 'lokasiRw',
+  isLocked: 'isLocked',
+  lockedAt: 'lockedAt',
   domainIsuId: 'domainIsuId',
   status: 'status',
   alasanPenolakan: 'alasanPenolakan',
   diverifikasiOlehId: 'diverifikasiOlehId',
+  isRelevant: 'isRelevant',
+  expiresAt: 'expiresAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -162,34 +166,43 @@ exports.Prisma.DataMasterScalarFieldEnum = {
   id: 'id',
   domainIsuId: 'domainIsuId',
   namaAtribut: 'namaAtribut',
-  nilai: 'nilai',
+  kritikalitas: 'kritikalitas',
   jumlah: 'jumlah',
   lokasiRt: 'lokasiRt',
   lokasiRw: 'lokasiRw',
+  isActive: 'isActive',
+  tahunData: 'tahunData',
   sumberData: 'sumberData',
   diprosesOlehId: 'diprosesOlehId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.RekomendasiScalarFieldEnum = {
+exports.Prisma.KegiatanRapatScalarFieldEnum = {
   id: 'id',
-  kegiatanRapatId: 'kegiatanRapatId',
-  domainIsuId: 'domainIsuId',
   judul: 'judul',
-  ringkasan: 'ringkasan',
   deskripsi: 'deskripsi',
-  skorPrioritas: 'skorPrioritas',
-  status: 'status',
-  laporanLengkap: 'laporanLengkap',
+  tanggal: 'tanggal',
+  lokasi: 'lokasi',
+  domainIsuId: 'domainIsuId',
+  dibuatOlehId: 'dibuatOlehId',
+  mode: 'mode',
+  judulLaporan: 'judulLaporan',
+  rekomendasiItems: 'rekomendasiItems',
+  fingerprint: 'fingerprint',
+  statusRekomendasi: 'statusRekomendasi',
+  aiModel: 'aiModel',
+  aiProcessedAt: 'aiProcessedAt',
   diprosesOlehId: 'diprosesOlehId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.RekomendasiMasukanScalarFieldEnum = {
-  rekomendasiId: 'rekomendasiId',
-  masukanId: 'masukanId'
+exports.Prisma.KegiatanRapatMasukanScalarFieldEnum = {
+  id: 'id',
+  kegiatanRapatId: 'kegiatanRapatId',
+  masukanId: 'masukanId',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.SessionScalarFieldEnum = {
@@ -232,21 +245,6 @@ exports.Prisma.VerificationScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.KegiatanRapatScalarFieldEnum = {
-  id: 'id',
-  judul: 'judul',
-  deskripsi: 'deskripsi',
-  tanggal: 'tanggal',
-  lokasi: 'lokasi',
-  domainIsuId: 'domainIsuId',
-  dibuatOlehId: 'dibuatOlehId',
-  aiModel: 'aiModel',
-  aiPromptHash: 'aiPromptHash',
-  aiProcessedAt: 'aiProcessedAt',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -280,7 +278,21 @@ exports.Role = exports.$Enums.Role = {
 exports.StatusMasukan = exports.$Enums.StatusMasukan = {
   MENUNGGU: 'MENUNGGU',
   DIVERIFIKASI: 'DIVERIFIKASI',
-  DITOLAK: 'DITOLAK'
+  DITOLAK: 'DITOLAK',
+  DIPROSES: 'DIPROSES',
+  DISELESAIKAN: 'DISELESAIKAN'
+};
+
+exports.NilaiKritikalitas = exports.$Enums.NilaiKritikalitas = {
+  KRITIS: 'KRITIS',
+  TINGGI: 'TINGGI',
+  SEDANG: 'SEDANG',
+  RENDAH: 'RENDAH'
+};
+
+exports.ModeRekomendasi = exports.$Enums.ModeRekomendasi = {
+  FUSI_DATA: 'FUSI_DATA',
+  DATA_MASTER_SAJA: 'DATA_MASTER_SAJA'
 };
 
 exports.StatusRekomendasi = exports.$Enums.StatusRekomendasi = {
@@ -295,12 +307,11 @@ exports.Prisma.ModelName = {
   User: 'User',
   MasukanWarga: 'MasukanWarga',
   DataMaster: 'DataMaster',
-  Rekomendasi: 'Rekomendasi',
-  RekomendasiMasukan: 'RekomendasiMasukan',
+  KegiatanRapat: 'KegiatanRapat',
+  KegiatanRapatMasukan: 'KegiatanRapatMasukan',
   Session: 'Session',
   Account: 'Account',
-  Verification: 'Verification',
-  KegiatanRapat: 'KegiatanRapat'
+  Verification: 'Verification'
 };
 
 /**

@@ -1,39 +1,43 @@
-import prisma from "@/lib/prisma";
 import { fakerID_ID as faker } from "@faker-js/faker";
+import prisma from "@/lib/prisma";
+import type { Prisma, NilaiKritikalitas } from "@/app/generated/prisma";
+
+interface DataMasterFactoryOptions {
+  countPerDomain?: number;
+}
 
 export async function dataMasterFactory(
   domainIds: string[],
-  diprosesOlehId: string,
-  count = 5,
+  userId: string,
+  options?: DataMasterFactoryOptions,
 ) {
-  const payload = [];
+  const countPerDomain = options?.countPerDomain ?? 10;
+  const kritikalitasOptions: NilaiKritikalitas[] = [
+    "KRITIS",
+    "TINGGI",
+    "SEDANG",
+    "RENDAH",
+  ];
+  const sumberOptions = ["Survey", "Sensus", "Laporan Desa", "BPS", "OPD"];
 
-  for (const domainId of domainIds) {
-    for (let i = 0; i < count; i++) {
-      payload.push({
-        domainIsuId: domainId,
-        namaAtribut: faker.helpers.arrayElement([
-          "Jumlah Penduduk",
-          "Jumlah RT",
-          "Jumlah RW",
-          "Fasilitas Umum",
-        ]),
-        diprosesOlehId,
-        nilai: faker.word.words(2),
-        jumlah: faker.number.int({ min: 10, max: 500 }),
-        lokasiRt: faker.number.int({ min: 1, max: 10 }),
-        lokasiRw: faker.number.int({ min: 1, max: 5 }),
-        sumberData: faker.helpers.arrayElement([
-          "BPS",
-          "Survey Internal",
-          "Data Desa",
-        ]),
+  const items: Prisma.DataMasterCreateManyInput[] = [];
+
+  for (const domainIsuId of domainIds) {
+    for (let i = 0; i < countPerDomain; i++) {
+      items.push({
+        domainIsuId,
+        namaAtribut: faker.lorem.words(2).substring(0, 100),
+        kritikalitas: faker.helpers.arrayElement(kritikalitasOptions),
+        jumlah: faker.number.int({ min: 1, max: 100 }),
+        lokasiRt: faker.string.numeric(3).substring(0, 3),
+        lokasiRw: faker.string.numeric(3).substring(0, 3),
+        isActive: true,
+        tahunData: faker.number.int({ min: 2022, max: 2024 }),
+        sumberData: faker.helpers.arrayElement(sumberOptions),
+        diprosesOlehId: userId || undefined,
       });
     }
   }
 
-  return prisma.dataMaster.createMany({
-    data: payload,
-    skipDuplicates: true,
-  });
+  return await prisma.dataMaster.createMany({ data: items });
 }

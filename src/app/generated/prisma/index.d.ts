@@ -34,15 +34,15 @@ export type MasukanWarga = $Result.DefaultSelection<Prisma.$MasukanWargaPayload>
  */
 export type DataMaster = $Result.DefaultSelection<Prisma.$DataMasterPayload>
 /**
- * Model Rekomendasi
+ * Model KegiatanRapat
  * 
  */
-export type Rekomendasi = $Result.DefaultSelection<Prisma.$RekomendasiPayload>
+export type KegiatanRapat = $Result.DefaultSelection<Prisma.$KegiatanRapatPayload>
 /**
- * Model RekomendasiMasukan
+ * Model KegiatanRapatMasukan
  * 
  */
-export type RekomendasiMasukan = $Result.DefaultSelection<Prisma.$RekomendasiMasukanPayload>
+export type KegiatanRapatMasukan = $Result.DefaultSelection<Prisma.$KegiatanRapatMasukanPayload>
 /**
  * Model Session
  * 
@@ -58,11 +58,6 @@ export type Account = $Result.DefaultSelection<Prisma.$AccountPayload>
  * 
  */
 export type Verification = $Result.DefaultSelection<Prisma.$VerificationPayload>
-/**
- * Model KegiatanRapat
- * 
- */
-export type KegiatanRapat = $Result.DefaultSelection<Prisma.$KegiatanRapatPayload>
 
 /**
  * Enums
@@ -80,7 +75,9 @@ export type Role = (typeof Role)[keyof typeof Role]
 export const StatusMasukan: {
   MENUNGGU: 'MENUNGGU',
   DIVERIFIKASI: 'DIVERIFIKASI',
-  DITOLAK: 'DITOLAK'
+  DITOLAK: 'DITOLAK',
+  DIPROSES: 'DIPROSES',
+  DISELESAIKAN: 'DISELESAIKAN'
 };
 
 export type StatusMasukan = (typeof StatusMasukan)[keyof typeof StatusMasukan]
@@ -95,6 +92,24 @@ export const StatusRekomendasi: {
 
 export type StatusRekomendasi = (typeof StatusRekomendasi)[keyof typeof StatusRekomendasi]
 
+
+export const NilaiKritikalitas: {
+  KRITIS: 'KRITIS',
+  TINGGI: 'TINGGI',
+  SEDANG: 'SEDANG',
+  RENDAH: 'RENDAH'
+};
+
+export type NilaiKritikalitas = (typeof NilaiKritikalitas)[keyof typeof NilaiKritikalitas]
+
+
+export const ModeRekomendasi: {
+  FUSI_DATA: 'FUSI_DATA',
+  DATA_MASTER_SAJA: 'DATA_MASTER_SAJA'
+};
+
+export type ModeRekomendasi = (typeof ModeRekomendasi)[keyof typeof ModeRekomendasi]
+
 }
 
 export type Role = $Enums.Role
@@ -108,6 +123,14 @@ export const StatusMasukan: typeof $Enums.StatusMasukan
 export type StatusRekomendasi = $Enums.StatusRekomendasi
 
 export const StatusRekomendasi: typeof $Enums.StatusRekomendasi
+
+export type NilaiKritikalitas = $Enums.NilaiKritikalitas
+
+export const NilaiKritikalitas: typeof $Enums.NilaiKritikalitas
+
+export type ModeRekomendasi = $Enums.ModeRekomendasi
+
+export const ModeRekomendasi: typeof $Enums.ModeRekomendasi
 
 /**
  * ##  Prisma Client ʲˢ
@@ -267,24 +290,24 @@ export class PrismaClient<
   get dataMaster(): Prisma.DataMasterDelegate<ExtArgs, ClientOptions>;
 
   /**
-   * `prisma.rekomendasi`: Exposes CRUD operations for the **Rekomendasi** model.
+   * `prisma.kegiatanRapat`: Exposes CRUD operations for the **KegiatanRapat** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more Rekomendasis
-    * const rekomendasis = await prisma.rekomendasi.findMany()
+    * // Fetch zero or more KegiatanRapats
+    * const kegiatanRapats = await prisma.kegiatanRapat.findMany()
     * ```
     */
-  get rekomendasi(): Prisma.RekomendasiDelegate<ExtArgs, ClientOptions>;
+  get kegiatanRapat(): Prisma.KegiatanRapatDelegate<ExtArgs, ClientOptions>;
 
   /**
-   * `prisma.rekomendasiMasukan`: Exposes CRUD operations for the **RekomendasiMasukan** model.
+   * `prisma.kegiatanRapatMasukan`: Exposes CRUD operations for the **KegiatanRapatMasukan** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more RekomendasiMasukans
-    * const rekomendasiMasukans = await prisma.rekomendasiMasukan.findMany()
+    * // Fetch zero or more KegiatanRapatMasukans
+    * const kegiatanRapatMasukans = await prisma.kegiatanRapatMasukan.findMany()
     * ```
     */
-  get rekomendasiMasukan(): Prisma.RekomendasiMasukanDelegate<ExtArgs, ClientOptions>;
+  get kegiatanRapatMasukan(): Prisma.KegiatanRapatMasukanDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.session`: Exposes CRUD operations for the **Session** model.
@@ -315,16 +338,6 @@ export class PrismaClient<
     * ```
     */
   get verification(): Prisma.VerificationDelegate<ExtArgs, ClientOptions>;
-
-  /**
-   * `prisma.kegiatanRapat`: Exposes CRUD operations for the **KegiatanRapat** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more KegiatanRapats
-    * const kegiatanRapats = await prisma.kegiatanRapat.findMany()
-    * ```
-    */
-  get kegiatanRapat(): Prisma.KegiatanRapatDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -763,12 +776,11 @@ export namespace Prisma {
     User: 'User',
     MasukanWarga: 'MasukanWarga',
     DataMaster: 'DataMaster',
-    Rekomendasi: 'Rekomendasi',
-    RekomendasiMasukan: 'RekomendasiMasukan',
+    KegiatanRapat: 'KegiatanRapat',
+    KegiatanRapatMasukan: 'KegiatanRapatMasukan',
     Session: 'Session',
     Account: 'Account',
-    Verification: 'Verification',
-    KegiatanRapat: 'KegiatanRapat'
+    Verification: 'Verification'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -784,7 +796,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "domainIsu" | "user" | "masukanWarga" | "dataMaster" | "rekomendasi" | "rekomendasiMasukan" | "session" | "account" | "verification" | "kegiatanRapat"
+      modelProps: "domainIsu" | "user" | "masukanWarga" | "dataMaster" | "kegiatanRapat" | "kegiatanRapatMasukan" | "session" | "account" | "verification"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1084,151 +1096,151 @@ export namespace Prisma {
           }
         }
       }
-      Rekomendasi: {
-        payload: Prisma.$RekomendasiPayload<ExtArgs>
-        fields: Prisma.RekomendasiFieldRefs
+      KegiatanRapat: {
+        payload: Prisma.$KegiatanRapatPayload<ExtArgs>
+        fields: Prisma.KegiatanRapatFieldRefs
         operations: {
           findUnique: {
-            args: Prisma.RekomendasiFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RekomendasiPayload> | null
+            args: Prisma.KegiatanRapatFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatPayload> | null
           }
           findUniqueOrThrow: {
-            args: Prisma.RekomendasiFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RekomendasiPayload>
+            args: Prisma.KegiatanRapatFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatPayload>
           }
           findFirst: {
-            args: Prisma.RekomendasiFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RekomendasiPayload> | null
+            args: Prisma.KegiatanRapatFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatPayload> | null
           }
           findFirstOrThrow: {
-            args: Prisma.RekomendasiFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RekomendasiPayload>
+            args: Prisma.KegiatanRapatFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatPayload>
           }
           findMany: {
-            args: Prisma.RekomendasiFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RekomendasiPayload>[]
+            args: Prisma.KegiatanRapatFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatPayload>[]
           }
           create: {
-            args: Prisma.RekomendasiCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RekomendasiPayload>
+            args: Prisma.KegiatanRapatCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatPayload>
           }
           createMany: {
-            args: Prisma.RekomendasiCreateManyArgs<ExtArgs>
+            args: Prisma.KegiatanRapatCreateManyArgs<ExtArgs>
             result: BatchPayload
           }
           createManyAndReturn: {
-            args: Prisma.RekomendasiCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RekomendasiPayload>[]
+            args: Prisma.KegiatanRapatCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatPayload>[]
           }
           delete: {
-            args: Prisma.RekomendasiDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RekomendasiPayload>
+            args: Prisma.KegiatanRapatDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatPayload>
           }
           update: {
-            args: Prisma.RekomendasiUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RekomendasiPayload>
+            args: Prisma.KegiatanRapatUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatPayload>
           }
           deleteMany: {
-            args: Prisma.RekomendasiDeleteManyArgs<ExtArgs>
+            args: Prisma.KegiatanRapatDeleteManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateMany: {
-            args: Prisma.RekomendasiUpdateManyArgs<ExtArgs>
+            args: Prisma.KegiatanRapatUpdateManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateManyAndReturn: {
-            args: Prisma.RekomendasiUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RekomendasiPayload>[]
+            args: Prisma.KegiatanRapatUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatPayload>[]
           }
           upsert: {
-            args: Prisma.RekomendasiUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RekomendasiPayload>
+            args: Prisma.KegiatanRapatUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatPayload>
           }
           aggregate: {
-            args: Prisma.RekomendasiAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateRekomendasi>
+            args: Prisma.KegiatanRapatAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateKegiatanRapat>
           }
           groupBy: {
-            args: Prisma.RekomendasiGroupByArgs<ExtArgs>
-            result: $Utils.Optional<RekomendasiGroupByOutputType>[]
+            args: Prisma.KegiatanRapatGroupByArgs<ExtArgs>
+            result: $Utils.Optional<KegiatanRapatGroupByOutputType>[]
           }
           count: {
-            args: Prisma.RekomendasiCountArgs<ExtArgs>
-            result: $Utils.Optional<RekomendasiCountAggregateOutputType> | number
+            args: Prisma.KegiatanRapatCountArgs<ExtArgs>
+            result: $Utils.Optional<KegiatanRapatCountAggregateOutputType> | number
           }
         }
       }
-      RekomendasiMasukan: {
-        payload: Prisma.$RekomendasiMasukanPayload<ExtArgs>
-        fields: Prisma.RekomendasiMasukanFieldRefs
+      KegiatanRapatMasukan: {
+        payload: Prisma.$KegiatanRapatMasukanPayload<ExtArgs>
+        fields: Prisma.KegiatanRapatMasukanFieldRefs
         operations: {
           findUnique: {
-            args: Prisma.RekomendasiMasukanFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RekomendasiMasukanPayload> | null
+            args: Prisma.KegiatanRapatMasukanFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatMasukanPayload> | null
           }
           findUniqueOrThrow: {
-            args: Prisma.RekomendasiMasukanFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RekomendasiMasukanPayload>
+            args: Prisma.KegiatanRapatMasukanFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatMasukanPayload>
           }
           findFirst: {
-            args: Prisma.RekomendasiMasukanFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RekomendasiMasukanPayload> | null
+            args: Prisma.KegiatanRapatMasukanFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatMasukanPayload> | null
           }
           findFirstOrThrow: {
-            args: Prisma.RekomendasiMasukanFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RekomendasiMasukanPayload>
+            args: Prisma.KegiatanRapatMasukanFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatMasukanPayload>
           }
           findMany: {
-            args: Prisma.RekomendasiMasukanFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RekomendasiMasukanPayload>[]
+            args: Prisma.KegiatanRapatMasukanFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatMasukanPayload>[]
           }
           create: {
-            args: Prisma.RekomendasiMasukanCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RekomendasiMasukanPayload>
+            args: Prisma.KegiatanRapatMasukanCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatMasukanPayload>
           }
           createMany: {
-            args: Prisma.RekomendasiMasukanCreateManyArgs<ExtArgs>
+            args: Prisma.KegiatanRapatMasukanCreateManyArgs<ExtArgs>
             result: BatchPayload
           }
           createManyAndReturn: {
-            args: Prisma.RekomendasiMasukanCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RekomendasiMasukanPayload>[]
+            args: Prisma.KegiatanRapatMasukanCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatMasukanPayload>[]
           }
           delete: {
-            args: Prisma.RekomendasiMasukanDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RekomendasiMasukanPayload>
+            args: Prisma.KegiatanRapatMasukanDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatMasukanPayload>
           }
           update: {
-            args: Prisma.RekomendasiMasukanUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RekomendasiMasukanPayload>
+            args: Prisma.KegiatanRapatMasukanUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatMasukanPayload>
           }
           deleteMany: {
-            args: Prisma.RekomendasiMasukanDeleteManyArgs<ExtArgs>
+            args: Prisma.KegiatanRapatMasukanDeleteManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateMany: {
-            args: Prisma.RekomendasiMasukanUpdateManyArgs<ExtArgs>
+            args: Prisma.KegiatanRapatMasukanUpdateManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateManyAndReturn: {
-            args: Prisma.RekomendasiMasukanUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RekomendasiMasukanPayload>[]
+            args: Prisma.KegiatanRapatMasukanUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatMasukanPayload>[]
           }
           upsert: {
-            args: Prisma.RekomendasiMasukanUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RekomendasiMasukanPayload>
+            args: Prisma.KegiatanRapatMasukanUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatMasukanPayload>
           }
           aggregate: {
-            args: Prisma.RekomendasiMasukanAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateRekomendasiMasukan>
+            args: Prisma.KegiatanRapatMasukanAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateKegiatanRapatMasukan>
           }
           groupBy: {
-            args: Prisma.RekomendasiMasukanGroupByArgs<ExtArgs>
-            result: $Utils.Optional<RekomendasiMasukanGroupByOutputType>[]
+            args: Prisma.KegiatanRapatMasukanGroupByArgs<ExtArgs>
+            result: $Utils.Optional<KegiatanRapatMasukanGroupByOutputType>[]
           }
           count: {
-            args: Prisma.RekomendasiMasukanCountArgs<ExtArgs>
-            result: $Utils.Optional<RekomendasiMasukanCountAggregateOutputType> | number
+            args: Prisma.KegiatanRapatMasukanCountArgs<ExtArgs>
+            result: $Utils.Optional<KegiatanRapatMasukanCountAggregateOutputType> | number
           }
         }
       }
@@ -1454,80 +1466,6 @@ export namespace Prisma {
           }
         }
       }
-      KegiatanRapat: {
-        payload: Prisma.$KegiatanRapatPayload<ExtArgs>
-        fields: Prisma.KegiatanRapatFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.KegiatanRapatFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatPayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.KegiatanRapatFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatPayload>
-          }
-          findFirst: {
-            args: Prisma.KegiatanRapatFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatPayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.KegiatanRapatFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatPayload>
-          }
-          findMany: {
-            args: Prisma.KegiatanRapatFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatPayload>[]
-          }
-          create: {
-            args: Prisma.KegiatanRapatCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatPayload>
-          }
-          createMany: {
-            args: Prisma.KegiatanRapatCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.KegiatanRapatCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatPayload>[]
-          }
-          delete: {
-            args: Prisma.KegiatanRapatDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatPayload>
-          }
-          update: {
-            args: Prisma.KegiatanRapatUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatPayload>
-          }
-          deleteMany: {
-            args: Prisma.KegiatanRapatDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.KegiatanRapatUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.KegiatanRapatUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatPayload>[]
-          }
-          upsert: {
-            args: Prisma.KegiatanRapatUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatPayload>
-          }
-          aggregate: {
-            args: Prisma.KegiatanRapatAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateKegiatanRapat>
-          }
-          groupBy: {
-            args: Prisma.KegiatanRapatGroupByArgs<ExtArgs>
-            result: $Utils.Optional<KegiatanRapatGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.KegiatanRapatCountArgs<ExtArgs>
-            result: $Utils.Optional<KegiatanRapatCountAggregateOutputType> | number
-          }
-        }
-      }
     }
   } & {
     other: {
@@ -1640,12 +1578,11 @@ export namespace Prisma {
     user?: UserOmit
     masukanWarga?: MasukanWargaOmit
     dataMaster?: DataMasterOmit
-    rekomendasi?: RekomendasiOmit
-    rekomendasiMasukan?: RekomendasiMasukanOmit
+    kegiatanRapat?: KegiatanRapatOmit
+    kegiatanRapatMasukan?: KegiatanRapatMasukanOmit
     session?: SessionOmit
     account?: AccountOmit
     verification?: VerificationOmit
-    kegiatanRapat?: KegiatanRapatOmit
   }
 
   /* Types for Logging */
@@ -1728,14 +1665,12 @@ export namespace Prisma {
   export type DomainIsuCountOutputType = {
     masukan: number
     dataMaster: number
-    rekomendasi: number
     kegiatanRapat: number
   }
 
   export type DomainIsuCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     masukan?: boolean | DomainIsuCountOutputTypeCountMasukanArgs
     dataMaster?: boolean | DomainIsuCountOutputTypeCountDataMasterArgs
-    rekomendasi?: boolean | DomainIsuCountOutputTypeCountRekomendasiArgs
     kegiatanRapat?: boolean | DomainIsuCountOutputTypeCountKegiatanRapatArgs
   }
 
@@ -1767,13 +1702,6 @@ export namespace Prisma {
   /**
    * DomainIsuCountOutputType without action
    */
-  export type DomainIsuCountOutputTypeCountRekomendasiArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: RekomendasiWhereInput
-  }
-
-  /**
-   * DomainIsuCountOutputType without action
-   */
   export type DomainIsuCountOutputTypeCountKegiatanRapatArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: KegiatanRapatWhereInput
   }
@@ -1785,20 +1713,20 @@ export namespace Prisma {
 
   export type UserCountOutputType = {
     masukanVerifikasi: number
-    rekomendasiDiproses: number
+    kegiatanRapatDiproses: number
+    kegiatanRapatDibuat: number
+    dataMasterDibuat: number
     sessions: number
     accounts: number
-    kegiatanRapat: number
-    dataMaster: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     masukanVerifikasi?: boolean | UserCountOutputTypeCountMasukanVerifikasiArgs
-    rekomendasiDiproses?: boolean | UserCountOutputTypeCountRekomendasiDiprosesArgs
+    kegiatanRapatDiproses?: boolean | UserCountOutputTypeCountKegiatanRapatDiprosesArgs
+    kegiatanRapatDibuat?: boolean | UserCountOutputTypeCountKegiatanRapatDibuatArgs
+    dataMasterDibuat?: boolean | UserCountOutputTypeCountDataMasterDibuatArgs
     sessions?: boolean | UserCountOutputTypeCountSessionsArgs
     accounts?: boolean | UserCountOutputTypeCountAccountsArgs
-    kegiatanRapat?: boolean | UserCountOutputTypeCountKegiatanRapatArgs
-    dataMaster?: boolean | UserCountOutputTypeCountDataMasterArgs
   }
 
   // Custom InputTypes
@@ -1822,8 +1750,22 @@ export namespace Prisma {
   /**
    * UserCountOutputType without action
    */
-  export type UserCountOutputTypeCountRekomendasiDiprosesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: RekomendasiWhereInput
+  export type UserCountOutputTypeCountKegiatanRapatDiprosesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: KegiatanRapatWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountKegiatanRapatDibuatArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: KegiatanRapatWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountDataMasterDibuatArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DataMasterWhereInput
   }
 
   /**
@@ -1840,31 +1782,17 @@ export namespace Prisma {
     where?: AccountWhereInput
   }
 
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeCountKegiatanRapatArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: KegiatanRapatWhereInput
-  }
-
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeCountDataMasterArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: DataMasterWhereInput
-  }
-
 
   /**
    * Count Type MasukanWargaCountOutputType
    */
 
   export type MasukanWargaCountOutputType = {
-    rekomendasiLinks: number
+    relasiRapat: number
   }
 
   export type MasukanWargaCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    rekomendasiLinks?: boolean | MasukanWargaCountOutputTypeCountRekomendasiLinksArgs
+    relasiRapat?: boolean | MasukanWargaCountOutputTypeCountRelasiRapatArgs
   }
 
   // Custom InputTypes
@@ -1881,39 +1809,8 @@ export namespace Prisma {
   /**
    * MasukanWargaCountOutputType without action
    */
-  export type MasukanWargaCountOutputTypeCountRekomendasiLinksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: RekomendasiMasukanWhereInput
-  }
-
-
-  /**
-   * Count Type RekomendasiCountOutputType
-   */
-
-  export type RekomendasiCountOutputType = {
-    masukanLinks: number
-  }
-
-  export type RekomendasiCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    masukanLinks?: boolean | RekomendasiCountOutputTypeCountMasukanLinksArgs
-  }
-
-  // Custom InputTypes
-  /**
-   * RekomendasiCountOutputType without action
-   */
-  export type RekomendasiCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the RekomendasiCountOutputType
-     */
-    select?: RekomendasiCountOutputTypeSelect<ExtArgs> | null
-  }
-
-  /**
-   * RekomendasiCountOutputType without action
-   */
-  export type RekomendasiCountOutputTypeCountMasukanLinksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: RekomendasiMasukanWhereInput
+  export type MasukanWargaCountOutputTypeCountRelasiRapatArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: KegiatanRapatMasukanWhereInput
   }
 
 
@@ -1922,11 +1819,11 @@ export namespace Prisma {
    */
 
   export type KegiatanRapatCountOutputType = {
-    rekomendasi: number
+    masukanRelasi: number
   }
 
   export type KegiatanRapatCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    rekomendasi?: boolean | KegiatanRapatCountOutputTypeCountRekomendasiArgs
+    masukanRelasi?: boolean | KegiatanRapatCountOutputTypeCountMasukanRelasiArgs
   }
 
   // Custom InputTypes
@@ -1943,8 +1840,8 @@ export namespace Prisma {
   /**
    * KegiatanRapatCountOutputType without action
    */
-  export type KegiatanRapatCountOutputTypeCountRekomendasiArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: RekomendasiWhereInput
+  export type KegiatanRapatCountOutputTypeCountMasukanRelasiArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: KegiatanRapatMasukanWhereInput
   }
 
 
@@ -2126,7 +2023,6 @@ export namespace Prisma {
     updatedAt?: boolean
     masukan?: boolean | DomainIsu$masukanArgs<ExtArgs>
     dataMaster?: boolean | DomainIsu$dataMasterArgs<ExtArgs>
-    rekomendasi?: boolean | DomainIsu$rekomendasiArgs<ExtArgs>
     kegiatanRapat?: boolean | DomainIsu$kegiatanRapatArgs<ExtArgs>
     _count?: boolean | DomainIsuCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["domainIsu"]>
@@ -2162,7 +2058,6 @@ export namespace Prisma {
   export type DomainIsuInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     masukan?: boolean | DomainIsu$masukanArgs<ExtArgs>
     dataMaster?: boolean | DomainIsu$dataMasterArgs<ExtArgs>
-    rekomendasi?: boolean | DomainIsu$rekomendasiArgs<ExtArgs>
     kegiatanRapat?: boolean | DomainIsu$kegiatanRapatArgs<ExtArgs>
     _count?: boolean | DomainIsuCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -2174,7 +2069,6 @@ export namespace Prisma {
     objects: {
       masukan: Prisma.$MasukanWargaPayload<ExtArgs>[]
       dataMaster: Prisma.$DataMasterPayload<ExtArgs>[]
-      rekomendasi: Prisma.$RekomendasiPayload<ExtArgs>[]
       kegiatanRapat: Prisma.$KegiatanRapatPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -2580,7 +2474,6 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     masukan<T extends DomainIsu$masukanArgs<ExtArgs> = {}>(args?: Subset<T, DomainIsu$masukanArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MasukanWargaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     dataMaster<T extends DomainIsu$dataMasterArgs<ExtArgs> = {}>(args?: Subset<T, DomainIsu$dataMasterArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataMasterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    rekomendasi<T extends DomainIsu$rekomendasiArgs<ExtArgs> = {}>(args?: Subset<T, DomainIsu$rekomendasiArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RekomendasiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     kegiatanRapat<T extends DomainIsu$kegiatanRapatArgs<ExtArgs> = {}>(args?: Subset<T, DomainIsu$kegiatanRapatArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -3053,30 +2946,6 @@ export namespace Prisma {
   }
 
   /**
-   * DomainIsu.rekomendasi
-   */
-  export type DomainIsu$rekomendasiArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Rekomendasi
-     */
-    select?: RekomendasiSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Rekomendasi
-     */
-    omit?: RekomendasiOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: RekomendasiInclude<ExtArgs> | null
-    where?: RekomendasiWhereInput
-    orderBy?: RekomendasiOrderByWithRelationInput | RekomendasiOrderByWithRelationInput[]
-    cursor?: RekomendasiWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: RekomendasiScalarFieldEnum | RekomendasiScalarFieldEnum[]
-  }
-
-  /**
    * DomainIsu.kegiatanRapat
    */
   export type DomainIsu$kegiatanRapatArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3324,11 +3193,11 @@ export namespace Prisma {
     emailVerified?: boolean
     image?: boolean
     masukanVerifikasi?: boolean | User$masukanVerifikasiArgs<ExtArgs>
-    rekomendasiDiproses?: boolean | User$rekomendasiDiprosesArgs<ExtArgs>
+    kegiatanRapatDiproses?: boolean | User$kegiatanRapatDiprosesArgs<ExtArgs>
+    kegiatanRapatDibuat?: boolean | User$kegiatanRapatDibuatArgs<ExtArgs>
+    dataMasterDibuat?: boolean | User$dataMasterDibuatArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     accounts?: boolean | User$accountsArgs<ExtArgs>
-    kegiatanRapat?: boolean | User$kegiatanRapatArgs<ExtArgs>
-    dataMaster?: boolean | User$dataMasterArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -3374,11 +3243,11 @@ export namespace Prisma {
   export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "jabatan" | "role" | "isActive" | "createdAt" | "updatedAt" | "emailVerified" | "image", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     masukanVerifikasi?: boolean | User$masukanVerifikasiArgs<ExtArgs>
-    rekomendasiDiproses?: boolean | User$rekomendasiDiprosesArgs<ExtArgs>
+    kegiatanRapatDiproses?: boolean | User$kegiatanRapatDiprosesArgs<ExtArgs>
+    kegiatanRapatDibuat?: boolean | User$kegiatanRapatDibuatArgs<ExtArgs>
+    dataMasterDibuat?: boolean | User$dataMasterDibuatArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     accounts?: boolean | User$accountsArgs<ExtArgs>
-    kegiatanRapat?: boolean | User$kegiatanRapatArgs<ExtArgs>
-    dataMaster?: boolean | User$dataMasterArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -3388,11 +3257,11 @@ export namespace Prisma {
     name: "User"
     objects: {
       masukanVerifikasi: Prisma.$MasukanWargaPayload<ExtArgs>[]
-      rekomendasiDiproses: Prisma.$RekomendasiPayload<ExtArgs>[]
+      kegiatanRapatDiproses: Prisma.$KegiatanRapatPayload<ExtArgs>[]
+      kegiatanRapatDibuat: Prisma.$KegiatanRapatPayload<ExtArgs>[]
+      dataMasterDibuat: Prisma.$DataMasterPayload<ExtArgs>[]
       sessions: Prisma.$SessionPayload<ExtArgs>[]
       accounts: Prisma.$AccountPayload<ExtArgs>[]
-      kegiatanRapat: Prisma.$KegiatanRapatPayload<ExtArgs>[]
-      dataMaster: Prisma.$DataMasterPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3800,11 +3669,11 @@ export namespace Prisma {
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     masukanVerifikasi<T extends User$masukanVerifikasiArgs<ExtArgs> = {}>(args?: Subset<T, User$masukanVerifikasiArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MasukanWargaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    rekomendasiDiproses<T extends User$rekomendasiDiprosesArgs<ExtArgs> = {}>(args?: Subset<T, User$rekomendasiDiprosesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RekomendasiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    kegiatanRapatDiproses<T extends User$kegiatanRapatDiprosesArgs<ExtArgs> = {}>(args?: Subset<T, User$kegiatanRapatDiprosesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    kegiatanRapatDibuat<T extends User$kegiatanRapatDibuatArgs<ExtArgs> = {}>(args?: Subset<T, User$kegiatanRapatDibuatArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    dataMasterDibuat<T extends User$dataMasterDibuatArgs<ExtArgs> = {}>(args?: Subset<T, User$dataMasterDibuatArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataMasterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sessions<T extends User$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     accounts<T extends User$accountsArgs<ExtArgs> = {}>(args?: Subset<T, User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    kegiatanRapat<T extends User$kegiatanRapatArgs<ExtArgs> = {}>(args?: Subset<T, User$kegiatanRapatArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    dataMaster<T extends User$dataMasterArgs<ExtArgs> = {}>(args?: Subset<T, User$dataMasterArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataMasterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4256,27 +4125,75 @@ export namespace Prisma {
   }
 
   /**
-   * User.rekomendasiDiproses
+   * User.kegiatanRapatDiproses
    */
-  export type User$rekomendasiDiprosesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type User$kegiatanRapatDiprosesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Rekomendasi
+     * Select specific fields to fetch from the KegiatanRapat
      */
-    select?: RekomendasiSelect<ExtArgs> | null
+    select?: KegiatanRapatSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Rekomendasi
+     * Omit specific fields from the KegiatanRapat
      */
-    omit?: RekomendasiOmit<ExtArgs> | null
+    omit?: KegiatanRapatOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiInclude<ExtArgs> | null
-    where?: RekomendasiWhereInput
-    orderBy?: RekomendasiOrderByWithRelationInput | RekomendasiOrderByWithRelationInput[]
-    cursor?: RekomendasiWhereUniqueInput
+    include?: KegiatanRapatInclude<ExtArgs> | null
+    where?: KegiatanRapatWhereInput
+    orderBy?: KegiatanRapatOrderByWithRelationInput | KegiatanRapatOrderByWithRelationInput[]
+    cursor?: KegiatanRapatWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: RekomendasiScalarFieldEnum | RekomendasiScalarFieldEnum[]
+    distinct?: KegiatanRapatScalarFieldEnum | KegiatanRapatScalarFieldEnum[]
+  }
+
+  /**
+   * User.kegiatanRapatDibuat
+   */
+  export type User$kegiatanRapatDibuatArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KegiatanRapat
+     */
+    select?: KegiatanRapatSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KegiatanRapat
+     */
+    omit?: KegiatanRapatOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KegiatanRapatInclude<ExtArgs> | null
+    where?: KegiatanRapatWhereInput
+    orderBy?: KegiatanRapatOrderByWithRelationInput | KegiatanRapatOrderByWithRelationInput[]
+    cursor?: KegiatanRapatWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: KegiatanRapatScalarFieldEnum | KegiatanRapatScalarFieldEnum[]
+  }
+
+  /**
+   * User.dataMasterDibuat
+   */
+  export type User$dataMasterDibuatArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataMaster
+     */
+    select?: DataMasterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataMaster
+     */
+    omit?: DataMasterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataMasterInclude<ExtArgs> | null
+    where?: DataMasterWhereInput
+    orderBy?: DataMasterOrderByWithRelationInput | DataMasterOrderByWithRelationInput[]
+    cursor?: DataMasterWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DataMasterScalarFieldEnum | DataMasterScalarFieldEnum[]
   }
 
   /**
@@ -4328,54 +4245,6 @@ export namespace Prisma {
   }
 
   /**
-   * User.kegiatanRapat
-   */
-  export type User$kegiatanRapatArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the KegiatanRapat
-     */
-    select?: KegiatanRapatSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the KegiatanRapat
-     */
-    omit?: KegiatanRapatOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: KegiatanRapatInclude<ExtArgs> | null
-    where?: KegiatanRapatWhereInput
-    orderBy?: KegiatanRapatOrderByWithRelationInput | KegiatanRapatOrderByWithRelationInput[]
-    cursor?: KegiatanRapatWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: KegiatanRapatScalarFieldEnum | KegiatanRapatScalarFieldEnum[]
-  }
-
-  /**
-   * User.dataMaster
-   */
-  export type User$dataMasterArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataMaster
-     */
-    select?: DataMasterSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataMaster
-     */
-    omit?: DataMasterOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: DataMasterInclude<ExtArgs> | null
-    where?: DataMasterWhereInput
-    orderBy?: DataMasterOrderByWithRelationInput | DataMasterOrderByWithRelationInput[]
-    cursor?: DataMasterWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: DataMasterScalarFieldEnum | DataMasterScalarFieldEnum[]
-  }
-
-  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4412,10 +4281,14 @@ export namespace Prisma {
     deskripsi: string | null
     lokasiRt: string | null
     lokasiRw: string | null
+    isLocked: boolean | null
+    lockedAt: Date | null
     domainIsuId: string | null
     status: $Enums.StatusMasukan | null
     alasanPenolakan: string | null
     diverifikasiOlehId: string | null
+    isRelevant: boolean | null
+    expiresAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4428,10 +4301,14 @@ export namespace Prisma {
     deskripsi: string | null
     lokasiRt: string | null
     lokasiRw: string | null
+    isLocked: boolean | null
+    lockedAt: Date | null
     domainIsuId: string | null
     status: $Enums.StatusMasukan | null
     alasanPenolakan: string | null
     diverifikasiOlehId: string | null
+    isRelevant: boolean | null
+    expiresAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4444,10 +4321,14 @@ export namespace Prisma {
     deskripsi: number
     lokasiRt: number
     lokasiRw: number
+    isLocked: number
+    lockedAt: number
     domainIsuId: number
     status: number
     alasanPenolakan: number
     diverifikasiOlehId: number
+    isRelevant: number
+    expiresAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -4462,10 +4343,14 @@ export namespace Prisma {
     deskripsi?: true
     lokasiRt?: true
     lokasiRw?: true
+    isLocked?: true
+    lockedAt?: true
     domainIsuId?: true
     status?: true
     alasanPenolakan?: true
     diverifikasiOlehId?: true
+    isRelevant?: true
+    expiresAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4478,10 +4363,14 @@ export namespace Prisma {
     deskripsi?: true
     lokasiRt?: true
     lokasiRw?: true
+    isLocked?: true
+    lockedAt?: true
     domainIsuId?: true
     status?: true
     alasanPenolakan?: true
     diverifikasiOlehId?: true
+    isRelevant?: true
+    expiresAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4494,10 +4383,14 @@ export namespace Prisma {
     deskripsi?: true
     lokasiRt?: true
     lokasiRw?: true
+    isLocked?: true
+    lockedAt?: true
     domainIsuId?: true
     status?: true
     alasanPenolakan?: true
     diverifikasiOlehId?: true
+    isRelevant?: true
+    expiresAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -4583,10 +4476,14 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
+    isLocked: boolean
+    lockedAt: Date | null
     domainIsuId: string
     status: $Enums.StatusMasukan
     alasanPenolakan: string | null
     diverifikasiOlehId: string | null
+    isRelevant: boolean
+    expiresAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: MasukanWargaCountAggregateOutputType | null
@@ -4616,15 +4513,19 @@ export namespace Prisma {
     deskripsi?: boolean
     lokasiRt?: boolean
     lokasiRw?: boolean
+    isLocked?: boolean
+    lockedAt?: boolean
     domainIsuId?: boolean
     status?: boolean
     alasanPenolakan?: boolean
     diverifikasiOlehId?: boolean
+    isRelevant?: boolean
+    expiresAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
     diverifikasiOleh?: boolean | MasukanWarga$diverifikasiOlehArgs<ExtArgs>
-    rekomendasiLinks?: boolean | MasukanWarga$rekomendasiLinksArgs<ExtArgs>
+    relasiRapat?: boolean | MasukanWarga$relasiRapatArgs<ExtArgs>
     _count?: boolean | MasukanWargaCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["masukanWarga"]>
 
@@ -4636,10 +4537,14 @@ export namespace Prisma {
     deskripsi?: boolean
     lokasiRt?: boolean
     lokasiRw?: boolean
+    isLocked?: boolean
+    lockedAt?: boolean
     domainIsuId?: boolean
     status?: boolean
     alasanPenolakan?: boolean
     diverifikasiOlehId?: boolean
+    isRelevant?: boolean
+    expiresAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
@@ -4654,10 +4559,14 @@ export namespace Prisma {
     deskripsi?: boolean
     lokasiRt?: boolean
     lokasiRw?: boolean
+    isLocked?: boolean
+    lockedAt?: boolean
     domainIsuId?: boolean
     status?: boolean
     alasanPenolakan?: boolean
     diverifikasiOlehId?: boolean
+    isRelevant?: boolean
+    expiresAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
@@ -4672,19 +4581,23 @@ export namespace Prisma {
     deskripsi?: boolean
     lokasiRt?: boolean
     lokasiRw?: boolean
+    isLocked?: boolean
+    lockedAt?: boolean
     domainIsuId?: boolean
     status?: boolean
     alasanPenolakan?: boolean
     diverifikasiOlehId?: boolean
+    isRelevant?: boolean
+    expiresAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type MasukanWargaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "namaPengirim" | "nomorHp" | "judul" | "deskripsi" | "lokasiRt" | "lokasiRw" | "domainIsuId" | "status" | "alasanPenolakan" | "diverifikasiOlehId" | "createdAt" | "updatedAt", ExtArgs["result"]["masukanWarga"]>
+  export type MasukanWargaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "namaPengirim" | "nomorHp" | "judul" | "deskripsi" | "lokasiRt" | "lokasiRw" | "isLocked" | "lockedAt" | "domainIsuId" | "status" | "alasanPenolakan" | "diverifikasiOlehId" | "isRelevant" | "expiresAt" | "createdAt" | "updatedAt", ExtArgs["result"]["masukanWarga"]>
   export type MasukanWargaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
     diverifikasiOleh?: boolean | MasukanWarga$diverifikasiOlehArgs<ExtArgs>
-    rekomendasiLinks?: boolean | MasukanWarga$rekomendasiLinksArgs<ExtArgs>
+    relasiRapat?: boolean | MasukanWarga$relasiRapatArgs<ExtArgs>
     _count?: boolean | MasukanWargaCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type MasukanWargaIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4701,7 +4614,7 @@ export namespace Prisma {
     objects: {
       domainIsu: Prisma.$DomainIsuPayload<ExtArgs>
       diverifikasiOleh: Prisma.$UserPayload<ExtArgs> | null
-      rekomendasiLinks: Prisma.$RekomendasiMasukanPayload<ExtArgs>[]
+      relasiRapat: Prisma.$KegiatanRapatMasukanPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4711,10 +4624,14 @@ export namespace Prisma {
       deskripsi: string
       lokasiRt: string
       lokasiRw: string
+      isLocked: boolean
+      lockedAt: Date | null
       domainIsuId: string
       status: $Enums.StatusMasukan
       alasanPenolakan: string | null
       diverifikasiOlehId: string | null
+      isRelevant: boolean
+      expiresAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["masukanWarga"]>
@@ -5113,7 +5030,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     domainIsu<T extends DomainIsuDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DomainIsuDefaultArgs<ExtArgs>>): Prisma__DomainIsuClient<$Result.GetResult<Prisma.$DomainIsuPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     diverifikasiOleh<T extends MasukanWarga$diverifikasiOlehArgs<ExtArgs> = {}>(args?: Subset<T, MasukanWarga$diverifikasiOlehArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-    rekomendasiLinks<T extends MasukanWarga$rekomendasiLinksArgs<ExtArgs> = {}>(args?: Subset<T, MasukanWarga$rekomendasiLinksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RekomendasiMasukanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    relasiRapat<T extends MasukanWarga$relasiRapatArgs<ExtArgs> = {}>(args?: Subset<T, MasukanWarga$relasiRapatArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatMasukanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5150,10 +5067,14 @@ export namespace Prisma {
     readonly deskripsi: FieldRef<"MasukanWarga", 'String'>
     readonly lokasiRt: FieldRef<"MasukanWarga", 'String'>
     readonly lokasiRw: FieldRef<"MasukanWarga", 'String'>
+    readonly isLocked: FieldRef<"MasukanWarga", 'Boolean'>
+    readonly lockedAt: FieldRef<"MasukanWarga", 'DateTime'>
     readonly domainIsuId: FieldRef<"MasukanWarga", 'String'>
     readonly status: FieldRef<"MasukanWarga", 'StatusMasukan'>
     readonly alasanPenolakan: FieldRef<"MasukanWarga", 'String'>
     readonly diverifikasiOlehId: FieldRef<"MasukanWarga", 'String'>
+    readonly isRelevant: FieldRef<"MasukanWarga", 'Boolean'>
+    readonly expiresAt: FieldRef<"MasukanWarga", 'DateTime'>
     readonly createdAt: FieldRef<"MasukanWarga", 'DateTime'>
     readonly updatedAt: FieldRef<"MasukanWarga", 'DateTime'>
   }
@@ -5571,27 +5492,27 @@ export namespace Prisma {
   }
 
   /**
-   * MasukanWarga.rekomendasiLinks
+   * MasukanWarga.relasiRapat
    */
-  export type MasukanWarga$rekomendasiLinksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type MasukanWarga$relasiRapatArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the RekomendasiMasukan
+     * Select specific fields to fetch from the KegiatanRapatMasukan
      */
-    select?: RekomendasiMasukanSelect<ExtArgs> | null
+    select?: KegiatanRapatMasukanSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the RekomendasiMasukan
+     * Omit specific fields from the KegiatanRapatMasukan
      */
-    omit?: RekomendasiMasukanOmit<ExtArgs> | null
+    omit?: KegiatanRapatMasukanOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiMasukanInclude<ExtArgs> | null
-    where?: RekomendasiMasukanWhereInput
-    orderBy?: RekomendasiMasukanOrderByWithRelationInput | RekomendasiMasukanOrderByWithRelationInput[]
-    cursor?: RekomendasiMasukanWhereUniqueInput
+    include?: KegiatanRapatMasukanInclude<ExtArgs> | null
+    where?: KegiatanRapatMasukanWhereInput
+    orderBy?: KegiatanRapatMasukanOrderByWithRelationInput | KegiatanRapatMasukanOrderByWithRelationInput[]
+    cursor?: KegiatanRapatMasukanWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: RekomendasiMasukanScalarFieldEnum | RekomendasiMasukanScalarFieldEnum[]
+    distinct?: KegiatanRapatMasukanScalarFieldEnum | KegiatanRapatMasukanScalarFieldEnum[]
   }
 
   /**
@@ -5627,24 +5548,24 @@ export namespace Prisma {
 
   export type DataMasterAvgAggregateOutputType = {
     jumlah: number | null
-    lokasiRt: number | null
-    lokasiRw: number | null
+    tahunData: number | null
   }
 
   export type DataMasterSumAggregateOutputType = {
     jumlah: number | null
-    lokasiRt: number | null
-    lokasiRw: number | null
+    tahunData: number | null
   }
 
   export type DataMasterMinAggregateOutputType = {
     id: string | null
     domainIsuId: string | null
     namaAtribut: string | null
-    nilai: string | null
+    kritikalitas: $Enums.NilaiKritikalitas | null
     jumlah: number | null
-    lokasiRt: number | null
-    lokasiRw: number | null
+    lokasiRt: string | null
+    lokasiRw: string | null
+    isActive: boolean | null
+    tahunData: number | null
     sumberData: string | null
     diprosesOlehId: string | null
     createdAt: Date | null
@@ -5655,10 +5576,12 @@ export namespace Prisma {
     id: string | null
     domainIsuId: string | null
     namaAtribut: string | null
-    nilai: string | null
+    kritikalitas: $Enums.NilaiKritikalitas | null
     jumlah: number | null
-    lokasiRt: number | null
-    lokasiRw: number | null
+    lokasiRt: string | null
+    lokasiRw: string | null
+    isActive: boolean | null
+    tahunData: number | null
     sumberData: string | null
     diprosesOlehId: string | null
     createdAt: Date | null
@@ -5669,10 +5592,12 @@ export namespace Prisma {
     id: number
     domainIsuId: number
     namaAtribut: number
-    nilai: number
+    kritikalitas: number
     jumlah: number
     lokasiRt: number
     lokasiRw: number
+    isActive: number
+    tahunData: number
     sumberData: number
     diprosesOlehId: number
     createdAt: number
@@ -5683,24 +5608,24 @@ export namespace Prisma {
 
   export type DataMasterAvgAggregateInputType = {
     jumlah?: true
-    lokasiRt?: true
-    lokasiRw?: true
+    tahunData?: true
   }
 
   export type DataMasterSumAggregateInputType = {
     jumlah?: true
-    lokasiRt?: true
-    lokasiRw?: true
+    tahunData?: true
   }
 
   export type DataMasterMinAggregateInputType = {
     id?: true
     domainIsuId?: true
     namaAtribut?: true
-    nilai?: true
+    kritikalitas?: true
     jumlah?: true
     lokasiRt?: true
     lokasiRw?: true
+    isActive?: true
+    tahunData?: true
     sumberData?: true
     diprosesOlehId?: true
     createdAt?: true
@@ -5711,10 +5636,12 @@ export namespace Prisma {
     id?: true
     domainIsuId?: true
     namaAtribut?: true
-    nilai?: true
+    kritikalitas?: true
     jumlah?: true
     lokasiRt?: true
     lokasiRw?: true
+    isActive?: true
+    tahunData?: true
     sumberData?: true
     diprosesOlehId?: true
     createdAt?: true
@@ -5725,10 +5652,12 @@ export namespace Prisma {
     id?: true
     domainIsuId?: true
     namaAtribut?: true
-    nilai?: true
+    kritikalitas?: true
     jumlah?: true
     lokasiRt?: true
     lokasiRw?: true
+    isActive?: true
+    tahunData?: true
     sumberData?: true
     diprosesOlehId?: true
     createdAt?: true
@@ -5826,10 +5755,12 @@ export namespace Prisma {
     id: string
     domainIsuId: string
     namaAtribut: string
-    nilai: string
+    kritikalitas: $Enums.NilaiKritikalitas
     jumlah: number | null
-    lokasiRt: number | null
-    lokasiRw: number | null
+    lokasiRt: string | null
+    lokasiRw: string | null
+    isActive: boolean
+    tahunData: number | null
     sumberData: string | null
     diprosesOlehId: string | null
     createdAt: Date
@@ -5859,10 +5790,12 @@ export namespace Prisma {
     id?: boolean
     domainIsuId?: boolean
     namaAtribut?: boolean
-    nilai?: boolean
+    kritikalitas?: boolean
     jumlah?: boolean
     lokasiRt?: boolean
     lokasiRw?: boolean
+    isActive?: boolean
+    tahunData?: boolean
     sumberData?: boolean
     diprosesOlehId?: boolean
     createdAt?: boolean
@@ -5875,10 +5808,12 @@ export namespace Prisma {
     id?: boolean
     domainIsuId?: boolean
     namaAtribut?: boolean
-    nilai?: boolean
+    kritikalitas?: boolean
     jumlah?: boolean
     lokasiRt?: boolean
     lokasiRw?: boolean
+    isActive?: boolean
+    tahunData?: boolean
     sumberData?: boolean
     diprosesOlehId?: boolean
     createdAt?: boolean
@@ -5891,10 +5826,12 @@ export namespace Prisma {
     id?: boolean
     domainIsuId?: boolean
     namaAtribut?: boolean
-    nilai?: boolean
+    kritikalitas?: boolean
     jumlah?: boolean
     lokasiRt?: boolean
     lokasiRw?: boolean
+    isActive?: boolean
+    tahunData?: boolean
     sumberData?: boolean
     diprosesOlehId?: boolean
     createdAt?: boolean
@@ -5907,17 +5844,19 @@ export namespace Prisma {
     id?: boolean
     domainIsuId?: boolean
     namaAtribut?: boolean
-    nilai?: boolean
+    kritikalitas?: boolean
     jumlah?: boolean
     lokasiRt?: boolean
     lokasiRw?: boolean
+    isActive?: boolean
+    tahunData?: boolean
     sumberData?: boolean
     diprosesOlehId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type DataMasterOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "domainIsuId" | "namaAtribut" | "nilai" | "jumlah" | "lokasiRt" | "lokasiRw" | "sumberData" | "diprosesOlehId" | "createdAt" | "updatedAt", ExtArgs["result"]["dataMaster"]>
+  export type DataMasterOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "domainIsuId" | "namaAtribut" | "kritikalitas" | "jumlah" | "lokasiRt" | "lokasiRw" | "isActive" | "tahunData" | "sumberData" | "diprosesOlehId" | "createdAt" | "updatedAt", ExtArgs["result"]["dataMaster"]>
   export type DataMasterInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
     diprosesOleh?: boolean | DataMaster$diprosesOlehArgs<ExtArgs>
@@ -5941,10 +5880,12 @@ export namespace Prisma {
       id: string
       domainIsuId: string
       namaAtribut: string
-      nilai: string
+      kritikalitas: $Enums.NilaiKritikalitas
       jumlah: number | null
-      lokasiRt: number | null
-      lokasiRw: number | null
+      lokasiRt: string | null
+      lokasiRw: string | null
+      isActive: boolean
+      tahunData: number | null
       sumberData: string | null
       diprosesOlehId: string | null
       createdAt: Date
@@ -6377,10 +6318,12 @@ export namespace Prisma {
     readonly id: FieldRef<"DataMaster", 'String'>
     readonly domainIsuId: FieldRef<"DataMaster", 'String'>
     readonly namaAtribut: FieldRef<"DataMaster", 'String'>
-    readonly nilai: FieldRef<"DataMaster", 'String'>
+    readonly kritikalitas: FieldRef<"DataMaster", 'NilaiKritikalitas'>
     readonly jumlah: FieldRef<"DataMaster", 'Int'>
-    readonly lokasiRt: FieldRef<"DataMaster", 'Int'>
-    readonly lokasiRw: FieldRef<"DataMaster", 'Int'>
+    readonly lokasiRt: FieldRef<"DataMaster", 'String'>
+    readonly lokasiRw: FieldRef<"DataMaster", 'String'>
+    readonly isActive: FieldRef<"DataMaster", 'Boolean'>
+    readonly tahunData: FieldRef<"DataMaster", 'Int'>
     readonly sumberData: FieldRef<"DataMaster", 'String'>
     readonly diprosesOlehId: FieldRef<"DataMaster", 'String'>
     readonly createdAt: FieldRef<"DataMaster", 'DateTime'>
@@ -6819,63 +6762,68 @@ export namespace Prisma {
 
 
   /**
-   * Model Rekomendasi
+   * Model KegiatanRapat
    */
 
-  export type AggregateRekomendasi = {
-    _count: RekomendasiCountAggregateOutputType | null
-    _avg: RekomendasiAvgAggregateOutputType | null
-    _sum: RekomendasiSumAggregateOutputType | null
-    _min: RekomendasiMinAggregateOutputType | null
-    _max: RekomendasiMaxAggregateOutputType | null
+  export type AggregateKegiatanRapat = {
+    _count: KegiatanRapatCountAggregateOutputType | null
+    _min: KegiatanRapatMinAggregateOutputType | null
+    _max: KegiatanRapatMaxAggregateOutputType | null
   }
 
-  export type RekomendasiAvgAggregateOutputType = {
-    skorPrioritas: number | null
-  }
-
-  export type RekomendasiSumAggregateOutputType = {
-    skorPrioritas: number | null
-  }
-
-  export type RekomendasiMinAggregateOutputType = {
+  export type KegiatanRapatMinAggregateOutputType = {
     id: string | null
-    kegiatanRapatId: string | null
-    domainIsuId: string | null
     judul: string | null
-    ringkasan: string | null
     deskripsi: string | null
-    skorPrioritas: number | null
-    status: $Enums.StatusRekomendasi | null
+    tanggal: Date | null
+    lokasi: string | null
+    domainIsuId: string | null
+    dibuatOlehId: string | null
+    mode: $Enums.ModeRekomendasi | null
+    judulLaporan: string | null
+    fingerprint: string | null
+    statusRekomendasi: $Enums.StatusRekomendasi | null
+    aiModel: string | null
+    aiProcessedAt: Date | null
     diprosesOlehId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
 
-  export type RekomendasiMaxAggregateOutputType = {
+  export type KegiatanRapatMaxAggregateOutputType = {
     id: string | null
-    kegiatanRapatId: string | null
-    domainIsuId: string | null
     judul: string | null
-    ringkasan: string | null
     deskripsi: string | null
-    skorPrioritas: number | null
-    status: $Enums.StatusRekomendasi | null
+    tanggal: Date | null
+    lokasi: string | null
+    domainIsuId: string | null
+    dibuatOlehId: string | null
+    mode: $Enums.ModeRekomendasi | null
+    judulLaporan: string | null
+    fingerprint: string | null
+    statusRekomendasi: $Enums.StatusRekomendasi | null
+    aiModel: string | null
+    aiProcessedAt: Date | null
     diprosesOlehId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
 
-  export type RekomendasiCountAggregateOutputType = {
+  export type KegiatanRapatCountAggregateOutputType = {
     id: number
-    kegiatanRapatId: number
-    domainIsuId: number
     judul: number
-    ringkasan: number
     deskripsi: number
-    skorPrioritas: number
-    status: number
-    laporanLengkap: number
+    tanggal: number
+    lokasi: number
+    domainIsuId: number
+    dibuatOlehId: number
+    mode: number
+    judulLaporan: number
+    rekomendasiItems: number
+    fingerprint: number
+    statusRekomendasi: number
+    aiModel: number
+    aiProcessedAt: number
     diprosesOlehId: number
     createdAt: number
     updatedAt: number
@@ -6883,419 +6831,440 @@ export namespace Prisma {
   }
 
 
-  export type RekomendasiAvgAggregateInputType = {
-    skorPrioritas?: true
-  }
-
-  export type RekomendasiSumAggregateInputType = {
-    skorPrioritas?: true
-  }
-
-  export type RekomendasiMinAggregateInputType = {
+  export type KegiatanRapatMinAggregateInputType = {
     id?: true
-    kegiatanRapatId?: true
-    domainIsuId?: true
     judul?: true
-    ringkasan?: true
     deskripsi?: true
-    skorPrioritas?: true
-    status?: true
+    tanggal?: true
+    lokasi?: true
+    domainIsuId?: true
+    dibuatOlehId?: true
+    mode?: true
+    judulLaporan?: true
+    fingerprint?: true
+    statusRekomendasi?: true
+    aiModel?: true
+    aiProcessedAt?: true
     diprosesOlehId?: true
     createdAt?: true
     updatedAt?: true
   }
 
-  export type RekomendasiMaxAggregateInputType = {
+  export type KegiatanRapatMaxAggregateInputType = {
     id?: true
-    kegiatanRapatId?: true
-    domainIsuId?: true
     judul?: true
-    ringkasan?: true
     deskripsi?: true
-    skorPrioritas?: true
-    status?: true
+    tanggal?: true
+    lokasi?: true
+    domainIsuId?: true
+    dibuatOlehId?: true
+    mode?: true
+    judulLaporan?: true
+    fingerprint?: true
+    statusRekomendasi?: true
+    aiModel?: true
+    aiProcessedAt?: true
     diprosesOlehId?: true
     createdAt?: true
     updatedAt?: true
   }
 
-  export type RekomendasiCountAggregateInputType = {
+  export type KegiatanRapatCountAggregateInputType = {
     id?: true
-    kegiatanRapatId?: true
-    domainIsuId?: true
     judul?: true
-    ringkasan?: true
     deskripsi?: true
-    skorPrioritas?: true
-    status?: true
-    laporanLengkap?: true
+    tanggal?: true
+    lokasi?: true
+    domainIsuId?: true
+    dibuatOlehId?: true
+    mode?: true
+    judulLaporan?: true
+    rekomendasiItems?: true
+    fingerprint?: true
+    statusRekomendasi?: true
+    aiModel?: true
+    aiProcessedAt?: true
     diprosesOlehId?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
   }
 
-  export type RekomendasiAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which Rekomendasi to aggregate.
+     * Filter which KegiatanRapat to aggregate.
      */
-    where?: RekomendasiWhereInput
+    where?: KegiatanRapatWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of Rekomendasis to fetch.
+     * Determine the order of KegiatanRapats to fetch.
      */
-    orderBy?: RekomendasiOrderByWithRelationInput | RekomendasiOrderByWithRelationInput[]
+    orderBy?: KegiatanRapatOrderByWithRelationInput | KegiatanRapatOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
      * Sets the start position
      */
-    cursor?: RekomendasiWhereUniqueInput
+    cursor?: KegiatanRapatWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` Rekomendasis from the position of the cursor.
+     * Take `±n` KegiatanRapats from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` Rekomendasis.
+     * Skip the first `n` KegiatanRapats.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Count returned Rekomendasis
+     * Count returned KegiatanRapats
     **/
-    _count?: true | RekomendasiCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to average
-    **/
-    _avg?: RekomendasiAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: RekomendasiSumAggregateInputType
+    _count?: true | KegiatanRapatCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the minimum value
     **/
-    _min?: RekomendasiMinAggregateInputType
+    _min?: KegiatanRapatMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the maximum value
     **/
-    _max?: RekomendasiMaxAggregateInputType
+    _max?: KegiatanRapatMaxAggregateInputType
   }
 
-  export type GetRekomendasiAggregateType<T extends RekomendasiAggregateArgs> = {
-        [P in keyof T & keyof AggregateRekomendasi]: P extends '_count' | 'count'
+  export type GetKegiatanRapatAggregateType<T extends KegiatanRapatAggregateArgs> = {
+        [P in keyof T & keyof AggregateKegiatanRapat]: P extends '_count' | 'count'
       ? T[P] extends true
         ? number
-        : GetScalarType<T[P], AggregateRekomendasi[P]>
-      : GetScalarType<T[P], AggregateRekomendasi[P]>
+        : GetScalarType<T[P], AggregateKegiatanRapat[P]>
+      : GetScalarType<T[P], AggregateKegiatanRapat[P]>
   }
 
 
 
 
-  export type RekomendasiGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: RekomendasiWhereInput
-    orderBy?: RekomendasiOrderByWithAggregationInput | RekomendasiOrderByWithAggregationInput[]
-    by: RekomendasiScalarFieldEnum[] | RekomendasiScalarFieldEnum
-    having?: RekomendasiScalarWhereWithAggregatesInput
+  export type KegiatanRapatGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: KegiatanRapatWhereInput
+    orderBy?: KegiatanRapatOrderByWithAggregationInput | KegiatanRapatOrderByWithAggregationInput[]
+    by: KegiatanRapatScalarFieldEnum[] | KegiatanRapatScalarFieldEnum
+    having?: KegiatanRapatScalarWhereWithAggregatesInput
     take?: number
     skip?: number
-    _count?: RekomendasiCountAggregateInputType | true
-    _avg?: RekomendasiAvgAggregateInputType
-    _sum?: RekomendasiSumAggregateInputType
-    _min?: RekomendasiMinAggregateInputType
-    _max?: RekomendasiMaxAggregateInputType
+    _count?: KegiatanRapatCountAggregateInputType | true
+    _min?: KegiatanRapatMinAggregateInputType
+    _max?: KegiatanRapatMaxAggregateInputType
   }
 
-  export type RekomendasiGroupByOutputType = {
+  export type KegiatanRapatGroupByOutputType = {
     id: string
-    kegiatanRapatId: string
-    domainIsuId: string
     judul: string
-    ringkasan: string
     deskripsi: string
-    skorPrioritas: number
-    status: $Enums.StatusRekomendasi
-    laporanLengkap: JsonValue
+    tanggal: Date
+    lokasi: string | null
+    domainIsuId: string
+    dibuatOlehId: string
+    mode: $Enums.ModeRekomendasi
+    judulLaporan: string
+    rekomendasiItems: JsonValue
+    fingerprint: string
+    statusRekomendasi: $Enums.StatusRekomendasi
+    aiModel: string | null
+    aiProcessedAt: Date | null
     diprosesOlehId: string | null
     createdAt: Date
     updatedAt: Date
-    _count: RekomendasiCountAggregateOutputType | null
-    _avg: RekomendasiAvgAggregateOutputType | null
-    _sum: RekomendasiSumAggregateOutputType | null
-    _min: RekomendasiMinAggregateOutputType | null
-    _max: RekomendasiMaxAggregateOutputType | null
+    _count: KegiatanRapatCountAggregateOutputType | null
+    _min: KegiatanRapatMinAggregateOutputType | null
+    _max: KegiatanRapatMaxAggregateOutputType | null
   }
 
-  type GetRekomendasiGroupByPayload<T extends RekomendasiGroupByArgs> = Prisma.PrismaPromise<
+  type GetKegiatanRapatGroupByPayload<T extends KegiatanRapatGroupByArgs> = Prisma.PrismaPromise<
     Array<
-      PickEnumerable<RekomendasiGroupByOutputType, T['by']> &
+      PickEnumerable<KegiatanRapatGroupByOutputType, T['by']> &
         {
-          [P in ((keyof T) & (keyof RekomendasiGroupByOutputType))]: P extends '_count'
+          [P in ((keyof T) & (keyof KegiatanRapatGroupByOutputType))]: P extends '_count'
             ? T[P] extends boolean
               ? number
-              : GetScalarType<T[P], RekomendasiGroupByOutputType[P]>
-            : GetScalarType<T[P], RekomendasiGroupByOutputType[P]>
+              : GetScalarType<T[P], KegiatanRapatGroupByOutputType[P]>
+            : GetScalarType<T[P], KegiatanRapatGroupByOutputType[P]>
         }
       >
     >
 
 
-  export type RekomendasiSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type KegiatanRapatSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    kegiatanRapatId?: boolean
-    domainIsuId?: boolean
     judul?: boolean
-    ringkasan?: boolean
     deskripsi?: boolean
-    skorPrioritas?: boolean
-    status?: boolean
-    laporanLengkap?: boolean
+    tanggal?: boolean
+    lokasi?: boolean
+    domainIsuId?: boolean
+    dibuatOlehId?: boolean
+    mode?: boolean
+    judulLaporan?: boolean
+    rekomendasiItems?: boolean
+    fingerprint?: boolean
+    statusRekomendasi?: boolean
+    aiModel?: boolean
+    aiProcessedAt?: boolean
     diprosesOlehId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    kegiatanRapat?: boolean | KegiatanRapatDefaultArgs<ExtArgs>
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
-    diprosesOleh?: boolean | Rekomendasi$diprosesOlehArgs<ExtArgs>
-    masukanLinks?: boolean | Rekomendasi$masukanLinksArgs<ExtArgs>
-    _count?: boolean | RekomendasiCountOutputTypeDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["rekomendasi"]>
+    dibuatOleh?: boolean | UserDefaultArgs<ExtArgs>
+    diprosesOleh?: boolean | KegiatanRapat$diprosesOlehArgs<ExtArgs>
+    masukanRelasi?: boolean | KegiatanRapat$masukanRelasiArgs<ExtArgs>
+    _count?: boolean | KegiatanRapatCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["kegiatanRapat"]>
 
-  export type RekomendasiSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type KegiatanRapatSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    kegiatanRapatId?: boolean
-    domainIsuId?: boolean
     judul?: boolean
-    ringkasan?: boolean
     deskripsi?: boolean
-    skorPrioritas?: boolean
-    status?: boolean
-    laporanLengkap?: boolean
+    tanggal?: boolean
+    lokasi?: boolean
+    domainIsuId?: boolean
+    dibuatOlehId?: boolean
+    mode?: boolean
+    judulLaporan?: boolean
+    rekomendasiItems?: boolean
+    fingerprint?: boolean
+    statusRekomendasi?: boolean
+    aiModel?: boolean
+    aiProcessedAt?: boolean
     diprosesOlehId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    kegiatanRapat?: boolean | KegiatanRapatDefaultArgs<ExtArgs>
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
-    diprosesOleh?: boolean | Rekomendasi$diprosesOlehArgs<ExtArgs>
-  }, ExtArgs["result"]["rekomendasi"]>
+    dibuatOleh?: boolean | UserDefaultArgs<ExtArgs>
+    diprosesOleh?: boolean | KegiatanRapat$diprosesOlehArgs<ExtArgs>
+  }, ExtArgs["result"]["kegiatanRapat"]>
 
-  export type RekomendasiSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type KegiatanRapatSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    kegiatanRapatId?: boolean
-    domainIsuId?: boolean
     judul?: boolean
-    ringkasan?: boolean
     deskripsi?: boolean
-    skorPrioritas?: boolean
-    status?: boolean
-    laporanLengkap?: boolean
+    tanggal?: boolean
+    lokasi?: boolean
+    domainIsuId?: boolean
+    dibuatOlehId?: boolean
+    mode?: boolean
+    judulLaporan?: boolean
+    rekomendasiItems?: boolean
+    fingerprint?: boolean
+    statusRekomendasi?: boolean
+    aiModel?: boolean
+    aiProcessedAt?: boolean
     diprosesOlehId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    kegiatanRapat?: boolean | KegiatanRapatDefaultArgs<ExtArgs>
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
-    diprosesOleh?: boolean | Rekomendasi$diprosesOlehArgs<ExtArgs>
-  }, ExtArgs["result"]["rekomendasi"]>
+    dibuatOleh?: boolean | UserDefaultArgs<ExtArgs>
+    diprosesOleh?: boolean | KegiatanRapat$diprosesOlehArgs<ExtArgs>
+  }, ExtArgs["result"]["kegiatanRapat"]>
 
-  export type RekomendasiSelectScalar = {
+  export type KegiatanRapatSelectScalar = {
     id?: boolean
-    kegiatanRapatId?: boolean
-    domainIsuId?: boolean
     judul?: boolean
-    ringkasan?: boolean
     deskripsi?: boolean
-    skorPrioritas?: boolean
-    status?: boolean
-    laporanLengkap?: boolean
+    tanggal?: boolean
+    lokasi?: boolean
+    domainIsuId?: boolean
+    dibuatOlehId?: boolean
+    mode?: boolean
+    judulLaporan?: boolean
+    rekomendasiItems?: boolean
+    fingerprint?: boolean
+    statusRekomendasi?: boolean
+    aiModel?: boolean
+    aiProcessedAt?: boolean
     diprosesOlehId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type RekomendasiOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "kegiatanRapatId" | "domainIsuId" | "judul" | "ringkasan" | "deskripsi" | "skorPrioritas" | "status" | "laporanLengkap" | "diprosesOlehId" | "createdAt" | "updatedAt", ExtArgs["result"]["rekomendasi"]>
-  export type RekomendasiInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    kegiatanRapat?: boolean | KegiatanRapatDefaultArgs<ExtArgs>
+  export type KegiatanRapatOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "judul" | "deskripsi" | "tanggal" | "lokasi" | "domainIsuId" | "dibuatOlehId" | "mode" | "judulLaporan" | "rekomendasiItems" | "fingerprint" | "statusRekomendasi" | "aiModel" | "aiProcessedAt" | "diprosesOlehId" | "createdAt" | "updatedAt", ExtArgs["result"]["kegiatanRapat"]>
+  export type KegiatanRapatInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
-    diprosesOleh?: boolean | Rekomendasi$diprosesOlehArgs<ExtArgs>
-    masukanLinks?: boolean | Rekomendasi$masukanLinksArgs<ExtArgs>
-    _count?: boolean | RekomendasiCountOutputTypeDefaultArgs<ExtArgs>
+    dibuatOleh?: boolean | UserDefaultArgs<ExtArgs>
+    diprosesOleh?: boolean | KegiatanRapat$diprosesOlehArgs<ExtArgs>
+    masukanRelasi?: boolean | KegiatanRapat$masukanRelasiArgs<ExtArgs>
+    _count?: boolean | KegiatanRapatCountOutputTypeDefaultArgs<ExtArgs>
   }
-  export type RekomendasiIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    kegiatanRapat?: boolean | KegiatanRapatDefaultArgs<ExtArgs>
+  export type KegiatanRapatIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
-    diprosesOleh?: boolean | Rekomendasi$diprosesOlehArgs<ExtArgs>
+    dibuatOleh?: boolean | UserDefaultArgs<ExtArgs>
+    diprosesOleh?: boolean | KegiatanRapat$diprosesOlehArgs<ExtArgs>
   }
-  export type RekomendasiIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    kegiatanRapat?: boolean | KegiatanRapatDefaultArgs<ExtArgs>
+  export type KegiatanRapatIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
-    diprosesOleh?: boolean | Rekomendasi$diprosesOlehArgs<ExtArgs>
+    dibuatOleh?: boolean | UserDefaultArgs<ExtArgs>
+    diprosesOleh?: boolean | KegiatanRapat$diprosesOlehArgs<ExtArgs>
   }
 
-  export type $RekomendasiPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "Rekomendasi"
+  export type $KegiatanRapatPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "KegiatanRapat"
     objects: {
-      kegiatanRapat: Prisma.$KegiatanRapatPayload<ExtArgs>
       domainIsu: Prisma.$DomainIsuPayload<ExtArgs>
+      dibuatOleh: Prisma.$UserPayload<ExtArgs>
       diprosesOleh: Prisma.$UserPayload<ExtArgs> | null
-      masukanLinks: Prisma.$RekomendasiMasukanPayload<ExtArgs>[]
+      masukanRelasi: Prisma.$KegiatanRapatMasukanPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      kegiatanRapatId: string
-      domainIsuId: string
       judul: string
-      ringkasan: string
       deskripsi: string
-      skorPrioritas: number
-      status: $Enums.StatusRekomendasi
-      laporanLengkap: Prisma.JsonValue
+      tanggal: Date
+      lokasi: string | null
+      domainIsuId: string
+      dibuatOlehId: string
+      mode: $Enums.ModeRekomendasi
+      judulLaporan: string
+      rekomendasiItems: Prisma.JsonValue
+      fingerprint: string
+      statusRekomendasi: $Enums.StatusRekomendasi
+      aiModel: string | null
+      aiProcessedAt: Date | null
       diprosesOlehId: string | null
       createdAt: Date
       updatedAt: Date
-    }, ExtArgs["result"]["rekomendasi"]>
+    }, ExtArgs["result"]["kegiatanRapat"]>
     composites: {}
   }
 
-  type RekomendasiGetPayload<S extends boolean | null | undefined | RekomendasiDefaultArgs> = $Result.GetResult<Prisma.$RekomendasiPayload, S>
+  type KegiatanRapatGetPayload<S extends boolean | null | undefined | KegiatanRapatDefaultArgs> = $Result.GetResult<Prisma.$KegiatanRapatPayload, S>
 
-  type RekomendasiCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<RekomendasiFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: RekomendasiCountAggregateInputType | true
+  type KegiatanRapatCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<KegiatanRapatFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: KegiatanRapatCountAggregateInputType | true
     }
 
-  export interface RekomendasiDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Rekomendasi'], meta: { name: 'Rekomendasi' } }
+  export interface KegiatanRapatDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['KegiatanRapat'], meta: { name: 'KegiatanRapat' } }
     /**
-     * Find zero or one Rekomendasi that matches the filter.
-     * @param {RekomendasiFindUniqueArgs} args - Arguments to find a Rekomendasi
+     * Find zero or one KegiatanRapat that matches the filter.
+     * @param {KegiatanRapatFindUniqueArgs} args - Arguments to find a KegiatanRapat
      * @example
-     * // Get one Rekomendasi
-     * const rekomendasi = await prisma.rekomendasi.findUnique({
+     * // Get one KegiatanRapat
+     * const kegiatanRapat = await prisma.kegiatanRapat.findUnique({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUnique<T extends RekomendasiFindUniqueArgs>(args: SelectSubset<T, RekomendasiFindUniqueArgs<ExtArgs>>): Prisma__RekomendasiClient<$Result.GetResult<Prisma.$RekomendasiPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    findUnique<T extends KegiatanRapatFindUniqueArgs>(args: SelectSubset<T, KegiatanRapatFindUniqueArgs<ExtArgs>>): Prisma__KegiatanRapatClient<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find one Rekomendasi that matches the filter or throw an error with `error.code='P2025'`
+     * Find one KegiatanRapat that matches the filter or throw an error with `error.code='P2025'`
      * if no matches were found.
-     * @param {RekomendasiFindUniqueOrThrowArgs} args - Arguments to find a Rekomendasi
+     * @param {KegiatanRapatFindUniqueOrThrowArgs} args - Arguments to find a KegiatanRapat
      * @example
-     * // Get one Rekomendasi
-     * const rekomendasi = await prisma.rekomendasi.findUniqueOrThrow({
+     * // Get one KegiatanRapat
+     * const kegiatanRapat = await prisma.kegiatanRapat.findUniqueOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUniqueOrThrow<T extends RekomendasiFindUniqueOrThrowArgs>(args: SelectSubset<T, RekomendasiFindUniqueOrThrowArgs<ExtArgs>>): Prisma__RekomendasiClient<$Result.GetResult<Prisma.$RekomendasiPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    findUniqueOrThrow<T extends KegiatanRapatFindUniqueOrThrowArgs>(args: SelectSubset<T, KegiatanRapatFindUniqueOrThrowArgs<ExtArgs>>): Prisma__KegiatanRapatClient<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find the first Rekomendasi that matches the filter.
+     * Find the first KegiatanRapat that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {RekomendasiFindFirstArgs} args - Arguments to find a Rekomendasi
+     * @param {KegiatanRapatFindFirstArgs} args - Arguments to find a KegiatanRapat
      * @example
-     * // Get one Rekomendasi
-     * const rekomendasi = await prisma.rekomendasi.findFirst({
+     * // Get one KegiatanRapat
+     * const kegiatanRapat = await prisma.kegiatanRapat.findFirst({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirst<T extends RekomendasiFindFirstArgs>(args?: SelectSubset<T, RekomendasiFindFirstArgs<ExtArgs>>): Prisma__RekomendasiClient<$Result.GetResult<Prisma.$RekomendasiPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    findFirst<T extends KegiatanRapatFindFirstArgs>(args?: SelectSubset<T, KegiatanRapatFindFirstArgs<ExtArgs>>): Prisma__KegiatanRapatClient<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find the first Rekomendasi that matches the filter or
+     * Find the first KegiatanRapat that matches the filter or
      * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {RekomendasiFindFirstOrThrowArgs} args - Arguments to find a Rekomendasi
+     * @param {KegiatanRapatFindFirstOrThrowArgs} args - Arguments to find a KegiatanRapat
      * @example
-     * // Get one Rekomendasi
-     * const rekomendasi = await prisma.rekomendasi.findFirstOrThrow({
+     * // Get one KegiatanRapat
+     * const kegiatanRapat = await prisma.kegiatanRapat.findFirstOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirstOrThrow<T extends RekomendasiFindFirstOrThrowArgs>(args?: SelectSubset<T, RekomendasiFindFirstOrThrowArgs<ExtArgs>>): Prisma__RekomendasiClient<$Result.GetResult<Prisma.$RekomendasiPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    findFirstOrThrow<T extends KegiatanRapatFindFirstOrThrowArgs>(args?: SelectSubset<T, KegiatanRapatFindFirstOrThrowArgs<ExtArgs>>): Prisma__KegiatanRapatClient<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find zero or more Rekomendasis that matches the filter.
+     * Find zero or more KegiatanRapats that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {RekomendasiFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @param {KegiatanRapatFindManyArgs} args - Arguments to filter and select certain fields only.
      * @example
-     * // Get all Rekomendasis
-     * const rekomendasis = await prisma.rekomendasi.findMany()
+     * // Get all KegiatanRapats
+     * const kegiatanRapats = await prisma.kegiatanRapat.findMany()
      * 
-     * // Get first 10 Rekomendasis
-     * const rekomendasis = await prisma.rekomendasi.findMany({ take: 10 })
+     * // Get first 10 KegiatanRapats
+     * const kegiatanRapats = await prisma.kegiatanRapat.findMany({ take: 10 })
      * 
      * // Only select the `id`
-     * const rekomendasiWithIdOnly = await prisma.rekomendasi.findMany({ select: { id: true } })
+     * const kegiatanRapatWithIdOnly = await prisma.kegiatanRapat.findMany({ select: { id: true } })
      * 
      */
-    findMany<T extends RekomendasiFindManyArgs>(args?: SelectSubset<T, RekomendasiFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RekomendasiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+    findMany<T extends KegiatanRapatFindManyArgs>(args?: SelectSubset<T, KegiatanRapatFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
     /**
-     * Create a Rekomendasi.
-     * @param {RekomendasiCreateArgs} args - Arguments to create a Rekomendasi.
+     * Create a KegiatanRapat.
+     * @param {KegiatanRapatCreateArgs} args - Arguments to create a KegiatanRapat.
      * @example
-     * // Create one Rekomendasi
-     * const Rekomendasi = await prisma.rekomendasi.create({
+     * // Create one KegiatanRapat
+     * const KegiatanRapat = await prisma.kegiatanRapat.create({
      *   data: {
-     *     // ... data to create a Rekomendasi
+     *     // ... data to create a KegiatanRapat
      *   }
      * })
      * 
      */
-    create<T extends RekomendasiCreateArgs>(args: SelectSubset<T, RekomendasiCreateArgs<ExtArgs>>): Prisma__RekomendasiClient<$Result.GetResult<Prisma.$RekomendasiPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    create<T extends KegiatanRapatCreateArgs>(args: SelectSubset<T, KegiatanRapatCreateArgs<ExtArgs>>): Prisma__KegiatanRapatClient<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Create many Rekomendasis.
-     * @param {RekomendasiCreateManyArgs} args - Arguments to create many Rekomendasis.
+     * Create many KegiatanRapats.
+     * @param {KegiatanRapatCreateManyArgs} args - Arguments to create many KegiatanRapats.
      * @example
-     * // Create many Rekomendasis
-     * const rekomendasi = await prisma.rekomendasi.createMany({
+     * // Create many KegiatanRapats
+     * const kegiatanRapat = await prisma.kegiatanRapat.createMany({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      *     
      */
-    createMany<T extends RekomendasiCreateManyArgs>(args?: SelectSubset<T, RekomendasiCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    createMany<T extends KegiatanRapatCreateManyArgs>(args?: SelectSubset<T, KegiatanRapatCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Create many Rekomendasis and returns the data saved in the database.
-     * @param {RekomendasiCreateManyAndReturnArgs} args - Arguments to create many Rekomendasis.
+     * Create many KegiatanRapats and returns the data saved in the database.
+     * @param {KegiatanRapatCreateManyAndReturnArgs} args - Arguments to create many KegiatanRapats.
      * @example
-     * // Create many Rekomendasis
-     * const rekomendasi = await prisma.rekomendasi.createManyAndReturn({
+     * // Create many KegiatanRapats
+     * const kegiatanRapat = await prisma.kegiatanRapat.createManyAndReturn({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      * 
-     * // Create many Rekomendasis and only return the `id`
-     * const rekomendasiWithIdOnly = await prisma.rekomendasi.createManyAndReturn({
+     * // Create many KegiatanRapats and only return the `id`
+     * const kegiatanRapatWithIdOnly = await prisma.kegiatanRapat.createManyAndReturn({
      *   select: { id: true },
      *   data: [
      *     // ... provide data here
@@ -7305,28 +7274,28 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends RekomendasiCreateManyAndReturnArgs>(args?: SelectSubset<T, RekomendasiCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RekomendasiPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+    createManyAndReturn<T extends KegiatanRapatCreateManyAndReturnArgs>(args?: SelectSubset<T, KegiatanRapatCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
     /**
-     * Delete a Rekomendasi.
-     * @param {RekomendasiDeleteArgs} args - Arguments to delete one Rekomendasi.
+     * Delete a KegiatanRapat.
+     * @param {KegiatanRapatDeleteArgs} args - Arguments to delete one KegiatanRapat.
      * @example
-     * // Delete one Rekomendasi
-     * const Rekomendasi = await prisma.rekomendasi.delete({
+     * // Delete one KegiatanRapat
+     * const KegiatanRapat = await prisma.kegiatanRapat.delete({
      *   where: {
-     *     // ... filter to delete one Rekomendasi
+     *     // ... filter to delete one KegiatanRapat
      *   }
      * })
      * 
      */
-    delete<T extends RekomendasiDeleteArgs>(args: SelectSubset<T, RekomendasiDeleteArgs<ExtArgs>>): Prisma__RekomendasiClient<$Result.GetResult<Prisma.$RekomendasiPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    delete<T extends KegiatanRapatDeleteArgs>(args: SelectSubset<T, KegiatanRapatDeleteArgs<ExtArgs>>): Prisma__KegiatanRapatClient<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Update one Rekomendasi.
-     * @param {RekomendasiUpdateArgs} args - Arguments to update one Rekomendasi.
+     * Update one KegiatanRapat.
+     * @param {KegiatanRapatUpdateArgs} args - Arguments to update one KegiatanRapat.
      * @example
-     * // Update one Rekomendasi
-     * const rekomendasi = await prisma.rekomendasi.update({
+     * // Update one KegiatanRapat
+     * const kegiatanRapat = await prisma.kegiatanRapat.update({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -7336,30 +7305,30 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends RekomendasiUpdateArgs>(args: SelectSubset<T, RekomendasiUpdateArgs<ExtArgs>>): Prisma__RekomendasiClient<$Result.GetResult<Prisma.$RekomendasiPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    update<T extends KegiatanRapatUpdateArgs>(args: SelectSubset<T, KegiatanRapatUpdateArgs<ExtArgs>>): Prisma__KegiatanRapatClient<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Delete zero or more Rekomendasis.
-     * @param {RekomendasiDeleteManyArgs} args - Arguments to filter Rekomendasis to delete.
+     * Delete zero or more KegiatanRapats.
+     * @param {KegiatanRapatDeleteManyArgs} args - Arguments to filter KegiatanRapats to delete.
      * @example
-     * // Delete a few Rekomendasis
-     * const { count } = await prisma.rekomendasi.deleteMany({
+     * // Delete a few KegiatanRapats
+     * const { count } = await prisma.kegiatanRapat.deleteMany({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      * 
      */
-    deleteMany<T extends RekomendasiDeleteManyArgs>(args?: SelectSubset<T, RekomendasiDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    deleteMany<T extends KegiatanRapatDeleteManyArgs>(args?: SelectSubset<T, KegiatanRapatDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more Rekomendasis.
+     * Update zero or more KegiatanRapats.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {RekomendasiUpdateManyArgs} args - Arguments to update one or more rows.
+     * @param {KegiatanRapatUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
-     * // Update many Rekomendasis
-     * const rekomendasi = await prisma.rekomendasi.updateMany({
+     * // Update many KegiatanRapats
+     * const kegiatanRapat = await prisma.kegiatanRapat.updateMany({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -7369,14 +7338,14 @@ export namespace Prisma {
      * })
      * 
      */
-    updateMany<T extends RekomendasiUpdateManyArgs>(args: SelectSubset<T, RekomendasiUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    updateMany<T extends KegiatanRapatUpdateManyArgs>(args: SelectSubset<T, KegiatanRapatUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more Rekomendasis and returns the data updated in the database.
-     * @param {RekomendasiUpdateManyAndReturnArgs} args - Arguments to update many Rekomendasis.
+     * Update zero or more KegiatanRapats and returns the data updated in the database.
+     * @param {KegiatanRapatUpdateManyAndReturnArgs} args - Arguments to update many KegiatanRapats.
      * @example
-     * // Update many Rekomendasis
-     * const rekomendasi = await prisma.rekomendasi.updateManyAndReturn({
+     * // Update many KegiatanRapats
+     * const kegiatanRapat = await prisma.kegiatanRapat.updateManyAndReturn({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -7385,8 +7354,8 @@ export namespace Prisma {
      *   ]
      * })
      * 
-     * // Update zero or more Rekomendasis and only return the `id`
-     * const rekomendasiWithIdOnly = await prisma.rekomendasi.updateManyAndReturn({
+     * // Update zero or more KegiatanRapats and only return the `id`
+     * const kegiatanRapatWithIdOnly = await prisma.kegiatanRapat.updateManyAndReturn({
      *   select: { id: true },
      *   where: {
      *     // ... provide filter here
@@ -7399,56 +7368,56 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    updateManyAndReturn<T extends RekomendasiUpdateManyAndReturnArgs>(args: SelectSubset<T, RekomendasiUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RekomendasiPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+    updateManyAndReturn<T extends KegiatanRapatUpdateManyAndReturnArgs>(args: SelectSubset<T, KegiatanRapatUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
     /**
-     * Create or update one Rekomendasi.
-     * @param {RekomendasiUpsertArgs} args - Arguments to update or create a Rekomendasi.
+     * Create or update one KegiatanRapat.
+     * @param {KegiatanRapatUpsertArgs} args - Arguments to update or create a KegiatanRapat.
      * @example
-     * // Update or create a Rekomendasi
-     * const rekomendasi = await prisma.rekomendasi.upsert({
+     * // Update or create a KegiatanRapat
+     * const kegiatanRapat = await prisma.kegiatanRapat.upsert({
      *   create: {
-     *     // ... data to create a Rekomendasi
+     *     // ... data to create a KegiatanRapat
      *   },
      *   update: {
      *     // ... in case it already exists, update
      *   },
      *   where: {
-     *     // ... the filter for the Rekomendasi we want to update
+     *     // ... the filter for the KegiatanRapat we want to update
      *   }
      * })
      */
-    upsert<T extends RekomendasiUpsertArgs>(args: SelectSubset<T, RekomendasiUpsertArgs<ExtArgs>>): Prisma__RekomendasiClient<$Result.GetResult<Prisma.$RekomendasiPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    upsert<T extends KegiatanRapatUpsertArgs>(args: SelectSubset<T, KegiatanRapatUpsertArgs<ExtArgs>>): Prisma__KegiatanRapatClient<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
-     * Count the number of Rekomendasis.
+     * Count the number of KegiatanRapats.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {RekomendasiCountArgs} args - Arguments to filter Rekomendasis to count.
+     * @param {KegiatanRapatCountArgs} args - Arguments to filter KegiatanRapats to count.
      * @example
-     * // Count the number of Rekomendasis
-     * const count = await prisma.rekomendasi.count({
+     * // Count the number of KegiatanRapats
+     * const count = await prisma.kegiatanRapat.count({
      *   where: {
-     *     // ... the filter for the Rekomendasis we want to count
+     *     // ... the filter for the KegiatanRapats we want to count
      *   }
      * })
     **/
-    count<T extends RekomendasiCountArgs>(
-      args?: Subset<T, RekomendasiCountArgs>,
+    count<T extends KegiatanRapatCountArgs>(
+      args?: Subset<T, KegiatanRapatCountArgs>,
     ): Prisma.PrismaPromise<
       T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
-          : GetScalarType<T['select'], RekomendasiCountAggregateOutputType>
+          : GetScalarType<T['select'], KegiatanRapatCountAggregateOutputType>
         : number
     >
 
     /**
-     * Allows you to perform aggregations operations on a Rekomendasi.
+     * Allows you to perform aggregations operations on a KegiatanRapat.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {RekomendasiAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @param {KegiatanRapatAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
      * // Where email contains prisma.io
@@ -7468,13 +7437,13 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends RekomendasiAggregateArgs>(args: Subset<T, RekomendasiAggregateArgs>): Prisma.PrismaPromise<GetRekomendasiAggregateType<T>>
+    aggregate<T extends KegiatanRapatAggregateArgs>(args: Subset<T, KegiatanRapatAggregateArgs>): Prisma.PrismaPromise<GetKegiatanRapatAggregateType<T>>
 
     /**
-     * Group by Rekomendasi.
+     * Group by KegiatanRapat.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {RekomendasiGroupByArgs} args - Group by arguments.
+     * @param {KegiatanRapatGroupByArgs} args - Group by arguments.
      * @example
      * // Group by city, order by createdAt, get count
      * const result = await prisma.user.groupBy({
@@ -7489,14 +7458,14 @@ export namespace Prisma {
      * 
     **/
     groupBy<
-      T extends RekomendasiGroupByArgs,
+      T extends KegiatanRapatGroupByArgs,
       HasSelectOrTake extends Or<
         Extends<'skip', Keys<T>>,
         Extends<'take', Keys<T>>
       >,
       OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: RekomendasiGroupByArgs['orderBy'] }
-        : { orderBy?: RekomendasiGroupByArgs['orderBy'] },
+        ? { orderBy: KegiatanRapatGroupByArgs['orderBy'] }
+        : { orderBy?: KegiatanRapatGroupByArgs['orderBy'] },
       OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
       ByFields extends MaybeTupleToUnion<T['by']>,
       ByValid extends Has<ByFields, OrderFields>,
@@ -7545,25 +7514,25 @@ export namespace Prisma {
             ? never
             : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
         }[OrderFields]
-    >(args: SubsetIntersection<T, RekomendasiGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetRekomendasiGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+    >(args: SubsetIntersection<T, KegiatanRapatGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetKegiatanRapatGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
   /**
-   * Fields of the Rekomendasi model
+   * Fields of the KegiatanRapat model
    */
-  readonly fields: RekomendasiFieldRefs;
+  readonly fields: KegiatanRapatFieldRefs;
   }
 
   /**
-   * The delegate class that acts as a "Promise-like" for Rekomendasi.
+   * The delegate class that acts as a "Promise-like" for KegiatanRapat.
    * Why is this prefixed with `Prisma__`?
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__RekomendasiClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__KegiatanRapatClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    kegiatanRapat<T extends KegiatanRapatDefaultArgs<ExtArgs> = {}>(args?: Subset<T, KegiatanRapatDefaultArgs<ExtArgs>>): Prisma__KegiatanRapatClient<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     domainIsu<T extends DomainIsuDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DomainIsuDefaultArgs<ExtArgs>>): Prisma__DomainIsuClient<$Result.GetResult<Prisma.$DomainIsuPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    diprosesOleh<T extends Rekomendasi$diprosesOlehArgs<ExtArgs> = {}>(args?: Subset<T, Rekomendasi$diprosesOlehArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-    masukanLinks<T extends Rekomendasi$masukanLinksArgs<ExtArgs> = {}>(args?: Subset<T, Rekomendasi$masukanLinksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RekomendasiMasukanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    dibuatOleh<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    diprosesOleh<T extends KegiatanRapat$diprosesOlehArgs<ExtArgs> = {}>(args?: Subset<T, KegiatanRapat$diprosesOlehArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    masukanRelasi<T extends KegiatanRapat$masukanRelasiArgs<ExtArgs> = {}>(args?: Subset<T, KegiatanRapat$masukanRelasiArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatMasukanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7590,420 +7559,425 @@ export namespace Prisma {
 
 
   /**
-   * Fields of the Rekomendasi model
+   * Fields of the KegiatanRapat model
    */
-  interface RekomendasiFieldRefs {
-    readonly id: FieldRef<"Rekomendasi", 'String'>
-    readonly kegiatanRapatId: FieldRef<"Rekomendasi", 'String'>
-    readonly domainIsuId: FieldRef<"Rekomendasi", 'String'>
-    readonly judul: FieldRef<"Rekomendasi", 'String'>
-    readonly ringkasan: FieldRef<"Rekomendasi", 'String'>
-    readonly deskripsi: FieldRef<"Rekomendasi", 'String'>
-    readonly skorPrioritas: FieldRef<"Rekomendasi", 'Float'>
-    readonly status: FieldRef<"Rekomendasi", 'StatusRekomendasi'>
-    readonly laporanLengkap: FieldRef<"Rekomendasi", 'Json'>
-    readonly diprosesOlehId: FieldRef<"Rekomendasi", 'String'>
-    readonly createdAt: FieldRef<"Rekomendasi", 'DateTime'>
-    readonly updatedAt: FieldRef<"Rekomendasi", 'DateTime'>
+  interface KegiatanRapatFieldRefs {
+    readonly id: FieldRef<"KegiatanRapat", 'String'>
+    readonly judul: FieldRef<"KegiatanRapat", 'String'>
+    readonly deskripsi: FieldRef<"KegiatanRapat", 'String'>
+    readonly tanggal: FieldRef<"KegiatanRapat", 'DateTime'>
+    readonly lokasi: FieldRef<"KegiatanRapat", 'String'>
+    readonly domainIsuId: FieldRef<"KegiatanRapat", 'String'>
+    readonly dibuatOlehId: FieldRef<"KegiatanRapat", 'String'>
+    readonly mode: FieldRef<"KegiatanRapat", 'ModeRekomendasi'>
+    readonly judulLaporan: FieldRef<"KegiatanRapat", 'String'>
+    readonly rekomendasiItems: FieldRef<"KegiatanRapat", 'Json'>
+    readonly fingerprint: FieldRef<"KegiatanRapat", 'String'>
+    readonly statusRekomendasi: FieldRef<"KegiatanRapat", 'StatusRekomendasi'>
+    readonly aiModel: FieldRef<"KegiatanRapat", 'String'>
+    readonly aiProcessedAt: FieldRef<"KegiatanRapat", 'DateTime'>
+    readonly diprosesOlehId: FieldRef<"KegiatanRapat", 'String'>
+    readonly createdAt: FieldRef<"KegiatanRapat", 'DateTime'>
+    readonly updatedAt: FieldRef<"KegiatanRapat", 'DateTime'>
   }
     
 
   // Custom InputTypes
   /**
-   * Rekomendasi findUnique
+   * KegiatanRapat findUnique
    */
-  export type RekomendasiFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Rekomendasi
+     * Select specific fields to fetch from the KegiatanRapat
      */
-    select?: RekomendasiSelect<ExtArgs> | null
+    select?: KegiatanRapatSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Rekomendasi
+     * Omit specific fields from the KegiatanRapat
      */
-    omit?: RekomendasiOmit<ExtArgs> | null
+    omit?: KegiatanRapatOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiInclude<ExtArgs> | null
+    include?: KegiatanRapatInclude<ExtArgs> | null
     /**
-     * Filter, which Rekomendasi to fetch.
+     * Filter, which KegiatanRapat to fetch.
      */
-    where: RekomendasiWhereUniqueInput
+    where: KegiatanRapatWhereUniqueInput
   }
 
   /**
-   * Rekomendasi findUniqueOrThrow
+   * KegiatanRapat findUniqueOrThrow
    */
-  export type RekomendasiFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Rekomendasi
+     * Select specific fields to fetch from the KegiatanRapat
      */
-    select?: RekomendasiSelect<ExtArgs> | null
+    select?: KegiatanRapatSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Rekomendasi
+     * Omit specific fields from the KegiatanRapat
      */
-    omit?: RekomendasiOmit<ExtArgs> | null
+    omit?: KegiatanRapatOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiInclude<ExtArgs> | null
+    include?: KegiatanRapatInclude<ExtArgs> | null
     /**
-     * Filter, which Rekomendasi to fetch.
+     * Filter, which KegiatanRapat to fetch.
      */
-    where: RekomendasiWhereUniqueInput
+    where: KegiatanRapatWhereUniqueInput
   }
 
   /**
-   * Rekomendasi findFirst
+   * KegiatanRapat findFirst
    */
-  export type RekomendasiFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Rekomendasi
+     * Select specific fields to fetch from the KegiatanRapat
      */
-    select?: RekomendasiSelect<ExtArgs> | null
+    select?: KegiatanRapatSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Rekomendasi
+     * Omit specific fields from the KegiatanRapat
      */
-    omit?: RekomendasiOmit<ExtArgs> | null
+    omit?: KegiatanRapatOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiInclude<ExtArgs> | null
+    include?: KegiatanRapatInclude<ExtArgs> | null
     /**
-     * Filter, which Rekomendasi to fetch.
+     * Filter, which KegiatanRapat to fetch.
      */
-    where?: RekomendasiWhereInput
+    where?: KegiatanRapatWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of Rekomendasis to fetch.
+     * Determine the order of KegiatanRapats to fetch.
      */
-    orderBy?: RekomendasiOrderByWithRelationInput | RekomendasiOrderByWithRelationInput[]
+    orderBy?: KegiatanRapatOrderByWithRelationInput | KegiatanRapatOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for Rekomendasis.
+     * Sets the position for searching for KegiatanRapats.
      */
-    cursor?: RekomendasiWhereUniqueInput
+    cursor?: KegiatanRapatWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` Rekomendasis from the position of the cursor.
+     * Take `±n` KegiatanRapats from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` Rekomendasis.
+     * Skip the first `n` KegiatanRapats.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of Rekomendasis.
+     * Filter by unique combinations of KegiatanRapats.
      */
-    distinct?: RekomendasiScalarFieldEnum | RekomendasiScalarFieldEnum[]
+    distinct?: KegiatanRapatScalarFieldEnum | KegiatanRapatScalarFieldEnum[]
   }
 
   /**
-   * Rekomendasi findFirstOrThrow
+   * KegiatanRapat findFirstOrThrow
    */
-  export type RekomendasiFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Rekomendasi
+     * Select specific fields to fetch from the KegiatanRapat
      */
-    select?: RekomendasiSelect<ExtArgs> | null
+    select?: KegiatanRapatSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Rekomendasi
+     * Omit specific fields from the KegiatanRapat
      */
-    omit?: RekomendasiOmit<ExtArgs> | null
+    omit?: KegiatanRapatOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiInclude<ExtArgs> | null
+    include?: KegiatanRapatInclude<ExtArgs> | null
     /**
-     * Filter, which Rekomendasi to fetch.
+     * Filter, which KegiatanRapat to fetch.
      */
-    where?: RekomendasiWhereInput
+    where?: KegiatanRapatWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of Rekomendasis to fetch.
+     * Determine the order of KegiatanRapats to fetch.
      */
-    orderBy?: RekomendasiOrderByWithRelationInput | RekomendasiOrderByWithRelationInput[]
+    orderBy?: KegiatanRapatOrderByWithRelationInput | KegiatanRapatOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for Rekomendasis.
+     * Sets the position for searching for KegiatanRapats.
      */
-    cursor?: RekomendasiWhereUniqueInput
+    cursor?: KegiatanRapatWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` Rekomendasis from the position of the cursor.
+     * Take `±n` KegiatanRapats from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` Rekomendasis.
+     * Skip the first `n` KegiatanRapats.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of Rekomendasis.
+     * Filter by unique combinations of KegiatanRapats.
      */
-    distinct?: RekomendasiScalarFieldEnum | RekomendasiScalarFieldEnum[]
+    distinct?: KegiatanRapatScalarFieldEnum | KegiatanRapatScalarFieldEnum[]
   }
 
   /**
-   * Rekomendasi findMany
+   * KegiatanRapat findMany
    */
-  export type RekomendasiFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Rekomendasi
+     * Select specific fields to fetch from the KegiatanRapat
      */
-    select?: RekomendasiSelect<ExtArgs> | null
+    select?: KegiatanRapatSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Rekomendasi
+     * Omit specific fields from the KegiatanRapat
      */
-    omit?: RekomendasiOmit<ExtArgs> | null
+    omit?: KegiatanRapatOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiInclude<ExtArgs> | null
+    include?: KegiatanRapatInclude<ExtArgs> | null
     /**
-     * Filter, which Rekomendasis to fetch.
+     * Filter, which KegiatanRapats to fetch.
      */
-    where?: RekomendasiWhereInput
+    where?: KegiatanRapatWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of Rekomendasis to fetch.
+     * Determine the order of KegiatanRapats to fetch.
      */
-    orderBy?: RekomendasiOrderByWithRelationInput | RekomendasiOrderByWithRelationInput[]
+    orderBy?: KegiatanRapatOrderByWithRelationInput | KegiatanRapatOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for listing Rekomendasis.
+     * Sets the position for listing KegiatanRapats.
      */
-    cursor?: RekomendasiWhereUniqueInput
+    cursor?: KegiatanRapatWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` Rekomendasis from the position of the cursor.
+     * Take `±n` KegiatanRapats from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` Rekomendasis.
+     * Skip the first `n` KegiatanRapats.
      */
     skip?: number
-    distinct?: RekomendasiScalarFieldEnum | RekomendasiScalarFieldEnum[]
+    distinct?: KegiatanRapatScalarFieldEnum | KegiatanRapatScalarFieldEnum[]
   }
 
   /**
-   * Rekomendasi create
+   * KegiatanRapat create
    */
-  export type RekomendasiCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Rekomendasi
+     * Select specific fields to fetch from the KegiatanRapat
      */
-    select?: RekomendasiSelect<ExtArgs> | null
+    select?: KegiatanRapatSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Rekomendasi
+     * Omit specific fields from the KegiatanRapat
      */
-    omit?: RekomendasiOmit<ExtArgs> | null
+    omit?: KegiatanRapatOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiInclude<ExtArgs> | null
+    include?: KegiatanRapatInclude<ExtArgs> | null
     /**
-     * The data needed to create a Rekomendasi.
+     * The data needed to create a KegiatanRapat.
      */
-    data: XOR<RekomendasiCreateInput, RekomendasiUncheckedCreateInput>
+    data: XOR<KegiatanRapatCreateInput, KegiatanRapatUncheckedCreateInput>
   }
 
   /**
-   * Rekomendasi createMany
+   * KegiatanRapat createMany
    */
-  export type RekomendasiCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to create many Rekomendasis.
+     * The data used to create many KegiatanRapats.
      */
-    data: RekomendasiCreateManyInput | RekomendasiCreateManyInput[]
+    data: KegiatanRapatCreateManyInput | KegiatanRapatCreateManyInput[]
     skipDuplicates?: boolean
   }
 
   /**
-   * Rekomendasi createManyAndReturn
+   * KegiatanRapat createManyAndReturn
    */
-  export type RekomendasiCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Rekomendasi
+     * Select specific fields to fetch from the KegiatanRapat
      */
-    select?: RekomendasiSelectCreateManyAndReturn<ExtArgs> | null
+    select?: KegiatanRapatSelectCreateManyAndReturn<ExtArgs> | null
     /**
-     * Omit specific fields from the Rekomendasi
+     * Omit specific fields from the KegiatanRapat
      */
-    omit?: RekomendasiOmit<ExtArgs> | null
+    omit?: KegiatanRapatOmit<ExtArgs> | null
     /**
-     * The data used to create many Rekomendasis.
+     * The data used to create many KegiatanRapats.
      */
-    data: RekomendasiCreateManyInput | RekomendasiCreateManyInput[]
+    data: KegiatanRapatCreateManyInput | KegiatanRapatCreateManyInput[]
     skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiIncludeCreateManyAndReturn<ExtArgs> | null
+    include?: KegiatanRapatIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
-   * Rekomendasi update
+   * KegiatanRapat update
    */
-  export type RekomendasiUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Rekomendasi
+     * Select specific fields to fetch from the KegiatanRapat
      */
-    select?: RekomendasiSelect<ExtArgs> | null
+    select?: KegiatanRapatSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Rekomendasi
+     * Omit specific fields from the KegiatanRapat
      */
-    omit?: RekomendasiOmit<ExtArgs> | null
+    omit?: KegiatanRapatOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiInclude<ExtArgs> | null
+    include?: KegiatanRapatInclude<ExtArgs> | null
     /**
-     * The data needed to update a Rekomendasi.
+     * The data needed to update a KegiatanRapat.
      */
-    data: XOR<RekomendasiUpdateInput, RekomendasiUncheckedUpdateInput>
+    data: XOR<KegiatanRapatUpdateInput, KegiatanRapatUncheckedUpdateInput>
     /**
-     * Choose, which Rekomendasi to update.
+     * Choose, which KegiatanRapat to update.
      */
-    where: RekomendasiWhereUniqueInput
+    where: KegiatanRapatWhereUniqueInput
   }
 
   /**
-   * Rekomendasi updateMany
+   * KegiatanRapat updateMany
    */
-  export type RekomendasiUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to update Rekomendasis.
+     * The data used to update KegiatanRapats.
      */
-    data: XOR<RekomendasiUpdateManyMutationInput, RekomendasiUncheckedUpdateManyInput>
+    data: XOR<KegiatanRapatUpdateManyMutationInput, KegiatanRapatUncheckedUpdateManyInput>
     /**
-     * Filter which Rekomendasis to update
+     * Filter which KegiatanRapats to update
      */
-    where?: RekomendasiWhereInput
+    where?: KegiatanRapatWhereInput
     /**
-     * Limit how many Rekomendasis to update.
+     * Limit how many KegiatanRapats to update.
      */
     limit?: number
   }
 
   /**
-   * Rekomendasi updateManyAndReturn
+   * KegiatanRapat updateManyAndReturn
    */
-  export type RekomendasiUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Rekomendasi
+     * Select specific fields to fetch from the KegiatanRapat
      */
-    select?: RekomendasiSelectUpdateManyAndReturn<ExtArgs> | null
+    select?: KegiatanRapatSelectUpdateManyAndReturn<ExtArgs> | null
     /**
-     * Omit specific fields from the Rekomendasi
+     * Omit specific fields from the KegiatanRapat
      */
-    omit?: RekomendasiOmit<ExtArgs> | null
+    omit?: KegiatanRapatOmit<ExtArgs> | null
     /**
-     * The data used to update Rekomendasis.
+     * The data used to update KegiatanRapats.
      */
-    data: XOR<RekomendasiUpdateManyMutationInput, RekomendasiUncheckedUpdateManyInput>
+    data: XOR<KegiatanRapatUpdateManyMutationInput, KegiatanRapatUncheckedUpdateManyInput>
     /**
-     * Filter which Rekomendasis to update
+     * Filter which KegiatanRapats to update
      */
-    where?: RekomendasiWhereInput
+    where?: KegiatanRapatWhereInput
     /**
-     * Limit how many Rekomendasis to update.
+     * Limit how many KegiatanRapats to update.
      */
     limit?: number
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiIncludeUpdateManyAndReturn<ExtArgs> | null
+    include?: KegiatanRapatIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
-   * Rekomendasi upsert
+   * KegiatanRapat upsert
    */
-  export type RekomendasiUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Rekomendasi
+     * Select specific fields to fetch from the KegiatanRapat
      */
-    select?: RekomendasiSelect<ExtArgs> | null
+    select?: KegiatanRapatSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Rekomendasi
+     * Omit specific fields from the KegiatanRapat
      */
-    omit?: RekomendasiOmit<ExtArgs> | null
+    omit?: KegiatanRapatOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiInclude<ExtArgs> | null
+    include?: KegiatanRapatInclude<ExtArgs> | null
     /**
-     * The filter to search for the Rekomendasi to update in case it exists.
+     * The filter to search for the KegiatanRapat to update in case it exists.
      */
-    where: RekomendasiWhereUniqueInput
+    where: KegiatanRapatWhereUniqueInput
     /**
-     * In case the Rekomendasi found by the `where` argument doesn't exist, create a new Rekomendasi with this data.
+     * In case the KegiatanRapat found by the `where` argument doesn't exist, create a new KegiatanRapat with this data.
      */
-    create: XOR<RekomendasiCreateInput, RekomendasiUncheckedCreateInput>
+    create: XOR<KegiatanRapatCreateInput, KegiatanRapatUncheckedCreateInput>
     /**
-     * In case the Rekomendasi was found with the provided `where` argument, update it with this data.
+     * In case the KegiatanRapat was found with the provided `where` argument, update it with this data.
      */
-    update: XOR<RekomendasiUpdateInput, RekomendasiUncheckedUpdateInput>
+    update: XOR<KegiatanRapatUpdateInput, KegiatanRapatUncheckedUpdateInput>
   }
 
   /**
-   * Rekomendasi delete
+   * KegiatanRapat delete
    */
-  export type RekomendasiDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Rekomendasi
+     * Select specific fields to fetch from the KegiatanRapat
      */
-    select?: RekomendasiSelect<ExtArgs> | null
+    select?: KegiatanRapatSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Rekomendasi
+     * Omit specific fields from the KegiatanRapat
      */
-    omit?: RekomendasiOmit<ExtArgs> | null
+    omit?: KegiatanRapatOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiInclude<ExtArgs> | null
+    include?: KegiatanRapatInclude<ExtArgs> | null
     /**
-     * Filter which Rekomendasi to delete.
+     * Filter which KegiatanRapat to delete.
      */
-    where: RekomendasiWhereUniqueInput
+    where: KegiatanRapatWhereUniqueInput
   }
 
   /**
-   * Rekomendasi deleteMany
+   * KegiatanRapat deleteMany
    */
-  export type RekomendasiDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which Rekomendasis to delete
+     * Filter which KegiatanRapats to delete
      */
-    where?: RekomendasiWhereInput
+    where?: KegiatanRapatWhereInput
     /**
-     * Limit how many Rekomendasis to delete.
+     * Limit how many KegiatanRapats to delete.
      */
     limit?: number
   }
 
   /**
-   * Rekomendasi.diprosesOleh
+   * KegiatanRapat.diprosesOleh
    */
-  export type Rekomendasi$diprosesOlehArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapat$diprosesOlehArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the User
      */
@@ -8020,365 +7994,389 @@ export namespace Prisma {
   }
 
   /**
-   * Rekomendasi.masukanLinks
+   * KegiatanRapat.masukanRelasi
    */
-  export type Rekomendasi$masukanLinksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapat$masukanRelasiArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the RekomendasiMasukan
+     * Select specific fields to fetch from the KegiatanRapatMasukan
      */
-    select?: RekomendasiMasukanSelect<ExtArgs> | null
+    select?: KegiatanRapatMasukanSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the RekomendasiMasukan
+     * Omit specific fields from the KegiatanRapatMasukan
      */
-    omit?: RekomendasiMasukanOmit<ExtArgs> | null
+    omit?: KegiatanRapatMasukanOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiMasukanInclude<ExtArgs> | null
-    where?: RekomendasiMasukanWhereInput
-    orderBy?: RekomendasiMasukanOrderByWithRelationInput | RekomendasiMasukanOrderByWithRelationInput[]
-    cursor?: RekomendasiMasukanWhereUniqueInput
+    include?: KegiatanRapatMasukanInclude<ExtArgs> | null
+    where?: KegiatanRapatMasukanWhereInput
+    orderBy?: KegiatanRapatMasukanOrderByWithRelationInput | KegiatanRapatMasukanOrderByWithRelationInput[]
+    cursor?: KegiatanRapatMasukanWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: RekomendasiMasukanScalarFieldEnum | RekomendasiMasukanScalarFieldEnum[]
+    distinct?: KegiatanRapatMasukanScalarFieldEnum | KegiatanRapatMasukanScalarFieldEnum[]
   }
 
   /**
-   * Rekomendasi without action
+   * KegiatanRapat without action
    */
-  export type RekomendasiDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Rekomendasi
+     * Select specific fields to fetch from the KegiatanRapat
      */
-    select?: RekomendasiSelect<ExtArgs> | null
+    select?: KegiatanRapatSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Rekomendasi
+     * Omit specific fields from the KegiatanRapat
      */
-    omit?: RekomendasiOmit<ExtArgs> | null
+    omit?: KegiatanRapatOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiInclude<ExtArgs> | null
+    include?: KegiatanRapatInclude<ExtArgs> | null
   }
 
 
   /**
-   * Model RekomendasiMasukan
+   * Model KegiatanRapatMasukan
    */
 
-  export type AggregateRekomendasiMasukan = {
-    _count: RekomendasiMasukanCountAggregateOutputType | null
-    _min: RekomendasiMasukanMinAggregateOutputType | null
-    _max: RekomendasiMasukanMaxAggregateOutputType | null
+  export type AggregateKegiatanRapatMasukan = {
+    _count: KegiatanRapatMasukanCountAggregateOutputType | null
+    _min: KegiatanRapatMasukanMinAggregateOutputType | null
+    _max: KegiatanRapatMasukanMaxAggregateOutputType | null
   }
 
-  export type RekomendasiMasukanMinAggregateOutputType = {
-    rekomendasiId: string | null
+  export type KegiatanRapatMasukanMinAggregateOutputType = {
+    id: string | null
+    kegiatanRapatId: string | null
     masukanId: string | null
+    createdAt: Date | null
   }
 
-  export type RekomendasiMasukanMaxAggregateOutputType = {
-    rekomendasiId: string | null
+  export type KegiatanRapatMasukanMaxAggregateOutputType = {
+    id: string | null
+    kegiatanRapatId: string | null
     masukanId: string | null
+    createdAt: Date | null
   }
 
-  export type RekomendasiMasukanCountAggregateOutputType = {
-    rekomendasiId: number
+  export type KegiatanRapatMasukanCountAggregateOutputType = {
+    id: number
+    kegiatanRapatId: number
     masukanId: number
+    createdAt: number
     _all: number
   }
 
 
-  export type RekomendasiMasukanMinAggregateInputType = {
-    rekomendasiId?: true
+  export type KegiatanRapatMasukanMinAggregateInputType = {
+    id?: true
+    kegiatanRapatId?: true
     masukanId?: true
+    createdAt?: true
   }
 
-  export type RekomendasiMasukanMaxAggregateInputType = {
-    rekomendasiId?: true
+  export type KegiatanRapatMasukanMaxAggregateInputType = {
+    id?: true
+    kegiatanRapatId?: true
     masukanId?: true
+    createdAt?: true
   }
 
-  export type RekomendasiMasukanCountAggregateInputType = {
-    rekomendasiId?: true
+  export type KegiatanRapatMasukanCountAggregateInputType = {
+    id?: true
+    kegiatanRapatId?: true
     masukanId?: true
+    createdAt?: true
     _all?: true
   }
 
-  export type RekomendasiMasukanAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatMasukanAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which RekomendasiMasukan to aggregate.
+     * Filter which KegiatanRapatMasukan to aggregate.
      */
-    where?: RekomendasiMasukanWhereInput
+    where?: KegiatanRapatMasukanWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of RekomendasiMasukans to fetch.
+     * Determine the order of KegiatanRapatMasukans to fetch.
      */
-    orderBy?: RekomendasiMasukanOrderByWithRelationInput | RekomendasiMasukanOrderByWithRelationInput[]
+    orderBy?: KegiatanRapatMasukanOrderByWithRelationInput | KegiatanRapatMasukanOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
      * Sets the start position
      */
-    cursor?: RekomendasiMasukanWhereUniqueInput
+    cursor?: KegiatanRapatMasukanWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` RekomendasiMasukans from the position of the cursor.
+     * Take `±n` KegiatanRapatMasukans from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` RekomendasiMasukans.
+     * Skip the first `n` KegiatanRapatMasukans.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Count returned RekomendasiMasukans
+     * Count returned KegiatanRapatMasukans
     **/
-    _count?: true | RekomendasiMasukanCountAggregateInputType
+    _count?: true | KegiatanRapatMasukanCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the minimum value
     **/
-    _min?: RekomendasiMasukanMinAggregateInputType
+    _min?: KegiatanRapatMasukanMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the maximum value
     **/
-    _max?: RekomendasiMasukanMaxAggregateInputType
+    _max?: KegiatanRapatMasukanMaxAggregateInputType
   }
 
-  export type GetRekomendasiMasukanAggregateType<T extends RekomendasiMasukanAggregateArgs> = {
-        [P in keyof T & keyof AggregateRekomendasiMasukan]: P extends '_count' | 'count'
+  export type GetKegiatanRapatMasukanAggregateType<T extends KegiatanRapatMasukanAggregateArgs> = {
+        [P in keyof T & keyof AggregateKegiatanRapatMasukan]: P extends '_count' | 'count'
       ? T[P] extends true
         ? number
-        : GetScalarType<T[P], AggregateRekomendasiMasukan[P]>
-      : GetScalarType<T[P], AggregateRekomendasiMasukan[P]>
+        : GetScalarType<T[P], AggregateKegiatanRapatMasukan[P]>
+      : GetScalarType<T[P], AggregateKegiatanRapatMasukan[P]>
   }
 
 
 
 
-  export type RekomendasiMasukanGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: RekomendasiMasukanWhereInput
-    orderBy?: RekomendasiMasukanOrderByWithAggregationInput | RekomendasiMasukanOrderByWithAggregationInput[]
-    by: RekomendasiMasukanScalarFieldEnum[] | RekomendasiMasukanScalarFieldEnum
-    having?: RekomendasiMasukanScalarWhereWithAggregatesInput
+  export type KegiatanRapatMasukanGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: KegiatanRapatMasukanWhereInput
+    orderBy?: KegiatanRapatMasukanOrderByWithAggregationInput | KegiatanRapatMasukanOrderByWithAggregationInput[]
+    by: KegiatanRapatMasukanScalarFieldEnum[] | KegiatanRapatMasukanScalarFieldEnum
+    having?: KegiatanRapatMasukanScalarWhereWithAggregatesInput
     take?: number
     skip?: number
-    _count?: RekomendasiMasukanCountAggregateInputType | true
-    _min?: RekomendasiMasukanMinAggregateInputType
-    _max?: RekomendasiMasukanMaxAggregateInputType
+    _count?: KegiatanRapatMasukanCountAggregateInputType | true
+    _min?: KegiatanRapatMasukanMinAggregateInputType
+    _max?: KegiatanRapatMasukanMaxAggregateInputType
   }
 
-  export type RekomendasiMasukanGroupByOutputType = {
-    rekomendasiId: string
+  export type KegiatanRapatMasukanGroupByOutputType = {
+    id: string
+    kegiatanRapatId: string
     masukanId: string
-    _count: RekomendasiMasukanCountAggregateOutputType | null
-    _min: RekomendasiMasukanMinAggregateOutputType | null
-    _max: RekomendasiMasukanMaxAggregateOutputType | null
+    createdAt: Date
+    _count: KegiatanRapatMasukanCountAggregateOutputType | null
+    _min: KegiatanRapatMasukanMinAggregateOutputType | null
+    _max: KegiatanRapatMasukanMaxAggregateOutputType | null
   }
 
-  type GetRekomendasiMasukanGroupByPayload<T extends RekomendasiMasukanGroupByArgs> = Prisma.PrismaPromise<
+  type GetKegiatanRapatMasukanGroupByPayload<T extends KegiatanRapatMasukanGroupByArgs> = Prisma.PrismaPromise<
     Array<
-      PickEnumerable<RekomendasiMasukanGroupByOutputType, T['by']> &
+      PickEnumerable<KegiatanRapatMasukanGroupByOutputType, T['by']> &
         {
-          [P in ((keyof T) & (keyof RekomendasiMasukanGroupByOutputType))]: P extends '_count'
+          [P in ((keyof T) & (keyof KegiatanRapatMasukanGroupByOutputType))]: P extends '_count'
             ? T[P] extends boolean
               ? number
-              : GetScalarType<T[P], RekomendasiMasukanGroupByOutputType[P]>
-            : GetScalarType<T[P], RekomendasiMasukanGroupByOutputType[P]>
+              : GetScalarType<T[P], KegiatanRapatMasukanGroupByOutputType[P]>
+            : GetScalarType<T[P], KegiatanRapatMasukanGroupByOutputType[P]>
         }
       >
     >
 
 
-  export type RekomendasiMasukanSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    rekomendasiId?: boolean
+  export type KegiatanRapatMasukanSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    kegiatanRapatId?: boolean
     masukanId?: boolean
-    rekomendasi?: boolean | RekomendasiDefaultArgs<ExtArgs>
+    createdAt?: boolean
+    kegiatanRapat?: boolean | KegiatanRapatDefaultArgs<ExtArgs>
     masukan?: boolean | MasukanWargaDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["rekomendasiMasukan"]>
+  }, ExtArgs["result"]["kegiatanRapatMasukan"]>
 
-  export type RekomendasiMasukanSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    rekomendasiId?: boolean
+  export type KegiatanRapatMasukanSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    kegiatanRapatId?: boolean
     masukanId?: boolean
-    rekomendasi?: boolean | RekomendasiDefaultArgs<ExtArgs>
+    createdAt?: boolean
+    kegiatanRapat?: boolean | KegiatanRapatDefaultArgs<ExtArgs>
     masukan?: boolean | MasukanWargaDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["rekomendasiMasukan"]>
+  }, ExtArgs["result"]["kegiatanRapatMasukan"]>
 
-  export type RekomendasiMasukanSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    rekomendasiId?: boolean
+  export type KegiatanRapatMasukanSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    kegiatanRapatId?: boolean
     masukanId?: boolean
-    rekomendasi?: boolean | RekomendasiDefaultArgs<ExtArgs>
+    createdAt?: boolean
+    kegiatanRapat?: boolean | KegiatanRapatDefaultArgs<ExtArgs>
     masukan?: boolean | MasukanWargaDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["rekomendasiMasukan"]>
+  }, ExtArgs["result"]["kegiatanRapatMasukan"]>
 
-  export type RekomendasiMasukanSelectScalar = {
-    rekomendasiId?: boolean
+  export type KegiatanRapatMasukanSelectScalar = {
+    id?: boolean
+    kegiatanRapatId?: boolean
     masukanId?: boolean
+    createdAt?: boolean
   }
 
-  export type RekomendasiMasukanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"rekomendasiId" | "masukanId", ExtArgs["result"]["rekomendasiMasukan"]>
-  export type RekomendasiMasukanInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    rekomendasi?: boolean | RekomendasiDefaultArgs<ExtArgs>
+  export type KegiatanRapatMasukanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "kegiatanRapatId" | "masukanId" | "createdAt", ExtArgs["result"]["kegiatanRapatMasukan"]>
+  export type KegiatanRapatMasukanInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    kegiatanRapat?: boolean | KegiatanRapatDefaultArgs<ExtArgs>
     masukan?: boolean | MasukanWargaDefaultArgs<ExtArgs>
   }
-  export type RekomendasiMasukanIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    rekomendasi?: boolean | RekomendasiDefaultArgs<ExtArgs>
+  export type KegiatanRapatMasukanIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    kegiatanRapat?: boolean | KegiatanRapatDefaultArgs<ExtArgs>
     masukan?: boolean | MasukanWargaDefaultArgs<ExtArgs>
   }
-  export type RekomendasiMasukanIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    rekomendasi?: boolean | RekomendasiDefaultArgs<ExtArgs>
+  export type KegiatanRapatMasukanIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    kegiatanRapat?: boolean | KegiatanRapatDefaultArgs<ExtArgs>
     masukan?: boolean | MasukanWargaDefaultArgs<ExtArgs>
   }
 
-  export type $RekomendasiMasukanPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "RekomendasiMasukan"
+  export type $KegiatanRapatMasukanPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "KegiatanRapatMasukan"
     objects: {
-      rekomendasi: Prisma.$RekomendasiPayload<ExtArgs>
+      kegiatanRapat: Prisma.$KegiatanRapatPayload<ExtArgs>
       masukan: Prisma.$MasukanWargaPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
-      rekomendasiId: string
+      id: string
+      kegiatanRapatId: string
       masukanId: string
-    }, ExtArgs["result"]["rekomendasiMasukan"]>
+      createdAt: Date
+    }, ExtArgs["result"]["kegiatanRapatMasukan"]>
     composites: {}
   }
 
-  type RekomendasiMasukanGetPayload<S extends boolean | null | undefined | RekomendasiMasukanDefaultArgs> = $Result.GetResult<Prisma.$RekomendasiMasukanPayload, S>
+  type KegiatanRapatMasukanGetPayload<S extends boolean | null | undefined | KegiatanRapatMasukanDefaultArgs> = $Result.GetResult<Prisma.$KegiatanRapatMasukanPayload, S>
 
-  type RekomendasiMasukanCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<RekomendasiMasukanFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: RekomendasiMasukanCountAggregateInputType | true
+  type KegiatanRapatMasukanCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<KegiatanRapatMasukanFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: KegiatanRapatMasukanCountAggregateInputType | true
     }
 
-  export interface RekomendasiMasukanDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['RekomendasiMasukan'], meta: { name: 'RekomendasiMasukan' } }
+  export interface KegiatanRapatMasukanDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['KegiatanRapatMasukan'], meta: { name: 'KegiatanRapatMasukan' } }
     /**
-     * Find zero or one RekomendasiMasukan that matches the filter.
-     * @param {RekomendasiMasukanFindUniqueArgs} args - Arguments to find a RekomendasiMasukan
+     * Find zero or one KegiatanRapatMasukan that matches the filter.
+     * @param {KegiatanRapatMasukanFindUniqueArgs} args - Arguments to find a KegiatanRapatMasukan
      * @example
-     * // Get one RekomendasiMasukan
-     * const rekomendasiMasukan = await prisma.rekomendasiMasukan.findUnique({
+     * // Get one KegiatanRapatMasukan
+     * const kegiatanRapatMasukan = await prisma.kegiatanRapatMasukan.findUnique({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUnique<T extends RekomendasiMasukanFindUniqueArgs>(args: SelectSubset<T, RekomendasiMasukanFindUniqueArgs<ExtArgs>>): Prisma__RekomendasiMasukanClient<$Result.GetResult<Prisma.$RekomendasiMasukanPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    findUnique<T extends KegiatanRapatMasukanFindUniqueArgs>(args: SelectSubset<T, KegiatanRapatMasukanFindUniqueArgs<ExtArgs>>): Prisma__KegiatanRapatMasukanClient<$Result.GetResult<Prisma.$KegiatanRapatMasukanPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find one RekomendasiMasukan that matches the filter or throw an error with `error.code='P2025'`
+     * Find one KegiatanRapatMasukan that matches the filter or throw an error with `error.code='P2025'`
      * if no matches were found.
-     * @param {RekomendasiMasukanFindUniqueOrThrowArgs} args - Arguments to find a RekomendasiMasukan
+     * @param {KegiatanRapatMasukanFindUniqueOrThrowArgs} args - Arguments to find a KegiatanRapatMasukan
      * @example
-     * // Get one RekomendasiMasukan
-     * const rekomendasiMasukan = await prisma.rekomendasiMasukan.findUniqueOrThrow({
+     * // Get one KegiatanRapatMasukan
+     * const kegiatanRapatMasukan = await prisma.kegiatanRapatMasukan.findUniqueOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUniqueOrThrow<T extends RekomendasiMasukanFindUniqueOrThrowArgs>(args: SelectSubset<T, RekomendasiMasukanFindUniqueOrThrowArgs<ExtArgs>>): Prisma__RekomendasiMasukanClient<$Result.GetResult<Prisma.$RekomendasiMasukanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    findUniqueOrThrow<T extends KegiatanRapatMasukanFindUniqueOrThrowArgs>(args: SelectSubset<T, KegiatanRapatMasukanFindUniqueOrThrowArgs<ExtArgs>>): Prisma__KegiatanRapatMasukanClient<$Result.GetResult<Prisma.$KegiatanRapatMasukanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find the first RekomendasiMasukan that matches the filter.
+     * Find the first KegiatanRapatMasukan that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {RekomendasiMasukanFindFirstArgs} args - Arguments to find a RekomendasiMasukan
+     * @param {KegiatanRapatMasukanFindFirstArgs} args - Arguments to find a KegiatanRapatMasukan
      * @example
-     * // Get one RekomendasiMasukan
-     * const rekomendasiMasukan = await prisma.rekomendasiMasukan.findFirst({
+     * // Get one KegiatanRapatMasukan
+     * const kegiatanRapatMasukan = await prisma.kegiatanRapatMasukan.findFirst({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirst<T extends RekomendasiMasukanFindFirstArgs>(args?: SelectSubset<T, RekomendasiMasukanFindFirstArgs<ExtArgs>>): Prisma__RekomendasiMasukanClient<$Result.GetResult<Prisma.$RekomendasiMasukanPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    findFirst<T extends KegiatanRapatMasukanFindFirstArgs>(args?: SelectSubset<T, KegiatanRapatMasukanFindFirstArgs<ExtArgs>>): Prisma__KegiatanRapatMasukanClient<$Result.GetResult<Prisma.$KegiatanRapatMasukanPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find the first RekomendasiMasukan that matches the filter or
+     * Find the first KegiatanRapatMasukan that matches the filter or
      * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {RekomendasiMasukanFindFirstOrThrowArgs} args - Arguments to find a RekomendasiMasukan
+     * @param {KegiatanRapatMasukanFindFirstOrThrowArgs} args - Arguments to find a KegiatanRapatMasukan
      * @example
-     * // Get one RekomendasiMasukan
-     * const rekomendasiMasukan = await prisma.rekomendasiMasukan.findFirstOrThrow({
+     * // Get one KegiatanRapatMasukan
+     * const kegiatanRapatMasukan = await prisma.kegiatanRapatMasukan.findFirstOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirstOrThrow<T extends RekomendasiMasukanFindFirstOrThrowArgs>(args?: SelectSubset<T, RekomendasiMasukanFindFirstOrThrowArgs<ExtArgs>>): Prisma__RekomendasiMasukanClient<$Result.GetResult<Prisma.$RekomendasiMasukanPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    findFirstOrThrow<T extends KegiatanRapatMasukanFindFirstOrThrowArgs>(args?: SelectSubset<T, KegiatanRapatMasukanFindFirstOrThrowArgs<ExtArgs>>): Prisma__KegiatanRapatMasukanClient<$Result.GetResult<Prisma.$KegiatanRapatMasukanPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find zero or more RekomendasiMasukans that matches the filter.
+     * Find zero or more KegiatanRapatMasukans that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {RekomendasiMasukanFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @param {KegiatanRapatMasukanFindManyArgs} args - Arguments to filter and select certain fields only.
      * @example
-     * // Get all RekomendasiMasukans
-     * const rekomendasiMasukans = await prisma.rekomendasiMasukan.findMany()
+     * // Get all KegiatanRapatMasukans
+     * const kegiatanRapatMasukans = await prisma.kegiatanRapatMasukan.findMany()
      * 
-     * // Get first 10 RekomendasiMasukans
-     * const rekomendasiMasukans = await prisma.rekomendasiMasukan.findMany({ take: 10 })
+     * // Get first 10 KegiatanRapatMasukans
+     * const kegiatanRapatMasukans = await prisma.kegiatanRapatMasukan.findMany({ take: 10 })
      * 
-     * // Only select the `rekomendasiId`
-     * const rekomendasiMasukanWithRekomendasiIdOnly = await prisma.rekomendasiMasukan.findMany({ select: { rekomendasiId: true } })
+     * // Only select the `id`
+     * const kegiatanRapatMasukanWithIdOnly = await prisma.kegiatanRapatMasukan.findMany({ select: { id: true } })
      * 
      */
-    findMany<T extends RekomendasiMasukanFindManyArgs>(args?: SelectSubset<T, RekomendasiMasukanFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RekomendasiMasukanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+    findMany<T extends KegiatanRapatMasukanFindManyArgs>(args?: SelectSubset<T, KegiatanRapatMasukanFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatMasukanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
     /**
-     * Create a RekomendasiMasukan.
-     * @param {RekomendasiMasukanCreateArgs} args - Arguments to create a RekomendasiMasukan.
+     * Create a KegiatanRapatMasukan.
+     * @param {KegiatanRapatMasukanCreateArgs} args - Arguments to create a KegiatanRapatMasukan.
      * @example
-     * // Create one RekomendasiMasukan
-     * const RekomendasiMasukan = await prisma.rekomendasiMasukan.create({
+     * // Create one KegiatanRapatMasukan
+     * const KegiatanRapatMasukan = await prisma.kegiatanRapatMasukan.create({
      *   data: {
-     *     // ... data to create a RekomendasiMasukan
+     *     // ... data to create a KegiatanRapatMasukan
      *   }
      * })
      * 
      */
-    create<T extends RekomendasiMasukanCreateArgs>(args: SelectSubset<T, RekomendasiMasukanCreateArgs<ExtArgs>>): Prisma__RekomendasiMasukanClient<$Result.GetResult<Prisma.$RekomendasiMasukanPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    create<T extends KegiatanRapatMasukanCreateArgs>(args: SelectSubset<T, KegiatanRapatMasukanCreateArgs<ExtArgs>>): Prisma__KegiatanRapatMasukanClient<$Result.GetResult<Prisma.$KegiatanRapatMasukanPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Create many RekomendasiMasukans.
-     * @param {RekomendasiMasukanCreateManyArgs} args - Arguments to create many RekomendasiMasukans.
+     * Create many KegiatanRapatMasukans.
+     * @param {KegiatanRapatMasukanCreateManyArgs} args - Arguments to create many KegiatanRapatMasukans.
      * @example
-     * // Create many RekomendasiMasukans
-     * const rekomendasiMasukan = await prisma.rekomendasiMasukan.createMany({
+     * // Create many KegiatanRapatMasukans
+     * const kegiatanRapatMasukan = await prisma.kegiatanRapatMasukan.createMany({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      *     
      */
-    createMany<T extends RekomendasiMasukanCreateManyArgs>(args?: SelectSubset<T, RekomendasiMasukanCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    createMany<T extends KegiatanRapatMasukanCreateManyArgs>(args?: SelectSubset<T, KegiatanRapatMasukanCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Create many RekomendasiMasukans and returns the data saved in the database.
-     * @param {RekomendasiMasukanCreateManyAndReturnArgs} args - Arguments to create many RekomendasiMasukans.
+     * Create many KegiatanRapatMasukans and returns the data saved in the database.
+     * @param {KegiatanRapatMasukanCreateManyAndReturnArgs} args - Arguments to create many KegiatanRapatMasukans.
      * @example
-     * // Create many RekomendasiMasukans
-     * const rekomendasiMasukan = await prisma.rekomendasiMasukan.createManyAndReturn({
+     * // Create many KegiatanRapatMasukans
+     * const kegiatanRapatMasukan = await prisma.kegiatanRapatMasukan.createManyAndReturn({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      * 
-     * // Create many RekomendasiMasukans and only return the `rekomendasiId`
-     * const rekomendasiMasukanWithRekomendasiIdOnly = await prisma.rekomendasiMasukan.createManyAndReturn({
-     *   select: { rekomendasiId: true },
+     * // Create many KegiatanRapatMasukans and only return the `id`
+     * const kegiatanRapatMasukanWithIdOnly = await prisma.kegiatanRapatMasukan.createManyAndReturn({
+     *   select: { id: true },
      *   data: [
      *     // ... provide data here
      *   ]
@@ -8387,28 +8385,28 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends RekomendasiMasukanCreateManyAndReturnArgs>(args?: SelectSubset<T, RekomendasiMasukanCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RekomendasiMasukanPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+    createManyAndReturn<T extends KegiatanRapatMasukanCreateManyAndReturnArgs>(args?: SelectSubset<T, KegiatanRapatMasukanCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatMasukanPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
     /**
-     * Delete a RekomendasiMasukan.
-     * @param {RekomendasiMasukanDeleteArgs} args - Arguments to delete one RekomendasiMasukan.
+     * Delete a KegiatanRapatMasukan.
+     * @param {KegiatanRapatMasukanDeleteArgs} args - Arguments to delete one KegiatanRapatMasukan.
      * @example
-     * // Delete one RekomendasiMasukan
-     * const RekomendasiMasukan = await prisma.rekomendasiMasukan.delete({
+     * // Delete one KegiatanRapatMasukan
+     * const KegiatanRapatMasukan = await prisma.kegiatanRapatMasukan.delete({
      *   where: {
-     *     // ... filter to delete one RekomendasiMasukan
+     *     // ... filter to delete one KegiatanRapatMasukan
      *   }
      * })
      * 
      */
-    delete<T extends RekomendasiMasukanDeleteArgs>(args: SelectSubset<T, RekomendasiMasukanDeleteArgs<ExtArgs>>): Prisma__RekomendasiMasukanClient<$Result.GetResult<Prisma.$RekomendasiMasukanPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    delete<T extends KegiatanRapatMasukanDeleteArgs>(args: SelectSubset<T, KegiatanRapatMasukanDeleteArgs<ExtArgs>>): Prisma__KegiatanRapatMasukanClient<$Result.GetResult<Prisma.$KegiatanRapatMasukanPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Update one RekomendasiMasukan.
-     * @param {RekomendasiMasukanUpdateArgs} args - Arguments to update one RekomendasiMasukan.
+     * Update one KegiatanRapatMasukan.
+     * @param {KegiatanRapatMasukanUpdateArgs} args - Arguments to update one KegiatanRapatMasukan.
      * @example
-     * // Update one RekomendasiMasukan
-     * const rekomendasiMasukan = await prisma.rekomendasiMasukan.update({
+     * // Update one KegiatanRapatMasukan
+     * const kegiatanRapatMasukan = await prisma.kegiatanRapatMasukan.update({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -8418,30 +8416,30 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends RekomendasiMasukanUpdateArgs>(args: SelectSubset<T, RekomendasiMasukanUpdateArgs<ExtArgs>>): Prisma__RekomendasiMasukanClient<$Result.GetResult<Prisma.$RekomendasiMasukanPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    update<T extends KegiatanRapatMasukanUpdateArgs>(args: SelectSubset<T, KegiatanRapatMasukanUpdateArgs<ExtArgs>>): Prisma__KegiatanRapatMasukanClient<$Result.GetResult<Prisma.$KegiatanRapatMasukanPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Delete zero or more RekomendasiMasukans.
-     * @param {RekomendasiMasukanDeleteManyArgs} args - Arguments to filter RekomendasiMasukans to delete.
+     * Delete zero or more KegiatanRapatMasukans.
+     * @param {KegiatanRapatMasukanDeleteManyArgs} args - Arguments to filter KegiatanRapatMasukans to delete.
      * @example
-     * // Delete a few RekomendasiMasukans
-     * const { count } = await prisma.rekomendasiMasukan.deleteMany({
+     * // Delete a few KegiatanRapatMasukans
+     * const { count } = await prisma.kegiatanRapatMasukan.deleteMany({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      * 
      */
-    deleteMany<T extends RekomendasiMasukanDeleteManyArgs>(args?: SelectSubset<T, RekomendasiMasukanDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    deleteMany<T extends KegiatanRapatMasukanDeleteManyArgs>(args?: SelectSubset<T, KegiatanRapatMasukanDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more RekomendasiMasukans.
+     * Update zero or more KegiatanRapatMasukans.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {RekomendasiMasukanUpdateManyArgs} args - Arguments to update one or more rows.
+     * @param {KegiatanRapatMasukanUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
-     * // Update many RekomendasiMasukans
-     * const rekomendasiMasukan = await prisma.rekomendasiMasukan.updateMany({
+     * // Update many KegiatanRapatMasukans
+     * const kegiatanRapatMasukan = await prisma.kegiatanRapatMasukan.updateMany({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -8451,14 +8449,14 @@ export namespace Prisma {
      * })
      * 
      */
-    updateMany<T extends RekomendasiMasukanUpdateManyArgs>(args: SelectSubset<T, RekomendasiMasukanUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    updateMany<T extends KegiatanRapatMasukanUpdateManyArgs>(args: SelectSubset<T, KegiatanRapatMasukanUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more RekomendasiMasukans and returns the data updated in the database.
-     * @param {RekomendasiMasukanUpdateManyAndReturnArgs} args - Arguments to update many RekomendasiMasukans.
+     * Update zero or more KegiatanRapatMasukans and returns the data updated in the database.
+     * @param {KegiatanRapatMasukanUpdateManyAndReturnArgs} args - Arguments to update many KegiatanRapatMasukans.
      * @example
-     * // Update many RekomendasiMasukans
-     * const rekomendasiMasukan = await prisma.rekomendasiMasukan.updateManyAndReturn({
+     * // Update many KegiatanRapatMasukans
+     * const kegiatanRapatMasukan = await prisma.kegiatanRapatMasukan.updateManyAndReturn({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -8467,9 +8465,9 @@ export namespace Prisma {
      *   ]
      * })
      * 
-     * // Update zero or more RekomendasiMasukans and only return the `rekomendasiId`
-     * const rekomendasiMasukanWithRekomendasiIdOnly = await prisma.rekomendasiMasukan.updateManyAndReturn({
-     *   select: { rekomendasiId: true },
+     * // Update zero or more KegiatanRapatMasukans and only return the `id`
+     * const kegiatanRapatMasukanWithIdOnly = await prisma.kegiatanRapatMasukan.updateManyAndReturn({
+     *   select: { id: true },
      *   where: {
      *     // ... provide filter here
      *   },
@@ -8481,56 +8479,56 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    updateManyAndReturn<T extends RekomendasiMasukanUpdateManyAndReturnArgs>(args: SelectSubset<T, RekomendasiMasukanUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RekomendasiMasukanPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+    updateManyAndReturn<T extends KegiatanRapatMasukanUpdateManyAndReturnArgs>(args: SelectSubset<T, KegiatanRapatMasukanUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatMasukanPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
     /**
-     * Create or update one RekomendasiMasukan.
-     * @param {RekomendasiMasukanUpsertArgs} args - Arguments to update or create a RekomendasiMasukan.
+     * Create or update one KegiatanRapatMasukan.
+     * @param {KegiatanRapatMasukanUpsertArgs} args - Arguments to update or create a KegiatanRapatMasukan.
      * @example
-     * // Update or create a RekomendasiMasukan
-     * const rekomendasiMasukan = await prisma.rekomendasiMasukan.upsert({
+     * // Update or create a KegiatanRapatMasukan
+     * const kegiatanRapatMasukan = await prisma.kegiatanRapatMasukan.upsert({
      *   create: {
-     *     // ... data to create a RekomendasiMasukan
+     *     // ... data to create a KegiatanRapatMasukan
      *   },
      *   update: {
      *     // ... in case it already exists, update
      *   },
      *   where: {
-     *     // ... the filter for the RekomendasiMasukan we want to update
+     *     // ... the filter for the KegiatanRapatMasukan we want to update
      *   }
      * })
      */
-    upsert<T extends RekomendasiMasukanUpsertArgs>(args: SelectSubset<T, RekomendasiMasukanUpsertArgs<ExtArgs>>): Prisma__RekomendasiMasukanClient<$Result.GetResult<Prisma.$RekomendasiMasukanPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    upsert<T extends KegiatanRapatMasukanUpsertArgs>(args: SelectSubset<T, KegiatanRapatMasukanUpsertArgs<ExtArgs>>): Prisma__KegiatanRapatMasukanClient<$Result.GetResult<Prisma.$KegiatanRapatMasukanPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
-     * Count the number of RekomendasiMasukans.
+     * Count the number of KegiatanRapatMasukans.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {RekomendasiMasukanCountArgs} args - Arguments to filter RekomendasiMasukans to count.
+     * @param {KegiatanRapatMasukanCountArgs} args - Arguments to filter KegiatanRapatMasukans to count.
      * @example
-     * // Count the number of RekomendasiMasukans
-     * const count = await prisma.rekomendasiMasukan.count({
+     * // Count the number of KegiatanRapatMasukans
+     * const count = await prisma.kegiatanRapatMasukan.count({
      *   where: {
-     *     // ... the filter for the RekomendasiMasukans we want to count
+     *     // ... the filter for the KegiatanRapatMasukans we want to count
      *   }
      * })
     **/
-    count<T extends RekomendasiMasukanCountArgs>(
-      args?: Subset<T, RekomendasiMasukanCountArgs>,
+    count<T extends KegiatanRapatMasukanCountArgs>(
+      args?: Subset<T, KegiatanRapatMasukanCountArgs>,
     ): Prisma.PrismaPromise<
       T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
-          : GetScalarType<T['select'], RekomendasiMasukanCountAggregateOutputType>
+          : GetScalarType<T['select'], KegiatanRapatMasukanCountAggregateOutputType>
         : number
     >
 
     /**
-     * Allows you to perform aggregations operations on a RekomendasiMasukan.
+     * Allows you to perform aggregations operations on a KegiatanRapatMasukan.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {RekomendasiMasukanAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @param {KegiatanRapatMasukanAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
      * // Where email contains prisma.io
@@ -8550,13 +8548,13 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends RekomendasiMasukanAggregateArgs>(args: Subset<T, RekomendasiMasukanAggregateArgs>): Prisma.PrismaPromise<GetRekomendasiMasukanAggregateType<T>>
+    aggregate<T extends KegiatanRapatMasukanAggregateArgs>(args: Subset<T, KegiatanRapatMasukanAggregateArgs>): Prisma.PrismaPromise<GetKegiatanRapatMasukanAggregateType<T>>
 
     /**
-     * Group by RekomendasiMasukan.
+     * Group by KegiatanRapatMasukan.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {RekomendasiMasukanGroupByArgs} args - Group by arguments.
+     * @param {KegiatanRapatMasukanGroupByArgs} args - Group by arguments.
      * @example
      * // Group by city, order by createdAt, get count
      * const result = await prisma.user.groupBy({
@@ -8571,14 +8569,14 @@ export namespace Prisma {
      * 
     **/
     groupBy<
-      T extends RekomendasiMasukanGroupByArgs,
+      T extends KegiatanRapatMasukanGroupByArgs,
       HasSelectOrTake extends Or<
         Extends<'skip', Keys<T>>,
         Extends<'take', Keys<T>>
       >,
       OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: RekomendasiMasukanGroupByArgs['orderBy'] }
-        : { orderBy?: RekomendasiMasukanGroupByArgs['orderBy'] },
+        ? { orderBy: KegiatanRapatMasukanGroupByArgs['orderBy'] }
+        : { orderBy?: KegiatanRapatMasukanGroupByArgs['orderBy'] },
       OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
       ByFields extends MaybeTupleToUnion<T['by']>,
       ByValid extends Has<ByFields, OrderFields>,
@@ -8627,22 +8625,22 @@ export namespace Prisma {
             ? never
             : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
         }[OrderFields]
-    >(args: SubsetIntersection<T, RekomendasiMasukanGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetRekomendasiMasukanGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+    >(args: SubsetIntersection<T, KegiatanRapatMasukanGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetKegiatanRapatMasukanGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
   /**
-   * Fields of the RekomendasiMasukan model
+   * Fields of the KegiatanRapatMasukan model
    */
-  readonly fields: RekomendasiMasukanFieldRefs;
+  readonly fields: KegiatanRapatMasukanFieldRefs;
   }
 
   /**
-   * The delegate class that acts as a "Promise-like" for RekomendasiMasukan.
+   * The delegate class that acts as a "Promise-like" for KegiatanRapatMasukan.
    * Why is this prefixed with `Prisma__`?
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__RekomendasiMasukanClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__KegiatanRapatMasukanClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    rekomendasi<T extends RekomendasiDefaultArgs<ExtArgs> = {}>(args?: Subset<T, RekomendasiDefaultArgs<ExtArgs>>): Prisma__RekomendasiClient<$Result.GetResult<Prisma.$RekomendasiPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    kegiatanRapat<T extends KegiatanRapatDefaultArgs<ExtArgs> = {}>(args?: Subset<T, KegiatanRapatDefaultArgs<ExtArgs>>): Prisma__KegiatanRapatClient<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     masukan<T extends MasukanWargaDefaultArgs<ExtArgs> = {}>(args?: Subset<T, MasukanWargaDefaultArgs<ExtArgs>>): Prisma__MasukanWargaClient<$Result.GetResult<Prisma.$MasukanWargaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -8670,422 +8668,424 @@ export namespace Prisma {
 
 
   /**
-   * Fields of the RekomendasiMasukan model
+   * Fields of the KegiatanRapatMasukan model
    */
-  interface RekomendasiMasukanFieldRefs {
-    readonly rekomendasiId: FieldRef<"RekomendasiMasukan", 'String'>
-    readonly masukanId: FieldRef<"RekomendasiMasukan", 'String'>
+  interface KegiatanRapatMasukanFieldRefs {
+    readonly id: FieldRef<"KegiatanRapatMasukan", 'String'>
+    readonly kegiatanRapatId: FieldRef<"KegiatanRapatMasukan", 'String'>
+    readonly masukanId: FieldRef<"KegiatanRapatMasukan", 'String'>
+    readonly createdAt: FieldRef<"KegiatanRapatMasukan", 'DateTime'>
   }
     
 
   // Custom InputTypes
   /**
-   * RekomendasiMasukan findUnique
+   * KegiatanRapatMasukan findUnique
    */
-  export type RekomendasiMasukanFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatMasukanFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the RekomendasiMasukan
+     * Select specific fields to fetch from the KegiatanRapatMasukan
      */
-    select?: RekomendasiMasukanSelect<ExtArgs> | null
+    select?: KegiatanRapatMasukanSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the RekomendasiMasukan
+     * Omit specific fields from the KegiatanRapatMasukan
      */
-    omit?: RekomendasiMasukanOmit<ExtArgs> | null
+    omit?: KegiatanRapatMasukanOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiMasukanInclude<ExtArgs> | null
+    include?: KegiatanRapatMasukanInclude<ExtArgs> | null
     /**
-     * Filter, which RekomendasiMasukan to fetch.
+     * Filter, which KegiatanRapatMasukan to fetch.
      */
-    where: RekomendasiMasukanWhereUniqueInput
+    where: KegiatanRapatMasukanWhereUniqueInput
   }
 
   /**
-   * RekomendasiMasukan findUniqueOrThrow
+   * KegiatanRapatMasukan findUniqueOrThrow
    */
-  export type RekomendasiMasukanFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatMasukanFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the RekomendasiMasukan
+     * Select specific fields to fetch from the KegiatanRapatMasukan
      */
-    select?: RekomendasiMasukanSelect<ExtArgs> | null
+    select?: KegiatanRapatMasukanSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the RekomendasiMasukan
+     * Omit specific fields from the KegiatanRapatMasukan
      */
-    omit?: RekomendasiMasukanOmit<ExtArgs> | null
+    omit?: KegiatanRapatMasukanOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiMasukanInclude<ExtArgs> | null
+    include?: KegiatanRapatMasukanInclude<ExtArgs> | null
     /**
-     * Filter, which RekomendasiMasukan to fetch.
+     * Filter, which KegiatanRapatMasukan to fetch.
      */
-    where: RekomendasiMasukanWhereUniqueInput
+    where: KegiatanRapatMasukanWhereUniqueInput
   }
 
   /**
-   * RekomendasiMasukan findFirst
+   * KegiatanRapatMasukan findFirst
    */
-  export type RekomendasiMasukanFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatMasukanFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the RekomendasiMasukan
+     * Select specific fields to fetch from the KegiatanRapatMasukan
      */
-    select?: RekomendasiMasukanSelect<ExtArgs> | null
+    select?: KegiatanRapatMasukanSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the RekomendasiMasukan
+     * Omit specific fields from the KegiatanRapatMasukan
      */
-    omit?: RekomendasiMasukanOmit<ExtArgs> | null
+    omit?: KegiatanRapatMasukanOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiMasukanInclude<ExtArgs> | null
+    include?: KegiatanRapatMasukanInclude<ExtArgs> | null
     /**
-     * Filter, which RekomendasiMasukan to fetch.
+     * Filter, which KegiatanRapatMasukan to fetch.
      */
-    where?: RekomendasiMasukanWhereInput
+    where?: KegiatanRapatMasukanWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of RekomendasiMasukans to fetch.
+     * Determine the order of KegiatanRapatMasukans to fetch.
      */
-    orderBy?: RekomendasiMasukanOrderByWithRelationInput | RekomendasiMasukanOrderByWithRelationInput[]
+    orderBy?: KegiatanRapatMasukanOrderByWithRelationInput | KegiatanRapatMasukanOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for RekomendasiMasukans.
+     * Sets the position for searching for KegiatanRapatMasukans.
      */
-    cursor?: RekomendasiMasukanWhereUniqueInput
+    cursor?: KegiatanRapatMasukanWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` RekomendasiMasukans from the position of the cursor.
+     * Take `±n` KegiatanRapatMasukans from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` RekomendasiMasukans.
+     * Skip the first `n` KegiatanRapatMasukans.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of RekomendasiMasukans.
+     * Filter by unique combinations of KegiatanRapatMasukans.
      */
-    distinct?: RekomendasiMasukanScalarFieldEnum | RekomendasiMasukanScalarFieldEnum[]
+    distinct?: KegiatanRapatMasukanScalarFieldEnum | KegiatanRapatMasukanScalarFieldEnum[]
   }
 
   /**
-   * RekomendasiMasukan findFirstOrThrow
+   * KegiatanRapatMasukan findFirstOrThrow
    */
-  export type RekomendasiMasukanFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatMasukanFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the RekomendasiMasukan
+     * Select specific fields to fetch from the KegiatanRapatMasukan
      */
-    select?: RekomendasiMasukanSelect<ExtArgs> | null
+    select?: KegiatanRapatMasukanSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the RekomendasiMasukan
+     * Omit specific fields from the KegiatanRapatMasukan
      */
-    omit?: RekomendasiMasukanOmit<ExtArgs> | null
+    omit?: KegiatanRapatMasukanOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiMasukanInclude<ExtArgs> | null
+    include?: KegiatanRapatMasukanInclude<ExtArgs> | null
     /**
-     * Filter, which RekomendasiMasukan to fetch.
+     * Filter, which KegiatanRapatMasukan to fetch.
      */
-    where?: RekomendasiMasukanWhereInput
+    where?: KegiatanRapatMasukanWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of RekomendasiMasukans to fetch.
+     * Determine the order of KegiatanRapatMasukans to fetch.
      */
-    orderBy?: RekomendasiMasukanOrderByWithRelationInput | RekomendasiMasukanOrderByWithRelationInput[]
+    orderBy?: KegiatanRapatMasukanOrderByWithRelationInput | KegiatanRapatMasukanOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for RekomendasiMasukans.
+     * Sets the position for searching for KegiatanRapatMasukans.
      */
-    cursor?: RekomendasiMasukanWhereUniqueInput
+    cursor?: KegiatanRapatMasukanWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` RekomendasiMasukans from the position of the cursor.
+     * Take `±n` KegiatanRapatMasukans from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` RekomendasiMasukans.
+     * Skip the first `n` KegiatanRapatMasukans.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of RekomendasiMasukans.
+     * Filter by unique combinations of KegiatanRapatMasukans.
      */
-    distinct?: RekomendasiMasukanScalarFieldEnum | RekomendasiMasukanScalarFieldEnum[]
+    distinct?: KegiatanRapatMasukanScalarFieldEnum | KegiatanRapatMasukanScalarFieldEnum[]
   }
 
   /**
-   * RekomendasiMasukan findMany
+   * KegiatanRapatMasukan findMany
    */
-  export type RekomendasiMasukanFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatMasukanFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the RekomendasiMasukan
+     * Select specific fields to fetch from the KegiatanRapatMasukan
      */
-    select?: RekomendasiMasukanSelect<ExtArgs> | null
+    select?: KegiatanRapatMasukanSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the RekomendasiMasukan
+     * Omit specific fields from the KegiatanRapatMasukan
      */
-    omit?: RekomendasiMasukanOmit<ExtArgs> | null
+    omit?: KegiatanRapatMasukanOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiMasukanInclude<ExtArgs> | null
+    include?: KegiatanRapatMasukanInclude<ExtArgs> | null
     /**
-     * Filter, which RekomendasiMasukans to fetch.
+     * Filter, which KegiatanRapatMasukans to fetch.
      */
-    where?: RekomendasiMasukanWhereInput
+    where?: KegiatanRapatMasukanWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of RekomendasiMasukans to fetch.
+     * Determine the order of KegiatanRapatMasukans to fetch.
      */
-    orderBy?: RekomendasiMasukanOrderByWithRelationInput | RekomendasiMasukanOrderByWithRelationInput[]
+    orderBy?: KegiatanRapatMasukanOrderByWithRelationInput | KegiatanRapatMasukanOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for listing RekomendasiMasukans.
+     * Sets the position for listing KegiatanRapatMasukans.
      */
-    cursor?: RekomendasiMasukanWhereUniqueInput
+    cursor?: KegiatanRapatMasukanWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` RekomendasiMasukans from the position of the cursor.
+     * Take `±n` KegiatanRapatMasukans from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` RekomendasiMasukans.
+     * Skip the first `n` KegiatanRapatMasukans.
      */
     skip?: number
-    distinct?: RekomendasiMasukanScalarFieldEnum | RekomendasiMasukanScalarFieldEnum[]
+    distinct?: KegiatanRapatMasukanScalarFieldEnum | KegiatanRapatMasukanScalarFieldEnum[]
   }
 
   /**
-   * RekomendasiMasukan create
+   * KegiatanRapatMasukan create
    */
-  export type RekomendasiMasukanCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatMasukanCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the RekomendasiMasukan
+     * Select specific fields to fetch from the KegiatanRapatMasukan
      */
-    select?: RekomendasiMasukanSelect<ExtArgs> | null
+    select?: KegiatanRapatMasukanSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the RekomendasiMasukan
+     * Omit specific fields from the KegiatanRapatMasukan
      */
-    omit?: RekomendasiMasukanOmit<ExtArgs> | null
+    omit?: KegiatanRapatMasukanOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiMasukanInclude<ExtArgs> | null
+    include?: KegiatanRapatMasukanInclude<ExtArgs> | null
     /**
-     * The data needed to create a RekomendasiMasukan.
+     * The data needed to create a KegiatanRapatMasukan.
      */
-    data: XOR<RekomendasiMasukanCreateInput, RekomendasiMasukanUncheckedCreateInput>
+    data: XOR<KegiatanRapatMasukanCreateInput, KegiatanRapatMasukanUncheckedCreateInput>
   }
 
   /**
-   * RekomendasiMasukan createMany
+   * KegiatanRapatMasukan createMany
    */
-  export type RekomendasiMasukanCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatMasukanCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to create many RekomendasiMasukans.
+     * The data used to create many KegiatanRapatMasukans.
      */
-    data: RekomendasiMasukanCreateManyInput | RekomendasiMasukanCreateManyInput[]
+    data: KegiatanRapatMasukanCreateManyInput | KegiatanRapatMasukanCreateManyInput[]
     skipDuplicates?: boolean
   }
 
   /**
-   * RekomendasiMasukan createManyAndReturn
+   * KegiatanRapatMasukan createManyAndReturn
    */
-  export type RekomendasiMasukanCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatMasukanCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the RekomendasiMasukan
+     * Select specific fields to fetch from the KegiatanRapatMasukan
      */
-    select?: RekomendasiMasukanSelectCreateManyAndReturn<ExtArgs> | null
+    select?: KegiatanRapatMasukanSelectCreateManyAndReturn<ExtArgs> | null
     /**
-     * Omit specific fields from the RekomendasiMasukan
+     * Omit specific fields from the KegiatanRapatMasukan
      */
-    omit?: RekomendasiMasukanOmit<ExtArgs> | null
+    omit?: KegiatanRapatMasukanOmit<ExtArgs> | null
     /**
-     * The data used to create many RekomendasiMasukans.
+     * The data used to create many KegiatanRapatMasukans.
      */
-    data: RekomendasiMasukanCreateManyInput | RekomendasiMasukanCreateManyInput[]
+    data: KegiatanRapatMasukanCreateManyInput | KegiatanRapatMasukanCreateManyInput[]
     skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiMasukanIncludeCreateManyAndReturn<ExtArgs> | null
+    include?: KegiatanRapatMasukanIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
-   * RekomendasiMasukan update
+   * KegiatanRapatMasukan update
    */
-  export type RekomendasiMasukanUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatMasukanUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the RekomendasiMasukan
+     * Select specific fields to fetch from the KegiatanRapatMasukan
      */
-    select?: RekomendasiMasukanSelect<ExtArgs> | null
+    select?: KegiatanRapatMasukanSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the RekomendasiMasukan
+     * Omit specific fields from the KegiatanRapatMasukan
      */
-    omit?: RekomendasiMasukanOmit<ExtArgs> | null
+    omit?: KegiatanRapatMasukanOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiMasukanInclude<ExtArgs> | null
+    include?: KegiatanRapatMasukanInclude<ExtArgs> | null
     /**
-     * The data needed to update a RekomendasiMasukan.
+     * The data needed to update a KegiatanRapatMasukan.
      */
-    data: XOR<RekomendasiMasukanUpdateInput, RekomendasiMasukanUncheckedUpdateInput>
+    data: XOR<KegiatanRapatMasukanUpdateInput, KegiatanRapatMasukanUncheckedUpdateInput>
     /**
-     * Choose, which RekomendasiMasukan to update.
+     * Choose, which KegiatanRapatMasukan to update.
      */
-    where: RekomendasiMasukanWhereUniqueInput
+    where: KegiatanRapatMasukanWhereUniqueInput
   }
 
   /**
-   * RekomendasiMasukan updateMany
+   * KegiatanRapatMasukan updateMany
    */
-  export type RekomendasiMasukanUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatMasukanUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to update RekomendasiMasukans.
+     * The data used to update KegiatanRapatMasukans.
      */
-    data: XOR<RekomendasiMasukanUpdateManyMutationInput, RekomendasiMasukanUncheckedUpdateManyInput>
+    data: XOR<KegiatanRapatMasukanUpdateManyMutationInput, KegiatanRapatMasukanUncheckedUpdateManyInput>
     /**
-     * Filter which RekomendasiMasukans to update
+     * Filter which KegiatanRapatMasukans to update
      */
-    where?: RekomendasiMasukanWhereInput
+    where?: KegiatanRapatMasukanWhereInput
     /**
-     * Limit how many RekomendasiMasukans to update.
+     * Limit how many KegiatanRapatMasukans to update.
      */
     limit?: number
   }
 
   /**
-   * RekomendasiMasukan updateManyAndReturn
+   * KegiatanRapatMasukan updateManyAndReturn
    */
-  export type RekomendasiMasukanUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatMasukanUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the RekomendasiMasukan
+     * Select specific fields to fetch from the KegiatanRapatMasukan
      */
-    select?: RekomendasiMasukanSelectUpdateManyAndReturn<ExtArgs> | null
+    select?: KegiatanRapatMasukanSelectUpdateManyAndReturn<ExtArgs> | null
     /**
-     * Omit specific fields from the RekomendasiMasukan
+     * Omit specific fields from the KegiatanRapatMasukan
      */
-    omit?: RekomendasiMasukanOmit<ExtArgs> | null
+    omit?: KegiatanRapatMasukanOmit<ExtArgs> | null
     /**
-     * The data used to update RekomendasiMasukans.
+     * The data used to update KegiatanRapatMasukans.
      */
-    data: XOR<RekomendasiMasukanUpdateManyMutationInput, RekomendasiMasukanUncheckedUpdateManyInput>
+    data: XOR<KegiatanRapatMasukanUpdateManyMutationInput, KegiatanRapatMasukanUncheckedUpdateManyInput>
     /**
-     * Filter which RekomendasiMasukans to update
+     * Filter which KegiatanRapatMasukans to update
      */
-    where?: RekomendasiMasukanWhereInput
+    where?: KegiatanRapatMasukanWhereInput
     /**
-     * Limit how many RekomendasiMasukans to update.
+     * Limit how many KegiatanRapatMasukans to update.
      */
     limit?: number
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiMasukanIncludeUpdateManyAndReturn<ExtArgs> | null
+    include?: KegiatanRapatMasukanIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
-   * RekomendasiMasukan upsert
+   * KegiatanRapatMasukan upsert
    */
-  export type RekomendasiMasukanUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatMasukanUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the RekomendasiMasukan
+     * Select specific fields to fetch from the KegiatanRapatMasukan
      */
-    select?: RekomendasiMasukanSelect<ExtArgs> | null
+    select?: KegiatanRapatMasukanSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the RekomendasiMasukan
+     * Omit specific fields from the KegiatanRapatMasukan
      */
-    omit?: RekomendasiMasukanOmit<ExtArgs> | null
+    omit?: KegiatanRapatMasukanOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiMasukanInclude<ExtArgs> | null
+    include?: KegiatanRapatMasukanInclude<ExtArgs> | null
     /**
-     * The filter to search for the RekomendasiMasukan to update in case it exists.
+     * The filter to search for the KegiatanRapatMasukan to update in case it exists.
      */
-    where: RekomendasiMasukanWhereUniqueInput
+    where: KegiatanRapatMasukanWhereUniqueInput
     /**
-     * In case the RekomendasiMasukan found by the `where` argument doesn't exist, create a new RekomendasiMasukan with this data.
+     * In case the KegiatanRapatMasukan found by the `where` argument doesn't exist, create a new KegiatanRapatMasukan with this data.
      */
-    create: XOR<RekomendasiMasukanCreateInput, RekomendasiMasukanUncheckedCreateInput>
+    create: XOR<KegiatanRapatMasukanCreateInput, KegiatanRapatMasukanUncheckedCreateInput>
     /**
-     * In case the RekomendasiMasukan was found with the provided `where` argument, update it with this data.
+     * In case the KegiatanRapatMasukan was found with the provided `where` argument, update it with this data.
      */
-    update: XOR<RekomendasiMasukanUpdateInput, RekomendasiMasukanUncheckedUpdateInput>
+    update: XOR<KegiatanRapatMasukanUpdateInput, KegiatanRapatMasukanUncheckedUpdateInput>
   }
 
   /**
-   * RekomendasiMasukan delete
+   * KegiatanRapatMasukan delete
    */
-  export type RekomendasiMasukanDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatMasukanDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the RekomendasiMasukan
+     * Select specific fields to fetch from the KegiatanRapatMasukan
      */
-    select?: RekomendasiMasukanSelect<ExtArgs> | null
+    select?: KegiatanRapatMasukanSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the RekomendasiMasukan
+     * Omit specific fields from the KegiatanRapatMasukan
      */
-    omit?: RekomendasiMasukanOmit<ExtArgs> | null
+    omit?: KegiatanRapatMasukanOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiMasukanInclude<ExtArgs> | null
+    include?: KegiatanRapatMasukanInclude<ExtArgs> | null
     /**
-     * Filter which RekomendasiMasukan to delete.
+     * Filter which KegiatanRapatMasukan to delete.
      */
-    where: RekomendasiMasukanWhereUniqueInput
+    where: KegiatanRapatMasukanWhereUniqueInput
   }
 
   /**
-   * RekomendasiMasukan deleteMany
+   * KegiatanRapatMasukan deleteMany
    */
-  export type RekomendasiMasukanDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatMasukanDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which RekomendasiMasukans to delete
+     * Filter which KegiatanRapatMasukans to delete
      */
-    where?: RekomendasiMasukanWhereInput
+    where?: KegiatanRapatMasukanWhereInput
     /**
-     * Limit how many RekomendasiMasukans to delete.
+     * Limit how many KegiatanRapatMasukans to delete.
      */
     limit?: number
   }
 
   /**
-   * RekomendasiMasukan without action
+   * KegiatanRapatMasukan without action
    */
-  export type RekomendasiMasukanDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type KegiatanRapatMasukanDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the RekomendasiMasukan
+     * Select specific fields to fetch from the KegiatanRapatMasukan
      */
-    select?: RekomendasiMasukanSelect<ExtArgs> | null
+    select?: KegiatanRapatMasukanSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the RekomendasiMasukan
+     * Omit specific fields from the KegiatanRapatMasukan
      */
-    omit?: RekomendasiMasukanOmit<ExtArgs> | null
+    omit?: KegiatanRapatMasukanOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RekomendasiMasukanInclude<ExtArgs> | null
+    include?: KegiatanRapatMasukanInclude<ExtArgs> | null
   }
 
 
@@ -12409,1212 +12409,6 @@ export namespace Prisma {
 
 
   /**
-   * Model KegiatanRapat
-   */
-
-  export type AggregateKegiatanRapat = {
-    _count: KegiatanRapatCountAggregateOutputType | null
-    _min: KegiatanRapatMinAggregateOutputType | null
-    _max: KegiatanRapatMaxAggregateOutputType | null
-  }
-
-  export type KegiatanRapatMinAggregateOutputType = {
-    id: string | null
-    judul: string | null
-    deskripsi: string | null
-    tanggal: Date | null
-    lokasi: string | null
-    domainIsuId: string | null
-    dibuatOlehId: string | null
-    aiModel: string | null
-    aiPromptHash: string | null
-    aiProcessedAt: Date | null
-    createdAt: Date | null
-    updatedAt: Date | null
-  }
-
-  export type KegiatanRapatMaxAggregateOutputType = {
-    id: string | null
-    judul: string | null
-    deskripsi: string | null
-    tanggal: Date | null
-    lokasi: string | null
-    domainIsuId: string | null
-    dibuatOlehId: string | null
-    aiModel: string | null
-    aiPromptHash: string | null
-    aiProcessedAt: Date | null
-    createdAt: Date | null
-    updatedAt: Date | null
-  }
-
-  export type KegiatanRapatCountAggregateOutputType = {
-    id: number
-    judul: number
-    deskripsi: number
-    tanggal: number
-    lokasi: number
-    domainIsuId: number
-    dibuatOlehId: number
-    aiModel: number
-    aiPromptHash: number
-    aiProcessedAt: number
-    createdAt: number
-    updatedAt: number
-    _all: number
-  }
-
-
-  export type KegiatanRapatMinAggregateInputType = {
-    id?: true
-    judul?: true
-    deskripsi?: true
-    tanggal?: true
-    lokasi?: true
-    domainIsuId?: true
-    dibuatOlehId?: true
-    aiModel?: true
-    aiPromptHash?: true
-    aiProcessedAt?: true
-    createdAt?: true
-    updatedAt?: true
-  }
-
-  export type KegiatanRapatMaxAggregateInputType = {
-    id?: true
-    judul?: true
-    deskripsi?: true
-    tanggal?: true
-    lokasi?: true
-    domainIsuId?: true
-    dibuatOlehId?: true
-    aiModel?: true
-    aiPromptHash?: true
-    aiProcessedAt?: true
-    createdAt?: true
-    updatedAt?: true
-  }
-
-  export type KegiatanRapatCountAggregateInputType = {
-    id?: true
-    judul?: true
-    deskripsi?: true
-    tanggal?: true
-    lokasi?: true
-    domainIsuId?: true
-    dibuatOlehId?: true
-    aiModel?: true
-    aiPromptHash?: true
-    aiProcessedAt?: true
-    createdAt?: true
-    updatedAt?: true
-    _all?: true
-  }
-
-  export type KegiatanRapatAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which KegiatanRapat to aggregate.
-     */
-    where?: KegiatanRapatWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of KegiatanRapats to fetch.
-     */
-    orderBy?: KegiatanRapatOrderByWithRelationInput | KegiatanRapatOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: KegiatanRapatWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` KegiatanRapats from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` KegiatanRapats.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned KegiatanRapats
-    **/
-    _count?: true | KegiatanRapatCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: KegiatanRapatMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: KegiatanRapatMaxAggregateInputType
-  }
-
-  export type GetKegiatanRapatAggregateType<T extends KegiatanRapatAggregateArgs> = {
-        [P in keyof T & keyof AggregateKegiatanRapat]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateKegiatanRapat[P]>
-      : GetScalarType<T[P], AggregateKegiatanRapat[P]>
-  }
-
-
-
-
-  export type KegiatanRapatGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: KegiatanRapatWhereInput
-    orderBy?: KegiatanRapatOrderByWithAggregationInput | KegiatanRapatOrderByWithAggregationInput[]
-    by: KegiatanRapatScalarFieldEnum[] | KegiatanRapatScalarFieldEnum
-    having?: KegiatanRapatScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: KegiatanRapatCountAggregateInputType | true
-    _min?: KegiatanRapatMinAggregateInputType
-    _max?: KegiatanRapatMaxAggregateInputType
-  }
-
-  export type KegiatanRapatGroupByOutputType = {
-    id: string
-    judul: string
-    deskripsi: string
-    tanggal: Date
-    lokasi: string | null
-    domainIsuId: string | null
-    dibuatOlehId: string
-    aiModel: string | null
-    aiPromptHash: string | null
-    aiProcessedAt: Date | null
-    createdAt: Date
-    updatedAt: Date
-    _count: KegiatanRapatCountAggregateOutputType | null
-    _min: KegiatanRapatMinAggregateOutputType | null
-    _max: KegiatanRapatMaxAggregateOutputType | null
-  }
-
-  type GetKegiatanRapatGroupByPayload<T extends KegiatanRapatGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<KegiatanRapatGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof KegiatanRapatGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], KegiatanRapatGroupByOutputType[P]>
-            : GetScalarType<T[P], KegiatanRapatGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type KegiatanRapatSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    judul?: boolean
-    deskripsi?: boolean
-    tanggal?: boolean
-    lokasi?: boolean
-    domainIsuId?: boolean
-    dibuatOlehId?: boolean
-    aiModel?: boolean
-    aiPromptHash?: boolean
-    aiProcessedAt?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-    domainIsu?: boolean | KegiatanRapat$domainIsuArgs<ExtArgs>
-    dibuatOleh?: boolean | UserDefaultArgs<ExtArgs>
-    rekomendasi?: boolean | KegiatanRapat$rekomendasiArgs<ExtArgs>
-    _count?: boolean | KegiatanRapatCountOutputTypeDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["kegiatanRapat"]>
-
-  export type KegiatanRapatSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    judul?: boolean
-    deskripsi?: boolean
-    tanggal?: boolean
-    lokasi?: boolean
-    domainIsuId?: boolean
-    dibuatOlehId?: boolean
-    aiModel?: boolean
-    aiPromptHash?: boolean
-    aiProcessedAt?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-    domainIsu?: boolean | KegiatanRapat$domainIsuArgs<ExtArgs>
-    dibuatOleh?: boolean | UserDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["kegiatanRapat"]>
-
-  export type KegiatanRapatSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    judul?: boolean
-    deskripsi?: boolean
-    tanggal?: boolean
-    lokasi?: boolean
-    domainIsuId?: boolean
-    dibuatOlehId?: boolean
-    aiModel?: boolean
-    aiPromptHash?: boolean
-    aiProcessedAt?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-    domainIsu?: boolean | KegiatanRapat$domainIsuArgs<ExtArgs>
-    dibuatOleh?: boolean | UserDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["kegiatanRapat"]>
-
-  export type KegiatanRapatSelectScalar = {
-    id?: boolean
-    judul?: boolean
-    deskripsi?: boolean
-    tanggal?: boolean
-    lokasi?: boolean
-    domainIsuId?: boolean
-    dibuatOlehId?: boolean
-    aiModel?: boolean
-    aiPromptHash?: boolean
-    aiProcessedAt?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-  }
-
-  export type KegiatanRapatOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "judul" | "deskripsi" | "tanggal" | "lokasi" | "domainIsuId" | "dibuatOlehId" | "aiModel" | "aiPromptHash" | "aiProcessedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["kegiatanRapat"]>
-  export type KegiatanRapatInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    domainIsu?: boolean | KegiatanRapat$domainIsuArgs<ExtArgs>
-    dibuatOleh?: boolean | UserDefaultArgs<ExtArgs>
-    rekomendasi?: boolean | KegiatanRapat$rekomendasiArgs<ExtArgs>
-    _count?: boolean | KegiatanRapatCountOutputTypeDefaultArgs<ExtArgs>
-  }
-  export type KegiatanRapatIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    domainIsu?: boolean | KegiatanRapat$domainIsuArgs<ExtArgs>
-    dibuatOleh?: boolean | UserDefaultArgs<ExtArgs>
-  }
-  export type KegiatanRapatIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    domainIsu?: boolean | KegiatanRapat$domainIsuArgs<ExtArgs>
-    dibuatOleh?: boolean | UserDefaultArgs<ExtArgs>
-  }
-
-  export type $KegiatanRapatPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "KegiatanRapat"
-    objects: {
-      domainIsu: Prisma.$DomainIsuPayload<ExtArgs> | null
-      dibuatOleh: Prisma.$UserPayload<ExtArgs>
-      rekomendasi: Prisma.$RekomendasiPayload<ExtArgs>[]
-    }
-    scalars: $Extensions.GetPayloadResult<{
-      id: string
-      judul: string
-      deskripsi: string
-      tanggal: Date
-      lokasi: string | null
-      domainIsuId: string | null
-      dibuatOlehId: string
-      aiModel: string | null
-      aiPromptHash: string | null
-      aiProcessedAt: Date | null
-      createdAt: Date
-      updatedAt: Date
-    }, ExtArgs["result"]["kegiatanRapat"]>
-    composites: {}
-  }
-
-  type KegiatanRapatGetPayload<S extends boolean | null | undefined | KegiatanRapatDefaultArgs> = $Result.GetResult<Prisma.$KegiatanRapatPayload, S>
-
-  type KegiatanRapatCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<KegiatanRapatFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: KegiatanRapatCountAggregateInputType | true
-    }
-
-  export interface KegiatanRapatDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['KegiatanRapat'], meta: { name: 'KegiatanRapat' } }
-    /**
-     * Find zero or one KegiatanRapat that matches the filter.
-     * @param {KegiatanRapatFindUniqueArgs} args - Arguments to find a KegiatanRapat
-     * @example
-     * // Get one KegiatanRapat
-     * const kegiatanRapat = await prisma.kegiatanRapat.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends KegiatanRapatFindUniqueArgs>(args: SelectSubset<T, KegiatanRapatFindUniqueArgs<ExtArgs>>): Prisma__KegiatanRapatClient<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find one KegiatanRapat that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {KegiatanRapatFindUniqueOrThrowArgs} args - Arguments to find a KegiatanRapat
-     * @example
-     * // Get one KegiatanRapat
-     * const kegiatanRapat = await prisma.kegiatanRapat.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends KegiatanRapatFindUniqueOrThrowArgs>(args: SelectSubset<T, KegiatanRapatFindUniqueOrThrowArgs<ExtArgs>>): Prisma__KegiatanRapatClient<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first KegiatanRapat that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {KegiatanRapatFindFirstArgs} args - Arguments to find a KegiatanRapat
-     * @example
-     * // Get one KegiatanRapat
-     * const kegiatanRapat = await prisma.kegiatanRapat.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends KegiatanRapatFindFirstArgs>(args?: SelectSubset<T, KegiatanRapatFindFirstArgs<ExtArgs>>): Prisma__KegiatanRapatClient<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first KegiatanRapat that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {KegiatanRapatFindFirstOrThrowArgs} args - Arguments to find a KegiatanRapat
-     * @example
-     * // Get one KegiatanRapat
-     * const kegiatanRapat = await prisma.kegiatanRapat.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends KegiatanRapatFindFirstOrThrowArgs>(args?: SelectSubset<T, KegiatanRapatFindFirstOrThrowArgs<ExtArgs>>): Prisma__KegiatanRapatClient<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find zero or more KegiatanRapats that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {KegiatanRapatFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all KegiatanRapats
-     * const kegiatanRapats = await prisma.kegiatanRapat.findMany()
-     * 
-     * // Get first 10 KegiatanRapats
-     * const kegiatanRapats = await prisma.kegiatanRapat.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const kegiatanRapatWithIdOnly = await prisma.kegiatanRapat.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends KegiatanRapatFindManyArgs>(args?: SelectSubset<T, KegiatanRapatFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
-
-    /**
-     * Create a KegiatanRapat.
-     * @param {KegiatanRapatCreateArgs} args - Arguments to create a KegiatanRapat.
-     * @example
-     * // Create one KegiatanRapat
-     * const KegiatanRapat = await prisma.kegiatanRapat.create({
-     *   data: {
-     *     // ... data to create a KegiatanRapat
-     *   }
-     * })
-     * 
-     */
-    create<T extends KegiatanRapatCreateArgs>(args: SelectSubset<T, KegiatanRapatCreateArgs<ExtArgs>>): Prisma__KegiatanRapatClient<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Create many KegiatanRapats.
-     * @param {KegiatanRapatCreateManyArgs} args - Arguments to create many KegiatanRapats.
-     * @example
-     * // Create many KegiatanRapats
-     * const kegiatanRapat = await prisma.kegiatanRapat.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends KegiatanRapatCreateManyArgs>(args?: SelectSubset<T, KegiatanRapatCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many KegiatanRapats and returns the data saved in the database.
-     * @param {KegiatanRapatCreateManyAndReturnArgs} args - Arguments to create many KegiatanRapats.
-     * @example
-     * // Create many KegiatanRapats
-     * const kegiatanRapat = await prisma.kegiatanRapat.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many KegiatanRapats and only return the `id`
-     * const kegiatanRapatWithIdOnly = await prisma.kegiatanRapat.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends KegiatanRapatCreateManyAndReturnArgs>(args?: SelectSubset<T, KegiatanRapatCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Delete a KegiatanRapat.
-     * @param {KegiatanRapatDeleteArgs} args - Arguments to delete one KegiatanRapat.
-     * @example
-     * // Delete one KegiatanRapat
-     * const KegiatanRapat = await prisma.kegiatanRapat.delete({
-     *   where: {
-     *     // ... filter to delete one KegiatanRapat
-     *   }
-     * })
-     * 
-     */
-    delete<T extends KegiatanRapatDeleteArgs>(args: SelectSubset<T, KegiatanRapatDeleteArgs<ExtArgs>>): Prisma__KegiatanRapatClient<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Update one KegiatanRapat.
-     * @param {KegiatanRapatUpdateArgs} args - Arguments to update one KegiatanRapat.
-     * @example
-     * // Update one KegiatanRapat
-     * const kegiatanRapat = await prisma.kegiatanRapat.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends KegiatanRapatUpdateArgs>(args: SelectSubset<T, KegiatanRapatUpdateArgs<ExtArgs>>): Prisma__KegiatanRapatClient<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Delete zero or more KegiatanRapats.
-     * @param {KegiatanRapatDeleteManyArgs} args - Arguments to filter KegiatanRapats to delete.
-     * @example
-     * // Delete a few KegiatanRapats
-     * const { count } = await prisma.kegiatanRapat.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends KegiatanRapatDeleteManyArgs>(args?: SelectSubset<T, KegiatanRapatDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more KegiatanRapats.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {KegiatanRapatUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many KegiatanRapats
-     * const kegiatanRapat = await prisma.kegiatanRapat.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends KegiatanRapatUpdateManyArgs>(args: SelectSubset<T, KegiatanRapatUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more KegiatanRapats and returns the data updated in the database.
-     * @param {KegiatanRapatUpdateManyAndReturnArgs} args - Arguments to update many KegiatanRapats.
-     * @example
-     * // Update many KegiatanRapats
-     * const kegiatanRapat = await prisma.kegiatanRapat.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more KegiatanRapats and only return the `id`
-     * const kegiatanRapatWithIdOnly = await prisma.kegiatanRapat.updateManyAndReturn({
-     *   select: { id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends KegiatanRapatUpdateManyAndReturnArgs>(args: SelectSubset<T, KegiatanRapatUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Create or update one KegiatanRapat.
-     * @param {KegiatanRapatUpsertArgs} args - Arguments to update or create a KegiatanRapat.
-     * @example
-     * // Update or create a KegiatanRapat
-     * const kegiatanRapat = await prisma.kegiatanRapat.upsert({
-     *   create: {
-     *     // ... data to create a KegiatanRapat
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the KegiatanRapat we want to update
-     *   }
-     * })
-     */
-    upsert<T extends KegiatanRapatUpsertArgs>(args: SelectSubset<T, KegiatanRapatUpsertArgs<ExtArgs>>): Prisma__KegiatanRapatClient<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-
-    /**
-     * Count the number of KegiatanRapats.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {KegiatanRapatCountArgs} args - Arguments to filter KegiatanRapats to count.
-     * @example
-     * // Count the number of KegiatanRapats
-     * const count = await prisma.kegiatanRapat.count({
-     *   where: {
-     *     // ... the filter for the KegiatanRapats we want to count
-     *   }
-     * })
-    **/
-    count<T extends KegiatanRapatCountArgs>(
-      args?: Subset<T, KegiatanRapatCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], KegiatanRapatCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a KegiatanRapat.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {KegiatanRapatAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends KegiatanRapatAggregateArgs>(args: Subset<T, KegiatanRapatAggregateArgs>): Prisma.PrismaPromise<GetKegiatanRapatAggregateType<T>>
-
-    /**
-     * Group by KegiatanRapat.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {KegiatanRapatGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends KegiatanRapatGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: KegiatanRapatGroupByArgs['orderBy'] }
-        : { orderBy?: KegiatanRapatGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, KegiatanRapatGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetKegiatanRapatGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the KegiatanRapat model
-   */
-  readonly fields: KegiatanRapatFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for KegiatanRapat.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__KegiatanRapatClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    domainIsu<T extends KegiatanRapat$domainIsuArgs<ExtArgs> = {}>(args?: Subset<T, KegiatanRapat$domainIsuArgs<ExtArgs>>): Prisma__DomainIsuClient<$Result.GetResult<Prisma.$DomainIsuPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-    dibuatOleh<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    rekomendasi<T extends KegiatanRapat$rekomendasiArgs<ExtArgs> = {}>(args?: Subset<T, KegiatanRapat$rekomendasiArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RekomendasiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the KegiatanRapat model
-   */
-  interface KegiatanRapatFieldRefs {
-    readonly id: FieldRef<"KegiatanRapat", 'String'>
-    readonly judul: FieldRef<"KegiatanRapat", 'String'>
-    readonly deskripsi: FieldRef<"KegiatanRapat", 'String'>
-    readonly tanggal: FieldRef<"KegiatanRapat", 'DateTime'>
-    readonly lokasi: FieldRef<"KegiatanRapat", 'String'>
-    readonly domainIsuId: FieldRef<"KegiatanRapat", 'String'>
-    readonly dibuatOlehId: FieldRef<"KegiatanRapat", 'String'>
-    readonly aiModel: FieldRef<"KegiatanRapat", 'String'>
-    readonly aiPromptHash: FieldRef<"KegiatanRapat", 'String'>
-    readonly aiProcessedAt: FieldRef<"KegiatanRapat", 'DateTime'>
-    readonly createdAt: FieldRef<"KegiatanRapat", 'DateTime'>
-    readonly updatedAt: FieldRef<"KegiatanRapat", 'DateTime'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * KegiatanRapat findUnique
-   */
-  export type KegiatanRapatFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the KegiatanRapat
-     */
-    select?: KegiatanRapatSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the KegiatanRapat
-     */
-    omit?: KegiatanRapatOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: KegiatanRapatInclude<ExtArgs> | null
-    /**
-     * Filter, which KegiatanRapat to fetch.
-     */
-    where: KegiatanRapatWhereUniqueInput
-  }
-
-  /**
-   * KegiatanRapat findUniqueOrThrow
-   */
-  export type KegiatanRapatFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the KegiatanRapat
-     */
-    select?: KegiatanRapatSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the KegiatanRapat
-     */
-    omit?: KegiatanRapatOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: KegiatanRapatInclude<ExtArgs> | null
-    /**
-     * Filter, which KegiatanRapat to fetch.
-     */
-    where: KegiatanRapatWhereUniqueInput
-  }
-
-  /**
-   * KegiatanRapat findFirst
-   */
-  export type KegiatanRapatFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the KegiatanRapat
-     */
-    select?: KegiatanRapatSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the KegiatanRapat
-     */
-    omit?: KegiatanRapatOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: KegiatanRapatInclude<ExtArgs> | null
-    /**
-     * Filter, which KegiatanRapat to fetch.
-     */
-    where?: KegiatanRapatWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of KegiatanRapats to fetch.
-     */
-    orderBy?: KegiatanRapatOrderByWithRelationInput | KegiatanRapatOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for KegiatanRapats.
-     */
-    cursor?: KegiatanRapatWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` KegiatanRapats from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` KegiatanRapats.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of KegiatanRapats.
-     */
-    distinct?: KegiatanRapatScalarFieldEnum | KegiatanRapatScalarFieldEnum[]
-  }
-
-  /**
-   * KegiatanRapat findFirstOrThrow
-   */
-  export type KegiatanRapatFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the KegiatanRapat
-     */
-    select?: KegiatanRapatSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the KegiatanRapat
-     */
-    omit?: KegiatanRapatOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: KegiatanRapatInclude<ExtArgs> | null
-    /**
-     * Filter, which KegiatanRapat to fetch.
-     */
-    where?: KegiatanRapatWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of KegiatanRapats to fetch.
-     */
-    orderBy?: KegiatanRapatOrderByWithRelationInput | KegiatanRapatOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for KegiatanRapats.
-     */
-    cursor?: KegiatanRapatWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` KegiatanRapats from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` KegiatanRapats.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of KegiatanRapats.
-     */
-    distinct?: KegiatanRapatScalarFieldEnum | KegiatanRapatScalarFieldEnum[]
-  }
-
-  /**
-   * KegiatanRapat findMany
-   */
-  export type KegiatanRapatFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the KegiatanRapat
-     */
-    select?: KegiatanRapatSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the KegiatanRapat
-     */
-    omit?: KegiatanRapatOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: KegiatanRapatInclude<ExtArgs> | null
-    /**
-     * Filter, which KegiatanRapats to fetch.
-     */
-    where?: KegiatanRapatWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of KegiatanRapats to fetch.
-     */
-    orderBy?: KegiatanRapatOrderByWithRelationInput | KegiatanRapatOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing KegiatanRapats.
-     */
-    cursor?: KegiatanRapatWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` KegiatanRapats from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` KegiatanRapats.
-     */
-    skip?: number
-    distinct?: KegiatanRapatScalarFieldEnum | KegiatanRapatScalarFieldEnum[]
-  }
-
-  /**
-   * KegiatanRapat create
-   */
-  export type KegiatanRapatCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the KegiatanRapat
-     */
-    select?: KegiatanRapatSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the KegiatanRapat
-     */
-    omit?: KegiatanRapatOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: KegiatanRapatInclude<ExtArgs> | null
-    /**
-     * The data needed to create a KegiatanRapat.
-     */
-    data: XOR<KegiatanRapatCreateInput, KegiatanRapatUncheckedCreateInput>
-  }
-
-  /**
-   * KegiatanRapat createMany
-   */
-  export type KegiatanRapatCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many KegiatanRapats.
-     */
-    data: KegiatanRapatCreateManyInput | KegiatanRapatCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * KegiatanRapat createManyAndReturn
-   */
-  export type KegiatanRapatCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the KegiatanRapat
-     */
-    select?: KegiatanRapatSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the KegiatanRapat
-     */
-    omit?: KegiatanRapatOmit<ExtArgs> | null
-    /**
-     * The data used to create many KegiatanRapats.
-     */
-    data: KegiatanRapatCreateManyInput | KegiatanRapatCreateManyInput[]
-    skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: KegiatanRapatIncludeCreateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * KegiatanRapat update
-   */
-  export type KegiatanRapatUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the KegiatanRapat
-     */
-    select?: KegiatanRapatSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the KegiatanRapat
-     */
-    omit?: KegiatanRapatOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: KegiatanRapatInclude<ExtArgs> | null
-    /**
-     * The data needed to update a KegiatanRapat.
-     */
-    data: XOR<KegiatanRapatUpdateInput, KegiatanRapatUncheckedUpdateInput>
-    /**
-     * Choose, which KegiatanRapat to update.
-     */
-    where: KegiatanRapatWhereUniqueInput
-  }
-
-  /**
-   * KegiatanRapat updateMany
-   */
-  export type KegiatanRapatUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update KegiatanRapats.
-     */
-    data: XOR<KegiatanRapatUpdateManyMutationInput, KegiatanRapatUncheckedUpdateManyInput>
-    /**
-     * Filter which KegiatanRapats to update
-     */
-    where?: KegiatanRapatWhereInput
-    /**
-     * Limit how many KegiatanRapats to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * KegiatanRapat updateManyAndReturn
-   */
-  export type KegiatanRapatUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the KegiatanRapat
-     */
-    select?: KegiatanRapatSelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the KegiatanRapat
-     */
-    omit?: KegiatanRapatOmit<ExtArgs> | null
-    /**
-     * The data used to update KegiatanRapats.
-     */
-    data: XOR<KegiatanRapatUpdateManyMutationInput, KegiatanRapatUncheckedUpdateManyInput>
-    /**
-     * Filter which KegiatanRapats to update
-     */
-    where?: KegiatanRapatWhereInput
-    /**
-     * Limit how many KegiatanRapats to update.
-     */
-    limit?: number
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: KegiatanRapatIncludeUpdateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * KegiatanRapat upsert
-   */
-  export type KegiatanRapatUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the KegiatanRapat
-     */
-    select?: KegiatanRapatSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the KegiatanRapat
-     */
-    omit?: KegiatanRapatOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: KegiatanRapatInclude<ExtArgs> | null
-    /**
-     * The filter to search for the KegiatanRapat to update in case it exists.
-     */
-    where: KegiatanRapatWhereUniqueInput
-    /**
-     * In case the KegiatanRapat found by the `where` argument doesn't exist, create a new KegiatanRapat with this data.
-     */
-    create: XOR<KegiatanRapatCreateInput, KegiatanRapatUncheckedCreateInput>
-    /**
-     * In case the KegiatanRapat was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<KegiatanRapatUpdateInput, KegiatanRapatUncheckedUpdateInput>
-  }
-
-  /**
-   * KegiatanRapat delete
-   */
-  export type KegiatanRapatDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the KegiatanRapat
-     */
-    select?: KegiatanRapatSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the KegiatanRapat
-     */
-    omit?: KegiatanRapatOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: KegiatanRapatInclude<ExtArgs> | null
-    /**
-     * Filter which KegiatanRapat to delete.
-     */
-    where: KegiatanRapatWhereUniqueInput
-  }
-
-  /**
-   * KegiatanRapat deleteMany
-   */
-  export type KegiatanRapatDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which KegiatanRapats to delete
-     */
-    where?: KegiatanRapatWhereInput
-    /**
-     * Limit how many KegiatanRapats to delete.
-     */
-    limit?: number
-  }
-
-  /**
-   * KegiatanRapat.domainIsu
-   */
-  export type KegiatanRapat$domainIsuArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DomainIsu
-     */
-    select?: DomainIsuSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DomainIsu
-     */
-    omit?: DomainIsuOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: DomainIsuInclude<ExtArgs> | null
-    where?: DomainIsuWhereInput
-  }
-
-  /**
-   * KegiatanRapat.rekomendasi
-   */
-  export type KegiatanRapat$rekomendasiArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Rekomendasi
-     */
-    select?: RekomendasiSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Rekomendasi
-     */
-    omit?: RekomendasiOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: RekomendasiInclude<ExtArgs> | null
-    where?: RekomendasiWhereInput
-    orderBy?: RekomendasiOrderByWithRelationInput | RekomendasiOrderByWithRelationInput[]
-    cursor?: RekomendasiWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: RekomendasiScalarFieldEnum | RekomendasiScalarFieldEnum[]
-  }
-
-  /**
-   * KegiatanRapat without action
-   */
-  export type KegiatanRapatDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the KegiatanRapat
-     */
-    select?: KegiatanRapatSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the KegiatanRapat
-     */
-    omit?: KegiatanRapatOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: KegiatanRapatInclude<ExtArgs> | null
-  }
-
-
-  /**
    * Enums
    */
 
@@ -13664,10 +12458,14 @@ export namespace Prisma {
     deskripsi: 'deskripsi',
     lokasiRt: 'lokasiRt',
     lokasiRw: 'lokasiRw',
+    isLocked: 'isLocked',
+    lockedAt: 'lockedAt',
     domainIsuId: 'domainIsuId',
     status: 'status',
     alasanPenolakan: 'alasanPenolakan',
     diverifikasiOlehId: 'diverifikasiOlehId',
+    isRelevant: 'isRelevant',
+    expiresAt: 'expiresAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -13679,10 +12477,12 @@ export namespace Prisma {
     id: 'id',
     domainIsuId: 'domainIsuId',
     namaAtribut: 'namaAtribut',
-    nilai: 'nilai',
+    kritikalitas: 'kritikalitas',
     jumlah: 'jumlah',
     lokasiRt: 'lokasiRt',
     lokasiRw: 'lokasiRw',
+    isActive: 'isActive',
+    tahunData: 'tahunData',
     sumberData: 'sumberData',
     diprosesOlehId: 'diprosesOlehId',
     createdAt: 'createdAt',
@@ -13692,30 +12492,37 @@ export namespace Prisma {
   export type DataMasterScalarFieldEnum = (typeof DataMasterScalarFieldEnum)[keyof typeof DataMasterScalarFieldEnum]
 
 
-  export const RekomendasiScalarFieldEnum: {
+  export const KegiatanRapatScalarFieldEnum: {
     id: 'id',
-    kegiatanRapatId: 'kegiatanRapatId',
-    domainIsuId: 'domainIsuId',
     judul: 'judul',
-    ringkasan: 'ringkasan',
     deskripsi: 'deskripsi',
-    skorPrioritas: 'skorPrioritas',
-    status: 'status',
-    laporanLengkap: 'laporanLengkap',
+    tanggal: 'tanggal',
+    lokasi: 'lokasi',
+    domainIsuId: 'domainIsuId',
+    dibuatOlehId: 'dibuatOlehId',
+    mode: 'mode',
+    judulLaporan: 'judulLaporan',
+    rekomendasiItems: 'rekomendasiItems',
+    fingerprint: 'fingerprint',
+    statusRekomendasi: 'statusRekomendasi',
+    aiModel: 'aiModel',
+    aiProcessedAt: 'aiProcessedAt',
     diprosesOlehId: 'diprosesOlehId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
 
-  export type RekomendasiScalarFieldEnum = (typeof RekomendasiScalarFieldEnum)[keyof typeof RekomendasiScalarFieldEnum]
+  export type KegiatanRapatScalarFieldEnum = (typeof KegiatanRapatScalarFieldEnum)[keyof typeof KegiatanRapatScalarFieldEnum]
 
 
-  export const RekomendasiMasukanScalarFieldEnum: {
-    rekomendasiId: 'rekomendasiId',
-    masukanId: 'masukanId'
+  export const KegiatanRapatMasukanScalarFieldEnum: {
+    id: 'id',
+    kegiatanRapatId: 'kegiatanRapatId',
+    masukanId: 'masukanId',
+    createdAt: 'createdAt'
   };
 
-  export type RekomendasiMasukanScalarFieldEnum = (typeof RekomendasiMasukanScalarFieldEnum)[keyof typeof RekomendasiMasukanScalarFieldEnum]
+  export type KegiatanRapatMasukanScalarFieldEnum = (typeof KegiatanRapatMasukanScalarFieldEnum)[keyof typeof KegiatanRapatMasukanScalarFieldEnum]
 
 
   export const SessionScalarFieldEnum: {
@@ -13765,24 +12572,6 @@ export namespace Prisma {
   };
 
   export type VerificationScalarFieldEnum = (typeof VerificationScalarFieldEnum)[keyof typeof VerificationScalarFieldEnum]
-
-
-  export const KegiatanRapatScalarFieldEnum: {
-    id: 'id',
-    judul: 'judul',
-    deskripsi: 'deskripsi',
-    tanggal: 'tanggal',
-    lokasi: 'lokasi',
-    domainIsuId: 'domainIsuId',
-    dibuatOlehId: 'dibuatOlehId',
-    aiModel: 'aiModel',
-    aiPromptHash: 'aiPromptHash',
-    aiProcessedAt: 'aiProcessedAt',
-    createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
-  };
-
-  export type KegiatanRapatScalarFieldEnum = (typeof KegiatanRapatScalarFieldEnum)[keyof typeof KegiatanRapatScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -13894,6 +12683,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'NilaiKritikalitas'
+   */
+  export type EnumNilaiKritikalitasFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NilaiKritikalitas'>
+    
+
+
+  /**
+   * Reference to a field of type 'NilaiKritikalitas[]'
+   */
+  export type ListEnumNilaiKritikalitasFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NilaiKritikalitas[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -13908,16 +12711,30 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Float'
+   * Reference to a field of type 'ModeRekomendasi'
    */
-  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+  export type EnumModeRekomendasiFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ModeRekomendasi'>
     
 
 
   /**
-   * Reference to a field of type 'Float[]'
+   * Reference to a field of type 'ModeRekomendasi[]'
    */
-  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+  export type ListEnumModeRekomendasiFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ModeRekomendasi[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -13936,16 +12753,16 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Json'
+   * Reference to a field of type 'Float'
    */
-  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
     
 
 
   /**
-   * Reference to a field of type 'QueryMode'
+   * Reference to a field of type 'Float[]'
    */
-  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
   /**
    * Deep Input Types
@@ -13964,7 +12781,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"DomainIsu"> | Date | string
     masukan?: MasukanWargaListRelationFilter
     dataMaster?: DataMasterListRelationFilter
-    rekomendasi?: RekomendasiListRelationFilter
     kegiatanRapat?: KegiatanRapatListRelationFilter
   }
 
@@ -13977,7 +12793,6 @@ export namespace Prisma {
     updatedAt?: SortOrder
     masukan?: MasukanWargaOrderByRelationAggregateInput
     dataMaster?: DataMasterOrderByRelationAggregateInput
-    rekomendasi?: RekomendasiOrderByRelationAggregateInput
     kegiatanRapat?: KegiatanRapatOrderByRelationAggregateInput
   }
 
@@ -13993,7 +12808,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"DomainIsu"> | Date | string
     masukan?: MasukanWargaListRelationFilter
     dataMaster?: DataMasterListRelationFilter
-    rekomendasi?: RekomendasiListRelationFilter
     kegiatanRapat?: KegiatanRapatListRelationFilter
   }, "id" | "code">
 
@@ -14036,11 +12850,11 @@ export namespace Prisma {
     emailVerified?: BoolFilter<"User"> | boolean
     image?: StringNullableFilter<"User"> | string | null
     masukanVerifikasi?: MasukanWargaListRelationFilter
-    rekomendasiDiproses?: RekomendasiListRelationFilter
+    kegiatanRapatDiproses?: KegiatanRapatListRelationFilter
+    kegiatanRapatDibuat?: KegiatanRapatListRelationFilter
+    dataMasterDibuat?: DataMasterListRelationFilter
     sessions?: SessionListRelationFilter
     accounts?: AccountListRelationFilter
-    kegiatanRapat?: KegiatanRapatListRelationFilter
-    dataMaster?: DataMasterListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -14055,11 +12869,11 @@ export namespace Prisma {
     emailVerified?: SortOrder
     image?: SortOrderInput | SortOrder
     masukanVerifikasi?: MasukanWargaOrderByRelationAggregateInput
-    rekomendasiDiproses?: RekomendasiOrderByRelationAggregateInput
+    kegiatanRapatDiproses?: KegiatanRapatOrderByRelationAggregateInput
+    kegiatanRapatDibuat?: KegiatanRapatOrderByRelationAggregateInput
+    dataMasterDibuat?: DataMasterOrderByRelationAggregateInput
     sessions?: SessionOrderByRelationAggregateInput
     accounts?: AccountOrderByRelationAggregateInput
-    kegiatanRapat?: KegiatanRapatOrderByRelationAggregateInput
-    dataMaster?: DataMasterOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -14077,11 +12891,11 @@ export namespace Prisma {
     emailVerified?: BoolFilter<"User"> | boolean
     image?: StringNullableFilter<"User"> | string | null
     masukanVerifikasi?: MasukanWargaListRelationFilter
-    rekomendasiDiproses?: RekomendasiListRelationFilter
+    kegiatanRapatDiproses?: KegiatanRapatListRelationFilter
+    kegiatanRapatDibuat?: KegiatanRapatListRelationFilter
+    dataMasterDibuat?: DataMasterListRelationFilter
     sessions?: SessionListRelationFilter
     accounts?: AccountListRelationFilter
-    kegiatanRapat?: KegiatanRapatListRelationFilter
-    dataMaster?: DataMasterListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -14127,15 +12941,19 @@ export namespace Prisma {
     deskripsi?: StringFilter<"MasukanWarga"> | string
     lokasiRt?: StringFilter<"MasukanWarga"> | string
     lokasiRw?: StringFilter<"MasukanWarga"> | string
+    isLocked?: BoolFilter<"MasukanWarga"> | boolean
+    lockedAt?: DateTimeNullableFilter<"MasukanWarga"> | Date | string | null
     domainIsuId?: StringFilter<"MasukanWarga"> | string
     status?: EnumStatusMasukanFilter<"MasukanWarga"> | $Enums.StatusMasukan
     alasanPenolakan?: StringNullableFilter<"MasukanWarga"> | string | null
     diverifikasiOlehId?: StringNullableFilter<"MasukanWarga"> | string | null
+    isRelevant?: BoolFilter<"MasukanWarga"> | boolean
+    expiresAt?: DateTimeNullableFilter<"MasukanWarga"> | Date | string | null
     createdAt?: DateTimeFilter<"MasukanWarga"> | Date | string
     updatedAt?: DateTimeFilter<"MasukanWarga"> | Date | string
     domainIsu?: XOR<DomainIsuScalarRelationFilter, DomainIsuWhereInput>
     diverifikasiOleh?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
-    rekomendasiLinks?: RekomendasiMasukanListRelationFilter
+    relasiRapat?: KegiatanRapatMasukanListRelationFilter
   }
 
   export type MasukanWargaOrderByWithRelationInput = {
@@ -14146,15 +12964,19 @@ export namespace Prisma {
     deskripsi?: SortOrder
     lokasiRt?: SortOrder
     lokasiRw?: SortOrder
+    isLocked?: SortOrder
+    lockedAt?: SortOrderInput | SortOrder
     domainIsuId?: SortOrder
     status?: SortOrder
     alasanPenolakan?: SortOrderInput | SortOrder
     diverifikasiOlehId?: SortOrderInput | SortOrder
+    isRelevant?: SortOrder
+    expiresAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     domainIsu?: DomainIsuOrderByWithRelationInput
     diverifikasiOleh?: UserOrderByWithRelationInput
-    rekomendasiLinks?: RekomendasiMasukanOrderByRelationAggregateInput
+    relasiRapat?: KegiatanRapatMasukanOrderByRelationAggregateInput
   }
 
   export type MasukanWargaWhereUniqueInput = Prisma.AtLeast<{
@@ -14168,15 +12990,19 @@ export namespace Prisma {
     deskripsi?: StringFilter<"MasukanWarga"> | string
     lokasiRt?: StringFilter<"MasukanWarga"> | string
     lokasiRw?: StringFilter<"MasukanWarga"> | string
+    isLocked?: BoolFilter<"MasukanWarga"> | boolean
+    lockedAt?: DateTimeNullableFilter<"MasukanWarga"> | Date | string | null
     domainIsuId?: StringFilter<"MasukanWarga"> | string
     status?: EnumStatusMasukanFilter<"MasukanWarga"> | $Enums.StatusMasukan
     alasanPenolakan?: StringNullableFilter<"MasukanWarga"> | string | null
     diverifikasiOlehId?: StringNullableFilter<"MasukanWarga"> | string | null
+    isRelevant?: BoolFilter<"MasukanWarga"> | boolean
+    expiresAt?: DateTimeNullableFilter<"MasukanWarga"> | Date | string | null
     createdAt?: DateTimeFilter<"MasukanWarga"> | Date | string
     updatedAt?: DateTimeFilter<"MasukanWarga"> | Date | string
     domainIsu?: XOR<DomainIsuScalarRelationFilter, DomainIsuWhereInput>
     diverifikasiOleh?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
-    rekomendasiLinks?: RekomendasiMasukanListRelationFilter
+    relasiRapat?: KegiatanRapatMasukanListRelationFilter
   }, "id">
 
   export type MasukanWargaOrderByWithAggregationInput = {
@@ -14187,10 +13013,14 @@ export namespace Prisma {
     deskripsi?: SortOrder
     lokasiRt?: SortOrder
     lokasiRw?: SortOrder
+    isLocked?: SortOrder
+    lockedAt?: SortOrderInput | SortOrder
     domainIsuId?: SortOrder
     status?: SortOrder
     alasanPenolakan?: SortOrderInput | SortOrder
     diverifikasiOlehId?: SortOrderInput | SortOrder
+    isRelevant?: SortOrder
+    expiresAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: MasukanWargaCountOrderByAggregateInput
@@ -14209,10 +13039,14 @@ export namespace Prisma {
     deskripsi?: StringWithAggregatesFilter<"MasukanWarga"> | string
     lokasiRt?: StringWithAggregatesFilter<"MasukanWarga"> | string
     lokasiRw?: StringWithAggregatesFilter<"MasukanWarga"> | string
+    isLocked?: BoolWithAggregatesFilter<"MasukanWarga"> | boolean
+    lockedAt?: DateTimeNullableWithAggregatesFilter<"MasukanWarga"> | Date | string | null
     domainIsuId?: StringWithAggregatesFilter<"MasukanWarga"> | string
     status?: EnumStatusMasukanWithAggregatesFilter<"MasukanWarga"> | $Enums.StatusMasukan
     alasanPenolakan?: StringNullableWithAggregatesFilter<"MasukanWarga"> | string | null
     diverifikasiOlehId?: StringNullableWithAggregatesFilter<"MasukanWarga"> | string | null
+    isRelevant?: BoolWithAggregatesFilter<"MasukanWarga"> | boolean
+    expiresAt?: DateTimeNullableWithAggregatesFilter<"MasukanWarga"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"MasukanWarga"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"MasukanWarga"> | Date | string
   }
@@ -14224,10 +13058,12 @@ export namespace Prisma {
     id?: StringFilter<"DataMaster"> | string
     domainIsuId?: StringFilter<"DataMaster"> | string
     namaAtribut?: StringFilter<"DataMaster"> | string
-    nilai?: StringFilter<"DataMaster"> | string
+    kritikalitas?: EnumNilaiKritikalitasFilter<"DataMaster"> | $Enums.NilaiKritikalitas
     jumlah?: IntNullableFilter<"DataMaster"> | number | null
-    lokasiRt?: IntNullableFilter<"DataMaster"> | number | null
-    lokasiRw?: IntNullableFilter<"DataMaster"> | number | null
+    lokasiRt?: StringNullableFilter<"DataMaster"> | string | null
+    lokasiRw?: StringNullableFilter<"DataMaster"> | string | null
+    isActive?: BoolFilter<"DataMaster"> | boolean
+    tahunData?: IntNullableFilter<"DataMaster"> | number | null
     sumberData?: StringNullableFilter<"DataMaster"> | string | null
     diprosesOlehId?: StringNullableFilter<"DataMaster"> | string | null
     createdAt?: DateTimeFilter<"DataMaster"> | Date | string
@@ -14240,10 +13076,12 @@ export namespace Prisma {
     id?: SortOrder
     domainIsuId?: SortOrder
     namaAtribut?: SortOrder
-    nilai?: SortOrder
+    kritikalitas?: SortOrder
     jumlah?: SortOrderInput | SortOrder
     lokasiRt?: SortOrderInput | SortOrder
     lokasiRw?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    tahunData?: SortOrderInput | SortOrder
     sumberData?: SortOrderInput | SortOrder
     diprosesOlehId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -14260,10 +13098,12 @@ export namespace Prisma {
     NOT?: DataMasterWhereInput | DataMasterWhereInput[]
     domainIsuId?: StringFilter<"DataMaster"> | string
     namaAtribut?: StringFilter<"DataMaster"> | string
-    nilai?: StringFilter<"DataMaster"> | string
+    kritikalitas?: EnumNilaiKritikalitasFilter<"DataMaster"> | $Enums.NilaiKritikalitas
     jumlah?: IntNullableFilter<"DataMaster"> | number | null
-    lokasiRt?: IntNullableFilter<"DataMaster"> | number | null
-    lokasiRw?: IntNullableFilter<"DataMaster"> | number | null
+    lokasiRt?: StringNullableFilter<"DataMaster"> | string | null
+    lokasiRw?: StringNullableFilter<"DataMaster"> | string | null
+    isActive?: BoolFilter<"DataMaster"> | boolean
+    tahunData?: IntNullableFilter<"DataMaster"> | number | null
     sumberData?: StringNullableFilter<"DataMaster"> | string | null
     diprosesOlehId?: StringNullableFilter<"DataMaster"> | string | null
     createdAt?: DateTimeFilter<"DataMaster"> | Date | string
@@ -14276,10 +13116,12 @@ export namespace Prisma {
     id?: SortOrder
     domainIsuId?: SortOrder
     namaAtribut?: SortOrder
-    nilai?: SortOrder
+    kritikalitas?: SortOrder
     jumlah?: SortOrderInput | SortOrder
     lokasiRt?: SortOrderInput | SortOrder
     lokasiRw?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    tahunData?: SortOrderInput | SortOrder
     sumberData?: SortOrderInput | SortOrder
     diprosesOlehId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -14298,159 +13140,194 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"DataMaster"> | string
     domainIsuId?: StringWithAggregatesFilter<"DataMaster"> | string
     namaAtribut?: StringWithAggregatesFilter<"DataMaster"> | string
-    nilai?: StringWithAggregatesFilter<"DataMaster"> | string
+    kritikalitas?: EnumNilaiKritikalitasWithAggregatesFilter<"DataMaster"> | $Enums.NilaiKritikalitas
     jumlah?: IntNullableWithAggregatesFilter<"DataMaster"> | number | null
-    lokasiRt?: IntNullableWithAggregatesFilter<"DataMaster"> | number | null
-    lokasiRw?: IntNullableWithAggregatesFilter<"DataMaster"> | number | null
+    lokasiRt?: StringNullableWithAggregatesFilter<"DataMaster"> | string | null
+    lokasiRw?: StringNullableWithAggregatesFilter<"DataMaster"> | string | null
+    isActive?: BoolWithAggregatesFilter<"DataMaster"> | boolean
+    tahunData?: IntNullableWithAggregatesFilter<"DataMaster"> | number | null
     sumberData?: StringNullableWithAggregatesFilter<"DataMaster"> | string | null
     diprosesOlehId?: StringNullableWithAggregatesFilter<"DataMaster"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"DataMaster"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"DataMaster"> | Date | string
   }
 
-  export type RekomendasiWhereInput = {
-    AND?: RekomendasiWhereInput | RekomendasiWhereInput[]
-    OR?: RekomendasiWhereInput[]
-    NOT?: RekomendasiWhereInput | RekomendasiWhereInput[]
-    id?: StringFilter<"Rekomendasi"> | string
-    kegiatanRapatId?: StringFilter<"Rekomendasi"> | string
-    domainIsuId?: StringFilter<"Rekomendasi"> | string
-    judul?: StringFilter<"Rekomendasi"> | string
-    ringkasan?: StringFilter<"Rekomendasi"> | string
-    deskripsi?: StringFilter<"Rekomendasi"> | string
-    skorPrioritas?: FloatFilter<"Rekomendasi"> | number
-    status?: EnumStatusRekomendasiFilter<"Rekomendasi"> | $Enums.StatusRekomendasi
-    laporanLengkap?: JsonFilter<"Rekomendasi">
-    diprosesOlehId?: StringNullableFilter<"Rekomendasi"> | string | null
-    createdAt?: DateTimeFilter<"Rekomendasi"> | Date | string
-    updatedAt?: DateTimeFilter<"Rekomendasi"> | Date | string
-    kegiatanRapat?: XOR<KegiatanRapatScalarRelationFilter, KegiatanRapatWhereInput>
+  export type KegiatanRapatWhereInput = {
+    AND?: KegiatanRapatWhereInput | KegiatanRapatWhereInput[]
+    OR?: KegiatanRapatWhereInput[]
+    NOT?: KegiatanRapatWhereInput | KegiatanRapatWhereInput[]
+    id?: StringFilter<"KegiatanRapat"> | string
+    judul?: StringFilter<"KegiatanRapat"> | string
+    deskripsi?: StringFilter<"KegiatanRapat"> | string
+    tanggal?: DateTimeFilter<"KegiatanRapat"> | Date | string
+    lokasi?: StringNullableFilter<"KegiatanRapat"> | string | null
+    domainIsuId?: StringFilter<"KegiatanRapat"> | string
+    dibuatOlehId?: StringFilter<"KegiatanRapat"> | string
+    mode?: EnumModeRekomendasiFilter<"KegiatanRapat"> | $Enums.ModeRekomendasi
+    judulLaporan?: StringFilter<"KegiatanRapat"> | string
+    rekomendasiItems?: JsonFilter<"KegiatanRapat">
+    fingerprint?: StringFilter<"KegiatanRapat"> | string
+    statusRekomendasi?: EnumStatusRekomendasiFilter<"KegiatanRapat"> | $Enums.StatusRekomendasi
+    aiModel?: StringNullableFilter<"KegiatanRapat"> | string | null
+    aiProcessedAt?: DateTimeNullableFilter<"KegiatanRapat"> | Date | string | null
+    diprosesOlehId?: StringNullableFilter<"KegiatanRapat"> | string | null
+    createdAt?: DateTimeFilter<"KegiatanRapat"> | Date | string
+    updatedAt?: DateTimeFilter<"KegiatanRapat"> | Date | string
     domainIsu?: XOR<DomainIsuScalarRelationFilter, DomainIsuWhereInput>
+    dibuatOleh?: XOR<UserScalarRelationFilter, UserWhereInput>
     diprosesOleh?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
-    masukanLinks?: RekomendasiMasukanListRelationFilter
+    masukanRelasi?: KegiatanRapatMasukanListRelationFilter
   }
 
-  export type RekomendasiOrderByWithRelationInput = {
+  export type KegiatanRapatOrderByWithRelationInput = {
     id?: SortOrder
-    kegiatanRapatId?: SortOrder
-    domainIsuId?: SortOrder
     judul?: SortOrder
-    ringkasan?: SortOrder
     deskripsi?: SortOrder
-    skorPrioritas?: SortOrder
-    status?: SortOrder
-    laporanLengkap?: SortOrder
+    tanggal?: SortOrder
+    lokasi?: SortOrderInput | SortOrder
+    domainIsuId?: SortOrder
+    dibuatOlehId?: SortOrder
+    mode?: SortOrder
+    judulLaporan?: SortOrder
+    rekomendasiItems?: SortOrder
+    fingerprint?: SortOrder
+    statusRekomendasi?: SortOrder
+    aiModel?: SortOrderInput | SortOrder
+    aiProcessedAt?: SortOrderInput | SortOrder
     diprosesOlehId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    kegiatanRapat?: KegiatanRapatOrderByWithRelationInput
     domainIsu?: DomainIsuOrderByWithRelationInput
+    dibuatOleh?: UserOrderByWithRelationInput
     diprosesOleh?: UserOrderByWithRelationInput
-    masukanLinks?: RekomendasiMasukanOrderByRelationAggregateInput
+    masukanRelasi?: KegiatanRapatMasukanOrderByRelationAggregateInput
   }
 
-  export type RekomendasiWhereUniqueInput = Prisma.AtLeast<{
+  export type KegiatanRapatWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    AND?: RekomendasiWhereInput | RekomendasiWhereInput[]
-    OR?: RekomendasiWhereInput[]
-    NOT?: RekomendasiWhereInput | RekomendasiWhereInput[]
-    kegiatanRapatId?: StringFilter<"Rekomendasi"> | string
-    domainIsuId?: StringFilter<"Rekomendasi"> | string
-    judul?: StringFilter<"Rekomendasi"> | string
-    ringkasan?: StringFilter<"Rekomendasi"> | string
-    deskripsi?: StringFilter<"Rekomendasi"> | string
-    skorPrioritas?: FloatFilter<"Rekomendasi"> | number
-    status?: EnumStatusRekomendasiFilter<"Rekomendasi"> | $Enums.StatusRekomendasi
-    laporanLengkap?: JsonFilter<"Rekomendasi">
-    diprosesOlehId?: StringNullableFilter<"Rekomendasi"> | string | null
-    createdAt?: DateTimeFilter<"Rekomendasi"> | Date | string
-    updatedAt?: DateTimeFilter<"Rekomendasi"> | Date | string
-    kegiatanRapat?: XOR<KegiatanRapatScalarRelationFilter, KegiatanRapatWhereInput>
+    fingerprint?: string
+    AND?: KegiatanRapatWhereInput | KegiatanRapatWhereInput[]
+    OR?: KegiatanRapatWhereInput[]
+    NOT?: KegiatanRapatWhereInput | KegiatanRapatWhereInput[]
+    judul?: StringFilter<"KegiatanRapat"> | string
+    deskripsi?: StringFilter<"KegiatanRapat"> | string
+    tanggal?: DateTimeFilter<"KegiatanRapat"> | Date | string
+    lokasi?: StringNullableFilter<"KegiatanRapat"> | string | null
+    domainIsuId?: StringFilter<"KegiatanRapat"> | string
+    dibuatOlehId?: StringFilter<"KegiatanRapat"> | string
+    mode?: EnumModeRekomendasiFilter<"KegiatanRapat"> | $Enums.ModeRekomendasi
+    judulLaporan?: StringFilter<"KegiatanRapat"> | string
+    rekomendasiItems?: JsonFilter<"KegiatanRapat">
+    statusRekomendasi?: EnumStatusRekomendasiFilter<"KegiatanRapat"> | $Enums.StatusRekomendasi
+    aiModel?: StringNullableFilter<"KegiatanRapat"> | string | null
+    aiProcessedAt?: DateTimeNullableFilter<"KegiatanRapat"> | Date | string | null
+    diprosesOlehId?: StringNullableFilter<"KegiatanRapat"> | string | null
+    createdAt?: DateTimeFilter<"KegiatanRapat"> | Date | string
+    updatedAt?: DateTimeFilter<"KegiatanRapat"> | Date | string
     domainIsu?: XOR<DomainIsuScalarRelationFilter, DomainIsuWhereInput>
+    dibuatOleh?: XOR<UserScalarRelationFilter, UserWhereInput>
     diprosesOleh?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
-    masukanLinks?: RekomendasiMasukanListRelationFilter
-  }, "id">
+    masukanRelasi?: KegiatanRapatMasukanListRelationFilter
+  }, "id" | "fingerprint">
 
-  export type RekomendasiOrderByWithAggregationInput = {
+  export type KegiatanRapatOrderByWithAggregationInput = {
     id?: SortOrder
-    kegiatanRapatId?: SortOrder
-    domainIsuId?: SortOrder
     judul?: SortOrder
-    ringkasan?: SortOrder
     deskripsi?: SortOrder
-    skorPrioritas?: SortOrder
-    status?: SortOrder
-    laporanLengkap?: SortOrder
+    tanggal?: SortOrder
+    lokasi?: SortOrderInput | SortOrder
+    domainIsuId?: SortOrder
+    dibuatOlehId?: SortOrder
+    mode?: SortOrder
+    judulLaporan?: SortOrder
+    rekomendasiItems?: SortOrder
+    fingerprint?: SortOrder
+    statusRekomendasi?: SortOrder
+    aiModel?: SortOrderInput | SortOrder
+    aiProcessedAt?: SortOrderInput | SortOrder
     diprosesOlehId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    _count?: RekomendasiCountOrderByAggregateInput
-    _avg?: RekomendasiAvgOrderByAggregateInput
-    _max?: RekomendasiMaxOrderByAggregateInput
-    _min?: RekomendasiMinOrderByAggregateInput
-    _sum?: RekomendasiSumOrderByAggregateInput
+    _count?: KegiatanRapatCountOrderByAggregateInput
+    _max?: KegiatanRapatMaxOrderByAggregateInput
+    _min?: KegiatanRapatMinOrderByAggregateInput
   }
 
-  export type RekomendasiScalarWhereWithAggregatesInput = {
-    AND?: RekomendasiScalarWhereWithAggregatesInput | RekomendasiScalarWhereWithAggregatesInput[]
-    OR?: RekomendasiScalarWhereWithAggregatesInput[]
-    NOT?: RekomendasiScalarWhereWithAggregatesInput | RekomendasiScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Rekomendasi"> | string
-    kegiatanRapatId?: StringWithAggregatesFilter<"Rekomendasi"> | string
-    domainIsuId?: StringWithAggregatesFilter<"Rekomendasi"> | string
-    judul?: StringWithAggregatesFilter<"Rekomendasi"> | string
-    ringkasan?: StringWithAggregatesFilter<"Rekomendasi"> | string
-    deskripsi?: StringWithAggregatesFilter<"Rekomendasi"> | string
-    skorPrioritas?: FloatWithAggregatesFilter<"Rekomendasi"> | number
-    status?: EnumStatusRekomendasiWithAggregatesFilter<"Rekomendasi"> | $Enums.StatusRekomendasi
-    laporanLengkap?: JsonWithAggregatesFilter<"Rekomendasi">
-    diprosesOlehId?: StringNullableWithAggregatesFilter<"Rekomendasi"> | string | null
-    createdAt?: DateTimeWithAggregatesFilter<"Rekomendasi"> | Date | string
-    updatedAt?: DateTimeWithAggregatesFilter<"Rekomendasi"> | Date | string
+  export type KegiatanRapatScalarWhereWithAggregatesInput = {
+    AND?: KegiatanRapatScalarWhereWithAggregatesInput | KegiatanRapatScalarWhereWithAggregatesInput[]
+    OR?: KegiatanRapatScalarWhereWithAggregatesInput[]
+    NOT?: KegiatanRapatScalarWhereWithAggregatesInput | KegiatanRapatScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"KegiatanRapat"> | string
+    judul?: StringWithAggregatesFilter<"KegiatanRapat"> | string
+    deskripsi?: StringWithAggregatesFilter<"KegiatanRapat"> | string
+    tanggal?: DateTimeWithAggregatesFilter<"KegiatanRapat"> | Date | string
+    lokasi?: StringNullableWithAggregatesFilter<"KegiatanRapat"> | string | null
+    domainIsuId?: StringWithAggregatesFilter<"KegiatanRapat"> | string
+    dibuatOlehId?: StringWithAggregatesFilter<"KegiatanRapat"> | string
+    mode?: EnumModeRekomendasiWithAggregatesFilter<"KegiatanRapat"> | $Enums.ModeRekomendasi
+    judulLaporan?: StringWithAggregatesFilter<"KegiatanRapat"> | string
+    rekomendasiItems?: JsonWithAggregatesFilter<"KegiatanRapat">
+    fingerprint?: StringWithAggregatesFilter<"KegiatanRapat"> | string
+    statusRekomendasi?: EnumStatusRekomendasiWithAggregatesFilter<"KegiatanRapat"> | $Enums.StatusRekomendasi
+    aiModel?: StringNullableWithAggregatesFilter<"KegiatanRapat"> | string | null
+    aiProcessedAt?: DateTimeNullableWithAggregatesFilter<"KegiatanRapat"> | Date | string | null
+    diprosesOlehId?: StringNullableWithAggregatesFilter<"KegiatanRapat"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"KegiatanRapat"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"KegiatanRapat"> | Date | string
   }
 
-  export type RekomendasiMasukanWhereInput = {
-    AND?: RekomendasiMasukanWhereInput | RekomendasiMasukanWhereInput[]
-    OR?: RekomendasiMasukanWhereInput[]
-    NOT?: RekomendasiMasukanWhereInput | RekomendasiMasukanWhereInput[]
-    rekomendasiId?: StringFilter<"RekomendasiMasukan"> | string
-    masukanId?: StringFilter<"RekomendasiMasukan"> | string
-    rekomendasi?: XOR<RekomendasiScalarRelationFilter, RekomendasiWhereInput>
+  export type KegiatanRapatMasukanWhereInput = {
+    AND?: KegiatanRapatMasukanWhereInput | KegiatanRapatMasukanWhereInput[]
+    OR?: KegiatanRapatMasukanWhereInput[]
+    NOT?: KegiatanRapatMasukanWhereInput | KegiatanRapatMasukanWhereInput[]
+    id?: StringFilter<"KegiatanRapatMasukan"> | string
+    kegiatanRapatId?: StringFilter<"KegiatanRapatMasukan"> | string
+    masukanId?: StringFilter<"KegiatanRapatMasukan"> | string
+    createdAt?: DateTimeFilter<"KegiatanRapatMasukan"> | Date | string
+    kegiatanRapat?: XOR<KegiatanRapatScalarRelationFilter, KegiatanRapatWhereInput>
     masukan?: XOR<MasukanWargaScalarRelationFilter, MasukanWargaWhereInput>
   }
 
-  export type RekomendasiMasukanOrderByWithRelationInput = {
-    rekomendasiId?: SortOrder
+  export type KegiatanRapatMasukanOrderByWithRelationInput = {
+    id?: SortOrder
+    kegiatanRapatId?: SortOrder
     masukanId?: SortOrder
-    rekomendasi?: RekomendasiOrderByWithRelationInput
+    createdAt?: SortOrder
+    kegiatanRapat?: KegiatanRapatOrderByWithRelationInput
     masukan?: MasukanWargaOrderByWithRelationInput
   }
 
-  export type RekomendasiMasukanWhereUniqueInput = Prisma.AtLeast<{
-    rekomendasiId_masukanId?: RekomendasiMasukanRekomendasiIdMasukanIdCompoundUniqueInput
-    AND?: RekomendasiMasukanWhereInput | RekomendasiMasukanWhereInput[]
-    OR?: RekomendasiMasukanWhereInput[]
-    NOT?: RekomendasiMasukanWhereInput | RekomendasiMasukanWhereInput[]
-    rekomendasiId?: StringFilter<"RekomendasiMasukan"> | string
-    masukanId?: StringFilter<"RekomendasiMasukan"> | string
-    rekomendasi?: XOR<RekomendasiScalarRelationFilter, RekomendasiWhereInput>
+  export type KegiatanRapatMasukanWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    kegiatanRapatId_masukanId?: KegiatanRapatMasukanKegiatanRapatIdMasukanIdCompoundUniqueInput
+    AND?: KegiatanRapatMasukanWhereInput | KegiatanRapatMasukanWhereInput[]
+    OR?: KegiatanRapatMasukanWhereInput[]
+    NOT?: KegiatanRapatMasukanWhereInput | KegiatanRapatMasukanWhereInput[]
+    kegiatanRapatId?: StringFilter<"KegiatanRapatMasukan"> | string
+    masukanId?: StringFilter<"KegiatanRapatMasukan"> | string
+    createdAt?: DateTimeFilter<"KegiatanRapatMasukan"> | Date | string
+    kegiatanRapat?: XOR<KegiatanRapatScalarRelationFilter, KegiatanRapatWhereInput>
     masukan?: XOR<MasukanWargaScalarRelationFilter, MasukanWargaWhereInput>
-  }, "rekomendasiId_masukanId">
+  }, "id" | "kegiatanRapatId_masukanId">
 
-  export type RekomendasiMasukanOrderByWithAggregationInput = {
-    rekomendasiId?: SortOrder
+  export type KegiatanRapatMasukanOrderByWithAggregationInput = {
+    id?: SortOrder
+    kegiatanRapatId?: SortOrder
     masukanId?: SortOrder
-    _count?: RekomendasiMasukanCountOrderByAggregateInput
-    _max?: RekomendasiMasukanMaxOrderByAggregateInput
-    _min?: RekomendasiMasukanMinOrderByAggregateInput
+    createdAt?: SortOrder
+    _count?: KegiatanRapatMasukanCountOrderByAggregateInput
+    _max?: KegiatanRapatMasukanMaxOrderByAggregateInput
+    _min?: KegiatanRapatMasukanMinOrderByAggregateInput
   }
 
-  export type RekomendasiMasukanScalarWhereWithAggregatesInput = {
-    AND?: RekomendasiMasukanScalarWhereWithAggregatesInput | RekomendasiMasukanScalarWhereWithAggregatesInput[]
-    OR?: RekomendasiMasukanScalarWhereWithAggregatesInput[]
-    NOT?: RekomendasiMasukanScalarWhereWithAggregatesInput | RekomendasiMasukanScalarWhereWithAggregatesInput[]
-    rekomendasiId?: StringWithAggregatesFilter<"RekomendasiMasukan"> | string
-    masukanId?: StringWithAggregatesFilter<"RekomendasiMasukan"> | string
+  export type KegiatanRapatMasukanScalarWhereWithAggregatesInput = {
+    AND?: KegiatanRapatMasukanScalarWhereWithAggregatesInput | KegiatanRapatMasukanScalarWhereWithAggregatesInput[]
+    OR?: KegiatanRapatMasukanScalarWhereWithAggregatesInput[]
+    NOT?: KegiatanRapatMasukanScalarWhereWithAggregatesInput | KegiatanRapatMasukanScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"KegiatanRapatMasukan"> | string
+    kegiatanRapatId?: StringWithAggregatesFilter<"KegiatanRapatMasukan"> | string
+    masukanId?: StringWithAggregatesFilter<"KegiatanRapatMasukan"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"KegiatanRapatMasukan"> | Date | string
   }
 
   export type SessionWhereInput = {
@@ -14695,102 +13572,6 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"Verification"> | Date | string
   }
 
-  export type KegiatanRapatWhereInput = {
-    AND?: KegiatanRapatWhereInput | KegiatanRapatWhereInput[]
-    OR?: KegiatanRapatWhereInput[]
-    NOT?: KegiatanRapatWhereInput | KegiatanRapatWhereInput[]
-    id?: StringFilter<"KegiatanRapat"> | string
-    judul?: StringFilter<"KegiatanRapat"> | string
-    deskripsi?: StringFilter<"KegiatanRapat"> | string
-    tanggal?: DateTimeFilter<"KegiatanRapat"> | Date | string
-    lokasi?: StringNullableFilter<"KegiatanRapat"> | string | null
-    domainIsuId?: StringNullableFilter<"KegiatanRapat"> | string | null
-    dibuatOlehId?: StringFilter<"KegiatanRapat"> | string
-    aiModel?: StringNullableFilter<"KegiatanRapat"> | string | null
-    aiPromptHash?: StringNullableFilter<"KegiatanRapat"> | string | null
-    aiProcessedAt?: DateTimeNullableFilter<"KegiatanRapat"> | Date | string | null
-    createdAt?: DateTimeFilter<"KegiatanRapat"> | Date | string
-    updatedAt?: DateTimeFilter<"KegiatanRapat"> | Date | string
-    domainIsu?: XOR<DomainIsuNullableScalarRelationFilter, DomainIsuWhereInput> | null
-    dibuatOleh?: XOR<UserScalarRelationFilter, UserWhereInput>
-    rekomendasi?: RekomendasiListRelationFilter
-  }
-
-  export type KegiatanRapatOrderByWithRelationInput = {
-    id?: SortOrder
-    judul?: SortOrder
-    deskripsi?: SortOrder
-    tanggal?: SortOrder
-    lokasi?: SortOrderInput | SortOrder
-    domainIsuId?: SortOrderInput | SortOrder
-    dibuatOlehId?: SortOrder
-    aiModel?: SortOrderInput | SortOrder
-    aiPromptHash?: SortOrderInput | SortOrder
-    aiProcessedAt?: SortOrderInput | SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-    domainIsu?: DomainIsuOrderByWithRelationInput
-    dibuatOleh?: UserOrderByWithRelationInput
-    rekomendasi?: RekomendasiOrderByRelationAggregateInput
-  }
-
-  export type KegiatanRapatWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    AND?: KegiatanRapatWhereInput | KegiatanRapatWhereInput[]
-    OR?: KegiatanRapatWhereInput[]
-    NOT?: KegiatanRapatWhereInput | KegiatanRapatWhereInput[]
-    judul?: StringFilter<"KegiatanRapat"> | string
-    deskripsi?: StringFilter<"KegiatanRapat"> | string
-    tanggal?: DateTimeFilter<"KegiatanRapat"> | Date | string
-    lokasi?: StringNullableFilter<"KegiatanRapat"> | string | null
-    domainIsuId?: StringNullableFilter<"KegiatanRapat"> | string | null
-    dibuatOlehId?: StringFilter<"KegiatanRapat"> | string
-    aiModel?: StringNullableFilter<"KegiatanRapat"> | string | null
-    aiPromptHash?: StringNullableFilter<"KegiatanRapat"> | string | null
-    aiProcessedAt?: DateTimeNullableFilter<"KegiatanRapat"> | Date | string | null
-    createdAt?: DateTimeFilter<"KegiatanRapat"> | Date | string
-    updatedAt?: DateTimeFilter<"KegiatanRapat"> | Date | string
-    domainIsu?: XOR<DomainIsuNullableScalarRelationFilter, DomainIsuWhereInput> | null
-    dibuatOleh?: XOR<UserScalarRelationFilter, UserWhereInput>
-    rekomendasi?: RekomendasiListRelationFilter
-  }, "id">
-
-  export type KegiatanRapatOrderByWithAggregationInput = {
-    id?: SortOrder
-    judul?: SortOrder
-    deskripsi?: SortOrder
-    tanggal?: SortOrder
-    lokasi?: SortOrderInput | SortOrder
-    domainIsuId?: SortOrderInput | SortOrder
-    dibuatOlehId?: SortOrder
-    aiModel?: SortOrderInput | SortOrder
-    aiPromptHash?: SortOrderInput | SortOrder
-    aiProcessedAt?: SortOrderInput | SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-    _count?: KegiatanRapatCountOrderByAggregateInput
-    _max?: KegiatanRapatMaxOrderByAggregateInput
-    _min?: KegiatanRapatMinOrderByAggregateInput
-  }
-
-  export type KegiatanRapatScalarWhereWithAggregatesInput = {
-    AND?: KegiatanRapatScalarWhereWithAggregatesInput | KegiatanRapatScalarWhereWithAggregatesInput[]
-    OR?: KegiatanRapatScalarWhereWithAggregatesInput[]
-    NOT?: KegiatanRapatScalarWhereWithAggregatesInput | KegiatanRapatScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"KegiatanRapat"> | string
-    judul?: StringWithAggregatesFilter<"KegiatanRapat"> | string
-    deskripsi?: StringWithAggregatesFilter<"KegiatanRapat"> | string
-    tanggal?: DateTimeWithAggregatesFilter<"KegiatanRapat"> | Date | string
-    lokasi?: StringNullableWithAggregatesFilter<"KegiatanRapat"> | string | null
-    domainIsuId?: StringNullableWithAggregatesFilter<"KegiatanRapat"> | string | null
-    dibuatOlehId?: StringWithAggregatesFilter<"KegiatanRapat"> | string
-    aiModel?: StringNullableWithAggregatesFilter<"KegiatanRapat"> | string | null
-    aiPromptHash?: StringNullableWithAggregatesFilter<"KegiatanRapat"> | string | null
-    aiProcessedAt?: DateTimeNullableWithAggregatesFilter<"KegiatanRapat"> | Date | string | null
-    createdAt?: DateTimeWithAggregatesFilter<"KegiatanRapat"> | Date | string
-    updatedAt?: DateTimeWithAggregatesFilter<"KegiatanRapat"> | Date | string
-  }
-
   export type DomainIsuCreateInput = {
     id?: string
     code: string
@@ -14800,7 +13581,6 @@ export namespace Prisma {
     updatedAt?: Date | string
     masukan?: MasukanWargaCreateNestedManyWithoutDomainIsuInput
     dataMaster?: DataMasterCreateNestedManyWithoutDomainIsuInput
-    rekomendasi?: RekomendasiCreateNestedManyWithoutDomainIsuInput
     kegiatanRapat?: KegiatanRapatCreateNestedManyWithoutDomainIsuInput
   }
 
@@ -14813,7 +13593,6 @@ export namespace Prisma {
     updatedAt?: Date | string
     masukan?: MasukanWargaUncheckedCreateNestedManyWithoutDomainIsuInput
     dataMaster?: DataMasterUncheckedCreateNestedManyWithoutDomainIsuInput
-    rekomendasi?: RekomendasiUncheckedCreateNestedManyWithoutDomainIsuInput
     kegiatanRapat?: KegiatanRapatUncheckedCreateNestedManyWithoutDomainIsuInput
   }
 
@@ -14826,7 +13605,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     masukan?: MasukanWargaUpdateManyWithoutDomainIsuNestedInput
     dataMaster?: DataMasterUpdateManyWithoutDomainIsuNestedInput
-    rekomendasi?: RekomendasiUpdateManyWithoutDomainIsuNestedInput
     kegiatanRapat?: KegiatanRapatUpdateManyWithoutDomainIsuNestedInput
   }
 
@@ -14839,7 +13617,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     masukan?: MasukanWargaUncheckedUpdateManyWithoutDomainIsuNestedInput
     dataMaster?: DataMasterUncheckedUpdateManyWithoutDomainIsuNestedInput
-    rekomendasi?: RekomendasiUncheckedUpdateManyWithoutDomainIsuNestedInput
     kegiatanRapat?: KegiatanRapatUncheckedUpdateManyWithoutDomainIsuNestedInput
   }
 
@@ -14882,11 +13659,11 @@ export namespace Prisma {
     emailVerified?: boolean
     image?: string | null
     masukanVerifikasi?: MasukanWargaCreateNestedManyWithoutDiverifikasiOlehInput
-    rekomendasiDiproses?: RekomendasiCreateNestedManyWithoutDiprosesOlehInput
+    kegiatanRapatDiproses?: KegiatanRapatCreateNestedManyWithoutDiprosesOlehInput
+    kegiatanRapatDibuat?: KegiatanRapatCreateNestedManyWithoutDibuatOlehInput
+    dataMasterDibuat?: DataMasterCreateNestedManyWithoutDiprosesOlehInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
-    kegiatanRapat?: KegiatanRapatCreateNestedManyWithoutDibuatOlehInput
-    dataMaster?: DataMasterCreateNestedManyWithoutDiprosesOlehInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -14901,11 +13678,11 @@ export namespace Prisma {
     emailVerified?: boolean
     image?: string | null
     masukanVerifikasi?: MasukanWargaUncheckedCreateNestedManyWithoutDiverifikasiOlehInput
-    rekomendasiDiproses?: RekomendasiUncheckedCreateNestedManyWithoutDiprosesOlehInput
+    kegiatanRapatDiproses?: KegiatanRapatUncheckedCreateNestedManyWithoutDiprosesOlehInput
+    kegiatanRapatDibuat?: KegiatanRapatUncheckedCreateNestedManyWithoutDibuatOlehInput
+    dataMasterDibuat?: DataMasterUncheckedCreateNestedManyWithoutDiprosesOlehInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
-    kegiatanRapat?: KegiatanRapatUncheckedCreateNestedManyWithoutDibuatOlehInput
-    dataMaster?: DataMasterUncheckedCreateNestedManyWithoutDiprosesOlehInput
   }
 
   export type UserUpdateInput = {
@@ -14920,11 +13697,11 @@ export namespace Prisma {
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
     masukanVerifikasi?: MasukanWargaUpdateManyWithoutDiverifikasiOlehNestedInput
-    rekomendasiDiproses?: RekomendasiUpdateManyWithoutDiprosesOlehNestedInput
+    kegiatanRapatDiproses?: KegiatanRapatUpdateManyWithoutDiprosesOlehNestedInput
+    kegiatanRapatDibuat?: KegiatanRapatUpdateManyWithoutDibuatOlehNestedInput
+    dataMasterDibuat?: DataMasterUpdateManyWithoutDiprosesOlehNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
-    kegiatanRapat?: KegiatanRapatUpdateManyWithoutDibuatOlehNestedInput
-    dataMaster?: DataMasterUpdateManyWithoutDiprosesOlehNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -14939,11 +13716,11 @@ export namespace Prisma {
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
     masukanVerifikasi?: MasukanWargaUncheckedUpdateManyWithoutDiverifikasiOlehNestedInput
-    rekomendasiDiproses?: RekomendasiUncheckedUpdateManyWithoutDiprosesOlehNestedInput
+    kegiatanRapatDiproses?: KegiatanRapatUncheckedUpdateManyWithoutDiprosesOlehNestedInput
+    kegiatanRapatDibuat?: KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehNestedInput
+    dataMasterDibuat?: DataMasterUncheckedUpdateManyWithoutDiprosesOlehNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
-    kegiatanRapat?: KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehNestedInput
-    dataMaster?: DataMasterUncheckedUpdateManyWithoutDiprosesOlehNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -14993,13 +13770,17 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
+    isLocked?: boolean
+    lockedAt?: Date | string | null
     status?: $Enums.StatusMasukan
     alasanPenolakan?: string | null
+    isRelevant?: boolean
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     domainIsu: DomainIsuCreateNestedOneWithoutMasukanInput
     diverifikasiOleh?: UserCreateNestedOneWithoutMasukanVerifikasiInput
-    rekomendasiLinks?: RekomendasiMasukanCreateNestedManyWithoutMasukanInput
+    relasiRapat?: KegiatanRapatMasukanCreateNestedManyWithoutMasukanInput
   }
 
   export type MasukanWargaUncheckedCreateInput = {
@@ -15010,13 +13791,17 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
+    isLocked?: boolean
+    lockedAt?: Date | string | null
     domainIsuId: string
     status?: $Enums.StatusMasukan
     alasanPenolakan?: string | null
     diverifikasiOlehId?: string | null
+    isRelevant?: boolean
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    rekomendasiLinks?: RekomendasiMasukanUncheckedCreateNestedManyWithoutMasukanInput
+    relasiRapat?: KegiatanRapatMasukanUncheckedCreateNestedManyWithoutMasukanInput
   }
 
   export type MasukanWargaUpdateInput = {
@@ -15027,13 +13812,17 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
+    isLocked?: BoolFieldUpdateOperationsInput | boolean
+    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
+    isRelevant?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     domainIsu?: DomainIsuUpdateOneRequiredWithoutMasukanNestedInput
     diverifikasiOleh?: UserUpdateOneWithoutMasukanVerifikasiNestedInput
-    rekomendasiLinks?: RekomendasiMasukanUpdateManyWithoutMasukanNestedInput
+    relasiRapat?: KegiatanRapatMasukanUpdateManyWithoutMasukanNestedInput
   }
 
   export type MasukanWargaUncheckedUpdateInput = {
@@ -15044,13 +13833,17 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
+    isLocked?: BoolFieldUpdateOperationsInput | boolean
+    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     domainIsuId?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     diverifikasiOlehId?: NullableStringFieldUpdateOperationsInput | string | null
+    isRelevant?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    rekomendasiLinks?: RekomendasiMasukanUncheckedUpdateManyWithoutMasukanNestedInput
+    relasiRapat?: KegiatanRapatMasukanUncheckedUpdateManyWithoutMasukanNestedInput
   }
 
   export type MasukanWargaCreateManyInput = {
@@ -15061,10 +13854,14 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
+    isLocked?: boolean
+    lockedAt?: Date | string | null
     domainIsuId: string
     status?: $Enums.StatusMasukan
     alasanPenolakan?: string | null
     diverifikasiOlehId?: string | null
+    isRelevant?: boolean
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -15077,8 +13874,12 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
+    isLocked?: BoolFieldUpdateOperationsInput | boolean
+    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
+    isRelevant?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -15091,10 +13892,14 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
+    isLocked?: BoolFieldUpdateOperationsInput | boolean
+    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     domainIsuId?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     diverifikasiOlehId?: NullableStringFieldUpdateOperationsInput | string | null
+    isRelevant?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -15102,25 +13907,29 @@ export namespace Prisma {
   export type DataMasterCreateInput = {
     id?: string
     namaAtribut: string
-    nilai: string
+    kritikalitas: $Enums.NilaiKritikalitas
     jumlah?: number | null
-    lokasiRt?: number | null
-    lokasiRw?: number | null
+    lokasiRt?: string | null
+    lokasiRw?: string | null
+    isActive?: boolean
+    tahunData?: number | null
     sumberData?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     domainIsu: DomainIsuCreateNestedOneWithoutDataMasterInput
-    diprosesOleh?: UserCreateNestedOneWithoutDataMasterInput
+    diprosesOleh?: UserCreateNestedOneWithoutDataMasterDibuatInput
   }
 
   export type DataMasterUncheckedCreateInput = {
     id?: string
     domainIsuId: string
     namaAtribut: string
-    nilai: string
+    kritikalitas: $Enums.NilaiKritikalitas
     jumlah?: number | null
-    lokasiRt?: number | null
-    lokasiRw?: number | null
+    lokasiRt?: string | null
+    lokasiRw?: string | null
+    isActive?: boolean
+    tahunData?: number | null
     sumberData?: string | null
     diprosesOlehId?: string | null
     createdAt?: Date | string
@@ -15130,25 +13939,29 @@ export namespace Prisma {
   export type DataMasterUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     namaAtribut?: StringFieldUpdateOperationsInput | string
-    nilai?: StringFieldUpdateOperationsInput | string
+    kritikalitas?: EnumNilaiKritikalitasFieldUpdateOperationsInput | $Enums.NilaiKritikalitas
     jumlah?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRt?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRw?: NullableIntFieldUpdateOperationsInput | number | null
+    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
+    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    tahunData?: NullableIntFieldUpdateOperationsInput | number | null
     sumberData?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     domainIsu?: DomainIsuUpdateOneRequiredWithoutDataMasterNestedInput
-    diprosesOleh?: UserUpdateOneWithoutDataMasterNestedInput
+    diprosesOleh?: UserUpdateOneWithoutDataMasterDibuatNestedInput
   }
 
   export type DataMasterUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     domainIsuId?: StringFieldUpdateOperationsInput | string
     namaAtribut?: StringFieldUpdateOperationsInput | string
-    nilai?: StringFieldUpdateOperationsInput | string
+    kritikalitas?: EnumNilaiKritikalitasFieldUpdateOperationsInput | $Enums.NilaiKritikalitas
     jumlah?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRt?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRw?: NullableIntFieldUpdateOperationsInput | number | null
+    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
+    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    tahunData?: NullableIntFieldUpdateOperationsInput | number | null
     sumberData?: NullableStringFieldUpdateOperationsInput | string | null
     diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -15159,10 +13972,12 @@ export namespace Prisma {
     id?: string
     domainIsuId: string
     namaAtribut: string
-    nilai: string
+    kritikalitas: $Enums.NilaiKritikalitas
     jumlah?: number | null
-    lokasiRt?: number | null
-    lokasiRw?: number | null
+    lokasiRt?: string | null
+    lokasiRw?: string | null
+    isActive?: boolean
+    tahunData?: number | null
     sumberData?: string | null
     diprosesOlehId?: string | null
     createdAt?: Date | string
@@ -15172,10 +13987,12 @@ export namespace Prisma {
   export type DataMasterUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     namaAtribut?: StringFieldUpdateOperationsInput | string
-    nilai?: StringFieldUpdateOperationsInput | string
+    kritikalitas?: EnumNilaiKritikalitasFieldUpdateOperationsInput | $Enums.NilaiKritikalitas
     jumlah?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRt?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRw?: NullableIntFieldUpdateOperationsInput | number | null
+    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
+    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    tahunData?: NullableIntFieldUpdateOperationsInput | number | null
     sumberData?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -15185,154 +14002,204 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     domainIsuId?: StringFieldUpdateOperationsInput | string
     namaAtribut?: StringFieldUpdateOperationsInput | string
-    nilai?: StringFieldUpdateOperationsInput | string
+    kritikalitas?: EnumNilaiKritikalitasFieldUpdateOperationsInput | $Enums.NilaiKritikalitas
     jumlah?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRt?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRw?: NullableIntFieldUpdateOperationsInput | number | null
+    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
+    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    tahunData?: NullableIntFieldUpdateOperationsInput | number | null
     sumberData?: NullableStringFieldUpdateOperationsInput | string | null
     diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type RekomendasiCreateInput = {
+  export type KegiatanRapatCreateInput = {
     id?: string
     judul: string
-    ringkasan: string
     deskripsi: string
-    skorPrioritas: number
-    status?: $Enums.StatusRekomendasi
-    laporanLengkap: JsonNullValueInput | InputJsonValue
+    tanggal: Date | string
+    lokasi?: string | null
+    mode: $Enums.ModeRekomendasi
+    judulLaporan: string
+    rekomendasiItems: JsonNullValueInput | InputJsonValue
+    fingerprint: string
+    statusRekomendasi?: $Enums.StatusRekomendasi
+    aiModel?: string | null
+    aiProcessedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    kegiatanRapat: KegiatanRapatCreateNestedOneWithoutRekomendasiInput
-    domainIsu: DomainIsuCreateNestedOneWithoutRekomendasiInput
-    diprosesOleh?: UserCreateNestedOneWithoutRekomendasiDiprosesInput
-    masukanLinks?: RekomendasiMasukanCreateNestedManyWithoutRekomendasiInput
+    domainIsu: DomainIsuCreateNestedOneWithoutKegiatanRapatInput
+    dibuatOleh: UserCreateNestedOneWithoutKegiatanRapatDibuatInput
+    diprosesOleh?: UserCreateNestedOneWithoutKegiatanRapatDiprosesInput
+    masukanRelasi?: KegiatanRapatMasukanCreateNestedManyWithoutKegiatanRapatInput
   }
 
-  export type RekomendasiUncheckedCreateInput = {
+  export type KegiatanRapatUncheckedCreateInput = {
     id?: string
-    kegiatanRapatId: string
-    domainIsuId: string
     judul: string
-    ringkasan: string
     deskripsi: string
-    skorPrioritas: number
-    status?: $Enums.StatusRekomendasi
-    laporanLengkap: JsonNullValueInput | InputJsonValue
+    tanggal: Date | string
+    lokasi?: string | null
+    domainIsuId: string
+    dibuatOlehId: string
+    mode: $Enums.ModeRekomendasi
+    judulLaporan: string
+    rekomendasiItems: JsonNullValueInput | InputJsonValue
+    fingerprint: string
+    statusRekomendasi?: $Enums.StatusRekomendasi
+    aiModel?: string | null
+    aiProcessedAt?: Date | string | null
     diprosesOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    masukanLinks?: RekomendasiMasukanUncheckedCreateNestedManyWithoutRekomendasiInput
+    masukanRelasi?: KegiatanRapatMasukanUncheckedCreateNestedManyWithoutKegiatanRapatInput
   }
 
-  export type RekomendasiUpdateInput = {
+  export type KegiatanRapatUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     judul?: StringFieldUpdateOperationsInput | string
-    ringkasan?: StringFieldUpdateOperationsInput | string
     deskripsi?: StringFieldUpdateOperationsInput | string
-    skorPrioritas?: FloatFieldUpdateOperationsInput | number
-    status?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
-    laporanLengkap?: JsonNullValueInput | InputJsonValue
+    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
+    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
+    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
+    judulLaporan?: StringFieldUpdateOperationsInput | string
+    rekomendasiItems?: JsonNullValueInput | InputJsonValue
+    fingerprint?: StringFieldUpdateOperationsInput | string
+    statusRekomendasi?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
+    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
+    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    kegiatanRapat?: KegiatanRapatUpdateOneRequiredWithoutRekomendasiNestedInput
-    domainIsu?: DomainIsuUpdateOneRequiredWithoutRekomendasiNestedInput
-    diprosesOleh?: UserUpdateOneWithoutRekomendasiDiprosesNestedInput
-    masukanLinks?: RekomendasiMasukanUpdateManyWithoutRekomendasiNestedInput
+    domainIsu?: DomainIsuUpdateOneRequiredWithoutKegiatanRapatNestedInput
+    dibuatOleh?: UserUpdateOneRequiredWithoutKegiatanRapatDibuatNestedInput
+    diprosesOleh?: UserUpdateOneWithoutKegiatanRapatDiprosesNestedInput
+    masukanRelasi?: KegiatanRapatMasukanUpdateManyWithoutKegiatanRapatNestedInput
   }
 
-  export type RekomendasiUncheckedUpdateInput = {
+  export type KegiatanRapatUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    kegiatanRapatId?: StringFieldUpdateOperationsInput | string
-    domainIsuId?: StringFieldUpdateOperationsInput | string
     judul?: StringFieldUpdateOperationsInput | string
-    ringkasan?: StringFieldUpdateOperationsInput | string
     deskripsi?: StringFieldUpdateOperationsInput | string
-    skorPrioritas?: FloatFieldUpdateOperationsInput | number
-    status?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
-    laporanLengkap?: JsonNullValueInput | InputJsonValue
+    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
+    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
+    domainIsuId?: StringFieldUpdateOperationsInput | string
+    dibuatOlehId?: StringFieldUpdateOperationsInput | string
+    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
+    judulLaporan?: StringFieldUpdateOperationsInput | string
+    rekomendasiItems?: JsonNullValueInput | InputJsonValue
+    fingerprint?: StringFieldUpdateOperationsInput | string
+    statusRekomendasi?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
+    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
+    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    masukanLinks?: RekomendasiMasukanUncheckedUpdateManyWithoutRekomendasiNestedInput
+    masukanRelasi?: KegiatanRapatMasukanUncheckedUpdateManyWithoutKegiatanRapatNestedInput
   }
 
-  export type RekomendasiCreateManyInput = {
+  export type KegiatanRapatCreateManyInput = {
     id?: string
-    kegiatanRapatId: string
-    domainIsuId: string
     judul: string
-    ringkasan: string
     deskripsi: string
-    skorPrioritas: number
-    status?: $Enums.StatusRekomendasi
-    laporanLengkap: JsonNullValueInput | InputJsonValue
+    tanggal: Date | string
+    lokasi?: string | null
+    domainIsuId: string
+    dibuatOlehId: string
+    mode: $Enums.ModeRekomendasi
+    judulLaporan: string
+    rekomendasiItems: JsonNullValueInput | InputJsonValue
+    fingerprint: string
+    statusRekomendasi?: $Enums.StatusRekomendasi
+    aiModel?: string | null
+    aiProcessedAt?: Date | string | null
     diprosesOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
-  export type RekomendasiUpdateManyMutationInput = {
+  export type KegiatanRapatUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     judul?: StringFieldUpdateOperationsInput | string
-    ringkasan?: StringFieldUpdateOperationsInput | string
     deskripsi?: StringFieldUpdateOperationsInput | string
-    skorPrioritas?: FloatFieldUpdateOperationsInput | number
-    status?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
-    laporanLengkap?: JsonNullValueInput | InputJsonValue
+    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
+    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
+    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
+    judulLaporan?: StringFieldUpdateOperationsInput | string
+    rekomendasiItems?: JsonNullValueInput | InputJsonValue
+    fingerprint?: StringFieldUpdateOperationsInput | string
+    statusRekomendasi?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
+    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
+    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type RekomendasiUncheckedUpdateManyInput = {
+  export type KegiatanRapatUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    kegiatanRapatId?: StringFieldUpdateOperationsInput | string
-    domainIsuId?: StringFieldUpdateOperationsInput | string
     judul?: StringFieldUpdateOperationsInput | string
-    ringkasan?: StringFieldUpdateOperationsInput | string
     deskripsi?: StringFieldUpdateOperationsInput | string
-    skorPrioritas?: FloatFieldUpdateOperationsInput | number
-    status?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
-    laporanLengkap?: JsonNullValueInput | InputJsonValue
+    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
+    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
+    domainIsuId?: StringFieldUpdateOperationsInput | string
+    dibuatOlehId?: StringFieldUpdateOperationsInput | string
+    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
+    judulLaporan?: StringFieldUpdateOperationsInput | string
+    rekomendasiItems?: JsonNullValueInput | InputJsonValue
+    fingerprint?: StringFieldUpdateOperationsInput | string
+    statusRekomendasi?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
+    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
+    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type RekomendasiMasukanCreateInput = {
-    rekomendasi: RekomendasiCreateNestedOneWithoutMasukanLinksInput
-    masukan: MasukanWargaCreateNestedOneWithoutRekomendasiLinksInput
+  export type KegiatanRapatMasukanCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    kegiatanRapat: KegiatanRapatCreateNestedOneWithoutMasukanRelasiInput
+    masukan: MasukanWargaCreateNestedOneWithoutRelasiRapatInput
   }
 
-  export type RekomendasiMasukanUncheckedCreateInput = {
-    rekomendasiId: string
+  export type KegiatanRapatMasukanUncheckedCreateInput = {
+    id?: string
+    kegiatanRapatId: string
     masukanId: string
+    createdAt?: Date | string
   }
 
-  export type RekomendasiMasukanUpdateInput = {
-    rekomendasi?: RekomendasiUpdateOneRequiredWithoutMasukanLinksNestedInput
-    masukan?: MasukanWargaUpdateOneRequiredWithoutRekomendasiLinksNestedInput
+  export type KegiatanRapatMasukanUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    kegiatanRapat?: KegiatanRapatUpdateOneRequiredWithoutMasukanRelasiNestedInput
+    masukan?: MasukanWargaUpdateOneRequiredWithoutRelasiRapatNestedInput
   }
 
-  export type RekomendasiMasukanUncheckedUpdateInput = {
-    rekomendasiId?: StringFieldUpdateOperationsInput | string
+  export type KegiatanRapatMasukanUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kegiatanRapatId?: StringFieldUpdateOperationsInput | string
     masukanId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type RekomendasiMasukanCreateManyInput = {
-    rekomendasiId: string
+  export type KegiatanRapatMasukanCreateManyInput = {
+    id?: string
+    kegiatanRapatId: string
     masukanId: string
+    createdAt?: Date | string
   }
 
-  export type RekomendasiMasukanUpdateManyMutationInput = {
-
+  export type KegiatanRapatMasukanUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type RekomendasiMasukanUncheckedUpdateManyInput = {
-    rekomendasiId?: StringFieldUpdateOperationsInput | string
+  export type KegiatanRapatMasukanUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kegiatanRapatId?: StringFieldUpdateOperationsInput | string
     masukanId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SessionCreateInput = {
@@ -15613,113 +14480,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type KegiatanRapatCreateInput = {
-    id?: string
-    judul: string
-    deskripsi: string
-    tanggal: Date | string
-    lokasi?: string | null
-    aiModel?: string | null
-    aiPromptHash?: string | null
-    aiProcessedAt?: Date | string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    domainIsu?: DomainIsuCreateNestedOneWithoutKegiatanRapatInput
-    dibuatOleh: UserCreateNestedOneWithoutKegiatanRapatInput
-    rekomendasi?: RekomendasiCreateNestedManyWithoutKegiatanRapatInput
-  }
-
-  export type KegiatanRapatUncheckedCreateInput = {
-    id?: string
-    judul: string
-    deskripsi: string
-    tanggal: Date | string
-    lokasi?: string | null
-    domainIsuId?: string | null
-    dibuatOlehId: string
-    aiModel?: string | null
-    aiPromptHash?: string | null
-    aiProcessedAt?: Date | string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    rekomendasi?: RekomendasiUncheckedCreateNestedManyWithoutKegiatanRapatInput
-  }
-
-  export type KegiatanRapatUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    judul?: StringFieldUpdateOperationsInput | string
-    deskripsi?: StringFieldUpdateOperationsInput | string
-    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
-    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
-    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
-    aiPromptHash?: NullableStringFieldUpdateOperationsInput | string | null
-    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    domainIsu?: DomainIsuUpdateOneWithoutKegiatanRapatNestedInput
-    dibuatOleh?: UserUpdateOneRequiredWithoutKegiatanRapatNestedInput
-    rekomendasi?: RekomendasiUpdateManyWithoutKegiatanRapatNestedInput
-  }
-
-  export type KegiatanRapatUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    judul?: StringFieldUpdateOperationsInput | string
-    deskripsi?: StringFieldUpdateOperationsInput | string
-    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
-    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
-    domainIsuId?: NullableStringFieldUpdateOperationsInput | string | null
-    dibuatOlehId?: StringFieldUpdateOperationsInput | string
-    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
-    aiPromptHash?: NullableStringFieldUpdateOperationsInput | string | null
-    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    rekomendasi?: RekomendasiUncheckedUpdateManyWithoutKegiatanRapatNestedInput
-  }
-
-  export type KegiatanRapatCreateManyInput = {
-    id?: string
-    judul: string
-    deskripsi: string
-    tanggal: Date | string
-    lokasi?: string | null
-    domainIsuId?: string | null
-    dibuatOlehId: string
-    aiModel?: string | null
-    aiPromptHash?: string | null
-    aiProcessedAt?: Date | string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type KegiatanRapatUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    judul?: StringFieldUpdateOperationsInput | string
-    deskripsi?: StringFieldUpdateOperationsInput | string
-    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
-    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
-    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
-    aiPromptHash?: NullableStringFieldUpdateOperationsInput | string | null
-    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type KegiatanRapatUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    judul?: StringFieldUpdateOperationsInput | string
-    deskripsi?: StringFieldUpdateOperationsInput | string
-    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
-    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
-    domainIsuId?: NullableStringFieldUpdateOperationsInput | string | null
-    dibuatOlehId?: StringFieldUpdateOperationsInput | string
-    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
-    aiPromptHash?: NullableStringFieldUpdateOperationsInput | string | null
-    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -15773,12 +14533,6 @@ export namespace Prisma {
     none?: DataMasterWhereInput
   }
 
-  export type RekomendasiListRelationFilter = {
-    every?: RekomendasiWhereInput
-    some?: RekomendasiWhereInput
-    none?: RekomendasiWhereInput
-  }
-
   export type KegiatanRapatListRelationFilter = {
     every?: KegiatanRapatWhereInput
     some?: KegiatanRapatWhereInput
@@ -15795,10 +14549,6 @@ export namespace Prisma {
   }
 
   export type DataMasterOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type RekomendasiOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -15972,6 +14722,17 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type EnumStatusMasukanFilter<$PrismaModel = never> = {
     equals?: $Enums.StatusMasukan | EnumStatusMasukanFieldRefInput<$PrismaModel>
     in?: $Enums.StatusMasukan[] | ListEnumStatusMasukanFieldRefInput<$PrismaModel>
@@ -15989,13 +14750,13 @@ export namespace Prisma {
     isNot?: UserWhereInput | null
   }
 
-  export type RekomendasiMasukanListRelationFilter = {
-    every?: RekomendasiMasukanWhereInput
-    some?: RekomendasiMasukanWhereInput
-    none?: RekomendasiMasukanWhereInput
+  export type KegiatanRapatMasukanListRelationFilter = {
+    every?: KegiatanRapatMasukanWhereInput
+    some?: KegiatanRapatMasukanWhereInput
+    none?: KegiatanRapatMasukanWhereInput
   }
 
-  export type RekomendasiMasukanOrderByRelationAggregateInput = {
+  export type KegiatanRapatMasukanOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -16007,10 +14768,14 @@ export namespace Prisma {
     deskripsi?: SortOrder
     lokasiRt?: SortOrder
     lokasiRw?: SortOrder
+    isLocked?: SortOrder
+    lockedAt?: SortOrder
     domainIsuId?: SortOrder
     status?: SortOrder
     alasanPenolakan?: SortOrder
     diverifikasiOlehId?: SortOrder
+    isRelevant?: SortOrder
+    expiresAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -16023,10 +14788,14 @@ export namespace Prisma {
     deskripsi?: SortOrder
     lokasiRt?: SortOrder
     lokasiRw?: SortOrder
+    isLocked?: SortOrder
+    lockedAt?: SortOrder
     domainIsuId?: SortOrder
     status?: SortOrder
     alasanPenolakan?: SortOrder
     diverifikasiOlehId?: SortOrder
+    isRelevant?: SortOrder
+    expiresAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -16039,12 +14808,30 @@ export namespace Prisma {
     deskripsi?: SortOrder
     lokasiRt?: SortOrder
     lokasiRw?: SortOrder
+    isLocked?: SortOrder
+    lockedAt?: SortOrder
     domainIsuId?: SortOrder
     status?: SortOrder
     alasanPenolakan?: SortOrder
     diverifikasiOlehId?: SortOrder
+    isRelevant?: SortOrder
+    expiresAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type EnumStatusMasukanWithAggregatesFilter<$PrismaModel = never> = {
@@ -16055,6 +14842,13 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumStatusMasukanFilter<$PrismaModel>
     _max?: NestedEnumStatusMasukanFilter<$PrismaModel>
+  }
+
+  export type EnumNilaiKritikalitasFilter<$PrismaModel = never> = {
+    equals?: $Enums.NilaiKritikalitas | EnumNilaiKritikalitasFieldRefInput<$PrismaModel>
+    in?: $Enums.NilaiKritikalitas[] | ListEnumNilaiKritikalitasFieldRefInput<$PrismaModel>
+    notIn?: $Enums.NilaiKritikalitas[] | ListEnumNilaiKritikalitasFieldRefInput<$PrismaModel>
+    not?: NestedEnumNilaiKritikalitasFilter<$PrismaModel> | $Enums.NilaiKritikalitas
   }
 
   export type IntNullableFilter<$PrismaModel = never> = {
@@ -16071,18 +14865,20 @@ export namespace Prisma {
   export type DataMasterDomainIsuIdNamaAtributLokasiRtLokasiRwCompoundUniqueInput = {
     domainIsuId: string
     namaAtribut: string
-    lokasiRt: number
-    lokasiRw: number
+    lokasiRt: string
+    lokasiRw: string
   }
 
   export type DataMasterCountOrderByAggregateInput = {
     id?: SortOrder
     domainIsuId?: SortOrder
     namaAtribut?: SortOrder
-    nilai?: SortOrder
+    kritikalitas?: SortOrder
     jumlah?: SortOrder
     lokasiRt?: SortOrder
     lokasiRw?: SortOrder
+    isActive?: SortOrder
+    tahunData?: SortOrder
     sumberData?: SortOrder
     diprosesOlehId?: SortOrder
     createdAt?: SortOrder
@@ -16091,18 +14887,19 @@ export namespace Prisma {
 
   export type DataMasterAvgOrderByAggregateInput = {
     jumlah?: SortOrder
-    lokasiRt?: SortOrder
-    lokasiRw?: SortOrder
+    tahunData?: SortOrder
   }
 
   export type DataMasterMaxOrderByAggregateInput = {
     id?: SortOrder
     domainIsuId?: SortOrder
     namaAtribut?: SortOrder
-    nilai?: SortOrder
+    kritikalitas?: SortOrder
     jumlah?: SortOrder
     lokasiRt?: SortOrder
     lokasiRw?: SortOrder
+    isActive?: SortOrder
+    tahunData?: SortOrder
     sumberData?: SortOrder
     diprosesOlehId?: SortOrder
     createdAt?: SortOrder
@@ -16113,10 +14910,12 @@ export namespace Prisma {
     id?: SortOrder
     domainIsuId?: SortOrder
     namaAtribut?: SortOrder
-    nilai?: SortOrder
+    kritikalitas?: SortOrder
     jumlah?: SortOrder
     lokasiRt?: SortOrder
     lokasiRw?: SortOrder
+    isActive?: SortOrder
+    tahunData?: SortOrder
     sumberData?: SortOrder
     diprosesOlehId?: SortOrder
     createdAt?: SortOrder
@@ -16125,8 +14924,17 @@ export namespace Prisma {
 
   export type DataMasterSumOrderByAggregateInput = {
     jumlah?: SortOrder
-    lokasiRt?: SortOrder
-    lokasiRw?: SortOrder
+    tahunData?: SortOrder
+  }
+
+  export type EnumNilaiKritikalitasWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.NilaiKritikalitas | EnumNilaiKritikalitasFieldRefInput<$PrismaModel>
+    in?: $Enums.NilaiKritikalitas[] | ListEnumNilaiKritikalitasFieldRefInput<$PrismaModel>
+    notIn?: $Enums.NilaiKritikalitas[] | ListEnumNilaiKritikalitasFieldRefInput<$PrismaModel>
+    not?: NestedEnumNilaiKritikalitasWithAggregatesFilter<$PrismaModel> | $Enums.NilaiKritikalitas
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumNilaiKritikalitasFilter<$PrismaModel>
+    _max?: NestedEnumNilaiKritikalitasFilter<$PrismaModel>
   }
 
   export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -16145,22 +14953,11 @@ export namespace Prisma {
     _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
-  export type FloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatFilter<$PrismaModel> | number
-  }
-
-  export type EnumStatusRekomendasiFilter<$PrismaModel = never> = {
-    equals?: $Enums.StatusRekomendasi | EnumStatusRekomendasiFieldRefInput<$PrismaModel>
-    in?: $Enums.StatusRekomendasi[] | ListEnumStatusRekomendasiFieldRefInput<$PrismaModel>
-    notIn?: $Enums.StatusRekomendasi[] | ListEnumStatusRekomendasiFieldRefInput<$PrismaModel>
-    not?: NestedEnumStatusRekomendasiFilter<$PrismaModel> | $Enums.StatusRekomendasi
+  export type EnumModeRekomendasiFilter<$PrismaModel = never> = {
+    equals?: $Enums.ModeRekomendasi | EnumModeRekomendasiFieldRefInput<$PrismaModel>
+    in?: $Enums.ModeRekomendasi[] | ListEnumModeRekomendasiFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ModeRekomendasi[] | ListEnumModeRekomendasiFieldRefInput<$PrismaModel>
+    not?: NestedEnumModeRekomendasiFilter<$PrismaModel> | $Enums.ModeRekomendasi
   }
   export type JsonFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -16186,86 +14983,84 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
-  export type KegiatanRapatScalarRelationFilter = {
-    is?: KegiatanRapatWhereInput
-    isNot?: KegiatanRapatWhereInput
-  }
-
-  export type RekomendasiCountOrderByAggregateInput = {
-    id?: SortOrder
-    kegiatanRapatId?: SortOrder
-    domainIsuId?: SortOrder
-    judul?: SortOrder
-    ringkasan?: SortOrder
-    deskripsi?: SortOrder
-    skorPrioritas?: SortOrder
-    status?: SortOrder
-    laporanLengkap?: SortOrder
-    diprosesOlehId?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type RekomendasiAvgOrderByAggregateInput = {
-    skorPrioritas?: SortOrder
-  }
-
-  export type RekomendasiMaxOrderByAggregateInput = {
-    id?: SortOrder
-    kegiatanRapatId?: SortOrder
-    domainIsuId?: SortOrder
-    judul?: SortOrder
-    ringkasan?: SortOrder
-    deskripsi?: SortOrder
-    skorPrioritas?: SortOrder
-    status?: SortOrder
-    diprosesOlehId?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type RekomendasiMinOrderByAggregateInput = {
-    id?: SortOrder
-    kegiatanRapatId?: SortOrder
-    domainIsuId?: SortOrder
-    judul?: SortOrder
-    ringkasan?: SortOrder
-    deskripsi?: SortOrder
-    skorPrioritas?: SortOrder
-    status?: SortOrder
-    diprosesOlehId?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type RekomendasiSumOrderByAggregateInput = {
-    skorPrioritas?: SortOrder
-  }
-
-  export type FloatWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedFloatFilter<$PrismaModel>
-    _min?: NestedFloatFilter<$PrismaModel>
-    _max?: NestedFloatFilter<$PrismaModel>
-  }
-
-  export type EnumStatusRekomendasiWithAggregatesFilter<$PrismaModel = never> = {
+  export type EnumStatusRekomendasiFilter<$PrismaModel = never> = {
     equals?: $Enums.StatusRekomendasi | EnumStatusRekomendasiFieldRefInput<$PrismaModel>
     in?: $Enums.StatusRekomendasi[] | ListEnumStatusRekomendasiFieldRefInput<$PrismaModel>
     notIn?: $Enums.StatusRekomendasi[] | ListEnumStatusRekomendasiFieldRefInput<$PrismaModel>
-    not?: NestedEnumStatusRekomendasiWithAggregatesFilter<$PrismaModel> | $Enums.StatusRekomendasi
+    not?: NestedEnumStatusRekomendasiFilter<$PrismaModel> | $Enums.StatusRekomendasi
+  }
+
+  export type UserScalarRelationFilter = {
+    is?: UserWhereInput
+    isNot?: UserWhereInput
+  }
+
+  export type KegiatanRapatCountOrderByAggregateInput = {
+    id?: SortOrder
+    judul?: SortOrder
+    deskripsi?: SortOrder
+    tanggal?: SortOrder
+    lokasi?: SortOrder
+    domainIsuId?: SortOrder
+    dibuatOlehId?: SortOrder
+    mode?: SortOrder
+    judulLaporan?: SortOrder
+    rekomendasiItems?: SortOrder
+    fingerprint?: SortOrder
+    statusRekomendasi?: SortOrder
+    aiModel?: SortOrder
+    aiProcessedAt?: SortOrder
+    diprosesOlehId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type KegiatanRapatMaxOrderByAggregateInput = {
+    id?: SortOrder
+    judul?: SortOrder
+    deskripsi?: SortOrder
+    tanggal?: SortOrder
+    lokasi?: SortOrder
+    domainIsuId?: SortOrder
+    dibuatOlehId?: SortOrder
+    mode?: SortOrder
+    judulLaporan?: SortOrder
+    fingerprint?: SortOrder
+    statusRekomendasi?: SortOrder
+    aiModel?: SortOrder
+    aiProcessedAt?: SortOrder
+    diprosesOlehId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type KegiatanRapatMinOrderByAggregateInput = {
+    id?: SortOrder
+    judul?: SortOrder
+    deskripsi?: SortOrder
+    tanggal?: SortOrder
+    lokasi?: SortOrder
+    domainIsuId?: SortOrder
+    dibuatOlehId?: SortOrder
+    mode?: SortOrder
+    judulLaporan?: SortOrder
+    fingerprint?: SortOrder
+    statusRekomendasi?: SortOrder
+    aiModel?: SortOrder
+    aiProcessedAt?: SortOrder
+    diprosesOlehId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumModeRekomendasiWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ModeRekomendasi | EnumModeRekomendasiFieldRefInput<$PrismaModel>
+    in?: $Enums.ModeRekomendasi[] | ListEnumModeRekomendasiFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ModeRekomendasi[] | ListEnumModeRekomendasiFieldRefInput<$PrismaModel>
+    not?: NestedEnumModeRekomendasiWithAggregatesFilter<$PrismaModel> | $Enums.ModeRekomendasi
     _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumStatusRekomendasiFilter<$PrismaModel>
-    _max?: NestedEnumStatusRekomendasiFilter<$PrismaModel>
+    _min?: NestedEnumModeRekomendasiFilter<$PrismaModel>
+    _max?: NestedEnumModeRekomendasiFilter<$PrismaModel>
   }
   export type JsonWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -16294,9 +15089,19 @@ export namespace Prisma {
     _max?: NestedJsonFilter<$PrismaModel>
   }
 
-  export type RekomendasiScalarRelationFilter = {
-    is?: RekomendasiWhereInput
-    isNot?: RekomendasiWhereInput
+  export type EnumStatusRekomendasiWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.StatusRekomendasi | EnumStatusRekomendasiFieldRefInput<$PrismaModel>
+    in?: $Enums.StatusRekomendasi[] | ListEnumStatusRekomendasiFieldRefInput<$PrismaModel>
+    notIn?: $Enums.StatusRekomendasi[] | ListEnumStatusRekomendasiFieldRefInput<$PrismaModel>
+    not?: NestedEnumStatusRekomendasiWithAggregatesFilter<$PrismaModel> | $Enums.StatusRekomendasi
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumStatusRekomendasiFilter<$PrismaModel>
+    _max?: NestedEnumStatusRekomendasiFilter<$PrismaModel>
+  }
+
+  export type KegiatanRapatScalarRelationFilter = {
+    is?: KegiatanRapatWhereInput
+    isNot?: KegiatanRapatWhereInput
   }
 
   export type MasukanWargaScalarRelationFilter = {
@@ -16304,34 +15109,35 @@ export namespace Prisma {
     isNot?: MasukanWargaWhereInput
   }
 
-  export type RekomendasiMasukanRekomendasiIdMasukanIdCompoundUniqueInput = {
-    rekomendasiId: string
+  export type KegiatanRapatMasukanKegiatanRapatIdMasukanIdCompoundUniqueInput = {
+    kegiatanRapatId: string
     masukanId: string
   }
 
-  export type RekomendasiMasukanCountOrderByAggregateInput = {
-    rekomendasiId?: SortOrder
+  export type KegiatanRapatMasukanCountOrderByAggregateInput = {
+    id?: SortOrder
+    kegiatanRapatId?: SortOrder
     masukanId?: SortOrder
+    createdAt?: SortOrder
   }
 
-  export type RekomendasiMasukanMaxOrderByAggregateInput = {
-    rekomendasiId?: SortOrder
+  export type KegiatanRapatMasukanMaxOrderByAggregateInput = {
+    id?: SortOrder
+    kegiatanRapatId?: SortOrder
     masukanId?: SortOrder
+    createdAt?: SortOrder
   }
 
-  export type RekomendasiMasukanMinOrderByAggregateInput = {
-    rekomendasiId?: SortOrder
+  export type KegiatanRapatMasukanMinOrderByAggregateInput = {
+    id?: SortOrder
+    kegiatanRapatId?: SortOrder
     masukanId?: SortOrder
+    createdAt?: SortOrder
   }
 
   export type BoolNullableFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
     not?: NestedBoolNullableFilter<$PrismaModel> | boolean | null
-  }
-
-  export type UserScalarRelationFilter = {
-    is?: UserWhereInput
-    isNot?: UserWhereInput
   }
 
   export type SessionCountOrderByAggregateInput = {
@@ -16387,17 +15193,6 @@ export namespace Prisma {
     _max?: NestedBoolNullableFilter<$PrismaModel>
   }
 
-  export type DateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
   export type AccountCountOrderByAggregateInput = {
     id?: SortOrder
     accountId?: SortOrder
@@ -16446,20 +15241,6 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
-  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
-  }
-
   export type VerificationCountOrderByAggregateInput = {
     id?: SortOrder
     identifier?: SortOrder
@@ -16487,56 +15268,6 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
-  export type DomainIsuNullableScalarRelationFilter = {
-    is?: DomainIsuWhereInput | null
-    isNot?: DomainIsuWhereInput | null
-  }
-
-  export type KegiatanRapatCountOrderByAggregateInput = {
-    id?: SortOrder
-    judul?: SortOrder
-    deskripsi?: SortOrder
-    tanggal?: SortOrder
-    lokasi?: SortOrder
-    domainIsuId?: SortOrder
-    dibuatOlehId?: SortOrder
-    aiModel?: SortOrder
-    aiPromptHash?: SortOrder
-    aiProcessedAt?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type KegiatanRapatMaxOrderByAggregateInput = {
-    id?: SortOrder
-    judul?: SortOrder
-    deskripsi?: SortOrder
-    tanggal?: SortOrder
-    lokasi?: SortOrder
-    domainIsuId?: SortOrder
-    dibuatOlehId?: SortOrder
-    aiModel?: SortOrder
-    aiPromptHash?: SortOrder
-    aiProcessedAt?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type KegiatanRapatMinOrderByAggregateInput = {
-    id?: SortOrder
-    judul?: SortOrder
-    deskripsi?: SortOrder
-    tanggal?: SortOrder
-    lokasi?: SortOrder
-    domainIsuId?: SortOrder
-    dibuatOlehId?: SortOrder
-    aiModel?: SortOrder
-    aiPromptHash?: SortOrder
-    aiProcessedAt?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-  }
-
   export type MasukanWargaCreateNestedManyWithoutDomainIsuInput = {
     create?: XOR<MasukanWargaCreateWithoutDomainIsuInput, MasukanWargaUncheckedCreateWithoutDomainIsuInput> | MasukanWargaCreateWithoutDomainIsuInput[] | MasukanWargaUncheckedCreateWithoutDomainIsuInput[]
     connectOrCreate?: MasukanWargaCreateOrConnectWithoutDomainIsuInput | MasukanWargaCreateOrConnectWithoutDomainIsuInput[]
@@ -16549,13 +15280,6 @@ export namespace Prisma {
     connectOrCreate?: DataMasterCreateOrConnectWithoutDomainIsuInput | DataMasterCreateOrConnectWithoutDomainIsuInput[]
     createMany?: DataMasterCreateManyDomainIsuInputEnvelope
     connect?: DataMasterWhereUniqueInput | DataMasterWhereUniqueInput[]
-  }
-
-  export type RekomendasiCreateNestedManyWithoutDomainIsuInput = {
-    create?: XOR<RekomendasiCreateWithoutDomainIsuInput, RekomendasiUncheckedCreateWithoutDomainIsuInput> | RekomendasiCreateWithoutDomainIsuInput[] | RekomendasiUncheckedCreateWithoutDomainIsuInput[]
-    connectOrCreate?: RekomendasiCreateOrConnectWithoutDomainIsuInput | RekomendasiCreateOrConnectWithoutDomainIsuInput[]
-    createMany?: RekomendasiCreateManyDomainIsuInputEnvelope
-    connect?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
   }
 
   export type KegiatanRapatCreateNestedManyWithoutDomainIsuInput = {
@@ -16577,13 +15301,6 @@ export namespace Prisma {
     connectOrCreate?: DataMasterCreateOrConnectWithoutDomainIsuInput | DataMasterCreateOrConnectWithoutDomainIsuInput[]
     createMany?: DataMasterCreateManyDomainIsuInputEnvelope
     connect?: DataMasterWhereUniqueInput | DataMasterWhereUniqueInput[]
-  }
-
-  export type RekomendasiUncheckedCreateNestedManyWithoutDomainIsuInput = {
-    create?: XOR<RekomendasiCreateWithoutDomainIsuInput, RekomendasiUncheckedCreateWithoutDomainIsuInput> | RekomendasiCreateWithoutDomainIsuInput[] | RekomendasiUncheckedCreateWithoutDomainIsuInput[]
-    connectOrCreate?: RekomendasiCreateOrConnectWithoutDomainIsuInput | RekomendasiCreateOrConnectWithoutDomainIsuInput[]
-    createMany?: RekomendasiCreateManyDomainIsuInputEnvelope
-    connect?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
   }
 
   export type KegiatanRapatUncheckedCreateNestedManyWithoutDomainIsuInput = {
@@ -16633,20 +15350,6 @@ export namespace Prisma {
     deleteMany?: DataMasterScalarWhereInput | DataMasterScalarWhereInput[]
   }
 
-  export type RekomendasiUpdateManyWithoutDomainIsuNestedInput = {
-    create?: XOR<RekomendasiCreateWithoutDomainIsuInput, RekomendasiUncheckedCreateWithoutDomainIsuInput> | RekomendasiCreateWithoutDomainIsuInput[] | RekomendasiUncheckedCreateWithoutDomainIsuInput[]
-    connectOrCreate?: RekomendasiCreateOrConnectWithoutDomainIsuInput | RekomendasiCreateOrConnectWithoutDomainIsuInput[]
-    upsert?: RekomendasiUpsertWithWhereUniqueWithoutDomainIsuInput | RekomendasiUpsertWithWhereUniqueWithoutDomainIsuInput[]
-    createMany?: RekomendasiCreateManyDomainIsuInputEnvelope
-    set?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    disconnect?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    delete?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    connect?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    update?: RekomendasiUpdateWithWhereUniqueWithoutDomainIsuInput | RekomendasiUpdateWithWhereUniqueWithoutDomainIsuInput[]
-    updateMany?: RekomendasiUpdateManyWithWhereWithoutDomainIsuInput | RekomendasiUpdateManyWithWhereWithoutDomainIsuInput[]
-    deleteMany?: RekomendasiScalarWhereInput | RekomendasiScalarWhereInput[]
-  }
-
   export type KegiatanRapatUpdateManyWithoutDomainIsuNestedInput = {
     create?: XOR<KegiatanRapatCreateWithoutDomainIsuInput, KegiatanRapatUncheckedCreateWithoutDomainIsuInput> | KegiatanRapatCreateWithoutDomainIsuInput[] | KegiatanRapatUncheckedCreateWithoutDomainIsuInput[]
     connectOrCreate?: KegiatanRapatCreateOrConnectWithoutDomainIsuInput | KegiatanRapatCreateOrConnectWithoutDomainIsuInput[]
@@ -16689,20 +15392,6 @@ export namespace Prisma {
     deleteMany?: DataMasterScalarWhereInput | DataMasterScalarWhereInput[]
   }
 
-  export type RekomendasiUncheckedUpdateManyWithoutDomainIsuNestedInput = {
-    create?: XOR<RekomendasiCreateWithoutDomainIsuInput, RekomendasiUncheckedCreateWithoutDomainIsuInput> | RekomendasiCreateWithoutDomainIsuInput[] | RekomendasiUncheckedCreateWithoutDomainIsuInput[]
-    connectOrCreate?: RekomendasiCreateOrConnectWithoutDomainIsuInput | RekomendasiCreateOrConnectWithoutDomainIsuInput[]
-    upsert?: RekomendasiUpsertWithWhereUniqueWithoutDomainIsuInput | RekomendasiUpsertWithWhereUniqueWithoutDomainIsuInput[]
-    createMany?: RekomendasiCreateManyDomainIsuInputEnvelope
-    set?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    disconnect?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    delete?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    connect?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    update?: RekomendasiUpdateWithWhereUniqueWithoutDomainIsuInput | RekomendasiUpdateWithWhereUniqueWithoutDomainIsuInput[]
-    updateMany?: RekomendasiUpdateManyWithWhereWithoutDomainIsuInput | RekomendasiUpdateManyWithWhereWithoutDomainIsuInput[]
-    deleteMany?: RekomendasiScalarWhereInput | RekomendasiScalarWhereInput[]
-  }
-
   export type KegiatanRapatUncheckedUpdateManyWithoutDomainIsuNestedInput = {
     create?: XOR<KegiatanRapatCreateWithoutDomainIsuInput, KegiatanRapatUncheckedCreateWithoutDomainIsuInput> | KegiatanRapatCreateWithoutDomainIsuInput[] | KegiatanRapatUncheckedCreateWithoutDomainIsuInput[]
     connectOrCreate?: KegiatanRapatCreateOrConnectWithoutDomainIsuInput | KegiatanRapatCreateOrConnectWithoutDomainIsuInput[]
@@ -16724,25 +15413,11 @@ export namespace Prisma {
     connect?: MasukanWargaWhereUniqueInput | MasukanWargaWhereUniqueInput[]
   }
 
-  export type RekomendasiCreateNestedManyWithoutDiprosesOlehInput = {
-    create?: XOR<RekomendasiCreateWithoutDiprosesOlehInput, RekomendasiUncheckedCreateWithoutDiprosesOlehInput> | RekomendasiCreateWithoutDiprosesOlehInput[] | RekomendasiUncheckedCreateWithoutDiprosesOlehInput[]
-    connectOrCreate?: RekomendasiCreateOrConnectWithoutDiprosesOlehInput | RekomendasiCreateOrConnectWithoutDiprosesOlehInput[]
-    createMany?: RekomendasiCreateManyDiprosesOlehInputEnvelope
-    connect?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-  }
-
-  export type SessionCreateNestedManyWithoutUserInput = {
-    create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
-    createMany?: SessionCreateManyUserInputEnvelope
-    connect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
-  }
-
-  export type AccountCreateNestedManyWithoutUserInput = {
-    create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
-    createMany?: AccountCreateManyUserInputEnvelope
-    connect?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
+  export type KegiatanRapatCreateNestedManyWithoutDiprosesOlehInput = {
+    create?: XOR<KegiatanRapatCreateWithoutDiprosesOlehInput, KegiatanRapatUncheckedCreateWithoutDiprosesOlehInput> | KegiatanRapatCreateWithoutDiprosesOlehInput[] | KegiatanRapatUncheckedCreateWithoutDiprosesOlehInput[]
+    connectOrCreate?: KegiatanRapatCreateOrConnectWithoutDiprosesOlehInput | KegiatanRapatCreateOrConnectWithoutDiprosesOlehInput[]
+    createMany?: KegiatanRapatCreateManyDiprosesOlehInputEnvelope
+    connect?: KegiatanRapatWhereUniqueInput | KegiatanRapatWhereUniqueInput[]
   }
 
   export type KegiatanRapatCreateNestedManyWithoutDibuatOlehInput = {
@@ -16759,6 +15434,20 @@ export namespace Prisma {
     connect?: DataMasterWhereUniqueInput | DataMasterWhereUniqueInput[]
   }
 
+  export type SessionCreateNestedManyWithoutUserInput = {
+    create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
+    createMany?: SessionCreateManyUserInputEnvelope
+    connect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
+  }
+
+  export type AccountCreateNestedManyWithoutUserInput = {
+    create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
+    createMany?: AccountCreateManyUserInputEnvelope
+    connect?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
+  }
+
   export type MasukanWargaUncheckedCreateNestedManyWithoutDiverifikasiOlehInput = {
     create?: XOR<MasukanWargaCreateWithoutDiverifikasiOlehInput, MasukanWargaUncheckedCreateWithoutDiverifikasiOlehInput> | MasukanWargaCreateWithoutDiverifikasiOlehInput[] | MasukanWargaUncheckedCreateWithoutDiverifikasiOlehInput[]
     connectOrCreate?: MasukanWargaCreateOrConnectWithoutDiverifikasiOlehInput | MasukanWargaCreateOrConnectWithoutDiverifikasiOlehInput[]
@@ -16766,25 +15455,11 @@ export namespace Prisma {
     connect?: MasukanWargaWhereUniqueInput | MasukanWargaWhereUniqueInput[]
   }
 
-  export type RekomendasiUncheckedCreateNestedManyWithoutDiprosesOlehInput = {
-    create?: XOR<RekomendasiCreateWithoutDiprosesOlehInput, RekomendasiUncheckedCreateWithoutDiprosesOlehInput> | RekomendasiCreateWithoutDiprosesOlehInput[] | RekomendasiUncheckedCreateWithoutDiprosesOlehInput[]
-    connectOrCreate?: RekomendasiCreateOrConnectWithoutDiprosesOlehInput | RekomendasiCreateOrConnectWithoutDiprosesOlehInput[]
-    createMany?: RekomendasiCreateManyDiprosesOlehInputEnvelope
-    connect?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-  }
-
-  export type SessionUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
-    createMany?: SessionCreateManyUserInputEnvelope
-    connect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
-  }
-
-  export type AccountUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
-    createMany?: AccountCreateManyUserInputEnvelope
-    connect?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
+  export type KegiatanRapatUncheckedCreateNestedManyWithoutDiprosesOlehInput = {
+    create?: XOR<KegiatanRapatCreateWithoutDiprosesOlehInput, KegiatanRapatUncheckedCreateWithoutDiprosesOlehInput> | KegiatanRapatCreateWithoutDiprosesOlehInput[] | KegiatanRapatUncheckedCreateWithoutDiprosesOlehInput[]
+    connectOrCreate?: KegiatanRapatCreateOrConnectWithoutDiprosesOlehInput | KegiatanRapatCreateOrConnectWithoutDiprosesOlehInput[]
+    createMany?: KegiatanRapatCreateManyDiprosesOlehInputEnvelope
+    connect?: KegiatanRapatWhereUniqueInput | KegiatanRapatWhereUniqueInput[]
   }
 
   export type KegiatanRapatUncheckedCreateNestedManyWithoutDibuatOlehInput = {
@@ -16799,6 +15474,20 @@ export namespace Prisma {
     connectOrCreate?: DataMasterCreateOrConnectWithoutDiprosesOlehInput | DataMasterCreateOrConnectWithoutDiprosesOlehInput[]
     createMany?: DataMasterCreateManyDiprosesOlehInputEnvelope
     connect?: DataMasterWhereUniqueInput | DataMasterWhereUniqueInput[]
+  }
+
+  export type SessionUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
+    createMany?: SessionCreateManyUserInputEnvelope
+    connect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
+  }
+
+  export type AccountUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
+    createMany?: AccountCreateManyUserInputEnvelope
+    connect?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
   }
 
   export type EnumRoleFieldUpdateOperationsInput = {
@@ -16823,46 +15512,18 @@ export namespace Prisma {
     deleteMany?: MasukanWargaScalarWhereInput | MasukanWargaScalarWhereInput[]
   }
 
-  export type RekomendasiUpdateManyWithoutDiprosesOlehNestedInput = {
-    create?: XOR<RekomendasiCreateWithoutDiprosesOlehInput, RekomendasiUncheckedCreateWithoutDiprosesOlehInput> | RekomendasiCreateWithoutDiprosesOlehInput[] | RekomendasiUncheckedCreateWithoutDiprosesOlehInput[]
-    connectOrCreate?: RekomendasiCreateOrConnectWithoutDiprosesOlehInput | RekomendasiCreateOrConnectWithoutDiprosesOlehInput[]
-    upsert?: RekomendasiUpsertWithWhereUniqueWithoutDiprosesOlehInput | RekomendasiUpsertWithWhereUniqueWithoutDiprosesOlehInput[]
-    createMany?: RekomendasiCreateManyDiprosesOlehInputEnvelope
-    set?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    disconnect?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    delete?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    connect?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    update?: RekomendasiUpdateWithWhereUniqueWithoutDiprosesOlehInput | RekomendasiUpdateWithWhereUniqueWithoutDiprosesOlehInput[]
-    updateMany?: RekomendasiUpdateManyWithWhereWithoutDiprosesOlehInput | RekomendasiUpdateManyWithWhereWithoutDiprosesOlehInput[]
-    deleteMany?: RekomendasiScalarWhereInput | RekomendasiScalarWhereInput[]
-  }
-
-  export type SessionUpdateManyWithoutUserNestedInput = {
-    create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
-    upsert?: SessionUpsertWithWhereUniqueWithoutUserInput | SessionUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: SessionCreateManyUserInputEnvelope
-    set?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
-    disconnect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
-    delete?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
-    connect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
-    update?: SessionUpdateWithWhereUniqueWithoutUserInput | SessionUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: SessionUpdateManyWithWhereWithoutUserInput | SessionUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: SessionScalarWhereInput | SessionScalarWhereInput[]
-  }
-
-  export type AccountUpdateManyWithoutUserNestedInput = {
-    create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
-    upsert?: AccountUpsertWithWhereUniqueWithoutUserInput | AccountUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: AccountCreateManyUserInputEnvelope
-    set?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
-    disconnect?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
-    delete?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
-    connect?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
-    update?: AccountUpdateWithWhereUniqueWithoutUserInput | AccountUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: AccountUpdateManyWithWhereWithoutUserInput | AccountUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: AccountScalarWhereInput | AccountScalarWhereInput[]
+  export type KegiatanRapatUpdateManyWithoutDiprosesOlehNestedInput = {
+    create?: XOR<KegiatanRapatCreateWithoutDiprosesOlehInput, KegiatanRapatUncheckedCreateWithoutDiprosesOlehInput> | KegiatanRapatCreateWithoutDiprosesOlehInput[] | KegiatanRapatUncheckedCreateWithoutDiprosesOlehInput[]
+    connectOrCreate?: KegiatanRapatCreateOrConnectWithoutDiprosesOlehInput | KegiatanRapatCreateOrConnectWithoutDiprosesOlehInput[]
+    upsert?: KegiatanRapatUpsertWithWhereUniqueWithoutDiprosesOlehInput | KegiatanRapatUpsertWithWhereUniqueWithoutDiprosesOlehInput[]
+    createMany?: KegiatanRapatCreateManyDiprosesOlehInputEnvelope
+    set?: KegiatanRapatWhereUniqueInput | KegiatanRapatWhereUniqueInput[]
+    disconnect?: KegiatanRapatWhereUniqueInput | KegiatanRapatWhereUniqueInput[]
+    delete?: KegiatanRapatWhereUniqueInput | KegiatanRapatWhereUniqueInput[]
+    connect?: KegiatanRapatWhereUniqueInput | KegiatanRapatWhereUniqueInput[]
+    update?: KegiatanRapatUpdateWithWhereUniqueWithoutDiprosesOlehInput | KegiatanRapatUpdateWithWhereUniqueWithoutDiprosesOlehInput[]
+    updateMany?: KegiatanRapatUpdateManyWithWhereWithoutDiprosesOlehInput | KegiatanRapatUpdateManyWithWhereWithoutDiprosesOlehInput[]
+    deleteMany?: KegiatanRapatScalarWhereInput | KegiatanRapatScalarWhereInput[]
   }
 
   export type KegiatanRapatUpdateManyWithoutDibuatOlehNestedInput = {
@@ -16893,6 +15554,34 @@ export namespace Prisma {
     deleteMany?: DataMasterScalarWhereInput | DataMasterScalarWhereInput[]
   }
 
+  export type SessionUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
+    upsert?: SessionUpsertWithWhereUniqueWithoutUserInput | SessionUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SessionCreateManyUserInputEnvelope
+    set?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
+    disconnect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
+    delete?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
+    connect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
+    update?: SessionUpdateWithWhereUniqueWithoutUserInput | SessionUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SessionUpdateManyWithWhereWithoutUserInput | SessionUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SessionScalarWhereInput | SessionScalarWhereInput[]
+  }
+
+  export type AccountUpdateManyWithoutUserNestedInput = {
+    create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
+    upsert?: AccountUpsertWithWhereUniqueWithoutUserInput | AccountUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: AccountCreateManyUserInputEnvelope
+    set?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
+    disconnect?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
+    delete?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
+    connect?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
+    update?: AccountUpdateWithWhereUniqueWithoutUserInput | AccountUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: AccountUpdateManyWithWhereWithoutUserInput | AccountUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: AccountScalarWhereInput | AccountScalarWhereInput[]
+  }
+
   export type MasukanWargaUncheckedUpdateManyWithoutDiverifikasiOlehNestedInput = {
     create?: XOR<MasukanWargaCreateWithoutDiverifikasiOlehInput, MasukanWargaUncheckedCreateWithoutDiverifikasiOlehInput> | MasukanWargaCreateWithoutDiverifikasiOlehInput[] | MasukanWargaUncheckedCreateWithoutDiverifikasiOlehInput[]
     connectOrCreate?: MasukanWargaCreateOrConnectWithoutDiverifikasiOlehInput | MasukanWargaCreateOrConnectWithoutDiverifikasiOlehInput[]
@@ -16907,46 +15596,18 @@ export namespace Prisma {
     deleteMany?: MasukanWargaScalarWhereInput | MasukanWargaScalarWhereInput[]
   }
 
-  export type RekomendasiUncheckedUpdateManyWithoutDiprosesOlehNestedInput = {
-    create?: XOR<RekomendasiCreateWithoutDiprosesOlehInput, RekomendasiUncheckedCreateWithoutDiprosesOlehInput> | RekomendasiCreateWithoutDiprosesOlehInput[] | RekomendasiUncheckedCreateWithoutDiprosesOlehInput[]
-    connectOrCreate?: RekomendasiCreateOrConnectWithoutDiprosesOlehInput | RekomendasiCreateOrConnectWithoutDiprosesOlehInput[]
-    upsert?: RekomendasiUpsertWithWhereUniqueWithoutDiprosesOlehInput | RekomendasiUpsertWithWhereUniqueWithoutDiprosesOlehInput[]
-    createMany?: RekomendasiCreateManyDiprosesOlehInputEnvelope
-    set?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    disconnect?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    delete?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    connect?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    update?: RekomendasiUpdateWithWhereUniqueWithoutDiprosesOlehInput | RekomendasiUpdateWithWhereUniqueWithoutDiprosesOlehInput[]
-    updateMany?: RekomendasiUpdateManyWithWhereWithoutDiprosesOlehInput | RekomendasiUpdateManyWithWhereWithoutDiprosesOlehInput[]
-    deleteMany?: RekomendasiScalarWhereInput | RekomendasiScalarWhereInput[]
-  }
-
-  export type SessionUncheckedUpdateManyWithoutUserNestedInput = {
-    create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
-    upsert?: SessionUpsertWithWhereUniqueWithoutUserInput | SessionUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: SessionCreateManyUserInputEnvelope
-    set?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
-    disconnect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
-    delete?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
-    connect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
-    update?: SessionUpdateWithWhereUniqueWithoutUserInput | SessionUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: SessionUpdateManyWithWhereWithoutUserInput | SessionUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: SessionScalarWhereInput | SessionScalarWhereInput[]
-  }
-
-  export type AccountUncheckedUpdateManyWithoutUserNestedInput = {
-    create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
-    upsert?: AccountUpsertWithWhereUniqueWithoutUserInput | AccountUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: AccountCreateManyUserInputEnvelope
-    set?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
-    disconnect?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
-    delete?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
-    connect?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
-    update?: AccountUpdateWithWhereUniqueWithoutUserInput | AccountUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: AccountUpdateManyWithWhereWithoutUserInput | AccountUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: AccountScalarWhereInput | AccountScalarWhereInput[]
+  export type KegiatanRapatUncheckedUpdateManyWithoutDiprosesOlehNestedInput = {
+    create?: XOR<KegiatanRapatCreateWithoutDiprosesOlehInput, KegiatanRapatUncheckedCreateWithoutDiprosesOlehInput> | KegiatanRapatCreateWithoutDiprosesOlehInput[] | KegiatanRapatUncheckedCreateWithoutDiprosesOlehInput[]
+    connectOrCreate?: KegiatanRapatCreateOrConnectWithoutDiprosesOlehInput | KegiatanRapatCreateOrConnectWithoutDiprosesOlehInput[]
+    upsert?: KegiatanRapatUpsertWithWhereUniqueWithoutDiprosesOlehInput | KegiatanRapatUpsertWithWhereUniqueWithoutDiprosesOlehInput[]
+    createMany?: KegiatanRapatCreateManyDiprosesOlehInputEnvelope
+    set?: KegiatanRapatWhereUniqueInput | KegiatanRapatWhereUniqueInput[]
+    disconnect?: KegiatanRapatWhereUniqueInput | KegiatanRapatWhereUniqueInput[]
+    delete?: KegiatanRapatWhereUniqueInput | KegiatanRapatWhereUniqueInput[]
+    connect?: KegiatanRapatWhereUniqueInput | KegiatanRapatWhereUniqueInput[]
+    update?: KegiatanRapatUpdateWithWhereUniqueWithoutDiprosesOlehInput | KegiatanRapatUpdateWithWhereUniqueWithoutDiprosesOlehInput[]
+    updateMany?: KegiatanRapatUpdateManyWithWhereWithoutDiprosesOlehInput | KegiatanRapatUpdateManyWithWhereWithoutDiprosesOlehInput[]
+    deleteMany?: KegiatanRapatScalarWhereInput | KegiatanRapatScalarWhereInput[]
   }
 
   export type KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehNestedInput = {
@@ -16977,6 +15638,34 @@ export namespace Prisma {
     deleteMany?: DataMasterScalarWhereInput | DataMasterScalarWhereInput[]
   }
 
+  export type SessionUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
+    upsert?: SessionUpsertWithWhereUniqueWithoutUserInput | SessionUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SessionCreateManyUserInputEnvelope
+    set?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
+    disconnect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
+    delete?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
+    connect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
+    update?: SessionUpdateWithWhereUniqueWithoutUserInput | SessionUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SessionUpdateManyWithWhereWithoutUserInput | SessionUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SessionScalarWhereInput | SessionScalarWhereInput[]
+  }
+
+  export type AccountUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
+    upsert?: AccountUpsertWithWhereUniqueWithoutUserInput | AccountUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: AccountCreateManyUserInputEnvelope
+    set?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
+    disconnect?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
+    delete?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
+    connect?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
+    update?: AccountUpdateWithWhereUniqueWithoutUserInput | AccountUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: AccountUpdateManyWithWhereWithoutUserInput | AccountUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: AccountScalarWhereInput | AccountScalarWhereInput[]
+  }
+
   export type DomainIsuCreateNestedOneWithoutMasukanInput = {
     create?: XOR<DomainIsuCreateWithoutMasukanInput, DomainIsuUncheckedCreateWithoutMasukanInput>
     connectOrCreate?: DomainIsuCreateOrConnectWithoutMasukanInput
@@ -16989,18 +15678,22 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
-  export type RekomendasiMasukanCreateNestedManyWithoutMasukanInput = {
-    create?: XOR<RekomendasiMasukanCreateWithoutMasukanInput, RekomendasiMasukanUncheckedCreateWithoutMasukanInput> | RekomendasiMasukanCreateWithoutMasukanInput[] | RekomendasiMasukanUncheckedCreateWithoutMasukanInput[]
-    connectOrCreate?: RekomendasiMasukanCreateOrConnectWithoutMasukanInput | RekomendasiMasukanCreateOrConnectWithoutMasukanInput[]
-    createMany?: RekomendasiMasukanCreateManyMasukanInputEnvelope
-    connect?: RekomendasiMasukanWhereUniqueInput | RekomendasiMasukanWhereUniqueInput[]
+  export type KegiatanRapatMasukanCreateNestedManyWithoutMasukanInput = {
+    create?: XOR<KegiatanRapatMasukanCreateWithoutMasukanInput, KegiatanRapatMasukanUncheckedCreateWithoutMasukanInput> | KegiatanRapatMasukanCreateWithoutMasukanInput[] | KegiatanRapatMasukanUncheckedCreateWithoutMasukanInput[]
+    connectOrCreate?: KegiatanRapatMasukanCreateOrConnectWithoutMasukanInput | KegiatanRapatMasukanCreateOrConnectWithoutMasukanInput[]
+    createMany?: KegiatanRapatMasukanCreateManyMasukanInputEnvelope
+    connect?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
   }
 
-  export type RekomendasiMasukanUncheckedCreateNestedManyWithoutMasukanInput = {
-    create?: XOR<RekomendasiMasukanCreateWithoutMasukanInput, RekomendasiMasukanUncheckedCreateWithoutMasukanInput> | RekomendasiMasukanCreateWithoutMasukanInput[] | RekomendasiMasukanUncheckedCreateWithoutMasukanInput[]
-    connectOrCreate?: RekomendasiMasukanCreateOrConnectWithoutMasukanInput | RekomendasiMasukanCreateOrConnectWithoutMasukanInput[]
-    createMany?: RekomendasiMasukanCreateManyMasukanInputEnvelope
-    connect?: RekomendasiMasukanWhereUniqueInput | RekomendasiMasukanWhereUniqueInput[]
+  export type KegiatanRapatMasukanUncheckedCreateNestedManyWithoutMasukanInput = {
+    create?: XOR<KegiatanRapatMasukanCreateWithoutMasukanInput, KegiatanRapatMasukanUncheckedCreateWithoutMasukanInput> | KegiatanRapatMasukanCreateWithoutMasukanInput[] | KegiatanRapatMasukanUncheckedCreateWithoutMasukanInput[]
+    connectOrCreate?: KegiatanRapatMasukanCreateOrConnectWithoutMasukanInput | KegiatanRapatMasukanCreateOrConnectWithoutMasukanInput[]
+    createMany?: KegiatanRapatMasukanCreateManyMasukanInputEnvelope
+    connect?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
   }
 
   export type EnumStatusMasukanFieldUpdateOperationsInput = {
@@ -17025,32 +15718,32 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutMasukanVerifikasiInput, UserUpdateWithoutMasukanVerifikasiInput>, UserUncheckedUpdateWithoutMasukanVerifikasiInput>
   }
 
-  export type RekomendasiMasukanUpdateManyWithoutMasukanNestedInput = {
-    create?: XOR<RekomendasiMasukanCreateWithoutMasukanInput, RekomendasiMasukanUncheckedCreateWithoutMasukanInput> | RekomendasiMasukanCreateWithoutMasukanInput[] | RekomendasiMasukanUncheckedCreateWithoutMasukanInput[]
-    connectOrCreate?: RekomendasiMasukanCreateOrConnectWithoutMasukanInput | RekomendasiMasukanCreateOrConnectWithoutMasukanInput[]
-    upsert?: RekomendasiMasukanUpsertWithWhereUniqueWithoutMasukanInput | RekomendasiMasukanUpsertWithWhereUniqueWithoutMasukanInput[]
-    createMany?: RekomendasiMasukanCreateManyMasukanInputEnvelope
-    set?: RekomendasiMasukanWhereUniqueInput | RekomendasiMasukanWhereUniqueInput[]
-    disconnect?: RekomendasiMasukanWhereUniqueInput | RekomendasiMasukanWhereUniqueInput[]
-    delete?: RekomendasiMasukanWhereUniqueInput | RekomendasiMasukanWhereUniqueInput[]
-    connect?: RekomendasiMasukanWhereUniqueInput | RekomendasiMasukanWhereUniqueInput[]
-    update?: RekomendasiMasukanUpdateWithWhereUniqueWithoutMasukanInput | RekomendasiMasukanUpdateWithWhereUniqueWithoutMasukanInput[]
-    updateMany?: RekomendasiMasukanUpdateManyWithWhereWithoutMasukanInput | RekomendasiMasukanUpdateManyWithWhereWithoutMasukanInput[]
-    deleteMany?: RekomendasiMasukanScalarWhereInput | RekomendasiMasukanScalarWhereInput[]
+  export type KegiatanRapatMasukanUpdateManyWithoutMasukanNestedInput = {
+    create?: XOR<KegiatanRapatMasukanCreateWithoutMasukanInput, KegiatanRapatMasukanUncheckedCreateWithoutMasukanInput> | KegiatanRapatMasukanCreateWithoutMasukanInput[] | KegiatanRapatMasukanUncheckedCreateWithoutMasukanInput[]
+    connectOrCreate?: KegiatanRapatMasukanCreateOrConnectWithoutMasukanInput | KegiatanRapatMasukanCreateOrConnectWithoutMasukanInput[]
+    upsert?: KegiatanRapatMasukanUpsertWithWhereUniqueWithoutMasukanInput | KegiatanRapatMasukanUpsertWithWhereUniqueWithoutMasukanInput[]
+    createMany?: KegiatanRapatMasukanCreateManyMasukanInputEnvelope
+    set?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
+    disconnect?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
+    delete?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
+    connect?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
+    update?: KegiatanRapatMasukanUpdateWithWhereUniqueWithoutMasukanInput | KegiatanRapatMasukanUpdateWithWhereUniqueWithoutMasukanInput[]
+    updateMany?: KegiatanRapatMasukanUpdateManyWithWhereWithoutMasukanInput | KegiatanRapatMasukanUpdateManyWithWhereWithoutMasukanInput[]
+    deleteMany?: KegiatanRapatMasukanScalarWhereInput | KegiatanRapatMasukanScalarWhereInput[]
   }
 
-  export type RekomendasiMasukanUncheckedUpdateManyWithoutMasukanNestedInput = {
-    create?: XOR<RekomendasiMasukanCreateWithoutMasukanInput, RekomendasiMasukanUncheckedCreateWithoutMasukanInput> | RekomendasiMasukanCreateWithoutMasukanInput[] | RekomendasiMasukanUncheckedCreateWithoutMasukanInput[]
-    connectOrCreate?: RekomendasiMasukanCreateOrConnectWithoutMasukanInput | RekomendasiMasukanCreateOrConnectWithoutMasukanInput[]
-    upsert?: RekomendasiMasukanUpsertWithWhereUniqueWithoutMasukanInput | RekomendasiMasukanUpsertWithWhereUniqueWithoutMasukanInput[]
-    createMany?: RekomendasiMasukanCreateManyMasukanInputEnvelope
-    set?: RekomendasiMasukanWhereUniqueInput | RekomendasiMasukanWhereUniqueInput[]
-    disconnect?: RekomendasiMasukanWhereUniqueInput | RekomendasiMasukanWhereUniqueInput[]
-    delete?: RekomendasiMasukanWhereUniqueInput | RekomendasiMasukanWhereUniqueInput[]
-    connect?: RekomendasiMasukanWhereUniqueInput | RekomendasiMasukanWhereUniqueInput[]
-    update?: RekomendasiMasukanUpdateWithWhereUniqueWithoutMasukanInput | RekomendasiMasukanUpdateWithWhereUniqueWithoutMasukanInput[]
-    updateMany?: RekomendasiMasukanUpdateManyWithWhereWithoutMasukanInput | RekomendasiMasukanUpdateManyWithWhereWithoutMasukanInput[]
-    deleteMany?: RekomendasiMasukanScalarWhereInput | RekomendasiMasukanScalarWhereInput[]
+  export type KegiatanRapatMasukanUncheckedUpdateManyWithoutMasukanNestedInput = {
+    create?: XOR<KegiatanRapatMasukanCreateWithoutMasukanInput, KegiatanRapatMasukanUncheckedCreateWithoutMasukanInput> | KegiatanRapatMasukanCreateWithoutMasukanInput[] | KegiatanRapatMasukanUncheckedCreateWithoutMasukanInput[]
+    connectOrCreate?: KegiatanRapatMasukanCreateOrConnectWithoutMasukanInput | KegiatanRapatMasukanCreateOrConnectWithoutMasukanInput[]
+    upsert?: KegiatanRapatMasukanUpsertWithWhereUniqueWithoutMasukanInput | KegiatanRapatMasukanUpsertWithWhereUniqueWithoutMasukanInput[]
+    createMany?: KegiatanRapatMasukanCreateManyMasukanInputEnvelope
+    set?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
+    disconnect?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
+    delete?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
+    connect?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
+    update?: KegiatanRapatMasukanUpdateWithWhereUniqueWithoutMasukanInput | KegiatanRapatMasukanUpdateWithWhereUniqueWithoutMasukanInput[]
+    updateMany?: KegiatanRapatMasukanUpdateManyWithWhereWithoutMasukanInput | KegiatanRapatMasukanUpdateManyWithWhereWithoutMasukanInput[]
+    deleteMany?: KegiatanRapatMasukanScalarWhereInput | KegiatanRapatMasukanScalarWhereInput[]
   }
 
   export type DomainIsuCreateNestedOneWithoutDataMasterInput = {
@@ -17059,10 +15752,14 @@ export namespace Prisma {
     connect?: DomainIsuWhereUniqueInput
   }
 
-  export type UserCreateNestedOneWithoutDataMasterInput = {
-    create?: XOR<UserCreateWithoutDataMasterInput, UserUncheckedCreateWithoutDataMasterInput>
-    connectOrCreate?: UserCreateOrConnectWithoutDataMasterInput
+  export type UserCreateNestedOneWithoutDataMasterDibuatInput = {
+    create?: XOR<UserCreateWithoutDataMasterDibuatInput, UserUncheckedCreateWithoutDataMasterDibuatInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDataMasterDibuatInput
     connect?: UserWhereUniqueInput
+  }
+
+  export type EnumNilaiKritikalitasFieldUpdateOperationsInput = {
+    set?: $Enums.NilaiKritikalitas
   }
 
   export type NullableIntFieldUpdateOperationsInput = {
@@ -17081,140 +15778,136 @@ export namespace Prisma {
     update?: XOR<XOR<DomainIsuUpdateToOneWithWhereWithoutDataMasterInput, DomainIsuUpdateWithoutDataMasterInput>, DomainIsuUncheckedUpdateWithoutDataMasterInput>
   }
 
-  export type UserUpdateOneWithoutDataMasterNestedInput = {
-    create?: XOR<UserCreateWithoutDataMasterInput, UserUncheckedCreateWithoutDataMasterInput>
-    connectOrCreate?: UserCreateOrConnectWithoutDataMasterInput
-    upsert?: UserUpsertWithoutDataMasterInput
+  export type UserUpdateOneWithoutDataMasterDibuatNestedInput = {
+    create?: XOR<UserCreateWithoutDataMasterDibuatInput, UserUncheckedCreateWithoutDataMasterDibuatInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDataMasterDibuatInput
+    upsert?: UserUpsertWithoutDataMasterDibuatInput
     disconnect?: UserWhereInput | boolean
     delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutDataMasterInput, UserUpdateWithoutDataMasterInput>, UserUncheckedUpdateWithoutDataMasterInput>
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutDataMasterDibuatInput, UserUpdateWithoutDataMasterDibuatInput>, UserUncheckedUpdateWithoutDataMasterDibuatInput>
   }
 
-  export type KegiatanRapatCreateNestedOneWithoutRekomendasiInput = {
-    create?: XOR<KegiatanRapatCreateWithoutRekomendasiInput, KegiatanRapatUncheckedCreateWithoutRekomendasiInput>
-    connectOrCreate?: KegiatanRapatCreateOrConnectWithoutRekomendasiInput
-    connect?: KegiatanRapatWhereUniqueInput
-  }
-
-  export type DomainIsuCreateNestedOneWithoutRekomendasiInput = {
-    create?: XOR<DomainIsuCreateWithoutRekomendasiInput, DomainIsuUncheckedCreateWithoutRekomendasiInput>
-    connectOrCreate?: DomainIsuCreateOrConnectWithoutRekomendasiInput
+  export type DomainIsuCreateNestedOneWithoutKegiatanRapatInput = {
+    create?: XOR<DomainIsuCreateWithoutKegiatanRapatInput, DomainIsuUncheckedCreateWithoutKegiatanRapatInput>
+    connectOrCreate?: DomainIsuCreateOrConnectWithoutKegiatanRapatInput
     connect?: DomainIsuWhereUniqueInput
   }
 
-  export type UserCreateNestedOneWithoutRekomendasiDiprosesInput = {
-    create?: XOR<UserCreateWithoutRekomendasiDiprosesInput, UserUncheckedCreateWithoutRekomendasiDiprosesInput>
-    connectOrCreate?: UserCreateOrConnectWithoutRekomendasiDiprosesInput
+  export type UserCreateNestedOneWithoutKegiatanRapatDibuatInput = {
+    create?: XOR<UserCreateWithoutKegiatanRapatDibuatInput, UserUncheckedCreateWithoutKegiatanRapatDibuatInput>
+    connectOrCreate?: UserCreateOrConnectWithoutKegiatanRapatDibuatInput
     connect?: UserWhereUniqueInput
   }
 
-  export type RekomendasiMasukanCreateNestedManyWithoutRekomendasiInput = {
-    create?: XOR<RekomendasiMasukanCreateWithoutRekomendasiInput, RekomendasiMasukanUncheckedCreateWithoutRekomendasiInput> | RekomendasiMasukanCreateWithoutRekomendasiInput[] | RekomendasiMasukanUncheckedCreateWithoutRekomendasiInput[]
-    connectOrCreate?: RekomendasiMasukanCreateOrConnectWithoutRekomendasiInput | RekomendasiMasukanCreateOrConnectWithoutRekomendasiInput[]
-    createMany?: RekomendasiMasukanCreateManyRekomendasiInputEnvelope
-    connect?: RekomendasiMasukanWhereUniqueInput | RekomendasiMasukanWhereUniqueInput[]
+  export type UserCreateNestedOneWithoutKegiatanRapatDiprosesInput = {
+    create?: XOR<UserCreateWithoutKegiatanRapatDiprosesInput, UserUncheckedCreateWithoutKegiatanRapatDiprosesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutKegiatanRapatDiprosesInput
+    connect?: UserWhereUniqueInput
   }
 
-  export type RekomendasiMasukanUncheckedCreateNestedManyWithoutRekomendasiInput = {
-    create?: XOR<RekomendasiMasukanCreateWithoutRekomendasiInput, RekomendasiMasukanUncheckedCreateWithoutRekomendasiInput> | RekomendasiMasukanCreateWithoutRekomendasiInput[] | RekomendasiMasukanUncheckedCreateWithoutRekomendasiInput[]
-    connectOrCreate?: RekomendasiMasukanCreateOrConnectWithoutRekomendasiInput | RekomendasiMasukanCreateOrConnectWithoutRekomendasiInput[]
-    createMany?: RekomendasiMasukanCreateManyRekomendasiInputEnvelope
-    connect?: RekomendasiMasukanWhereUniqueInput | RekomendasiMasukanWhereUniqueInput[]
+  export type KegiatanRapatMasukanCreateNestedManyWithoutKegiatanRapatInput = {
+    create?: XOR<KegiatanRapatMasukanCreateWithoutKegiatanRapatInput, KegiatanRapatMasukanUncheckedCreateWithoutKegiatanRapatInput> | KegiatanRapatMasukanCreateWithoutKegiatanRapatInput[] | KegiatanRapatMasukanUncheckedCreateWithoutKegiatanRapatInput[]
+    connectOrCreate?: KegiatanRapatMasukanCreateOrConnectWithoutKegiatanRapatInput | KegiatanRapatMasukanCreateOrConnectWithoutKegiatanRapatInput[]
+    createMany?: KegiatanRapatMasukanCreateManyKegiatanRapatInputEnvelope
+    connect?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
   }
 
-  export type FloatFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
+  export type KegiatanRapatMasukanUncheckedCreateNestedManyWithoutKegiatanRapatInput = {
+    create?: XOR<KegiatanRapatMasukanCreateWithoutKegiatanRapatInput, KegiatanRapatMasukanUncheckedCreateWithoutKegiatanRapatInput> | KegiatanRapatMasukanCreateWithoutKegiatanRapatInput[] | KegiatanRapatMasukanUncheckedCreateWithoutKegiatanRapatInput[]
+    connectOrCreate?: KegiatanRapatMasukanCreateOrConnectWithoutKegiatanRapatInput | KegiatanRapatMasukanCreateOrConnectWithoutKegiatanRapatInput[]
+    createMany?: KegiatanRapatMasukanCreateManyKegiatanRapatInputEnvelope
+    connect?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
+  }
+
+  export type EnumModeRekomendasiFieldUpdateOperationsInput = {
+    set?: $Enums.ModeRekomendasi
   }
 
   export type EnumStatusRekomendasiFieldUpdateOperationsInput = {
     set?: $Enums.StatusRekomendasi
   }
 
-  export type KegiatanRapatUpdateOneRequiredWithoutRekomendasiNestedInput = {
-    create?: XOR<KegiatanRapatCreateWithoutRekomendasiInput, KegiatanRapatUncheckedCreateWithoutRekomendasiInput>
-    connectOrCreate?: KegiatanRapatCreateOrConnectWithoutRekomendasiInput
-    upsert?: KegiatanRapatUpsertWithoutRekomendasiInput
-    connect?: KegiatanRapatWhereUniqueInput
-    update?: XOR<XOR<KegiatanRapatUpdateToOneWithWhereWithoutRekomendasiInput, KegiatanRapatUpdateWithoutRekomendasiInput>, KegiatanRapatUncheckedUpdateWithoutRekomendasiInput>
-  }
-
-  export type DomainIsuUpdateOneRequiredWithoutRekomendasiNestedInput = {
-    create?: XOR<DomainIsuCreateWithoutRekomendasiInput, DomainIsuUncheckedCreateWithoutRekomendasiInput>
-    connectOrCreate?: DomainIsuCreateOrConnectWithoutRekomendasiInput
-    upsert?: DomainIsuUpsertWithoutRekomendasiInput
+  export type DomainIsuUpdateOneRequiredWithoutKegiatanRapatNestedInput = {
+    create?: XOR<DomainIsuCreateWithoutKegiatanRapatInput, DomainIsuUncheckedCreateWithoutKegiatanRapatInput>
+    connectOrCreate?: DomainIsuCreateOrConnectWithoutKegiatanRapatInput
+    upsert?: DomainIsuUpsertWithoutKegiatanRapatInput
     connect?: DomainIsuWhereUniqueInput
-    update?: XOR<XOR<DomainIsuUpdateToOneWithWhereWithoutRekomendasiInput, DomainIsuUpdateWithoutRekomendasiInput>, DomainIsuUncheckedUpdateWithoutRekomendasiInput>
+    update?: XOR<XOR<DomainIsuUpdateToOneWithWhereWithoutKegiatanRapatInput, DomainIsuUpdateWithoutKegiatanRapatInput>, DomainIsuUncheckedUpdateWithoutKegiatanRapatInput>
   }
 
-  export type UserUpdateOneWithoutRekomendasiDiprosesNestedInput = {
-    create?: XOR<UserCreateWithoutRekomendasiDiprosesInput, UserUncheckedCreateWithoutRekomendasiDiprosesInput>
-    connectOrCreate?: UserCreateOrConnectWithoutRekomendasiDiprosesInput
-    upsert?: UserUpsertWithoutRekomendasiDiprosesInput
+  export type UserUpdateOneRequiredWithoutKegiatanRapatDibuatNestedInput = {
+    create?: XOR<UserCreateWithoutKegiatanRapatDibuatInput, UserUncheckedCreateWithoutKegiatanRapatDibuatInput>
+    connectOrCreate?: UserCreateOrConnectWithoutKegiatanRapatDibuatInput
+    upsert?: UserUpsertWithoutKegiatanRapatDibuatInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutKegiatanRapatDibuatInput, UserUpdateWithoutKegiatanRapatDibuatInput>, UserUncheckedUpdateWithoutKegiatanRapatDibuatInput>
+  }
+
+  export type UserUpdateOneWithoutKegiatanRapatDiprosesNestedInput = {
+    create?: XOR<UserCreateWithoutKegiatanRapatDiprosesInput, UserUncheckedCreateWithoutKegiatanRapatDiprosesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutKegiatanRapatDiprosesInput
+    upsert?: UserUpsertWithoutKegiatanRapatDiprosesInput
     disconnect?: UserWhereInput | boolean
     delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutRekomendasiDiprosesInput, UserUpdateWithoutRekomendasiDiprosesInput>, UserUncheckedUpdateWithoutRekomendasiDiprosesInput>
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutKegiatanRapatDiprosesInput, UserUpdateWithoutKegiatanRapatDiprosesInput>, UserUncheckedUpdateWithoutKegiatanRapatDiprosesInput>
   }
 
-  export type RekomendasiMasukanUpdateManyWithoutRekomendasiNestedInput = {
-    create?: XOR<RekomendasiMasukanCreateWithoutRekomendasiInput, RekomendasiMasukanUncheckedCreateWithoutRekomendasiInput> | RekomendasiMasukanCreateWithoutRekomendasiInput[] | RekomendasiMasukanUncheckedCreateWithoutRekomendasiInput[]
-    connectOrCreate?: RekomendasiMasukanCreateOrConnectWithoutRekomendasiInput | RekomendasiMasukanCreateOrConnectWithoutRekomendasiInput[]
-    upsert?: RekomendasiMasukanUpsertWithWhereUniqueWithoutRekomendasiInput | RekomendasiMasukanUpsertWithWhereUniqueWithoutRekomendasiInput[]
-    createMany?: RekomendasiMasukanCreateManyRekomendasiInputEnvelope
-    set?: RekomendasiMasukanWhereUniqueInput | RekomendasiMasukanWhereUniqueInput[]
-    disconnect?: RekomendasiMasukanWhereUniqueInput | RekomendasiMasukanWhereUniqueInput[]
-    delete?: RekomendasiMasukanWhereUniqueInput | RekomendasiMasukanWhereUniqueInput[]
-    connect?: RekomendasiMasukanWhereUniqueInput | RekomendasiMasukanWhereUniqueInput[]
-    update?: RekomendasiMasukanUpdateWithWhereUniqueWithoutRekomendasiInput | RekomendasiMasukanUpdateWithWhereUniqueWithoutRekomendasiInput[]
-    updateMany?: RekomendasiMasukanUpdateManyWithWhereWithoutRekomendasiInput | RekomendasiMasukanUpdateManyWithWhereWithoutRekomendasiInput[]
-    deleteMany?: RekomendasiMasukanScalarWhereInput | RekomendasiMasukanScalarWhereInput[]
+  export type KegiatanRapatMasukanUpdateManyWithoutKegiatanRapatNestedInput = {
+    create?: XOR<KegiatanRapatMasukanCreateWithoutKegiatanRapatInput, KegiatanRapatMasukanUncheckedCreateWithoutKegiatanRapatInput> | KegiatanRapatMasukanCreateWithoutKegiatanRapatInput[] | KegiatanRapatMasukanUncheckedCreateWithoutKegiatanRapatInput[]
+    connectOrCreate?: KegiatanRapatMasukanCreateOrConnectWithoutKegiatanRapatInput | KegiatanRapatMasukanCreateOrConnectWithoutKegiatanRapatInput[]
+    upsert?: KegiatanRapatMasukanUpsertWithWhereUniqueWithoutKegiatanRapatInput | KegiatanRapatMasukanUpsertWithWhereUniqueWithoutKegiatanRapatInput[]
+    createMany?: KegiatanRapatMasukanCreateManyKegiatanRapatInputEnvelope
+    set?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
+    disconnect?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
+    delete?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
+    connect?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
+    update?: KegiatanRapatMasukanUpdateWithWhereUniqueWithoutKegiatanRapatInput | KegiatanRapatMasukanUpdateWithWhereUniqueWithoutKegiatanRapatInput[]
+    updateMany?: KegiatanRapatMasukanUpdateManyWithWhereWithoutKegiatanRapatInput | KegiatanRapatMasukanUpdateManyWithWhereWithoutKegiatanRapatInput[]
+    deleteMany?: KegiatanRapatMasukanScalarWhereInput | KegiatanRapatMasukanScalarWhereInput[]
   }
 
-  export type RekomendasiMasukanUncheckedUpdateManyWithoutRekomendasiNestedInput = {
-    create?: XOR<RekomendasiMasukanCreateWithoutRekomendasiInput, RekomendasiMasukanUncheckedCreateWithoutRekomendasiInput> | RekomendasiMasukanCreateWithoutRekomendasiInput[] | RekomendasiMasukanUncheckedCreateWithoutRekomendasiInput[]
-    connectOrCreate?: RekomendasiMasukanCreateOrConnectWithoutRekomendasiInput | RekomendasiMasukanCreateOrConnectWithoutRekomendasiInput[]
-    upsert?: RekomendasiMasukanUpsertWithWhereUniqueWithoutRekomendasiInput | RekomendasiMasukanUpsertWithWhereUniqueWithoutRekomendasiInput[]
-    createMany?: RekomendasiMasukanCreateManyRekomendasiInputEnvelope
-    set?: RekomendasiMasukanWhereUniqueInput | RekomendasiMasukanWhereUniqueInput[]
-    disconnect?: RekomendasiMasukanWhereUniqueInput | RekomendasiMasukanWhereUniqueInput[]
-    delete?: RekomendasiMasukanWhereUniqueInput | RekomendasiMasukanWhereUniqueInput[]
-    connect?: RekomendasiMasukanWhereUniqueInput | RekomendasiMasukanWhereUniqueInput[]
-    update?: RekomendasiMasukanUpdateWithWhereUniqueWithoutRekomendasiInput | RekomendasiMasukanUpdateWithWhereUniqueWithoutRekomendasiInput[]
-    updateMany?: RekomendasiMasukanUpdateManyWithWhereWithoutRekomendasiInput | RekomendasiMasukanUpdateManyWithWhereWithoutRekomendasiInput[]
-    deleteMany?: RekomendasiMasukanScalarWhereInput | RekomendasiMasukanScalarWhereInput[]
+  export type KegiatanRapatMasukanUncheckedUpdateManyWithoutKegiatanRapatNestedInput = {
+    create?: XOR<KegiatanRapatMasukanCreateWithoutKegiatanRapatInput, KegiatanRapatMasukanUncheckedCreateWithoutKegiatanRapatInput> | KegiatanRapatMasukanCreateWithoutKegiatanRapatInput[] | KegiatanRapatMasukanUncheckedCreateWithoutKegiatanRapatInput[]
+    connectOrCreate?: KegiatanRapatMasukanCreateOrConnectWithoutKegiatanRapatInput | KegiatanRapatMasukanCreateOrConnectWithoutKegiatanRapatInput[]
+    upsert?: KegiatanRapatMasukanUpsertWithWhereUniqueWithoutKegiatanRapatInput | KegiatanRapatMasukanUpsertWithWhereUniqueWithoutKegiatanRapatInput[]
+    createMany?: KegiatanRapatMasukanCreateManyKegiatanRapatInputEnvelope
+    set?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
+    disconnect?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
+    delete?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
+    connect?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
+    update?: KegiatanRapatMasukanUpdateWithWhereUniqueWithoutKegiatanRapatInput | KegiatanRapatMasukanUpdateWithWhereUniqueWithoutKegiatanRapatInput[]
+    updateMany?: KegiatanRapatMasukanUpdateManyWithWhereWithoutKegiatanRapatInput | KegiatanRapatMasukanUpdateManyWithWhereWithoutKegiatanRapatInput[]
+    deleteMany?: KegiatanRapatMasukanScalarWhereInput | KegiatanRapatMasukanScalarWhereInput[]
   }
 
-  export type RekomendasiCreateNestedOneWithoutMasukanLinksInput = {
-    create?: XOR<RekomendasiCreateWithoutMasukanLinksInput, RekomendasiUncheckedCreateWithoutMasukanLinksInput>
-    connectOrCreate?: RekomendasiCreateOrConnectWithoutMasukanLinksInput
-    connect?: RekomendasiWhereUniqueInput
+  export type KegiatanRapatCreateNestedOneWithoutMasukanRelasiInput = {
+    create?: XOR<KegiatanRapatCreateWithoutMasukanRelasiInput, KegiatanRapatUncheckedCreateWithoutMasukanRelasiInput>
+    connectOrCreate?: KegiatanRapatCreateOrConnectWithoutMasukanRelasiInput
+    connect?: KegiatanRapatWhereUniqueInput
   }
 
-  export type MasukanWargaCreateNestedOneWithoutRekomendasiLinksInput = {
-    create?: XOR<MasukanWargaCreateWithoutRekomendasiLinksInput, MasukanWargaUncheckedCreateWithoutRekomendasiLinksInput>
-    connectOrCreate?: MasukanWargaCreateOrConnectWithoutRekomendasiLinksInput
+  export type MasukanWargaCreateNestedOneWithoutRelasiRapatInput = {
+    create?: XOR<MasukanWargaCreateWithoutRelasiRapatInput, MasukanWargaUncheckedCreateWithoutRelasiRapatInput>
+    connectOrCreate?: MasukanWargaCreateOrConnectWithoutRelasiRapatInput
     connect?: MasukanWargaWhereUniqueInput
   }
 
-  export type RekomendasiUpdateOneRequiredWithoutMasukanLinksNestedInput = {
-    create?: XOR<RekomendasiCreateWithoutMasukanLinksInput, RekomendasiUncheckedCreateWithoutMasukanLinksInput>
-    connectOrCreate?: RekomendasiCreateOrConnectWithoutMasukanLinksInput
-    upsert?: RekomendasiUpsertWithoutMasukanLinksInput
-    connect?: RekomendasiWhereUniqueInput
-    update?: XOR<XOR<RekomendasiUpdateToOneWithWhereWithoutMasukanLinksInput, RekomendasiUpdateWithoutMasukanLinksInput>, RekomendasiUncheckedUpdateWithoutMasukanLinksInput>
+  export type KegiatanRapatUpdateOneRequiredWithoutMasukanRelasiNestedInput = {
+    create?: XOR<KegiatanRapatCreateWithoutMasukanRelasiInput, KegiatanRapatUncheckedCreateWithoutMasukanRelasiInput>
+    connectOrCreate?: KegiatanRapatCreateOrConnectWithoutMasukanRelasiInput
+    upsert?: KegiatanRapatUpsertWithoutMasukanRelasiInput
+    connect?: KegiatanRapatWhereUniqueInput
+    update?: XOR<XOR<KegiatanRapatUpdateToOneWithWhereWithoutMasukanRelasiInput, KegiatanRapatUpdateWithoutMasukanRelasiInput>, KegiatanRapatUncheckedUpdateWithoutMasukanRelasiInput>
   }
 
-  export type MasukanWargaUpdateOneRequiredWithoutRekomendasiLinksNestedInput = {
-    create?: XOR<MasukanWargaCreateWithoutRekomendasiLinksInput, MasukanWargaUncheckedCreateWithoutRekomendasiLinksInput>
-    connectOrCreate?: MasukanWargaCreateOrConnectWithoutRekomendasiLinksInput
-    upsert?: MasukanWargaUpsertWithoutRekomendasiLinksInput
+  export type MasukanWargaUpdateOneRequiredWithoutRelasiRapatNestedInput = {
+    create?: XOR<MasukanWargaCreateWithoutRelasiRapatInput, MasukanWargaUncheckedCreateWithoutRelasiRapatInput>
+    connectOrCreate?: MasukanWargaCreateOrConnectWithoutRelasiRapatInput
+    upsert?: MasukanWargaUpsertWithoutRelasiRapatInput
     connect?: MasukanWargaWhereUniqueInput
-    update?: XOR<XOR<MasukanWargaUpdateToOneWithWhereWithoutRekomendasiLinksInput, MasukanWargaUpdateWithoutRekomendasiLinksInput>, MasukanWargaUncheckedUpdateWithoutRekomendasiLinksInput>
+    update?: XOR<XOR<MasukanWargaUpdateToOneWithWhereWithoutRelasiRapatInput, MasukanWargaUpdateWithoutRelasiRapatInput>, MasukanWargaUncheckedUpdateWithoutRelasiRapatInput>
   }
 
   export type UserCreateNestedOneWithoutSessionsInput = {
@@ -17241,88 +15934,12 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
-  export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null
-  }
-
   export type UserUpdateOneRequiredWithoutAccountsNestedInput = {
     create?: XOR<UserCreateWithoutAccountsInput, UserUncheckedCreateWithoutAccountsInput>
     connectOrCreate?: UserCreateOrConnectWithoutAccountsInput
     upsert?: UserUpsertWithoutAccountsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutAccountsInput, UserUpdateWithoutAccountsInput>, UserUncheckedUpdateWithoutAccountsInput>
-  }
-
-  export type DomainIsuCreateNestedOneWithoutKegiatanRapatInput = {
-    create?: XOR<DomainIsuCreateWithoutKegiatanRapatInput, DomainIsuUncheckedCreateWithoutKegiatanRapatInput>
-    connectOrCreate?: DomainIsuCreateOrConnectWithoutKegiatanRapatInput
-    connect?: DomainIsuWhereUniqueInput
-  }
-
-  export type UserCreateNestedOneWithoutKegiatanRapatInput = {
-    create?: XOR<UserCreateWithoutKegiatanRapatInput, UserUncheckedCreateWithoutKegiatanRapatInput>
-    connectOrCreate?: UserCreateOrConnectWithoutKegiatanRapatInput
-    connect?: UserWhereUniqueInput
-  }
-
-  export type RekomendasiCreateNestedManyWithoutKegiatanRapatInput = {
-    create?: XOR<RekomendasiCreateWithoutKegiatanRapatInput, RekomendasiUncheckedCreateWithoutKegiatanRapatInput> | RekomendasiCreateWithoutKegiatanRapatInput[] | RekomendasiUncheckedCreateWithoutKegiatanRapatInput[]
-    connectOrCreate?: RekomendasiCreateOrConnectWithoutKegiatanRapatInput | RekomendasiCreateOrConnectWithoutKegiatanRapatInput[]
-    createMany?: RekomendasiCreateManyKegiatanRapatInputEnvelope
-    connect?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-  }
-
-  export type RekomendasiUncheckedCreateNestedManyWithoutKegiatanRapatInput = {
-    create?: XOR<RekomendasiCreateWithoutKegiatanRapatInput, RekomendasiUncheckedCreateWithoutKegiatanRapatInput> | RekomendasiCreateWithoutKegiatanRapatInput[] | RekomendasiUncheckedCreateWithoutKegiatanRapatInput[]
-    connectOrCreate?: RekomendasiCreateOrConnectWithoutKegiatanRapatInput | RekomendasiCreateOrConnectWithoutKegiatanRapatInput[]
-    createMany?: RekomendasiCreateManyKegiatanRapatInputEnvelope
-    connect?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-  }
-
-  export type DomainIsuUpdateOneWithoutKegiatanRapatNestedInput = {
-    create?: XOR<DomainIsuCreateWithoutKegiatanRapatInput, DomainIsuUncheckedCreateWithoutKegiatanRapatInput>
-    connectOrCreate?: DomainIsuCreateOrConnectWithoutKegiatanRapatInput
-    upsert?: DomainIsuUpsertWithoutKegiatanRapatInput
-    disconnect?: DomainIsuWhereInput | boolean
-    delete?: DomainIsuWhereInput | boolean
-    connect?: DomainIsuWhereUniqueInput
-    update?: XOR<XOR<DomainIsuUpdateToOneWithWhereWithoutKegiatanRapatInput, DomainIsuUpdateWithoutKegiatanRapatInput>, DomainIsuUncheckedUpdateWithoutKegiatanRapatInput>
-  }
-
-  export type UserUpdateOneRequiredWithoutKegiatanRapatNestedInput = {
-    create?: XOR<UserCreateWithoutKegiatanRapatInput, UserUncheckedCreateWithoutKegiatanRapatInput>
-    connectOrCreate?: UserCreateOrConnectWithoutKegiatanRapatInput
-    upsert?: UserUpsertWithoutKegiatanRapatInput
-    connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutKegiatanRapatInput, UserUpdateWithoutKegiatanRapatInput>, UserUncheckedUpdateWithoutKegiatanRapatInput>
-  }
-
-  export type RekomendasiUpdateManyWithoutKegiatanRapatNestedInput = {
-    create?: XOR<RekomendasiCreateWithoutKegiatanRapatInput, RekomendasiUncheckedCreateWithoutKegiatanRapatInput> | RekomendasiCreateWithoutKegiatanRapatInput[] | RekomendasiUncheckedCreateWithoutKegiatanRapatInput[]
-    connectOrCreate?: RekomendasiCreateOrConnectWithoutKegiatanRapatInput | RekomendasiCreateOrConnectWithoutKegiatanRapatInput[]
-    upsert?: RekomendasiUpsertWithWhereUniqueWithoutKegiatanRapatInput | RekomendasiUpsertWithWhereUniqueWithoutKegiatanRapatInput[]
-    createMany?: RekomendasiCreateManyKegiatanRapatInputEnvelope
-    set?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    disconnect?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    delete?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    connect?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    update?: RekomendasiUpdateWithWhereUniqueWithoutKegiatanRapatInput | RekomendasiUpdateWithWhereUniqueWithoutKegiatanRapatInput[]
-    updateMany?: RekomendasiUpdateManyWithWhereWithoutKegiatanRapatInput | RekomendasiUpdateManyWithWhereWithoutKegiatanRapatInput[]
-    deleteMany?: RekomendasiScalarWhereInput | RekomendasiScalarWhereInput[]
-  }
-
-  export type RekomendasiUncheckedUpdateManyWithoutKegiatanRapatNestedInput = {
-    create?: XOR<RekomendasiCreateWithoutKegiatanRapatInput, RekomendasiUncheckedCreateWithoutKegiatanRapatInput> | RekomendasiCreateWithoutKegiatanRapatInput[] | RekomendasiUncheckedCreateWithoutKegiatanRapatInput[]
-    connectOrCreate?: RekomendasiCreateOrConnectWithoutKegiatanRapatInput | RekomendasiCreateOrConnectWithoutKegiatanRapatInput[]
-    upsert?: RekomendasiUpsertWithWhereUniqueWithoutKegiatanRapatInput | RekomendasiUpsertWithWhereUniqueWithoutKegiatanRapatInput[]
-    createMany?: RekomendasiCreateManyKegiatanRapatInputEnvelope
-    set?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    disconnect?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    delete?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    connect?: RekomendasiWhereUniqueInput | RekomendasiWhereUniqueInput[]
-    update?: RekomendasiUpdateWithWhereUniqueWithoutKegiatanRapatInput | RekomendasiUpdateWithWhereUniqueWithoutKegiatanRapatInput[]
-    updateMany?: RekomendasiUpdateManyWithWhereWithoutKegiatanRapatInput | RekomendasiUpdateManyWithWhereWithoutKegiatanRapatInput[]
-    deleteMany?: RekomendasiScalarWhereInput | RekomendasiScalarWhereInput[]
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -17464,11 +16081,36 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type NestedEnumStatusMasukanFilter<$PrismaModel = never> = {
     equals?: $Enums.StatusMasukan | EnumStatusMasukanFieldRefInput<$PrismaModel>
     in?: $Enums.StatusMasukan[] | ListEnumStatusMasukanFieldRefInput<$PrismaModel>
     notIn?: $Enums.StatusMasukan[] | ListEnumStatusMasukanFieldRefInput<$PrismaModel>
     not?: NestedEnumStatusMasukanFilter<$PrismaModel> | $Enums.StatusMasukan
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumStatusMasukanWithAggregatesFilter<$PrismaModel = never> = {
@@ -17479,6 +16121,23 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumStatusMasukanFilter<$PrismaModel>
     _max?: NestedEnumStatusMasukanFilter<$PrismaModel>
+  }
+
+  export type NestedEnumNilaiKritikalitasFilter<$PrismaModel = never> = {
+    equals?: $Enums.NilaiKritikalitas | EnumNilaiKritikalitasFieldRefInput<$PrismaModel>
+    in?: $Enums.NilaiKritikalitas[] | ListEnumNilaiKritikalitasFieldRefInput<$PrismaModel>
+    notIn?: $Enums.NilaiKritikalitas[] | ListEnumNilaiKritikalitasFieldRefInput<$PrismaModel>
+    not?: NestedEnumNilaiKritikalitasFilter<$PrismaModel> | $Enums.NilaiKritikalitas
+  }
+
+  export type NestedEnumNilaiKritikalitasWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.NilaiKritikalitas | EnumNilaiKritikalitasFieldRefInput<$PrismaModel>
+    in?: $Enums.NilaiKritikalitas[] | ListEnumNilaiKritikalitasFieldRefInput<$PrismaModel>
+    notIn?: $Enums.NilaiKritikalitas[] | ListEnumNilaiKritikalitasFieldRefInput<$PrismaModel>
+    not?: NestedEnumNilaiKritikalitasWithAggregatesFilter<$PrismaModel> | $Enums.NilaiKritikalitas
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumNilaiKritikalitasFilter<$PrismaModel>
+    _max?: NestedEnumNilaiKritikalitasFilter<$PrismaModel>
   }
 
   export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -17508,15 +16167,11 @@ export namespace Prisma {
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
-  export type NestedFloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatFilter<$PrismaModel> | number
+  export type NestedEnumModeRekomendasiFilter<$PrismaModel = never> = {
+    equals?: $Enums.ModeRekomendasi | EnumModeRekomendasiFieldRefInput<$PrismaModel>
+    in?: $Enums.ModeRekomendasi[] | ListEnumModeRekomendasiFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ModeRekomendasi[] | ListEnumModeRekomendasiFieldRefInput<$PrismaModel>
+    not?: NestedEnumModeRekomendasiFilter<$PrismaModel> | $Enums.ModeRekomendasi
   }
 
   export type NestedEnumStatusRekomendasiFilter<$PrismaModel = never> = {
@@ -17526,30 +16181,14 @@ export namespace Prisma {
     not?: NestedEnumStatusRekomendasiFilter<$PrismaModel> | $Enums.StatusRekomendasi
   }
 
-  export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
+  export type NestedEnumModeRekomendasiWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ModeRekomendasi | EnumModeRekomendasiFieldRefInput<$PrismaModel>
+    in?: $Enums.ModeRekomendasi[] | ListEnumModeRekomendasiFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ModeRekomendasi[] | ListEnumModeRekomendasiFieldRefInput<$PrismaModel>
+    not?: NestedEnumModeRekomendasiWithAggregatesFilter<$PrismaModel> | $Enums.ModeRekomendasi
     _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedFloatFilter<$PrismaModel>
-    _min?: NestedFloatFilter<$PrismaModel>
-    _max?: NestedFloatFilter<$PrismaModel>
-  }
-
-  export type NestedEnumStatusRekomendasiWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.StatusRekomendasi | EnumStatusRekomendasiFieldRefInput<$PrismaModel>
-    in?: $Enums.StatusRekomendasi[] | ListEnumStatusRekomendasiFieldRefInput<$PrismaModel>
-    notIn?: $Enums.StatusRekomendasi[] | ListEnumStatusRekomendasiFieldRefInput<$PrismaModel>
-    not?: NestedEnumStatusRekomendasiWithAggregatesFilter<$PrismaModel> | $Enums.StatusRekomendasi
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumStatusRekomendasiFilter<$PrismaModel>
-    _max?: NestedEnumStatusRekomendasiFilter<$PrismaModel>
+    _min?: NestedEnumModeRekomendasiFilter<$PrismaModel>
+    _max?: NestedEnumModeRekomendasiFilter<$PrismaModel>
   }
   export type NestedJsonFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -17575,6 +16214,16 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
+  export type NestedEnumStatusRekomendasiWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.StatusRekomendasi | EnumStatusRekomendasiFieldRefInput<$PrismaModel>
+    in?: $Enums.StatusRekomendasi[] | ListEnumStatusRekomendasiFieldRefInput<$PrismaModel>
+    notIn?: $Enums.StatusRekomendasi[] | ListEnumStatusRekomendasiFieldRefInput<$PrismaModel>
+    not?: NestedEnumStatusRekomendasiWithAggregatesFilter<$PrismaModel> | $Enums.StatusRekomendasi
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumStatusRekomendasiFilter<$PrismaModel>
+    _max?: NestedEnumStatusRekomendasiFilter<$PrismaModel>
+  }
+
   export type NestedBoolNullableFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
     not?: NestedBoolNullableFilter<$PrismaModel> | boolean | null
@@ -17588,31 +16237,6 @@ export namespace Prisma {
     _max?: NestedBoolNullableFilter<$PrismaModel>
   }
 
-  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
-  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
-  }
-
   export type MasukanWargaCreateWithoutDomainIsuInput = {
     id?: string
     namaPengirim?: string | null
@@ -17621,12 +16245,16 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
+    isLocked?: boolean
+    lockedAt?: Date | string | null
     status?: $Enums.StatusMasukan
     alasanPenolakan?: string | null
+    isRelevant?: boolean
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     diverifikasiOleh?: UserCreateNestedOneWithoutMasukanVerifikasiInput
-    rekomendasiLinks?: RekomendasiMasukanCreateNestedManyWithoutMasukanInput
+    relasiRapat?: KegiatanRapatMasukanCreateNestedManyWithoutMasukanInput
   }
 
   export type MasukanWargaUncheckedCreateWithoutDomainIsuInput = {
@@ -17637,12 +16265,16 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
+    isLocked?: boolean
+    lockedAt?: Date | string | null
     status?: $Enums.StatusMasukan
     alasanPenolakan?: string | null
     diverifikasiOlehId?: string | null
+    isRelevant?: boolean
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    rekomendasiLinks?: RekomendasiMasukanUncheckedCreateNestedManyWithoutMasukanInput
+    relasiRapat?: KegiatanRapatMasukanUncheckedCreateNestedManyWithoutMasukanInput
   }
 
   export type MasukanWargaCreateOrConnectWithoutDomainIsuInput = {
@@ -17658,23 +16290,27 @@ export namespace Prisma {
   export type DataMasterCreateWithoutDomainIsuInput = {
     id?: string
     namaAtribut: string
-    nilai: string
+    kritikalitas: $Enums.NilaiKritikalitas
     jumlah?: number | null
-    lokasiRt?: number | null
-    lokasiRw?: number | null
+    lokasiRt?: string | null
+    lokasiRw?: string | null
+    isActive?: boolean
+    tahunData?: number | null
     sumberData?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    diprosesOleh?: UserCreateNestedOneWithoutDataMasterInput
+    diprosesOleh?: UserCreateNestedOneWithoutDataMasterDibuatInput
   }
 
   export type DataMasterUncheckedCreateWithoutDomainIsuInput = {
     id?: string
     namaAtribut: string
-    nilai: string
+    kritikalitas: $Enums.NilaiKritikalitas
     jumlah?: number | null
-    lokasiRt?: number | null
-    lokasiRw?: number | null
+    lokasiRt?: string | null
+    lokasiRw?: string | null
+    isActive?: boolean
+    tahunData?: number | null
     sumberData?: string | null
     diprosesOlehId?: string | null
     createdAt?: Date | string
@@ -17691,59 +16327,24 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type RekomendasiCreateWithoutDomainIsuInput = {
-    id?: string
-    judul: string
-    ringkasan: string
-    deskripsi: string
-    skorPrioritas: number
-    status?: $Enums.StatusRekomendasi
-    laporanLengkap: JsonNullValueInput | InputJsonValue
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    kegiatanRapat: KegiatanRapatCreateNestedOneWithoutRekomendasiInput
-    diprosesOleh?: UserCreateNestedOneWithoutRekomendasiDiprosesInput
-    masukanLinks?: RekomendasiMasukanCreateNestedManyWithoutRekomendasiInput
-  }
-
-  export type RekomendasiUncheckedCreateWithoutDomainIsuInput = {
-    id?: string
-    kegiatanRapatId: string
-    judul: string
-    ringkasan: string
-    deskripsi: string
-    skorPrioritas: number
-    status?: $Enums.StatusRekomendasi
-    laporanLengkap: JsonNullValueInput | InputJsonValue
-    diprosesOlehId?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    masukanLinks?: RekomendasiMasukanUncheckedCreateNestedManyWithoutRekomendasiInput
-  }
-
-  export type RekomendasiCreateOrConnectWithoutDomainIsuInput = {
-    where: RekomendasiWhereUniqueInput
-    create: XOR<RekomendasiCreateWithoutDomainIsuInput, RekomendasiUncheckedCreateWithoutDomainIsuInput>
-  }
-
-  export type RekomendasiCreateManyDomainIsuInputEnvelope = {
-    data: RekomendasiCreateManyDomainIsuInput | RekomendasiCreateManyDomainIsuInput[]
-    skipDuplicates?: boolean
-  }
-
   export type KegiatanRapatCreateWithoutDomainIsuInput = {
     id?: string
     judul: string
     deskripsi: string
     tanggal: Date | string
     lokasi?: string | null
+    mode: $Enums.ModeRekomendasi
+    judulLaporan: string
+    rekomendasiItems: JsonNullValueInput | InputJsonValue
+    fingerprint: string
+    statusRekomendasi?: $Enums.StatusRekomendasi
     aiModel?: string | null
-    aiPromptHash?: string | null
     aiProcessedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    dibuatOleh: UserCreateNestedOneWithoutKegiatanRapatInput
-    rekomendasi?: RekomendasiCreateNestedManyWithoutKegiatanRapatInput
+    dibuatOleh: UserCreateNestedOneWithoutKegiatanRapatDibuatInput
+    diprosesOleh?: UserCreateNestedOneWithoutKegiatanRapatDiprosesInput
+    masukanRelasi?: KegiatanRapatMasukanCreateNestedManyWithoutKegiatanRapatInput
   }
 
   export type KegiatanRapatUncheckedCreateWithoutDomainIsuInput = {
@@ -17753,12 +16354,17 @@ export namespace Prisma {
     tanggal: Date | string
     lokasi?: string | null
     dibuatOlehId: string
+    mode: $Enums.ModeRekomendasi
+    judulLaporan: string
+    rekomendasiItems: JsonNullValueInput | InputJsonValue
+    fingerprint: string
+    statusRekomendasi?: $Enums.StatusRekomendasi
     aiModel?: string | null
-    aiPromptHash?: string | null
     aiProcessedAt?: Date | string | null
+    diprosesOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    rekomendasi?: RekomendasiUncheckedCreateNestedManyWithoutKegiatanRapatInput
+    masukanRelasi?: KegiatanRapatMasukanUncheckedCreateNestedManyWithoutKegiatanRapatInput
   }
 
   export type KegiatanRapatCreateOrConnectWithoutDomainIsuInput = {
@@ -17798,10 +16404,14 @@ export namespace Prisma {
     deskripsi?: StringFilter<"MasukanWarga"> | string
     lokasiRt?: StringFilter<"MasukanWarga"> | string
     lokasiRw?: StringFilter<"MasukanWarga"> | string
+    isLocked?: BoolFilter<"MasukanWarga"> | boolean
+    lockedAt?: DateTimeNullableFilter<"MasukanWarga"> | Date | string | null
     domainIsuId?: StringFilter<"MasukanWarga"> | string
     status?: EnumStatusMasukanFilter<"MasukanWarga"> | $Enums.StatusMasukan
     alasanPenolakan?: StringNullableFilter<"MasukanWarga"> | string | null
     diverifikasiOlehId?: StringNullableFilter<"MasukanWarga"> | string | null
+    isRelevant?: BoolFilter<"MasukanWarga"> | boolean
+    expiresAt?: DateTimeNullableFilter<"MasukanWarga"> | Date | string | null
     createdAt?: DateTimeFilter<"MasukanWarga"> | Date | string
     updatedAt?: DateTimeFilter<"MasukanWarga"> | Date | string
   }
@@ -17829,48 +16439,16 @@ export namespace Prisma {
     id?: StringFilter<"DataMaster"> | string
     domainIsuId?: StringFilter<"DataMaster"> | string
     namaAtribut?: StringFilter<"DataMaster"> | string
-    nilai?: StringFilter<"DataMaster"> | string
+    kritikalitas?: EnumNilaiKritikalitasFilter<"DataMaster"> | $Enums.NilaiKritikalitas
     jumlah?: IntNullableFilter<"DataMaster"> | number | null
-    lokasiRt?: IntNullableFilter<"DataMaster"> | number | null
-    lokasiRw?: IntNullableFilter<"DataMaster"> | number | null
+    lokasiRt?: StringNullableFilter<"DataMaster"> | string | null
+    lokasiRw?: StringNullableFilter<"DataMaster"> | string | null
+    isActive?: BoolFilter<"DataMaster"> | boolean
+    tahunData?: IntNullableFilter<"DataMaster"> | number | null
     sumberData?: StringNullableFilter<"DataMaster"> | string | null
     diprosesOlehId?: StringNullableFilter<"DataMaster"> | string | null
     createdAt?: DateTimeFilter<"DataMaster"> | Date | string
     updatedAt?: DateTimeFilter<"DataMaster"> | Date | string
-  }
-
-  export type RekomendasiUpsertWithWhereUniqueWithoutDomainIsuInput = {
-    where: RekomendasiWhereUniqueInput
-    update: XOR<RekomendasiUpdateWithoutDomainIsuInput, RekomendasiUncheckedUpdateWithoutDomainIsuInput>
-    create: XOR<RekomendasiCreateWithoutDomainIsuInput, RekomendasiUncheckedCreateWithoutDomainIsuInput>
-  }
-
-  export type RekomendasiUpdateWithWhereUniqueWithoutDomainIsuInput = {
-    where: RekomendasiWhereUniqueInput
-    data: XOR<RekomendasiUpdateWithoutDomainIsuInput, RekomendasiUncheckedUpdateWithoutDomainIsuInput>
-  }
-
-  export type RekomendasiUpdateManyWithWhereWithoutDomainIsuInput = {
-    where: RekomendasiScalarWhereInput
-    data: XOR<RekomendasiUpdateManyMutationInput, RekomendasiUncheckedUpdateManyWithoutDomainIsuInput>
-  }
-
-  export type RekomendasiScalarWhereInput = {
-    AND?: RekomendasiScalarWhereInput | RekomendasiScalarWhereInput[]
-    OR?: RekomendasiScalarWhereInput[]
-    NOT?: RekomendasiScalarWhereInput | RekomendasiScalarWhereInput[]
-    id?: StringFilter<"Rekomendasi"> | string
-    kegiatanRapatId?: StringFilter<"Rekomendasi"> | string
-    domainIsuId?: StringFilter<"Rekomendasi"> | string
-    judul?: StringFilter<"Rekomendasi"> | string
-    ringkasan?: StringFilter<"Rekomendasi"> | string
-    deskripsi?: StringFilter<"Rekomendasi"> | string
-    skorPrioritas?: FloatFilter<"Rekomendasi"> | number
-    status?: EnumStatusRekomendasiFilter<"Rekomendasi"> | $Enums.StatusRekomendasi
-    laporanLengkap?: JsonFilter<"Rekomendasi">
-    diprosesOlehId?: StringNullableFilter<"Rekomendasi"> | string | null
-    createdAt?: DateTimeFilter<"Rekomendasi"> | Date | string
-    updatedAt?: DateTimeFilter<"Rekomendasi"> | Date | string
   }
 
   export type KegiatanRapatUpsertWithWhereUniqueWithoutDomainIsuInput = {
@@ -17898,11 +16476,16 @@ export namespace Prisma {
     deskripsi?: StringFilter<"KegiatanRapat"> | string
     tanggal?: DateTimeFilter<"KegiatanRapat"> | Date | string
     lokasi?: StringNullableFilter<"KegiatanRapat"> | string | null
-    domainIsuId?: StringNullableFilter<"KegiatanRapat"> | string | null
+    domainIsuId?: StringFilter<"KegiatanRapat"> | string
     dibuatOlehId?: StringFilter<"KegiatanRapat"> | string
+    mode?: EnumModeRekomendasiFilter<"KegiatanRapat"> | $Enums.ModeRekomendasi
+    judulLaporan?: StringFilter<"KegiatanRapat"> | string
+    rekomendasiItems?: JsonFilter<"KegiatanRapat">
+    fingerprint?: StringFilter<"KegiatanRapat"> | string
+    statusRekomendasi?: EnumStatusRekomendasiFilter<"KegiatanRapat"> | $Enums.StatusRekomendasi
     aiModel?: StringNullableFilter<"KegiatanRapat"> | string | null
-    aiPromptHash?: StringNullableFilter<"KegiatanRapat"> | string | null
     aiProcessedAt?: DateTimeNullableFilter<"KegiatanRapat"> | Date | string | null
+    diprosesOlehId?: StringNullableFilter<"KegiatanRapat"> | string | null
     createdAt?: DateTimeFilter<"KegiatanRapat"> | Date | string
     updatedAt?: DateTimeFilter<"KegiatanRapat"> | Date | string
   }
@@ -17915,12 +16498,16 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
+    isLocked?: boolean
+    lockedAt?: Date | string | null
     status?: $Enums.StatusMasukan
     alasanPenolakan?: string | null
+    isRelevant?: boolean
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     domainIsu: DomainIsuCreateNestedOneWithoutMasukanInput
-    rekomendasiLinks?: RekomendasiMasukanCreateNestedManyWithoutMasukanInput
+    relasiRapat?: KegiatanRapatMasukanCreateNestedManyWithoutMasukanInput
   }
 
   export type MasukanWargaUncheckedCreateWithoutDiverifikasiOlehInput = {
@@ -17931,12 +16518,16 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
+    isLocked?: boolean
+    lockedAt?: Date | string | null
     domainIsuId: string
     status?: $Enums.StatusMasukan
     alasanPenolakan?: string | null
+    isRelevant?: boolean
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    rekomendasiLinks?: RekomendasiMasukanUncheckedCreateNestedManyWithoutMasukanInput
+    relasiRapat?: KegiatanRapatMasukanUncheckedCreateNestedManyWithoutMasukanInput
   }
 
   export type MasukanWargaCreateOrConnectWithoutDiverifikasiOlehInput = {
@@ -17949,43 +16540,143 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type RekomendasiCreateWithoutDiprosesOlehInput = {
+  export type KegiatanRapatCreateWithoutDiprosesOlehInput = {
     id?: string
     judul: string
-    ringkasan: string
     deskripsi: string
-    skorPrioritas: number
-    status?: $Enums.StatusRekomendasi
-    laporanLengkap: JsonNullValueInput | InputJsonValue
+    tanggal: Date | string
+    lokasi?: string | null
+    mode: $Enums.ModeRekomendasi
+    judulLaporan: string
+    rekomendasiItems: JsonNullValueInput | InputJsonValue
+    fingerprint: string
+    statusRekomendasi?: $Enums.StatusRekomendasi
+    aiModel?: string | null
+    aiProcessedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    kegiatanRapat: KegiatanRapatCreateNestedOneWithoutRekomendasiInput
-    domainIsu: DomainIsuCreateNestedOneWithoutRekomendasiInput
-    masukanLinks?: RekomendasiMasukanCreateNestedManyWithoutRekomendasiInput
+    domainIsu: DomainIsuCreateNestedOneWithoutKegiatanRapatInput
+    dibuatOleh: UserCreateNestedOneWithoutKegiatanRapatDibuatInput
+    masukanRelasi?: KegiatanRapatMasukanCreateNestedManyWithoutKegiatanRapatInput
   }
 
-  export type RekomendasiUncheckedCreateWithoutDiprosesOlehInput = {
+  export type KegiatanRapatUncheckedCreateWithoutDiprosesOlehInput = {
     id?: string
-    kegiatanRapatId: string
+    judul: string
+    deskripsi: string
+    tanggal: Date | string
+    lokasi?: string | null
     domainIsuId: string
-    judul: string
-    ringkasan: string
-    deskripsi: string
-    skorPrioritas: number
-    status?: $Enums.StatusRekomendasi
-    laporanLengkap: JsonNullValueInput | InputJsonValue
+    dibuatOlehId: string
+    mode: $Enums.ModeRekomendasi
+    judulLaporan: string
+    rekomendasiItems: JsonNullValueInput | InputJsonValue
+    fingerprint: string
+    statusRekomendasi?: $Enums.StatusRekomendasi
+    aiModel?: string | null
+    aiProcessedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    masukanLinks?: RekomendasiMasukanUncheckedCreateNestedManyWithoutRekomendasiInput
+    masukanRelasi?: KegiatanRapatMasukanUncheckedCreateNestedManyWithoutKegiatanRapatInput
   }
 
-  export type RekomendasiCreateOrConnectWithoutDiprosesOlehInput = {
-    where: RekomendasiWhereUniqueInput
-    create: XOR<RekomendasiCreateWithoutDiprosesOlehInput, RekomendasiUncheckedCreateWithoutDiprosesOlehInput>
+  export type KegiatanRapatCreateOrConnectWithoutDiprosesOlehInput = {
+    where: KegiatanRapatWhereUniqueInput
+    create: XOR<KegiatanRapatCreateWithoutDiprosesOlehInput, KegiatanRapatUncheckedCreateWithoutDiprosesOlehInput>
   }
 
-  export type RekomendasiCreateManyDiprosesOlehInputEnvelope = {
-    data: RekomendasiCreateManyDiprosesOlehInput | RekomendasiCreateManyDiprosesOlehInput[]
+  export type KegiatanRapatCreateManyDiprosesOlehInputEnvelope = {
+    data: KegiatanRapatCreateManyDiprosesOlehInput | KegiatanRapatCreateManyDiprosesOlehInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type KegiatanRapatCreateWithoutDibuatOlehInput = {
+    id?: string
+    judul: string
+    deskripsi: string
+    tanggal: Date | string
+    lokasi?: string | null
+    mode: $Enums.ModeRekomendasi
+    judulLaporan: string
+    rekomendasiItems: JsonNullValueInput | InputJsonValue
+    fingerprint: string
+    statusRekomendasi?: $Enums.StatusRekomendasi
+    aiModel?: string | null
+    aiProcessedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    domainIsu: DomainIsuCreateNestedOneWithoutKegiatanRapatInput
+    diprosesOleh?: UserCreateNestedOneWithoutKegiatanRapatDiprosesInput
+    masukanRelasi?: KegiatanRapatMasukanCreateNestedManyWithoutKegiatanRapatInput
+  }
+
+  export type KegiatanRapatUncheckedCreateWithoutDibuatOlehInput = {
+    id?: string
+    judul: string
+    deskripsi: string
+    tanggal: Date | string
+    lokasi?: string | null
+    domainIsuId: string
+    mode: $Enums.ModeRekomendasi
+    judulLaporan: string
+    rekomendasiItems: JsonNullValueInput | InputJsonValue
+    fingerprint: string
+    statusRekomendasi?: $Enums.StatusRekomendasi
+    aiModel?: string | null
+    aiProcessedAt?: Date | string | null
+    diprosesOlehId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    masukanRelasi?: KegiatanRapatMasukanUncheckedCreateNestedManyWithoutKegiatanRapatInput
+  }
+
+  export type KegiatanRapatCreateOrConnectWithoutDibuatOlehInput = {
+    where: KegiatanRapatWhereUniqueInput
+    create: XOR<KegiatanRapatCreateWithoutDibuatOlehInput, KegiatanRapatUncheckedCreateWithoutDibuatOlehInput>
+  }
+
+  export type KegiatanRapatCreateManyDibuatOlehInputEnvelope = {
+    data: KegiatanRapatCreateManyDibuatOlehInput | KegiatanRapatCreateManyDibuatOlehInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DataMasterCreateWithoutDiprosesOlehInput = {
+    id?: string
+    namaAtribut: string
+    kritikalitas: $Enums.NilaiKritikalitas
+    jumlah?: number | null
+    lokasiRt?: string | null
+    lokasiRw?: string | null
+    isActive?: boolean
+    tahunData?: number | null
+    sumberData?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    domainIsu: DomainIsuCreateNestedOneWithoutDataMasterInput
+  }
+
+  export type DataMasterUncheckedCreateWithoutDiprosesOlehInput = {
+    id?: string
+    domainIsuId: string
+    namaAtribut: string
+    kritikalitas: $Enums.NilaiKritikalitas
+    jumlah?: number | null
+    lokasiRt?: string | null
+    lokasiRw?: string | null
+    isActive?: boolean
+    tahunData?: number | null
+    sumberData?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DataMasterCreateOrConnectWithoutDiprosesOlehInput = {
+    where: DataMasterWhereUniqueInput
+    create: XOR<DataMasterCreateWithoutDiprosesOlehInput, DataMasterUncheckedCreateWithoutDiprosesOlehInput>
+  }
+
+  export type DataMasterCreateManyDiprosesOlehInputEnvelope = {
+    data: DataMasterCreateManyDiprosesOlehInput | DataMasterCreateManyDiprosesOlehInput[]
     skipDuplicates?: boolean
   }
 
@@ -18067,82 +16758,6 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type KegiatanRapatCreateWithoutDibuatOlehInput = {
-    id?: string
-    judul: string
-    deskripsi: string
-    tanggal: Date | string
-    lokasi?: string | null
-    aiModel?: string | null
-    aiPromptHash?: string | null
-    aiProcessedAt?: Date | string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    domainIsu?: DomainIsuCreateNestedOneWithoutKegiatanRapatInput
-    rekomendasi?: RekomendasiCreateNestedManyWithoutKegiatanRapatInput
-  }
-
-  export type KegiatanRapatUncheckedCreateWithoutDibuatOlehInput = {
-    id?: string
-    judul: string
-    deskripsi: string
-    tanggal: Date | string
-    lokasi?: string | null
-    domainIsuId?: string | null
-    aiModel?: string | null
-    aiPromptHash?: string | null
-    aiProcessedAt?: Date | string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    rekomendasi?: RekomendasiUncheckedCreateNestedManyWithoutKegiatanRapatInput
-  }
-
-  export type KegiatanRapatCreateOrConnectWithoutDibuatOlehInput = {
-    where: KegiatanRapatWhereUniqueInput
-    create: XOR<KegiatanRapatCreateWithoutDibuatOlehInput, KegiatanRapatUncheckedCreateWithoutDibuatOlehInput>
-  }
-
-  export type KegiatanRapatCreateManyDibuatOlehInputEnvelope = {
-    data: KegiatanRapatCreateManyDibuatOlehInput | KegiatanRapatCreateManyDibuatOlehInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type DataMasterCreateWithoutDiprosesOlehInput = {
-    id?: string
-    namaAtribut: string
-    nilai: string
-    jumlah?: number | null
-    lokasiRt?: number | null
-    lokasiRw?: number | null
-    sumberData?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    domainIsu: DomainIsuCreateNestedOneWithoutDataMasterInput
-  }
-
-  export type DataMasterUncheckedCreateWithoutDiprosesOlehInput = {
-    id?: string
-    domainIsuId: string
-    namaAtribut: string
-    nilai: string
-    jumlah?: number | null
-    lokasiRt?: number | null
-    lokasiRw?: number | null
-    sumberData?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type DataMasterCreateOrConnectWithoutDiprosesOlehInput = {
-    where: DataMasterWhereUniqueInput
-    create: XOR<DataMasterCreateWithoutDiprosesOlehInput, DataMasterUncheckedCreateWithoutDiprosesOlehInput>
-  }
-
-  export type DataMasterCreateManyDiprosesOlehInputEnvelope = {
-    data: DataMasterCreateManyDiprosesOlehInput | DataMasterCreateManyDiprosesOlehInput[]
-    skipDuplicates?: boolean
-  }
-
   export type MasukanWargaUpsertWithWhereUniqueWithoutDiverifikasiOlehInput = {
     where: MasukanWargaWhereUniqueInput
     update: XOR<MasukanWargaUpdateWithoutDiverifikasiOlehInput, MasukanWargaUncheckedUpdateWithoutDiverifikasiOlehInput>
@@ -18159,20 +16774,52 @@ export namespace Prisma {
     data: XOR<MasukanWargaUpdateManyMutationInput, MasukanWargaUncheckedUpdateManyWithoutDiverifikasiOlehInput>
   }
 
-  export type RekomendasiUpsertWithWhereUniqueWithoutDiprosesOlehInput = {
-    where: RekomendasiWhereUniqueInput
-    update: XOR<RekomendasiUpdateWithoutDiprosesOlehInput, RekomendasiUncheckedUpdateWithoutDiprosesOlehInput>
-    create: XOR<RekomendasiCreateWithoutDiprosesOlehInput, RekomendasiUncheckedCreateWithoutDiprosesOlehInput>
+  export type KegiatanRapatUpsertWithWhereUniqueWithoutDiprosesOlehInput = {
+    where: KegiatanRapatWhereUniqueInput
+    update: XOR<KegiatanRapatUpdateWithoutDiprosesOlehInput, KegiatanRapatUncheckedUpdateWithoutDiprosesOlehInput>
+    create: XOR<KegiatanRapatCreateWithoutDiprosesOlehInput, KegiatanRapatUncheckedCreateWithoutDiprosesOlehInput>
   }
 
-  export type RekomendasiUpdateWithWhereUniqueWithoutDiprosesOlehInput = {
-    where: RekomendasiWhereUniqueInput
-    data: XOR<RekomendasiUpdateWithoutDiprosesOlehInput, RekomendasiUncheckedUpdateWithoutDiprosesOlehInput>
+  export type KegiatanRapatUpdateWithWhereUniqueWithoutDiprosesOlehInput = {
+    where: KegiatanRapatWhereUniqueInput
+    data: XOR<KegiatanRapatUpdateWithoutDiprosesOlehInput, KegiatanRapatUncheckedUpdateWithoutDiprosesOlehInput>
   }
 
-  export type RekomendasiUpdateManyWithWhereWithoutDiprosesOlehInput = {
-    where: RekomendasiScalarWhereInput
-    data: XOR<RekomendasiUpdateManyMutationInput, RekomendasiUncheckedUpdateManyWithoutDiprosesOlehInput>
+  export type KegiatanRapatUpdateManyWithWhereWithoutDiprosesOlehInput = {
+    where: KegiatanRapatScalarWhereInput
+    data: XOR<KegiatanRapatUpdateManyMutationInput, KegiatanRapatUncheckedUpdateManyWithoutDiprosesOlehInput>
+  }
+
+  export type KegiatanRapatUpsertWithWhereUniqueWithoutDibuatOlehInput = {
+    where: KegiatanRapatWhereUniqueInput
+    update: XOR<KegiatanRapatUpdateWithoutDibuatOlehInput, KegiatanRapatUncheckedUpdateWithoutDibuatOlehInput>
+    create: XOR<KegiatanRapatCreateWithoutDibuatOlehInput, KegiatanRapatUncheckedCreateWithoutDibuatOlehInput>
+  }
+
+  export type KegiatanRapatUpdateWithWhereUniqueWithoutDibuatOlehInput = {
+    where: KegiatanRapatWhereUniqueInput
+    data: XOR<KegiatanRapatUpdateWithoutDibuatOlehInput, KegiatanRapatUncheckedUpdateWithoutDibuatOlehInput>
+  }
+
+  export type KegiatanRapatUpdateManyWithWhereWithoutDibuatOlehInput = {
+    where: KegiatanRapatScalarWhereInput
+    data: XOR<KegiatanRapatUpdateManyMutationInput, KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehInput>
+  }
+
+  export type DataMasterUpsertWithWhereUniqueWithoutDiprosesOlehInput = {
+    where: DataMasterWhereUniqueInput
+    update: XOR<DataMasterUpdateWithoutDiprosesOlehInput, DataMasterUncheckedUpdateWithoutDiprosesOlehInput>
+    create: XOR<DataMasterCreateWithoutDiprosesOlehInput, DataMasterUncheckedCreateWithoutDiprosesOlehInput>
+  }
+
+  export type DataMasterUpdateWithWhereUniqueWithoutDiprosesOlehInput = {
+    where: DataMasterWhereUniqueInput
+    data: XOR<DataMasterUpdateWithoutDiprosesOlehInput, DataMasterUncheckedUpdateWithoutDiprosesOlehInput>
+  }
+
+  export type DataMasterUpdateManyWithWhereWithoutDiprosesOlehInput = {
+    where: DataMasterScalarWhereInput
+    data: XOR<DataMasterUpdateManyMutationInput, DataMasterUncheckedUpdateManyWithoutDiprosesOlehInput>
   }
 
   export type SessionUpsertWithWhereUniqueWithoutUserInput = {
@@ -18244,38 +16891,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Account"> | Date | string
   }
 
-  export type KegiatanRapatUpsertWithWhereUniqueWithoutDibuatOlehInput = {
-    where: KegiatanRapatWhereUniqueInput
-    update: XOR<KegiatanRapatUpdateWithoutDibuatOlehInput, KegiatanRapatUncheckedUpdateWithoutDibuatOlehInput>
-    create: XOR<KegiatanRapatCreateWithoutDibuatOlehInput, KegiatanRapatUncheckedCreateWithoutDibuatOlehInput>
-  }
-
-  export type KegiatanRapatUpdateWithWhereUniqueWithoutDibuatOlehInput = {
-    where: KegiatanRapatWhereUniqueInput
-    data: XOR<KegiatanRapatUpdateWithoutDibuatOlehInput, KegiatanRapatUncheckedUpdateWithoutDibuatOlehInput>
-  }
-
-  export type KegiatanRapatUpdateManyWithWhereWithoutDibuatOlehInput = {
-    where: KegiatanRapatScalarWhereInput
-    data: XOR<KegiatanRapatUpdateManyMutationInput, KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehInput>
-  }
-
-  export type DataMasterUpsertWithWhereUniqueWithoutDiprosesOlehInput = {
-    where: DataMasterWhereUniqueInput
-    update: XOR<DataMasterUpdateWithoutDiprosesOlehInput, DataMasterUncheckedUpdateWithoutDiprosesOlehInput>
-    create: XOR<DataMasterCreateWithoutDiprosesOlehInput, DataMasterUncheckedCreateWithoutDiprosesOlehInput>
-  }
-
-  export type DataMasterUpdateWithWhereUniqueWithoutDiprosesOlehInput = {
-    where: DataMasterWhereUniqueInput
-    data: XOR<DataMasterUpdateWithoutDiprosesOlehInput, DataMasterUncheckedUpdateWithoutDiprosesOlehInput>
-  }
-
-  export type DataMasterUpdateManyWithWhereWithoutDiprosesOlehInput = {
-    where: DataMasterScalarWhereInput
-    data: XOR<DataMasterUpdateManyMutationInput, DataMasterUncheckedUpdateManyWithoutDiprosesOlehInput>
-  }
-
   export type DomainIsuCreateWithoutMasukanInput = {
     id?: string
     code: string
@@ -18284,7 +16899,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     dataMaster?: DataMasterCreateNestedManyWithoutDomainIsuInput
-    rekomendasi?: RekomendasiCreateNestedManyWithoutDomainIsuInput
     kegiatanRapat?: KegiatanRapatCreateNestedManyWithoutDomainIsuInput
   }
 
@@ -18296,7 +16910,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     dataMaster?: DataMasterUncheckedCreateNestedManyWithoutDomainIsuInput
-    rekomendasi?: RekomendasiUncheckedCreateNestedManyWithoutDomainIsuInput
     kegiatanRapat?: KegiatanRapatUncheckedCreateNestedManyWithoutDomainIsuInput
   }
 
@@ -18316,11 +16929,11 @@ export namespace Prisma {
     updatedAt?: Date | string
     emailVerified?: boolean
     image?: string | null
-    rekomendasiDiproses?: RekomendasiCreateNestedManyWithoutDiprosesOlehInput
+    kegiatanRapatDiproses?: KegiatanRapatCreateNestedManyWithoutDiprosesOlehInput
+    kegiatanRapatDibuat?: KegiatanRapatCreateNestedManyWithoutDibuatOlehInput
+    dataMasterDibuat?: DataMasterCreateNestedManyWithoutDiprosesOlehInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
-    kegiatanRapat?: KegiatanRapatCreateNestedManyWithoutDibuatOlehInput
-    dataMaster?: DataMasterCreateNestedManyWithoutDiprosesOlehInput
   }
 
   export type UserUncheckedCreateWithoutMasukanVerifikasiInput = {
@@ -18334,11 +16947,11 @@ export namespace Prisma {
     updatedAt?: Date | string
     emailVerified?: boolean
     image?: string | null
-    rekomendasiDiproses?: RekomendasiUncheckedCreateNestedManyWithoutDiprosesOlehInput
+    kegiatanRapatDiproses?: KegiatanRapatUncheckedCreateNestedManyWithoutDiprosesOlehInput
+    kegiatanRapatDibuat?: KegiatanRapatUncheckedCreateNestedManyWithoutDibuatOlehInput
+    dataMasterDibuat?: DataMasterUncheckedCreateNestedManyWithoutDiprosesOlehInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
-    kegiatanRapat?: KegiatanRapatUncheckedCreateNestedManyWithoutDibuatOlehInput
-    dataMaster?: DataMasterUncheckedCreateNestedManyWithoutDiprosesOlehInput
   }
 
   export type UserCreateOrConnectWithoutMasukanVerifikasiInput = {
@@ -18346,21 +16959,25 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutMasukanVerifikasiInput, UserUncheckedCreateWithoutMasukanVerifikasiInput>
   }
 
-  export type RekomendasiMasukanCreateWithoutMasukanInput = {
-    rekomendasi: RekomendasiCreateNestedOneWithoutMasukanLinksInput
+  export type KegiatanRapatMasukanCreateWithoutMasukanInput = {
+    id?: string
+    createdAt?: Date | string
+    kegiatanRapat: KegiatanRapatCreateNestedOneWithoutMasukanRelasiInput
   }
 
-  export type RekomendasiMasukanUncheckedCreateWithoutMasukanInput = {
-    rekomendasiId: string
+  export type KegiatanRapatMasukanUncheckedCreateWithoutMasukanInput = {
+    id?: string
+    kegiatanRapatId: string
+    createdAt?: Date | string
   }
 
-  export type RekomendasiMasukanCreateOrConnectWithoutMasukanInput = {
-    where: RekomendasiMasukanWhereUniqueInput
-    create: XOR<RekomendasiMasukanCreateWithoutMasukanInput, RekomendasiMasukanUncheckedCreateWithoutMasukanInput>
+  export type KegiatanRapatMasukanCreateOrConnectWithoutMasukanInput = {
+    where: KegiatanRapatMasukanWhereUniqueInput
+    create: XOR<KegiatanRapatMasukanCreateWithoutMasukanInput, KegiatanRapatMasukanUncheckedCreateWithoutMasukanInput>
   }
 
-  export type RekomendasiMasukanCreateManyMasukanInputEnvelope = {
-    data: RekomendasiMasukanCreateManyMasukanInput | RekomendasiMasukanCreateManyMasukanInput[]
+  export type KegiatanRapatMasukanCreateManyMasukanInputEnvelope = {
+    data: KegiatanRapatMasukanCreateManyMasukanInput | KegiatanRapatMasukanCreateManyMasukanInput[]
     skipDuplicates?: boolean
   }
 
@@ -18383,7 +17000,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     dataMaster?: DataMasterUpdateManyWithoutDomainIsuNestedInput
-    rekomendasi?: RekomendasiUpdateManyWithoutDomainIsuNestedInput
     kegiatanRapat?: KegiatanRapatUpdateManyWithoutDomainIsuNestedInput
   }
 
@@ -18395,7 +17011,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     dataMaster?: DataMasterUncheckedUpdateManyWithoutDomainIsuNestedInput
-    rekomendasi?: RekomendasiUncheckedUpdateManyWithoutDomainIsuNestedInput
     kegiatanRapat?: KegiatanRapatUncheckedUpdateManyWithoutDomainIsuNestedInput
   }
 
@@ -18421,11 +17036,11 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    rekomendasiDiproses?: RekomendasiUpdateManyWithoutDiprosesOlehNestedInput
+    kegiatanRapatDiproses?: KegiatanRapatUpdateManyWithoutDiprosesOlehNestedInput
+    kegiatanRapatDibuat?: KegiatanRapatUpdateManyWithoutDibuatOlehNestedInput
+    dataMasterDibuat?: DataMasterUpdateManyWithoutDiprosesOlehNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
-    kegiatanRapat?: KegiatanRapatUpdateManyWithoutDibuatOlehNestedInput
-    dataMaster?: DataMasterUpdateManyWithoutDiprosesOlehNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMasukanVerifikasiInput = {
@@ -18439,35 +17054,37 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    rekomendasiDiproses?: RekomendasiUncheckedUpdateManyWithoutDiprosesOlehNestedInput
+    kegiatanRapatDiproses?: KegiatanRapatUncheckedUpdateManyWithoutDiprosesOlehNestedInput
+    kegiatanRapatDibuat?: KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehNestedInput
+    dataMasterDibuat?: DataMasterUncheckedUpdateManyWithoutDiprosesOlehNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
-    kegiatanRapat?: KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehNestedInput
-    dataMaster?: DataMasterUncheckedUpdateManyWithoutDiprosesOlehNestedInput
   }
 
-  export type RekomendasiMasukanUpsertWithWhereUniqueWithoutMasukanInput = {
-    where: RekomendasiMasukanWhereUniqueInput
-    update: XOR<RekomendasiMasukanUpdateWithoutMasukanInput, RekomendasiMasukanUncheckedUpdateWithoutMasukanInput>
-    create: XOR<RekomendasiMasukanCreateWithoutMasukanInput, RekomendasiMasukanUncheckedCreateWithoutMasukanInput>
+  export type KegiatanRapatMasukanUpsertWithWhereUniqueWithoutMasukanInput = {
+    where: KegiatanRapatMasukanWhereUniqueInput
+    update: XOR<KegiatanRapatMasukanUpdateWithoutMasukanInput, KegiatanRapatMasukanUncheckedUpdateWithoutMasukanInput>
+    create: XOR<KegiatanRapatMasukanCreateWithoutMasukanInput, KegiatanRapatMasukanUncheckedCreateWithoutMasukanInput>
   }
 
-  export type RekomendasiMasukanUpdateWithWhereUniqueWithoutMasukanInput = {
-    where: RekomendasiMasukanWhereUniqueInput
-    data: XOR<RekomendasiMasukanUpdateWithoutMasukanInput, RekomendasiMasukanUncheckedUpdateWithoutMasukanInput>
+  export type KegiatanRapatMasukanUpdateWithWhereUniqueWithoutMasukanInput = {
+    where: KegiatanRapatMasukanWhereUniqueInput
+    data: XOR<KegiatanRapatMasukanUpdateWithoutMasukanInput, KegiatanRapatMasukanUncheckedUpdateWithoutMasukanInput>
   }
 
-  export type RekomendasiMasukanUpdateManyWithWhereWithoutMasukanInput = {
-    where: RekomendasiMasukanScalarWhereInput
-    data: XOR<RekomendasiMasukanUpdateManyMutationInput, RekomendasiMasukanUncheckedUpdateManyWithoutMasukanInput>
+  export type KegiatanRapatMasukanUpdateManyWithWhereWithoutMasukanInput = {
+    where: KegiatanRapatMasukanScalarWhereInput
+    data: XOR<KegiatanRapatMasukanUpdateManyMutationInput, KegiatanRapatMasukanUncheckedUpdateManyWithoutMasukanInput>
   }
 
-  export type RekomendasiMasukanScalarWhereInput = {
-    AND?: RekomendasiMasukanScalarWhereInput | RekomendasiMasukanScalarWhereInput[]
-    OR?: RekomendasiMasukanScalarWhereInput[]
-    NOT?: RekomendasiMasukanScalarWhereInput | RekomendasiMasukanScalarWhereInput[]
-    rekomendasiId?: StringFilter<"RekomendasiMasukan"> | string
-    masukanId?: StringFilter<"RekomendasiMasukan"> | string
+  export type KegiatanRapatMasukanScalarWhereInput = {
+    AND?: KegiatanRapatMasukanScalarWhereInput | KegiatanRapatMasukanScalarWhereInput[]
+    OR?: KegiatanRapatMasukanScalarWhereInput[]
+    NOT?: KegiatanRapatMasukanScalarWhereInput | KegiatanRapatMasukanScalarWhereInput[]
+    id?: StringFilter<"KegiatanRapatMasukan"> | string
+    kegiatanRapatId?: StringFilter<"KegiatanRapatMasukan"> | string
+    masukanId?: StringFilter<"KegiatanRapatMasukan"> | string
+    createdAt?: DateTimeFilter<"KegiatanRapatMasukan"> | Date | string
   }
 
   export type DomainIsuCreateWithoutDataMasterInput = {
@@ -18478,7 +17095,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     masukan?: MasukanWargaCreateNestedManyWithoutDomainIsuInput
-    rekomendasi?: RekomendasiCreateNestedManyWithoutDomainIsuInput
     kegiatanRapat?: KegiatanRapatCreateNestedManyWithoutDomainIsuInput
   }
 
@@ -18490,7 +17106,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     masukan?: MasukanWargaUncheckedCreateNestedManyWithoutDomainIsuInput
-    rekomendasi?: RekomendasiUncheckedCreateNestedManyWithoutDomainIsuInput
     kegiatanRapat?: KegiatanRapatUncheckedCreateNestedManyWithoutDomainIsuInput
   }
 
@@ -18499,7 +17114,7 @@ export namespace Prisma {
     create: XOR<DomainIsuCreateWithoutDataMasterInput, DomainIsuUncheckedCreateWithoutDataMasterInput>
   }
 
-  export type UserCreateWithoutDataMasterInput = {
+  export type UserCreateWithoutDataMasterDibuatInput = {
     id?: string
     name: string
     email: string
@@ -18511,13 +17126,13 @@ export namespace Prisma {
     emailVerified?: boolean
     image?: string | null
     masukanVerifikasi?: MasukanWargaCreateNestedManyWithoutDiverifikasiOlehInput
-    rekomendasiDiproses?: RekomendasiCreateNestedManyWithoutDiprosesOlehInput
+    kegiatanRapatDiproses?: KegiatanRapatCreateNestedManyWithoutDiprosesOlehInput
+    kegiatanRapatDibuat?: KegiatanRapatCreateNestedManyWithoutDibuatOlehInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
-    kegiatanRapat?: KegiatanRapatCreateNestedManyWithoutDibuatOlehInput
   }
 
-  export type UserUncheckedCreateWithoutDataMasterInput = {
+  export type UserUncheckedCreateWithoutDataMasterDibuatInput = {
     id?: string
     name: string
     email: string
@@ -18529,15 +17144,15 @@ export namespace Prisma {
     emailVerified?: boolean
     image?: string | null
     masukanVerifikasi?: MasukanWargaUncheckedCreateNestedManyWithoutDiverifikasiOlehInput
-    rekomendasiDiproses?: RekomendasiUncheckedCreateNestedManyWithoutDiprosesOlehInput
+    kegiatanRapatDiproses?: KegiatanRapatUncheckedCreateNestedManyWithoutDiprosesOlehInput
+    kegiatanRapatDibuat?: KegiatanRapatUncheckedCreateNestedManyWithoutDibuatOlehInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
-    kegiatanRapat?: KegiatanRapatUncheckedCreateNestedManyWithoutDibuatOlehInput
   }
 
-  export type UserCreateOrConnectWithoutDataMasterInput = {
+  export type UserCreateOrConnectWithoutDataMasterDibuatInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutDataMasterInput, UserUncheckedCreateWithoutDataMasterInput>
+    create: XOR<UserCreateWithoutDataMasterDibuatInput, UserUncheckedCreateWithoutDataMasterDibuatInput>
   }
 
   export type DomainIsuUpsertWithoutDataMasterInput = {
@@ -18559,7 +17174,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     masukan?: MasukanWargaUpdateManyWithoutDomainIsuNestedInput
-    rekomendasi?: RekomendasiUpdateManyWithoutDomainIsuNestedInput
     kegiatanRapat?: KegiatanRapatUpdateManyWithoutDomainIsuNestedInput
   }
 
@@ -18571,22 +17185,21 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     masukan?: MasukanWargaUncheckedUpdateManyWithoutDomainIsuNestedInput
-    rekomendasi?: RekomendasiUncheckedUpdateManyWithoutDomainIsuNestedInput
     kegiatanRapat?: KegiatanRapatUncheckedUpdateManyWithoutDomainIsuNestedInput
   }
 
-  export type UserUpsertWithoutDataMasterInput = {
-    update: XOR<UserUpdateWithoutDataMasterInput, UserUncheckedUpdateWithoutDataMasterInput>
-    create: XOR<UserCreateWithoutDataMasterInput, UserUncheckedCreateWithoutDataMasterInput>
+  export type UserUpsertWithoutDataMasterDibuatInput = {
+    update: XOR<UserUpdateWithoutDataMasterDibuatInput, UserUncheckedUpdateWithoutDataMasterDibuatInput>
+    create: XOR<UserCreateWithoutDataMasterDibuatInput, UserUncheckedCreateWithoutDataMasterDibuatInput>
     where?: UserWhereInput
   }
 
-  export type UserUpdateToOneWithWhereWithoutDataMasterInput = {
+  export type UserUpdateToOneWithWhereWithoutDataMasterDibuatInput = {
     where?: UserWhereInput
-    data: XOR<UserUpdateWithoutDataMasterInput, UserUncheckedUpdateWithoutDataMasterInput>
+    data: XOR<UserUpdateWithoutDataMasterDibuatInput, UserUncheckedUpdateWithoutDataMasterDibuatInput>
   }
 
-  export type UserUpdateWithoutDataMasterInput = {
+  export type UserUpdateWithoutDataMasterDibuatInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -18598,13 +17211,13 @@ export namespace Prisma {
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
     masukanVerifikasi?: MasukanWargaUpdateManyWithoutDiverifikasiOlehNestedInput
-    rekomendasiDiproses?: RekomendasiUpdateManyWithoutDiprosesOlehNestedInput
+    kegiatanRapatDiproses?: KegiatanRapatUpdateManyWithoutDiprosesOlehNestedInput
+    kegiatanRapatDibuat?: KegiatanRapatUpdateManyWithoutDibuatOlehNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
-    kegiatanRapat?: KegiatanRapatUpdateManyWithoutDibuatOlehNestedInput
   }
 
-  export type UserUncheckedUpdateWithoutDataMasterInput = {
+  export type UserUncheckedUpdateWithoutDataMasterDibuatInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -18616,48 +17229,13 @@ export namespace Prisma {
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
     masukanVerifikasi?: MasukanWargaUncheckedUpdateManyWithoutDiverifikasiOlehNestedInput
-    rekomendasiDiproses?: RekomendasiUncheckedUpdateManyWithoutDiprosesOlehNestedInput
+    kegiatanRapatDiproses?: KegiatanRapatUncheckedUpdateManyWithoutDiprosesOlehNestedInput
+    kegiatanRapatDibuat?: KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
-    kegiatanRapat?: KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehNestedInput
   }
 
-  export type KegiatanRapatCreateWithoutRekomendasiInput = {
-    id?: string
-    judul: string
-    deskripsi: string
-    tanggal: Date | string
-    lokasi?: string | null
-    aiModel?: string | null
-    aiPromptHash?: string | null
-    aiProcessedAt?: Date | string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    domainIsu?: DomainIsuCreateNestedOneWithoutKegiatanRapatInput
-    dibuatOleh: UserCreateNestedOneWithoutKegiatanRapatInput
-  }
-
-  export type KegiatanRapatUncheckedCreateWithoutRekomendasiInput = {
-    id?: string
-    judul: string
-    deskripsi: string
-    tanggal: Date | string
-    lokasi?: string | null
-    domainIsuId?: string | null
-    dibuatOlehId: string
-    aiModel?: string | null
-    aiPromptHash?: string | null
-    aiProcessedAt?: Date | string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type KegiatanRapatCreateOrConnectWithoutRekomendasiInput = {
-    where: KegiatanRapatWhereUniqueInput
-    create: XOR<KegiatanRapatCreateWithoutRekomendasiInput, KegiatanRapatUncheckedCreateWithoutRekomendasiInput>
-  }
-
-  export type DomainIsuCreateWithoutRekomendasiInput = {
+  export type DomainIsuCreateWithoutKegiatanRapatInput = {
     id?: string
     code: string
     nama: string
@@ -18666,10 +17244,9 @@ export namespace Prisma {
     updatedAt?: Date | string
     masukan?: MasukanWargaCreateNestedManyWithoutDomainIsuInput
     dataMaster?: DataMasterCreateNestedManyWithoutDomainIsuInput
-    kegiatanRapat?: KegiatanRapatCreateNestedManyWithoutDomainIsuInput
   }
 
-  export type DomainIsuUncheckedCreateWithoutRekomendasiInput = {
+  export type DomainIsuUncheckedCreateWithoutKegiatanRapatInput = {
     id?: string
     code: string
     nama: string
@@ -18678,15 +17255,14 @@ export namespace Prisma {
     updatedAt?: Date | string
     masukan?: MasukanWargaUncheckedCreateNestedManyWithoutDomainIsuInput
     dataMaster?: DataMasterUncheckedCreateNestedManyWithoutDomainIsuInput
-    kegiatanRapat?: KegiatanRapatUncheckedCreateNestedManyWithoutDomainIsuInput
   }
 
-  export type DomainIsuCreateOrConnectWithoutRekomendasiInput = {
+  export type DomainIsuCreateOrConnectWithoutKegiatanRapatInput = {
     where: DomainIsuWhereUniqueInput
-    create: XOR<DomainIsuCreateWithoutRekomendasiInput, DomainIsuUncheckedCreateWithoutRekomendasiInput>
+    create: XOR<DomainIsuCreateWithoutKegiatanRapatInput, DomainIsuUncheckedCreateWithoutKegiatanRapatInput>
   }
 
-  export type UserCreateWithoutRekomendasiDiprosesInput = {
+  export type UserCreateWithoutKegiatanRapatDibuatInput = {
     id?: string
     name: string
     email: string
@@ -18698,13 +17274,13 @@ export namespace Prisma {
     emailVerified?: boolean
     image?: string | null
     masukanVerifikasi?: MasukanWargaCreateNestedManyWithoutDiverifikasiOlehInput
+    kegiatanRapatDiproses?: KegiatanRapatCreateNestedManyWithoutDiprosesOlehInput
+    dataMasterDibuat?: DataMasterCreateNestedManyWithoutDiprosesOlehInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
-    kegiatanRapat?: KegiatanRapatCreateNestedManyWithoutDibuatOlehInput
-    dataMaster?: DataMasterCreateNestedManyWithoutDiprosesOlehInput
   }
 
-  export type UserUncheckedCreateWithoutRekomendasiDiprosesInput = {
+  export type UserUncheckedCreateWithoutKegiatanRapatDibuatInput = {
     id?: string
     name: string
     email: string
@@ -18716,88 +17292,92 @@ export namespace Prisma {
     emailVerified?: boolean
     image?: string | null
     masukanVerifikasi?: MasukanWargaUncheckedCreateNestedManyWithoutDiverifikasiOlehInput
+    kegiatanRapatDiproses?: KegiatanRapatUncheckedCreateNestedManyWithoutDiprosesOlehInput
+    dataMasterDibuat?: DataMasterUncheckedCreateNestedManyWithoutDiprosesOlehInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
-    kegiatanRapat?: KegiatanRapatUncheckedCreateNestedManyWithoutDibuatOlehInput
-    dataMaster?: DataMasterUncheckedCreateNestedManyWithoutDiprosesOlehInput
   }
 
-  export type UserCreateOrConnectWithoutRekomendasiDiprosesInput = {
+  export type UserCreateOrConnectWithoutKegiatanRapatDibuatInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutRekomendasiDiprosesInput, UserUncheckedCreateWithoutRekomendasiDiprosesInput>
+    create: XOR<UserCreateWithoutKegiatanRapatDibuatInput, UserUncheckedCreateWithoutKegiatanRapatDibuatInput>
   }
 
-  export type RekomendasiMasukanCreateWithoutRekomendasiInput = {
-    masukan: MasukanWargaCreateNestedOneWithoutRekomendasiLinksInput
+  export type UserCreateWithoutKegiatanRapatDiprosesInput = {
+    id?: string
+    name: string
+    email: string
+    jabatan?: string | null
+    role?: $Enums.Role
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    emailVerified?: boolean
+    image?: string | null
+    masukanVerifikasi?: MasukanWargaCreateNestedManyWithoutDiverifikasiOlehInput
+    kegiatanRapatDibuat?: KegiatanRapatCreateNestedManyWithoutDibuatOlehInput
+    dataMasterDibuat?: DataMasterCreateNestedManyWithoutDiprosesOlehInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    accounts?: AccountCreateNestedManyWithoutUserInput
   }
 
-  export type RekomendasiMasukanUncheckedCreateWithoutRekomendasiInput = {
+  export type UserUncheckedCreateWithoutKegiatanRapatDiprosesInput = {
+    id?: string
+    name: string
+    email: string
+    jabatan?: string | null
+    role?: $Enums.Role
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    emailVerified?: boolean
+    image?: string | null
+    masukanVerifikasi?: MasukanWargaUncheckedCreateNestedManyWithoutDiverifikasiOlehInput
+    kegiatanRapatDibuat?: KegiatanRapatUncheckedCreateNestedManyWithoutDibuatOlehInput
+    dataMasterDibuat?: DataMasterUncheckedCreateNestedManyWithoutDiprosesOlehInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutKegiatanRapatDiprosesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutKegiatanRapatDiprosesInput, UserUncheckedCreateWithoutKegiatanRapatDiprosesInput>
+  }
+
+  export type KegiatanRapatMasukanCreateWithoutKegiatanRapatInput = {
+    id?: string
+    createdAt?: Date | string
+    masukan: MasukanWargaCreateNestedOneWithoutRelasiRapatInput
+  }
+
+  export type KegiatanRapatMasukanUncheckedCreateWithoutKegiatanRapatInput = {
+    id?: string
     masukanId: string
+    createdAt?: Date | string
   }
 
-  export type RekomendasiMasukanCreateOrConnectWithoutRekomendasiInput = {
-    where: RekomendasiMasukanWhereUniqueInput
-    create: XOR<RekomendasiMasukanCreateWithoutRekomendasiInput, RekomendasiMasukanUncheckedCreateWithoutRekomendasiInput>
+  export type KegiatanRapatMasukanCreateOrConnectWithoutKegiatanRapatInput = {
+    where: KegiatanRapatMasukanWhereUniqueInput
+    create: XOR<KegiatanRapatMasukanCreateWithoutKegiatanRapatInput, KegiatanRapatMasukanUncheckedCreateWithoutKegiatanRapatInput>
   }
 
-  export type RekomendasiMasukanCreateManyRekomendasiInputEnvelope = {
-    data: RekomendasiMasukanCreateManyRekomendasiInput | RekomendasiMasukanCreateManyRekomendasiInput[]
+  export type KegiatanRapatMasukanCreateManyKegiatanRapatInputEnvelope = {
+    data: KegiatanRapatMasukanCreateManyKegiatanRapatInput | KegiatanRapatMasukanCreateManyKegiatanRapatInput[]
     skipDuplicates?: boolean
   }
 
-  export type KegiatanRapatUpsertWithoutRekomendasiInput = {
-    update: XOR<KegiatanRapatUpdateWithoutRekomendasiInput, KegiatanRapatUncheckedUpdateWithoutRekomendasiInput>
-    create: XOR<KegiatanRapatCreateWithoutRekomendasiInput, KegiatanRapatUncheckedCreateWithoutRekomendasiInput>
-    where?: KegiatanRapatWhereInput
-  }
-
-  export type KegiatanRapatUpdateToOneWithWhereWithoutRekomendasiInput = {
-    where?: KegiatanRapatWhereInput
-    data: XOR<KegiatanRapatUpdateWithoutRekomendasiInput, KegiatanRapatUncheckedUpdateWithoutRekomendasiInput>
-  }
-
-  export type KegiatanRapatUpdateWithoutRekomendasiInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    judul?: StringFieldUpdateOperationsInput | string
-    deskripsi?: StringFieldUpdateOperationsInput | string
-    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
-    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
-    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
-    aiPromptHash?: NullableStringFieldUpdateOperationsInput | string | null
-    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    domainIsu?: DomainIsuUpdateOneWithoutKegiatanRapatNestedInput
-    dibuatOleh?: UserUpdateOneRequiredWithoutKegiatanRapatNestedInput
-  }
-
-  export type KegiatanRapatUncheckedUpdateWithoutRekomendasiInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    judul?: StringFieldUpdateOperationsInput | string
-    deskripsi?: StringFieldUpdateOperationsInput | string
-    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
-    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
-    domainIsuId?: NullableStringFieldUpdateOperationsInput | string | null
-    dibuatOlehId?: StringFieldUpdateOperationsInput | string
-    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
-    aiPromptHash?: NullableStringFieldUpdateOperationsInput | string | null
-    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type DomainIsuUpsertWithoutRekomendasiInput = {
-    update: XOR<DomainIsuUpdateWithoutRekomendasiInput, DomainIsuUncheckedUpdateWithoutRekomendasiInput>
-    create: XOR<DomainIsuCreateWithoutRekomendasiInput, DomainIsuUncheckedCreateWithoutRekomendasiInput>
+  export type DomainIsuUpsertWithoutKegiatanRapatInput = {
+    update: XOR<DomainIsuUpdateWithoutKegiatanRapatInput, DomainIsuUncheckedUpdateWithoutKegiatanRapatInput>
+    create: XOR<DomainIsuCreateWithoutKegiatanRapatInput, DomainIsuUncheckedCreateWithoutKegiatanRapatInput>
     where?: DomainIsuWhereInput
   }
 
-  export type DomainIsuUpdateToOneWithWhereWithoutRekomendasiInput = {
+  export type DomainIsuUpdateToOneWithWhereWithoutKegiatanRapatInput = {
     where?: DomainIsuWhereInput
-    data: XOR<DomainIsuUpdateWithoutRekomendasiInput, DomainIsuUncheckedUpdateWithoutRekomendasiInput>
+    data: XOR<DomainIsuUpdateWithoutKegiatanRapatInput, DomainIsuUncheckedUpdateWithoutKegiatanRapatInput>
   }
 
-  export type DomainIsuUpdateWithoutRekomendasiInput = {
+  export type DomainIsuUpdateWithoutKegiatanRapatInput = {
     id?: StringFieldUpdateOperationsInput | string
     code?: StringFieldUpdateOperationsInput | string
     nama?: StringFieldUpdateOperationsInput | string
@@ -18806,10 +17386,9 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     masukan?: MasukanWargaUpdateManyWithoutDomainIsuNestedInput
     dataMaster?: DataMasterUpdateManyWithoutDomainIsuNestedInput
-    kegiatanRapat?: KegiatanRapatUpdateManyWithoutDomainIsuNestedInput
   }
 
-  export type DomainIsuUncheckedUpdateWithoutRekomendasiInput = {
+  export type DomainIsuUncheckedUpdateWithoutKegiatanRapatInput = {
     id?: StringFieldUpdateOperationsInput | string
     code?: StringFieldUpdateOperationsInput | string
     nama?: StringFieldUpdateOperationsInput | string
@@ -18818,21 +17397,20 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     masukan?: MasukanWargaUncheckedUpdateManyWithoutDomainIsuNestedInput
     dataMaster?: DataMasterUncheckedUpdateManyWithoutDomainIsuNestedInput
-    kegiatanRapat?: KegiatanRapatUncheckedUpdateManyWithoutDomainIsuNestedInput
   }
 
-  export type UserUpsertWithoutRekomendasiDiprosesInput = {
-    update: XOR<UserUpdateWithoutRekomendasiDiprosesInput, UserUncheckedUpdateWithoutRekomendasiDiprosesInput>
-    create: XOR<UserCreateWithoutRekomendasiDiprosesInput, UserUncheckedCreateWithoutRekomendasiDiprosesInput>
+  export type UserUpsertWithoutKegiatanRapatDibuatInput = {
+    update: XOR<UserUpdateWithoutKegiatanRapatDibuatInput, UserUncheckedUpdateWithoutKegiatanRapatDibuatInput>
+    create: XOR<UserCreateWithoutKegiatanRapatDibuatInput, UserUncheckedCreateWithoutKegiatanRapatDibuatInput>
     where?: UserWhereInput
   }
 
-  export type UserUpdateToOneWithWhereWithoutRekomendasiDiprosesInput = {
+  export type UserUpdateToOneWithWhereWithoutKegiatanRapatDibuatInput = {
     where?: UserWhereInput
-    data: XOR<UserUpdateWithoutRekomendasiDiprosesInput, UserUncheckedUpdateWithoutRekomendasiDiprosesInput>
+    data: XOR<UserUpdateWithoutKegiatanRapatDibuatInput, UserUncheckedUpdateWithoutKegiatanRapatDibuatInput>
   }
 
-  export type UserUpdateWithoutRekomendasiDiprosesInput = {
+  export type UserUpdateWithoutKegiatanRapatDibuatInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -18844,13 +17422,13 @@ export namespace Prisma {
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
     masukanVerifikasi?: MasukanWargaUpdateManyWithoutDiverifikasiOlehNestedInput
+    kegiatanRapatDiproses?: KegiatanRapatUpdateManyWithoutDiprosesOlehNestedInput
+    dataMasterDibuat?: DataMasterUpdateManyWithoutDiprosesOlehNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
-    kegiatanRapat?: KegiatanRapatUpdateManyWithoutDibuatOlehNestedInput
-    dataMaster?: DataMasterUpdateManyWithoutDiprosesOlehNestedInput
   }
 
-  export type UserUncheckedUpdateWithoutRekomendasiDiprosesInput = {
+  export type UserUncheckedUpdateWithoutKegiatanRapatDibuatInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -18862,64 +17440,121 @@ export namespace Prisma {
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
     masukanVerifikasi?: MasukanWargaUncheckedUpdateManyWithoutDiverifikasiOlehNestedInput
+    kegiatanRapatDiproses?: KegiatanRapatUncheckedUpdateManyWithoutDiprosesOlehNestedInput
+    dataMasterDibuat?: DataMasterUncheckedUpdateManyWithoutDiprosesOlehNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
-    kegiatanRapat?: KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehNestedInput
-    dataMaster?: DataMasterUncheckedUpdateManyWithoutDiprosesOlehNestedInput
   }
 
-  export type RekomendasiMasukanUpsertWithWhereUniqueWithoutRekomendasiInput = {
-    where: RekomendasiMasukanWhereUniqueInput
-    update: XOR<RekomendasiMasukanUpdateWithoutRekomendasiInput, RekomendasiMasukanUncheckedUpdateWithoutRekomendasiInput>
-    create: XOR<RekomendasiMasukanCreateWithoutRekomendasiInput, RekomendasiMasukanUncheckedCreateWithoutRekomendasiInput>
+  export type UserUpsertWithoutKegiatanRapatDiprosesInput = {
+    update: XOR<UserUpdateWithoutKegiatanRapatDiprosesInput, UserUncheckedUpdateWithoutKegiatanRapatDiprosesInput>
+    create: XOR<UserCreateWithoutKegiatanRapatDiprosesInput, UserUncheckedCreateWithoutKegiatanRapatDiprosesInput>
+    where?: UserWhereInput
   }
 
-  export type RekomendasiMasukanUpdateWithWhereUniqueWithoutRekomendasiInput = {
-    where: RekomendasiMasukanWhereUniqueInput
-    data: XOR<RekomendasiMasukanUpdateWithoutRekomendasiInput, RekomendasiMasukanUncheckedUpdateWithoutRekomendasiInput>
+  export type UserUpdateToOneWithWhereWithoutKegiatanRapatDiprosesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutKegiatanRapatDiprosesInput, UserUncheckedUpdateWithoutKegiatanRapatDiprosesInput>
   }
 
-  export type RekomendasiMasukanUpdateManyWithWhereWithoutRekomendasiInput = {
-    where: RekomendasiMasukanScalarWhereInput
-    data: XOR<RekomendasiMasukanUpdateManyMutationInput, RekomendasiMasukanUncheckedUpdateManyWithoutRekomendasiInput>
+  export type UserUpdateWithoutKegiatanRapatDiprosesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    jabatan?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    masukanVerifikasi?: MasukanWargaUpdateManyWithoutDiverifikasiOlehNestedInput
+    kegiatanRapatDibuat?: KegiatanRapatUpdateManyWithoutDibuatOlehNestedInput
+    dataMasterDibuat?: DataMasterUpdateManyWithoutDiprosesOlehNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    accounts?: AccountUpdateManyWithoutUserNestedInput
   }
 
-  export type RekomendasiCreateWithoutMasukanLinksInput = {
+  export type UserUncheckedUpdateWithoutKegiatanRapatDiprosesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    jabatan?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    masukanVerifikasi?: MasukanWargaUncheckedUpdateManyWithoutDiverifikasiOlehNestedInput
+    kegiatanRapatDibuat?: KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehNestedInput
+    dataMasterDibuat?: DataMasterUncheckedUpdateManyWithoutDiprosesOlehNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type KegiatanRapatMasukanUpsertWithWhereUniqueWithoutKegiatanRapatInput = {
+    where: KegiatanRapatMasukanWhereUniqueInput
+    update: XOR<KegiatanRapatMasukanUpdateWithoutKegiatanRapatInput, KegiatanRapatMasukanUncheckedUpdateWithoutKegiatanRapatInput>
+    create: XOR<KegiatanRapatMasukanCreateWithoutKegiatanRapatInput, KegiatanRapatMasukanUncheckedCreateWithoutKegiatanRapatInput>
+  }
+
+  export type KegiatanRapatMasukanUpdateWithWhereUniqueWithoutKegiatanRapatInput = {
+    where: KegiatanRapatMasukanWhereUniqueInput
+    data: XOR<KegiatanRapatMasukanUpdateWithoutKegiatanRapatInput, KegiatanRapatMasukanUncheckedUpdateWithoutKegiatanRapatInput>
+  }
+
+  export type KegiatanRapatMasukanUpdateManyWithWhereWithoutKegiatanRapatInput = {
+    where: KegiatanRapatMasukanScalarWhereInput
+    data: XOR<KegiatanRapatMasukanUpdateManyMutationInput, KegiatanRapatMasukanUncheckedUpdateManyWithoutKegiatanRapatInput>
+  }
+
+  export type KegiatanRapatCreateWithoutMasukanRelasiInput = {
     id?: string
     judul: string
-    ringkasan: string
     deskripsi: string
-    skorPrioritas: number
-    status?: $Enums.StatusRekomendasi
-    laporanLengkap: JsonNullValueInput | InputJsonValue
+    tanggal: Date | string
+    lokasi?: string | null
+    mode: $Enums.ModeRekomendasi
+    judulLaporan: string
+    rekomendasiItems: JsonNullValueInput | InputJsonValue
+    fingerprint: string
+    statusRekomendasi?: $Enums.StatusRekomendasi
+    aiModel?: string | null
+    aiProcessedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    kegiatanRapat: KegiatanRapatCreateNestedOneWithoutRekomendasiInput
-    domainIsu: DomainIsuCreateNestedOneWithoutRekomendasiInput
-    diprosesOleh?: UserCreateNestedOneWithoutRekomendasiDiprosesInput
+    domainIsu: DomainIsuCreateNestedOneWithoutKegiatanRapatInput
+    dibuatOleh: UserCreateNestedOneWithoutKegiatanRapatDibuatInput
+    diprosesOleh?: UserCreateNestedOneWithoutKegiatanRapatDiprosesInput
   }
 
-  export type RekomendasiUncheckedCreateWithoutMasukanLinksInput = {
+  export type KegiatanRapatUncheckedCreateWithoutMasukanRelasiInput = {
     id?: string
-    kegiatanRapatId: string
-    domainIsuId: string
     judul: string
-    ringkasan: string
     deskripsi: string
-    skorPrioritas: number
-    status?: $Enums.StatusRekomendasi
-    laporanLengkap: JsonNullValueInput | InputJsonValue
+    tanggal: Date | string
+    lokasi?: string | null
+    domainIsuId: string
+    dibuatOlehId: string
+    mode: $Enums.ModeRekomendasi
+    judulLaporan: string
+    rekomendasiItems: JsonNullValueInput | InputJsonValue
+    fingerprint: string
+    statusRekomendasi?: $Enums.StatusRekomendasi
+    aiModel?: string | null
+    aiProcessedAt?: Date | string | null
     diprosesOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
-  export type RekomendasiCreateOrConnectWithoutMasukanLinksInput = {
-    where: RekomendasiWhereUniqueInput
-    create: XOR<RekomendasiCreateWithoutMasukanLinksInput, RekomendasiUncheckedCreateWithoutMasukanLinksInput>
+  export type KegiatanRapatCreateOrConnectWithoutMasukanRelasiInput = {
+    where: KegiatanRapatWhereUniqueInput
+    create: XOR<KegiatanRapatCreateWithoutMasukanRelasiInput, KegiatanRapatUncheckedCreateWithoutMasukanRelasiInput>
   }
 
-  export type MasukanWargaCreateWithoutRekomendasiLinksInput = {
+  export type MasukanWargaCreateWithoutRelasiRapatInput = {
     id?: string
     namaPengirim?: string | null
     nomorHp?: string | null
@@ -18927,15 +17562,19 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
+    isLocked?: boolean
+    lockedAt?: Date | string | null
     status?: $Enums.StatusMasukan
     alasanPenolakan?: string | null
+    isRelevant?: boolean
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     domainIsu: DomainIsuCreateNestedOneWithoutMasukanInput
     diverifikasiOleh?: UserCreateNestedOneWithoutMasukanVerifikasiInput
   }
 
-  export type MasukanWargaUncheckedCreateWithoutRekomendasiLinksInput = {
+  export type MasukanWargaUncheckedCreateWithoutRelasiRapatInput = {
     id?: string
     namaPengirim?: string | null
     nomorHp?: string | null
@@ -18943,72 +17582,86 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
+    isLocked?: boolean
+    lockedAt?: Date | string | null
     domainIsuId: string
     status?: $Enums.StatusMasukan
     alasanPenolakan?: string | null
     diverifikasiOlehId?: string | null
+    isRelevant?: boolean
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
-  export type MasukanWargaCreateOrConnectWithoutRekomendasiLinksInput = {
+  export type MasukanWargaCreateOrConnectWithoutRelasiRapatInput = {
     where: MasukanWargaWhereUniqueInput
-    create: XOR<MasukanWargaCreateWithoutRekomendasiLinksInput, MasukanWargaUncheckedCreateWithoutRekomendasiLinksInput>
+    create: XOR<MasukanWargaCreateWithoutRelasiRapatInput, MasukanWargaUncheckedCreateWithoutRelasiRapatInput>
   }
 
-  export type RekomendasiUpsertWithoutMasukanLinksInput = {
-    update: XOR<RekomendasiUpdateWithoutMasukanLinksInput, RekomendasiUncheckedUpdateWithoutMasukanLinksInput>
-    create: XOR<RekomendasiCreateWithoutMasukanLinksInput, RekomendasiUncheckedCreateWithoutMasukanLinksInput>
-    where?: RekomendasiWhereInput
+  export type KegiatanRapatUpsertWithoutMasukanRelasiInput = {
+    update: XOR<KegiatanRapatUpdateWithoutMasukanRelasiInput, KegiatanRapatUncheckedUpdateWithoutMasukanRelasiInput>
+    create: XOR<KegiatanRapatCreateWithoutMasukanRelasiInput, KegiatanRapatUncheckedCreateWithoutMasukanRelasiInput>
+    where?: KegiatanRapatWhereInput
   }
 
-  export type RekomendasiUpdateToOneWithWhereWithoutMasukanLinksInput = {
-    where?: RekomendasiWhereInput
-    data: XOR<RekomendasiUpdateWithoutMasukanLinksInput, RekomendasiUncheckedUpdateWithoutMasukanLinksInput>
+  export type KegiatanRapatUpdateToOneWithWhereWithoutMasukanRelasiInput = {
+    where?: KegiatanRapatWhereInput
+    data: XOR<KegiatanRapatUpdateWithoutMasukanRelasiInput, KegiatanRapatUncheckedUpdateWithoutMasukanRelasiInput>
   }
 
-  export type RekomendasiUpdateWithoutMasukanLinksInput = {
+  export type KegiatanRapatUpdateWithoutMasukanRelasiInput = {
     id?: StringFieldUpdateOperationsInput | string
     judul?: StringFieldUpdateOperationsInput | string
-    ringkasan?: StringFieldUpdateOperationsInput | string
     deskripsi?: StringFieldUpdateOperationsInput | string
-    skorPrioritas?: FloatFieldUpdateOperationsInput | number
-    status?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
-    laporanLengkap?: JsonNullValueInput | InputJsonValue
+    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
+    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
+    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
+    judulLaporan?: StringFieldUpdateOperationsInput | string
+    rekomendasiItems?: JsonNullValueInput | InputJsonValue
+    fingerprint?: StringFieldUpdateOperationsInput | string
+    statusRekomendasi?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
+    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
+    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    kegiatanRapat?: KegiatanRapatUpdateOneRequiredWithoutRekomendasiNestedInput
-    domainIsu?: DomainIsuUpdateOneRequiredWithoutRekomendasiNestedInput
-    diprosesOleh?: UserUpdateOneWithoutRekomendasiDiprosesNestedInput
+    domainIsu?: DomainIsuUpdateOneRequiredWithoutKegiatanRapatNestedInput
+    dibuatOleh?: UserUpdateOneRequiredWithoutKegiatanRapatDibuatNestedInput
+    diprosesOleh?: UserUpdateOneWithoutKegiatanRapatDiprosesNestedInput
   }
 
-  export type RekomendasiUncheckedUpdateWithoutMasukanLinksInput = {
+  export type KegiatanRapatUncheckedUpdateWithoutMasukanRelasiInput = {
     id?: StringFieldUpdateOperationsInput | string
-    kegiatanRapatId?: StringFieldUpdateOperationsInput | string
-    domainIsuId?: StringFieldUpdateOperationsInput | string
     judul?: StringFieldUpdateOperationsInput | string
-    ringkasan?: StringFieldUpdateOperationsInput | string
     deskripsi?: StringFieldUpdateOperationsInput | string
-    skorPrioritas?: FloatFieldUpdateOperationsInput | number
-    status?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
-    laporanLengkap?: JsonNullValueInput | InputJsonValue
+    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
+    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
+    domainIsuId?: StringFieldUpdateOperationsInput | string
+    dibuatOlehId?: StringFieldUpdateOperationsInput | string
+    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
+    judulLaporan?: StringFieldUpdateOperationsInput | string
+    rekomendasiItems?: JsonNullValueInput | InputJsonValue
+    fingerprint?: StringFieldUpdateOperationsInput | string
+    statusRekomendasi?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
+    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
+    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type MasukanWargaUpsertWithoutRekomendasiLinksInput = {
-    update: XOR<MasukanWargaUpdateWithoutRekomendasiLinksInput, MasukanWargaUncheckedUpdateWithoutRekomendasiLinksInput>
-    create: XOR<MasukanWargaCreateWithoutRekomendasiLinksInput, MasukanWargaUncheckedCreateWithoutRekomendasiLinksInput>
+  export type MasukanWargaUpsertWithoutRelasiRapatInput = {
+    update: XOR<MasukanWargaUpdateWithoutRelasiRapatInput, MasukanWargaUncheckedUpdateWithoutRelasiRapatInput>
+    create: XOR<MasukanWargaCreateWithoutRelasiRapatInput, MasukanWargaUncheckedCreateWithoutRelasiRapatInput>
     where?: MasukanWargaWhereInput
   }
 
-  export type MasukanWargaUpdateToOneWithWhereWithoutRekomendasiLinksInput = {
+  export type MasukanWargaUpdateToOneWithWhereWithoutRelasiRapatInput = {
     where?: MasukanWargaWhereInput
-    data: XOR<MasukanWargaUpdateWithoutRekomendasiLinksInput, MasukanWargaUncheckedUpdateWithoutRekomendasiLinksInput>
+    data: XOR<MasukanWargaUpdateWithoutRelasiRapatInput, MasukanWargaUncheckedUpdateWithoutRelasiRapatInput>
   }
 
-  export type MasukanWargaUpdateWithoutRekomendasiLinksInput = {
+  export type MasukanWargaUpdateWithoutRelasiRapatInput = {
     id?: StringFieldUpdateOperationsInput | string
     namaPengirim?: NullableStringFieldUpdateOperationsInput | string | null
     nomorHp?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19016,15 +17669,19 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
+    isLocked?: BoolFieldUpdateOperationsInput | boolean
+    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
+    isRelevant?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     domainIsu?: DomainIsuUpdateOneRequiredWithoutMasukanNestedInput
     diverifikasiOleh?: UserUpdateOneWithoutMasukanVerifikasiNestedInput
   }
 
-  export type MasukanWargaUncheckedUpdateWithoutRekomendasiLinksInput = {
+  export type MasukanWargaUncheckedUpdateWithoutRelasiRapatInput = {
     id?: StringFieldUpdateOperationsInput | string
     namaPengirim?: NullableStringFieldUpdateOperationsInput | string | null
     nomorHp?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19032,10 +17689,14 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
+    isLocked?: BoolFieldUpdateOperationsInput | boolean
+    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     domainIsuId?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     diverifikasiOlehId?: NullableStringFieldUpdateOperationsInput | string | null
+    isRelevant?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -19052,10 +17713,10 @@ export namespace Prisma {
     emailVerified?: boolean
     image?: string | null
     masukanVerifikasi?: MasukanWargaCreateNestedManyWithoutDiverifikasiOlehInput
-    rekomendasiDiproses?: RekomendasiCreateNestedManyWithoutDiprosesOlehInput
+    kegiatanRapatDiproses?: KegiatanRapatCreateNestedManyWithoutDiprosesOlehInput
+    kegiatanRapatDibuat?: KegiatanRapatCreateNestedManyWithoutDibuatOlehInput
+    dataMasterDibuat?: DataMasterCreateNestedManyWithoutDiprosesOlehInput
     accounts?: AccountCreateNestedManyWithoutUserInput
-    kegiatanRapat?: KegiatanRapatCreateNestedManyWithoutDibuatOlehInput
-    dataMaster?: DataMasterCreateNestedManyWithoutDiprosesOlehInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -19070,10 +17731,10 @@ export namespace Prisma {
     emailVerified?: boolean
     image?: string | null
     masukanVerifikasi?: MasukanWargaUncheckedCreateNestedManyWithoutDiverifikasiOlehInput
-    rekomendasiDiproses?: RekomendasiUncheckedCreateNestedManyWithoutDiprosesOlehInput
+    kegiatanRapatDiproses?: KegiatanRapatUncheckedCreateNestedManyWithoutDiprosesOlehInput
+    kegiatanRapatDibuat?: KegiatanRapatUncheckedCreateNestedManyWithoutDibuatOlehInput
+    dataMasterDibuat?: DataMasterUncheckedCreateNestedManyWithoutDiprosesOlehInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
-    kegiatanRapat?: KegiatanRapatUncheckedCreateNestedManyWithoutDibuatOlehInput
-    dataMaster?: DataMasterUncheckedCreateNestedManyWithoutDiprosesOlehInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -19104,10 +17765,10 @@ export namespace Prisma {
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
     masukanVerifikasi?: MasukanWargaUpdateManyWithoutDiverifikasiOlehNestedInput
-    rekomendasiDiproses?: RekomendasiUpdateManyWithoutDiprosesOlehNestedInput
+    kegiatanRapatDiproses?: KegiatanRapatUpdateManyWithoutDiprosesOlehNestedInput
+    kegiatanRapatDibuat?: KegiatanRapatUpdateManyWithoutDibuatOlehNestedInput
+    dataMasterDibuat?: DataMasterUpdateManyWithoutDiprosesOlehNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
-    kegiatanRapat?: KegiatanRapatUpdateManyWithoutDibuatOlehNestedInput
-    dataMaster?: DataMasterUpdateManyWithoutDiprosesOlehNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -19122,10 +17783,10 @@ export namespace Prisma {
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
     masukanVerifikasi?: MasukanWargaUncheckedUpdateManyWithoutDiverifikasiOlehNestedInput
-    rekomendasiDiproses?: RekomendasiUncheckedUpdateManyWithoutDiprosesOlehNestedInput
+    kegiatanRapatDiproses?: KegiatanRapatUncheckedUpdateManyWithoutDiprosesOlehNestedInput
+    kegiatanRapatDibuat?: KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehNestedInput
+    dataMasterDibuat?: DataMasterUncheckedUpdateManyWithoutDiprosesOlehNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
-    kegiatanRapat?: KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehNestedInput
-    dataMaster?: DataMasterUncheckedUpdateManyWithoutDiprosesOlehNestedInput
   }
 
   export type UserCreateWithoutAccountsInput = {
@@ -19140,10 +17801,10 @@ export namespace Prisma {
     emailVerified?: boolean
     image?: string | null
     masukanVerifikasi?: MasukanWargaCreateNestedManyWithoutDiverifikasiOlehInput
-    rekomendasiDiproses?: RekomendasiCreateNestedManyWithoutDiprosesOlehInput
+    kegiatanRapatDiproses?: KegiatanRapatCreateNestedManyWithoutDiprosesOlehInput
+    kegiatanRapatDibuat?: KegiatanRapatCreateNestedManyWithoutDibuatOlehInput
+    dataMasterDibuat?: DataMasterCreateNestedManyWithoutDiprosesOlehInput
     sessions?: SessionCreateNestedManyWithoutUserInput
-    kegiatanRapat?: KegiatanRapatCreateNestedManyWithoutDibuatOlehInput
-    dataMaster?: DataMasterCreateNestedManyWithoutDiprosesOlehInput
   }
 
   export type UserUncheckedCreateWithoutAccountsInput = {
@@ -19158,10 +17819,10 @@ export namespace Prisma {
     emailVerified?: boolean
     image?: string | null
     masukanVerifikasi?: MasukanWargaUncheckedCreateNestedManyWithoutDiverifikasiOlehInput
-    rekomendasiDiproses?: RekomendasiUncheckedCreateNestedManyWithoutDiprosesOlehInput
+    kegiatanRapatDiproses?: KegiatanRapatUncheckedCreateNestedManyWithoutDiprosesOlehInput
+    kegiatanRapatDibuat?: KegiatanRapatUncheckedCreateNestedManyWithoutDibuatOlehInput
+    dataMasterDibuat?: DataMasterUncheckedCreateNestedManyWithoutDiprosesOlehInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    kegiatanRapat?: KegiatanRapatUncheckedCreateNestedManyWithoutDibuatOlehInput
-    dataMaster?: DataMasterUncheckedCreateNestedManyWithoutDiprosesOlehInput
   }
 
   export type UserCreateOrConnectWithoutAccountsInput = {
@@ -19192,10 +17853,10 @@ export namespace Prisma {
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
     masukanVerifikasi?: MasukanWargaUpdateManyWithoutDiverifikasiOlehNestedInput
-    rekomendasiDiproses?: RekomendasiUpdateManyWithoutDiprosesOlehNestedInput
+    kegiatanRapatDiproses?: KegiatanRapatUpdateManyWithoutDiprosesOlehNestedInput
+    kegiatanRapatDibuat?: KegiatanRapatUpdateManyWithoutDibuatOlehNestedInput
+    dataMasterDibuat?: DataMasterUpdateManyWithoutDiprosesOlehNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    kegiatanRapat?: KegiatanRapatUpdateManyWithoutDibuatOlehNestedInput
-    dataMaster?: DataMasterUpdateManyWithoutDiprosesOlehNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -19210,218 +17871,10 @@ export namespace Prisma {
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     image?: NullableStringFieldUpdateOperationsInput | string | null
     masukanVerifikasi?: MasukanWargaUncheckedUpdateManyWithoutDiverifikasiOlehNestedInput
-    rekomendasiDiproses?: RekomendasiUncheckedUpdateManyWithoutDiprosesOlehNestedInput
+    kegiatanRapatDiproses?: KegiatanRapatUncheckedUpdateManyWithoutDiprosesOlehNestedInput
+    kegiatanRapatDibuat?: KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehNestedInput
+    dataMasterDibuat?: DataMasterUncheckedUpdateManyWithoutDiprosesOlehNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    kegiatanRapat?: KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehNestedInput
-    dataMaster?: DataMasterUncheckedUpdateManyWithoutDiprosesOlehNestedInput
-  }
-
-  export type DomainIsuCreateWithoutKegiatanRapatInput = {
-    id?: string
-    code: string
-    nama: string
-    deskripsi?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    masukan?: MasukanWargaCreateNestedManyWithoutDomainIsuInput
-    dataMaster?: DataMasterCreateNestedManyWithoutDomainIsuInput
-    rekomendasi?: RekomendasiCreateNestedManyWithoutDomainIsuInput
-  }
-
-  export type DomainIsuUncheckedCreateWithoutKegiatanRapatInput = {
-    id?: string
-    code: string
-    nama: string
-    deskripsi?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    masukan?: MasukanWargaUncheckedCreateNestedManyWithoutDomainIsuInput
-    dataMaster?: DataMasterUncheckedCreateNestedManyWithoutDomainIsuInput
-    rekomendasi?: RekomendasiUncheckedCreateNestedManyWithoutDomainIsuInput
-  }
-
-  export type DomainIsuCreateOrConnectWithoutKegiatanRapatInput = {
-    where: DomainIsuWhereUniqueInput
-    create: XOR<DomainIsuCreateWithoutKegiatanRapatInput, DomainIsuUncheckedCreateWithoutKegiatanRapatInput>
-  }
-
-  export type UserCreateWithoutKegiatanRapatInput = {
-    id?: string
-    name: string
-    email: string
-    jabatan?: string | null
-    role?: $Enums.Role
-    isActive?: boolean
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    emailVerified?: boolean
-    image?: string | null
-    masukanVerifikasi?: MasukanWargaCreateNestedManyWithoutDiverifikasiOlehInput
-    rekomendasiDiproses?: RekomendasiCreateNestedManyWithoutDiprosesOlehInput
-    sessions?: SessionCreateNestedManyWithoutUserInput
-    accounts?: AccountCreateNestedManyWithoutUserInput
-    dataMaster?: DataMasterCreateNestedManyWithoutDiprosesOlehInput
-  }
-
-  export type UserUncheckedCreateWithoutKegiatanRapatInput = {
-    id?: string
-    name: string
-    email: string
-    jabatan?: string | null
-    role?: $Enums.Role
-    isActive?: boolean
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    emailVerified?: boolean
-    image?: string | null
-    masukanVerifikasi?: MasukanWargaUncheckedCreateNestedManyWithoutDiverifikasiOlehInput
-    rekomendasiDiproses?: RekomendasiUncheckedCreateNestedManyWithoutDiprosesOlehInput
-    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
-    dataMaster?: DataMasterUncheckedCreateNestedManyWithoutDiprosesOlehInput
-  }
-
-  export type UserCreateOrConnectWithoutKegiatanRapatInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutKegiatanRapatInput, UserUncheckedCreateWithoutKegiatanRapatInput>
-  }
-
-  export type RekomendasiCreateWithoutKegiatanRapatInput = {
-    id?: string
-    judul: string
-    ringkasan: string
-    deskripsi: string
-    skorPrioritas: number
-    status?: $Enums.StatusRekomendasi
-    laporanLengkap: JsonNullValueInput | InputJsonValue
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    domainIsu: DomainIsuCreateNestedOneWithoutRekomendasiInput
-    diprosesOleh?: UserCreateNestedOneWithoutRekomendasiDiprosesInput
-    masukanLinks?: RekomendasiMasukanCreateNestedManyWithoutRekomendasiInput
-  }
-
-  export type RekomendasiUncheckedCreateWithoutKegiatanRapatInput = {
-    id?: string
-    domainIsuId: string
-    judul: string
-    ringkasan: string
-    deskripsi: string
-    skorPrioritas: number
-    status?: $Enums.StatusRekomendasi
-    laporanLengkap: JsonNullValueInput | InputJsonValue
-    diprosesOlehId?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    masukanLinks?: RekomendasiMasukanUncheckedCreateNestedManyWithoutRekomendasiInput
-  }
-
-  export type RekomendasiCreateOrConnectWithoutKegiatanRapatInput = {
-    where: RekomendasiWhereUniqueInput
-    create: XOR<RekomendasiCreateWithoutKegiatanRapatInput, RekomendasiUncheckedCreateWithoutKegiatanRapatInput>
-  }
-
-  export type RekomendasiCreateManyKegiatanRapatInputEnvelope = {
-    data: RekomendasiCreateManyKegiatanRapatInput | RekomendasiCreateManyKegiatanRapatInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type DomainIsuUpsertWithoutKegiatanRapatInput = {
-    update: XOR<DomainIsuUpdateWithoutKegiatanRapatInput, DomainIsuUncheckedUpdateWithoutKegiatanRapatInput>
-    create: XOR<DomainIsuCreateWithoutKegiatanRapatInput, DomainIsuUncheckedCreateWithoutKegiatanRapatInput>
-    where?: DomainIsuWhereInput
-  }
-
-  export type DomainIsuUpdateToOneWithWhereWithoutKegiatanRapatInput = {
-    where?: DomainIsuWhereInput
-    data: XOR<DomainIsuUpdateWithoutKegiatanRapatInput, DomainIsuUncheckedUpdateWithoutKegiatanRapatInput>
-  }
-
-  export type DomainIsuUpdateWithoutKegiatanRapatInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    code?: StringFieldUpdateOperationsInput | string
-    nama?: StringFieldUpdateOperationsInput | string
-    deskripsi?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    masukan?: MasukanWargaUpdateManyWithoutDomainIsuNestedInput
-    dataMaster?: DataMasterUpdateManyWithoutDomainIsuNestedInput
-    rekomendasi?: RekomendasiUpdateManyWithoutDomainIsuNestedInput
-  }
-
-  export type DomainIsuUncheckedUpdateWithoutKegiatanRapatInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    code?: StringFieldUpdateOperationsInput | string
-    nama?: StringFieldUpdateOperationsInput | string
-    deskripsi?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    masukan?: MasukanWargaUncheckedUpdateManyWithoutDomainIsuNestedInput
-    dataMaster?: DataMasterUncheckedUpdateManyWithoutDomainIsuNestedInput
-    rekomendasi?: RekomendasiUncheckedUpdateManyWithoutDomainIsuNestedInput
-  }
-
-  export type UserUpsertWithoutKegiatanRapatInput = {
-    update: XOR<UserUpdateWithoutKegiatanRapatInput, UserUncheckedUpdateWithoutKegiatanRapatInput>
-    create: XOR<UserCreateWithoutKegiatanRapatInput, UserUncheckedCreateWithoutKegiatanRapatInput>
-    where?: UserWhereInput
-  }
-
-  export type UserUpdateToOneWithWhereWithoutKegiatanRapatInput = {
-    where?: UserWhereInput
-    data: XOR<UserUpdateWithoutKegiatanRapatInput, UserUncheckedUpdateWithoutKegiatanRapatInput>
-  }
-
-  export type UserUpdateWithoutKegiatanRapatInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    jabatan?: NullableStringFieldUpdateOperationsInput | string | null
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    emailVerified?: BoolFieldUpdateOperationsInput | boolean
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    masukanVerifikasi?: MasukanWargaUpdateManyWithoutDiverifikasiOlehNestedInput
-    rekomendasiDiproses?: RekomendasiUpdateManyWithoutDiprosesOlehNestedInput
-    sessions?: SessionUpdateManyWithoutUserNestedInput
-    accounts?: AccountUpdateManyWithoutUserNestedInput
-    dataMaster?: DataMasterUpdateManyWithoutDiprosesOlehNestedInput
-  }
-
-  export type UserUncheckedUpdateWithoutKegiatanRapatInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    jabatan?: NullableStringFieldUpdateOperationsInput | string | null
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    emailVerified?: BoolFieldUpdateOperationsInput | boolean
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    masukanVerifikasi?: MasukanWargaUncheckedUpdateManyWithoutDiverifikasiOlehNestedInput
-    rekomendasiDiproses?: RekomendasiUncheckedUpdateManyWithoutDiprosesOlehNestedInput
-    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
-    dataMaster?: DataMasterUncheckedUpdateManyWithoutDiprosesOlehNestedInput
-  }
-
-  export type RekomendasiUpsertWithWhereUniqueWithoutKegiatanRapatInput = {
-    where: RekomendasiWhereUniqueInput
-    update: XOR<RekomendasiUpdateWithoutKegiatanRapatInput, RekomendasiUncheckedUpdateWithoutKegiatanRapatInput>
-    create: XOR<RekomendasiCreateWithoutKegiatanRapatInput, RekomendasiUncheckedCreateWithoutKegiatanRapatInput>
-  }
-
-  export type RekomendasiUpdateWithWhereUniqueWithoutKegiatanRapatInput = {
-    where: RekomendasiWhereUniqueInput
-    data: XOR<RekomendasiUpdateWithoutKegiatanRapatInput, RekomendasiUncheckedUpdateWithoutKegiatanRapatInput>
-  }
-
-  export type RekomendasiUpdateManyWithWhereWithoutKegiatanRapatInput = {
-    where: RekomendasiScalarWhereInput
-    data: XOR<RekomendasiUpdateManyMutationInput, RekomendasiUncheckedUpdateManyWithoutKegiatanRapatInput>
   }
 
   export type MasukanWargaCreateManyDomainIsuInput = {
@@ -19432,9 +17885,13 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
+    isLocked?: boolean
+    lockedAt?: Date | string | null
     status?: $Enums.StatusMasukan
     alasanPenolakan?: string | null
     diverifikasiOlehId?: string | null
+    isRelevant?: boolean
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -19442,25 +17899,13 @@ export namespace Prisma {
   export type DataMasterCreateManyDomainIsuInput = {
     id?: string
     namaAtribut: string
-    nilai: string
+    kritikalitas: $Enums.NilaiKritikalitas
     jumlah?: number | null
-    lokasiRt?: number | null
-    lokasiRw?: number | null
+    lokasiRt?: string | null
+    lokasiRw?: string | null
+    isActive?: boolean
+    tahunData?: number | null
     sumberData?: string | null
-    diprosesOlehId?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type RekomendasiCreateManyDomainIsuInput = {
-    id?: string
-    kegiatanRapatId: string
-    judul: string
-    ringkasan: string
-    deskripsi: string
-    skorPrioritas: number
-    status?: $Enums.StatusRekomendasi
-    laporanLengkap: JsonNullValueInput | InputJsonValue
     diprosesOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -19473,9 +17918,14 @@ export namespace Prisma {
     tanggal: Date | string
     lokasi?: string | null
     dibuatOlehId: string
+    mode: $Enums.ModeRekomendasi
+    judulLaporan: string
+    rekomendasiItems: JsonNullValueInput | InputJsonValue
+    fingerprint: string
+    statusRekomendasi?: $Enums.StatusRekomendasi
     aiModel?: string | null
-    aiPromptHash?: string | null
     aiProcessedAt?: Date | string | null
+    diprosesOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -19488,12 +17938,16 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
+    isLocked?: BoolFieldUpdateOperationsInput | boolean
+    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
+    isRelevant?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     diverifikasiOleh?: UserUpdateOneWithoutMasukanVerifikasiNestedInput
-    rekomendasiLinks?: RekomendasiMasukanUpdateManyWithoutMasukanNestedInput
+    relasiRapat?: KegiatanRapatMasukanUpdateManyWithoutMasukanNestedInput
   }
 
   export type MasukanWargaUncheckedUpdateWithoutDomainIsuInput = {
@@ -19504,12 +17958,16 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
+    isLocked?: BoolFieldUpdateOperationsInput | boolean
+    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     diverifikasiOlehId?: NullableStringFieldUpdateOperationsInput | string | null
+    isRelevant?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    rekomendasiLinks?: RekomendasiMasukanUncheckedUpdateManyWithoutMasukanNestedInput
+    relasiRapat?: KegiatanRapatMasukanUncheckedUpdateManyWithoutMasukanNestedInput
   }
 
   export type MasukanWargaUncheckedUpdateManyWithoutDomainIsuInput = {
@@ -19520,9 +17978,13 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
+    isLocked?: BoolFieldUpdateOperationsInput | boolean
+    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     diverifikasiOlehId?: NullableStringFieldUpdateOperationsInput | string | null
+    isRelevant?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -19530,23 +17992,27 @@ export namespace Prisma {
   export type DataMasterUpdateWithoutDomainIsuInput = {
     id?: StringFieldUpdateOperationsInput | string
     namaAtribut?: StringFieldUpdateOperationsInput | string
-    nilai?: StringFieldUpdateOperationsInput | string
+    kritikalitas?: EnumNilaiKritikalitasFieldUpdateOperationsInput | $Enums.NilaiKritikalitas
     jumlah?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRt?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRw?: NullableIntFieldUpdateOperationsInput | number | null
+    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
+    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    tahunData?: NullableIntFieldUpdateOperationsInput | number | null
     sumberData?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    diprosesOleh?: UserUpdateOneWithoutDataMasterNestedInput
+    diprosesOleh?: UserUpdateOneWithoutDataMasterDibuatNestedInput
   }
 
   export type DataMasterUncheckedUpdateWithoutDomainIsuInput = {
     id?: StringFieldUpdateOperationsInput | string
     namaAtribut?: StringFieldUpdateOperationsInput | string
-    nilai?: StringFieldUpdateOperationsInput | string
+    kritikalitas?: EnumNilaiKritikalitasFieldUpdateOperationsInput | $Enums.NilaiKritikalitas
     jumlah?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRt?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRw?: NullableIntFieldUpdateOperationsInput | number | null
+    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
+    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    tahunData?: NullableIntFieldUpdateOperationsInput | number | null
     sumberData?: NullableStringFieldUpdateOperationsInput | string | null
     diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19556,55 +18022,13 @@ export namespace Prisma {
   export type DataMasterUncheckedUpdateManyWithoutDomainIsuInput = {
     id?: StringFieldUpdateOperationsInput | string
     namaAtribut?: StringFieldUpdateOperationsInput | string
-    nilai?: StringFieldUpdateOperationsInput | string
+    kritikalitas?: EnumNilaiKritikalitasFieldUpdateOperationsInput | $Enums.NilaiKritikalitas
     jumlah?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRt?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRw?: NullableIntFieldUpdateOperationsInput | number | null
+    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
+    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    tahunData?: NullableIntFieldUpdateOperationsInput | number | null
     sumberData?: NullableStringFieldUpdateOperationsInput | string | null
-    diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type RekomendasiUpdateWithoutDomainIsuInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    judul?: StringFieldUpdateOperationsInput | string
-    ringkasan?: StringFieldUpdateOperationsInput | string
-    deskripsi?: StringFieldUpdateOperationsInput | string
-    skorPrioritas?: FloatFieldUpdateOperationsInput | number
-    status?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
-    laporanLengkap?: JsonNullValueInput | InputJsonValue
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    kegiatanRapat?: KegiatanRapatUpdateOneRequiredWithoutRekomendasiNestedInput
-    diprosesOleh?: UserUpdateOneWithoutRekomendasiDiprosesNestedInput
-    masukanLinks?: RekomendasiMasukanUpdateManyWithoutRekomendasiNestedInput
-  }
-
-  export type RekomendasiUncheckedUpdateWithoutDomainIsuInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    kegiatanRapatId?: StringFieldUpdateOperationsInput | string
-    judul?: StringFieldUpdateOperationsInput | string
-    ringkasan?: StringFieldUpdateOperationsInput | string
-    deskripsi?: StringFieldUpdateOperationsInput | string
-    skorPrioritas?: FloatFieldUpdateOperationsInput | number
-    status?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
-    laporanLengkap?: JsonNullValueInput | InputJsonValue
-    diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    masukanLinks?: RekomendasiMasukanUncheckedUpdateManyWithoutRekomendasiNestedInput
-  }
-
-  export type RekomendasiUncheckedUpdateManyWithoutDomainIsuInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    kegiatanRapatId?: StringFieldUpdateOperationsInput | string
-    judul?: StringFieldUpdateOperationsInput | string
-    ringkasan?: StringFieldUpdateOperationsInput | string
-    deskripsi?: StringFieldUpdateOperationsInput | string
-    skorPrioritas?: FloatFieldUpdateOperationsInput | number
-    status?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
-    laporanLengkap?: JsonNullValueInput | InputJsonValue
     diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19616,13 +18040,18 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
+    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
+    judulLaporan?: StringFieldUpdateOperationsInput | string
+    rekomendasiItems?: JsonNullValueInput | InputJsonValue
+    fingerprint?: StringFieldUpdateOperationsInput | string
+    statusRekomendasi?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
     aiModel?: NullableStringFieldUpdateOperationsInput | string | null
-    aiPromptHash?: NullableStringFieldUpdateOperationsInput | string | null
     aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    dibuatOleh?: UserUpdateOneRequiredWithoutKegiatanRapatNestedInput
-    rekomendasi?: RekomendasiUpdateManyWithoutKegiatanRapatNestedInput
+    dibuatOleh?: UserUpdateOneRequiredWithoutKegiatanRapatDibuatNestedInput
+    diprosesOleh?: UserUpdateOneWithoutKegiatanRapatDiprosesNestedInput
+    masukanRelasi?: KegiatanRapatMasukanUpdateManyWithoutKegiatanRapatNestedInput
   }
 
   export type KegiatanRapatUncheckedUpdateWithoutDomainIsuInput = {
@@ -19632,12 +18061,17 @@ export namespace Prisma {
     tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
     dibuatOlehId?: StringFieldUpdateOperationsInput | string
+    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
+    judulLaporan?: StringFieldUpdateOperationsInput | string
+    rekomendasiItems?: JsonNullValueInput | InputJsonValue
+    fingerprint?: StringFieldUpdateOperationsInput | string
+    statusRekomendasi?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
     aiModel?: NullableStringFieldUpdateOperationsInput | string | null
-    aiPromptHash?: NullableStringFieldUpdateOperationsInput | string | null
     aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    rekomendasi?: RekomendasiUncheckedUpdateManyWithoutKegiatanRapatNestedInput
+    masukanRelasi?: KegiatanRapatMasukanUncheckedUpdateManyWithoutKegiatanRapatNestedInput
   }
 
   export type KegiatanRapatUncheckedUpdateManyWithoutDomainIsuInput = {
@@ -19647,9 +18081,14 @@ export namespace Prisma {
     tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
     dibuatOlehId?: StringFieldUpdateOperationsInput | string
+    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
+    judulLaporan?: StringFieldUpdateOperationsInput | string
+    rekomendasiItems?: JsonNullValueInput | InputJsonValue
+    fingerprint?: StringFieldUpdateOperationsInput | string
+    statusRekomendasi?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
     aiModel?: NullableStringFieldUpdateOperationsInput | string | null
-    aiPromptHash?: NullableStringFieldUpdateOperationsInput | string | null
     aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -19662,23 +18101,66 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
+    isLocked?: boolean
+    lockedAt?: Date | string | null
     domainIsuId: string
     status?: $Enums.StatusMasukan
     alasanPenolakan?: string | null
+    isRelevant?: boolean
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
-  export type RekomendasiCreateManyDiprosesOlehInput = {
+  export type KegiatanRapatCreateManyDiprosesOlehInput = {
     id?: string
-    kegiatanRapatId: string
-    domainIsuId: string
     judul: string
-    ringkasan: string
     deskripsi: string
-    skorPrioritas: number
-    status?: $Enums.StatusRekomendasi
-    laporanLengkap: JsonNullValueInput | InputJsonValue
+    tanggal: Date | string
+    lokasi?: string | null
+    domainIsuId: string
+    dibuatOlehId: string
+    mode: $Enums.ModeRekomendasi
+    judulLaporan: string
+    rekomendasiItems: JsonNullValueInput | InputJsonValue
+    fingerprint: string
+    statusRekomendasi?: $Enums.StatusRekomendasi
+    aiModel?: string | null
+    aiProcessedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type KegiatanRapatCreateManyDibuatOlehInput = {
+    id?: string
+    judul: string
+    deskripsi: string
+    tanggal: Date | string
+    lokasi?: string | null
+    domainIsuId: string
+    mode: $Enums.ModeRekomendasi
+    judulLaporan: string
+    rekomendasiItems: JsonNullValueInput | InputJsonValue
+    fingerprint: string
+    statusRekomendasi?: $Enums.StatusRekomendasi
+    aiModel?: string | null
+    aiProcessedAt?: Date | string | null
+    diprosesOlehId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DataMasterCreateManyDiprosesOlehInput = {
+    id?: string
+    domainIsuId: string
+    namaAtribut: string
+    kritikalitas: $Enums.NilaiKritikalitas
+    jumlah?: number | null
+    lokasiRt?: string | null
+    lokasiRw?: string | null
+    isActive?: boolean
+    tahunData?: number | null
+    sumberData?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -19712,33 +18194,6 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
-  export type KegiatanRapatCreateManyDibuatOlehInput = {
-    id?: string
-    judul: string
-    deskripsi: string
-    tanggal: Date | string
-    lokasi?: string | null
-    domainIsuId?: string | null
-    aiModel?: string | null
-    aiPromptHash?: string | null
-    aiProcessedAt?: Date | string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type DataMasterCreateManyDiprosesOlehInput = {
-    id?: string
-    domainIsuId: string
-    namaAtribut: string
-    nilai: string
-    jumlah?: number | null
-    lokasiRt?: number | null
-    lokasiRw?: number | null
-    sumberData?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
   export type MasukanWargaUpdateWithoutDiverifikasiOlehInput = {
     id?: StringFieldUpdateOperationsInput | string
     namaPengirim?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19747,12 +18202,16 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
+    isLocked?: BoolFieldUpdateOperationsInput | boolean
+    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
+    isRelevant?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     domainIsu?: DomainIsuUpdateOneRequiredWithoutMasukanNestedInput
-    rekomendasiLinks?: RekomendasiMasukanUpdateManyWithoutMasukanNestedInput
+    relasiRapat?: KegiatanRapatMasukanUpdateManyWithoutMasukanNestedInput
   }
 
   export type MasukanWargaUncheckedUpdateWithoutDiverifikasiOlehInput = {
@@ -19763,12 +18222,16 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
+    isLocked?: BoolFieldUpdateOperationsInput | boolean
+    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     domainIsuId?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
+    isRelevant?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    rekomendasiLinks?: RekomendasiMasukanUncheckedUpdateManyWithoutMasukanNestedInput
+    relasiRapat?: KegiatanRapatMasukanUncheckedUpdateManyWithoutMasukanNestedInput
   }
 
   export type MasukanWargaUncheckedUpdateManyWithoutDiverifikasiOlehInput = {
@@ -19779,53 +18242,176 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
+    isLocked?: BoolFieldUpdateOperationsInput | boolean
+    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     domainIsuId?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
+    isRelevant?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type RekomendasiUpdateWithoutDiprosesOlehInput = {
+  export type KegiatanRapatUpdateWithoutDiprosesOlehInput = {
     id?: StringFieldUpdateOperationsInput | string
     judul?: StringFieldUpdateOperationsInput | string
-    ringkasan?: StringFieldUpdateOperationsInput | string
     deskripsi?: StringFieldUpdateOperationsInput | string
-    skorPrioritas?: FloatFieldUpdateOperationsInput | number
-    status?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
-    laporanLengkap?: JsonNullValueInput | InputJsonValue
+    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
+    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
+    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
+    judulLaporan?: StringFieldUpdateOperationsInput | string
+    rekomendasiItems?: JsonNullValueInput | InputJsonValue
+    fingerprint?: StringFieldUpdateOperationsInput | string
+    statusRekomendasi?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
+    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
+    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    kegiatanRapat?: KegiatanRapatUpdateOneRequiredWithoutRekomendasiNestedInput
-    domainIsu?: DomainIsuUpdateOneRequiredWithoutRekomendasiNestedInput
-    masukanLinks?: RekomendasiMasukanUpdateManyWithoutRekomendasiNestedInput
+    domainIsu?: DomainIsuUpdateOneRequiredWithoutKegiatanRapatNestedInput
+    dibuatOleh?: UserUpdateOneRequiredWithoutKegiatanRapatDibuatNestedInput
+    masukanRelasi?: KegiatanRapatMasukanUpdateManyWithoutKegiatanRapatNestedInput
   }
 
-  export type RekomendasiUncheckedUpdateWithoutDiprosesOlehInput = {
+  export type KegiatanRapatUncheckedUpdateWithoutDiprosesOlehInput = {
     id?: StringFieldUpdateOperationsInput | string
-    kegiatanRapatId?: StringFieldUpdateOperationsInput | string
+    judul?: StringFieldUpdateOperationsInput | string
+    deskripsi?: StringFieldUpdateOperationsInput | string
+    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
+    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
     domainIsuId?: StringFieldUpdateOperationsInput | string
-    judul?: StringFieldUpdateOperationsInput | string
-    ringkasan?: StringFieldUpdateOperationsInput | string
-    deskripsi?: StringFieldUpdateOperationsInput | string
-    skorPrioritas?: FloatFieldUpdateOperationsInput | number
-    status?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
-    laporanLengkap?: JsonNullValueInput | InputJsonValue
+    dibuatOlehId?: StringFieldUpdateOperationsInput | string
+    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
+    judulLaporan?: StringFieldUpdateOperationsInput | string
+    rekomendasiItems?: JsonNullValueInput | InputJsonValue
+    fingerprint?: StringFieldUpdateOperationsInput | string
+    statusRekomendasi?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
+    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
+    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    masukanLinks?: RekomendasiMasukanUncheckedUpdateManyWithoutRekomendasiNestedInput
+    masukanRelasi?: KegiatanRapatMasukanUncheckedUpdateManyWithoutKegiatanRapatNestedInput
   }
 
-  export type RekomendasiUncheckedUpdateManyWithoutDiprosesOlehInput = {
+  export type KegiatanRapatUncheckedUpdateManyWithoutDiprosesOlehInput = {
     id?: StringFieldUpdateOperationsInput | string
-    kegiatanRapatId?: StringFieldUpdateOperationsInput | string
-    domainIsuId?: StringFieldUpdateOperationsInput | string
     judul?: StringFieldUpdateOperationsInput | string
-    ringkasan?: StringFieldUpdateOperationsInput | string
     deskripsi?: StringFieldUpdateOperationsInput | string
-    skorPrioritas?: FloatFieldUpdateOperationsInput | number
-    status?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
-    laporanLengkap?: JsonNullValueInput | InputJsonValue
+    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
+    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
+    domainIsuId?: StringFieldUpdateOperationsInput | string
+    dibuatOlehId?: StringFieldUpdateOperationsInput | string
+    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
+    judulLaporan?: StringFieldUpdateOperationsInput | string
+    rekomendasiItems?: JsonNullValueInput | InputJsonValue
+    fingerprint?: StringFieldUpdateOperationsInput | string
+    statusRekomendasi?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
+    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
+    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KegiatanRapatUpdateWithoutDibuatOlehInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    judul?: StringFieldUpdateOperationsInput | string
+    deskripsi?: StringFieldUpdateOperationsInput | string
+    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
+    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
+    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
+    judulLaporan?: StringFieldUpdateOperationsInput | string
+    rekomendasiItems?: JsonNullValueInput | InputJsonValue
+    fingerprint?: StringFieldUpdateOperationsInput | string
+    statusRekomendasi?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
+    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
+    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    domainIsu?: DomainIsuUpdateOneRequiredWithoutKegiatanRapatNestedInput
+    diprosesOleh?: UserUpdateOneWithoutKegiatanRapatDiprosesNestedInput
+    masukanRelasi?: KegiatanRapatMasukanUpdateManyWithoutKegiatanRapatNestedInput
+  }
+
+  export type KegiatanRapatUncheckedUpdateWithoutDibuatOlehInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    judul?: StringFieldUpdateOperationsInput | string
+    deskripsi?: StringFieldUpdateOperationsInput | string
+    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
+    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
+    domainIsuId?: StringFieldUpdateOperationsInput | string
+    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
+    judulLaporan?: StringFieldUpdateOperationsInput | string
+    rekomendasiItems?: JsonNullValueInput | InputJsonValue
+    fingerprint?: StringFieldUpdateOperationsInput | string
+    statusRekomendasi?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
+    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
+    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    masukanRelasi?: KegiatanRapatMasukanUncheckedUpdateManyWithoutKegiatanRapatNestedInput
+  }
+
+  export type KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    judul?: StringFieldUpdateOperationsInput | string
+    deskripsi?: StringFieldUpdateOperationsInput | string
+    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
+    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
+    domainIsuId?: StringFieldUpdateOperationsInput | string
+    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
+    judulLaporan?: StringFieldUpdateOperationsInput | string
+    rekomendasiItems?: JsonNullValueInput | InputJsonValue
+    fingerprint?: StringFieldUpdateOperationsInput | string
+    statusRekomendasi?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
+    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
+    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DataMasterUpdateWithoutDiprosesOlehInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    namaAtribut?: StringFieldUpdateOperationsInput | string
+    kritikalitas?: EnumNilaiKritikalitasFieldUpdateOperationsInput | $Enums.NilaiKritikalitas
+    jumlah?: NullableIntFieldUpdateOperationsInput | number | null
+    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
+    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    tahunData?: NullableIntFieldUpdateOperationsInput | number | null
+    sumberData?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    domainIsu?: DomainIsuUpdateOneRequiredWithoutDataMasterNestedInput
+  }
+
+  export type DataMasterUncheckedUpdateWithoutDiprosesOlehInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    domainIsuId?: StringFieldUpdateOperationsInput | string
+    namaAtribut?: StringFieldUpdateOperationsInput | string
+    kritikalitas?: EnumNilaiKritikalitasFieldUpdateOperationsInput | $Enums.NilaiKritikalitas
+    jumlah?: NullableIntFieldUpdateOperationsInput | number | null
+    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
+    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    tahunData?: NullableIntFieldUpdateOperationsInput | number | null
+    sumberData?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DataMasterUncheckedUpdateManyWithoutDiprosesOlehInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    domainIsuId?: StringFieldUpdateOperationsInput | string
+    namaAtribut?: StringFieldUpdateOperationsInput | string
+    kritikalitas?: EnumNilaiKritikalitasFieldUpdateOperationsInput | $Enums.NilaiKritikalitas
+    jumlah?: NullableIntFieldUpdateOperationsInput | number | null
+    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
+    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    tahunData?: NullableIntFieldUpdateOperationsInput | number | null
+    sumberData?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -19917,177 +18503,52 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type KegiatanRapatUpdateWithoutDibuatOlehInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    judul?: StringFieldUpdateOperationsInput | string
-    deskripsi?: StringFieldUpdateOperationsInput | string
-    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
-    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
-    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
-    aiPromptHash?: NullableStringFieldUpdateOperationsInput | string | null
-    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    domainIsu?: DomainIsuUpdateOneWithoutKegiatanRapatNestedInput
-    rekomendasi?: RekomendasiUpdateManyWithoutKegiatanRapatNestedInput
-  }
-
-  export type KegiatanRapatUncheckedUpdateWithoutDibuatOlehInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    judul?: StringFieldUpdateOperationsInput | string
-    deskripsi?: StringFieldUpdateOperationsInput | string
-    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
-    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
-    domainIsuId?: NullableStringFieldUpdateOperationsInput | string | null
-    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
-    aiPromptHash?: NullableStringFieldUpdateOperationsInput | string | null
-    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    rekomendasi?: RekomendasiUncheckedUpdateManyWithoutKegiatanRapatNestedInput
-  }
-
-  export type KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    judul?: StringFieldUpdateOperationsInput | string
-    deskripsi?: StringFieldUpdateOperationsInput | string
-    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
-    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
-    domainIsuId?: NullableStringFieldUpdateOperationsInput | string | null
-    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
-    aiPromptHash?: NullableStringFieldUpdateOperationsInput | string | null
-    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type DataMasterUpdateWithoutDiprosesOlehInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    namaAtribut?: StringFieldUpdateOperationsInput | string
-    nilai?: StringFieldUpdateOperationsInput | string
-    jumlah?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRt?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRw?: NullableIntFieldUpdateOperationsInput | number | null
-    sumberData?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    domainIsu?: DomainIsuUpdateOneRequiredWithoutDataMasterNestedInput
-  }
-
-  export type DataMasterUncheckedUpdateWithoutDiprosesOlehInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    domainIsuId?: StringFieldUpdateOperationsInput | string
-    namaAtribut?: StringFieldUpdateOperationsInput | string
-    nilai?: StringFieldUpdateOperationsInput | string
-    jumlah?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRt?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRw?: NullableIntFieldUpdateOperationsInput | number | null
-    sumberData?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type DataMasterUncheckedUpdateManyWithoutDiprosesOlehInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    domainIsuId?: StringFieldUpdateOperationsInput | string
-    namaAtribut?: StringFieldUpdateOperationsInput | string
-    nilai?: StringFieldUpdateOperationsInput | string
-    jumlah?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRt?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRw?: NullableIntFieldUpdateOperationsInput | number | null
-    sumberData?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type RekomendasiMasukanCreateManyMasukanInput = {
-    rekomendasiId: string
-  }
-
-  export type RekomendasiMasukanUpdateWithoutMasukanInput = {
-    rekomendasi?: RekomendasiUpdateOneRequiredWithoutMasukanLinksNestedInput
-  }
-
-  export type RekomendasiMasukanUncheckedUpdateWithoutMasukanInput = {
-    rekomendasiId?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type RekomendasiMasukanUncheckedUpdateManyWithoutMasukanInput = {
-    rekomendasiId?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type RekomendasiMasukanCreateManyRekomendasiInput = {
-    masukanId: string
-  }
-
-  export type RekomendasiMasukanUpdateWithoutRekomendasiInput = {
-    masukan?: MasukanWargaUpdateOneRequiredWithoutRekomendasiLinksNestedInput
-  }
-
-  export type RekomendasiMasukanUncheckedUpdateWithoutRekomendasiInput = {
-    masukanId?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type RekomendasiMasukanUncheckedUpdateManyWithoutRekomendasiInput = {
-    masukanId?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type RekomendasiCreateManyKegiatanRapatInput = {
+  export type KegiatanRapatMasukanCreateManyMasukanInput = {
     id?: string
-    domainIsuId: string
-    judul: string
-    ringkasan: string
-    deskripsi: string
-    skorPrioritas: number
-    status?: $Enums.StatusRekomendasi
-    laporanLengkap: JsonNullValueInput | InputJsonValue
-    diprosesOlehId?: string | null
+    kegiatanRapatId: string
     createdAt?: Date | string
-    updatedAt?: Date | string
   }
 
-  export type RekomendasiUpdateWithoutKegiatanRapatInput = {
+  export type KegiatanRapatMasukanUpdateWithoutMasukanInput = {
     id?: StringFieldUpdateOperationsInput | string
-    judul?: StringFieldUpdateOperationsInput | string
-    ringkasan?: StringFieldUpdateOperationsInput | string
-    deskripsi?: StringFieldUpdateOperationsInput | string
-    skorPrioritas?: FloatFieldUpdateOperationsInput | number
-    status?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
-    laporanLengkap?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    domainIsu?: DomainIsuUpdateOneRequiredWithoutRekomendasiNestedInput
-    diprosesOleh?: UserUpdateOneWithoutRekomendasiDiprosesNestedInput
-    masukanLinks?: RekomendasiMasukanUpdateManyWithoutRekomendasiNestedInput
+    kegiatanRapat?: KegiatanRapatUpdateOneRequiredWithoutMasukanRelasiNestedInput
   }
 
-  export type RekomendasiUncheckedUpdateWithoutKegiatanRapatInput = {
+  export type KegiatanRapatMasukanUncheckedUpdateWithoutMasukanInput = {
     id?: StringFieldUpdateOperationsInput | string
-    domainIsuId?: StringFieldUpdateOperationsInput | string
-    judul?: StringFieldUpdateOperationsInput | string
-    ringkasan?: StringFieldUpdateOperationsInput | string
-    deskripsi?: StringFieldUpdateOperationsInput | string
-    skorPrioritas?: FloatFieldUpdateOperationsInput | number
-    status?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
-    laporanLengkap?: JsonNullValueInput | InputJsonValue
-    diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
+    kegiatanRapatId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    masukanLinks?: RekomendasiMasukanUncheckedUpdateManyWithoutRekomendasiNestedInput
   }
 
-  export type RekomendasiUncheckedUpdateManyWithoutKegiatanRapatInput = {
+  export type KegiatanRapatMasukanUncheckedUpdateManyWithoutMasukanInput = {
     id?: StringFieldUpdateOperationsInput | string
-    domainIsuId?: StringFieldUpdateOperationsInput | string
-    judul?: StringFieldUpdateOperationsInput | string
-    ringkasan?: StringFieldUpdateOperationsInput | string
-    deskripsi?: StringFieldUpdateOperationsInput | string
-    skorPrioritas?: FloatFieldUpdateOperationsInput | number
-    status?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
-    laporanLengkap?: JsonNullValueInput | InputJsonValue
-    diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
+    kegiatanRapatId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KegiatanRapatMasukanCreateManyKegiatanRapatInput = {
+    id?: string
+    masukanId: string
+    createdAt?: Date | string
+  }
+
+  export type KegiatanRapatMasukanUpdateWithoutKegiatanRapatInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    masukan?: MasukanWargaUpdateOneRequiredWithoutRelasiRapatNestedInput
+  }
+
+  export type KegiatanRapatMasukanUncheckedUpdateWithoutKegiatanRapatInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    masukanId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KegiatanRapatMasukanUncheckedUpdateManyWithoutKegiatanRapatInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    masukanId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

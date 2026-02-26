@@ -751,7 +751,7 @@ export default function ListTableDataMaster() {
                     </TableCell>
                     <TableCell className={cellCenter}>
                       <Badge variant="outline" className="whitespace-nowrap">
-                        {item.nilai}
+                        {item.kritikalitas}
                       </Badge>
                     </TableCell>
                     <TableCell className={cellCenter}>

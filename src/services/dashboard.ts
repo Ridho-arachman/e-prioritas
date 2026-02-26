@@ -28,7 +28,7 @@ export const dashboardService = {
 
       prisma.dataMaster.count(),
 
-      prisma.rekomendasi.count(),
+      prisma.kegiatanRapat.count(),
     ]);
 
     return {
@@ -42,7 +42,7 @@ export const dashboardService = {
   },
 
   getRecentActivities: async () => {
-    const [verifikasi, rekomendasi, dataMaster, penggunaBaru] =
+    const [verifikasi, kegiatanRapat, dataMaster, penggunaBaru] =
       await Promise.all([
         prisma.masukanWarga.findMany({
           take: 3,
@@ -54,7 +54,7 @@ export const dashboardService = {
             diverifikasiOleh: { select: { name: true } },
           },
         }),
-        prisma.rekomendasi.findMany({
+        prisma.kegiatanRapat.findMany({
           take: 3,
           orderBy: { createdAt: "desc" },
           select: {
@@ -87,8 +87,8 @@ export const dashboardService = {
         title: `Verifikasi masukan warga oleh ${v.diverifikasiOleh?.name || "Anonim"}`,
         time: v.updatedAt,
       })),
-      ...rekomendasi.map((r) => ({
-        title: `Rekomendasi baru diproses oleh ${r.diprosesOleh?.name || "Admin"}`,
+      ...kegiatanRapat.map((r) => ({
+        title: `Kegiatan rapat baru diproses oleh ${r.diprosesOleh?.name || "Admin"}`,
         time: r.createdAt,
       })),
       ...dataMaster.map((d) => ({

@@ -2,23 +2,28 @@ import { auth } from "@/lib/auth";
 import { handlePrismaError } from "@/lib/handlePrismaError";
 import { handleZodValidation } from "@/lib/handleZodValidation";
 import { handleResponse } from "@/lib/handleResponse";
-import {
-  dataMasterQuerySchema,
-  dataMasterSchema,
-} from "@/schema/dataMasterSchema";
-import { dataMasterService } from "@/services/dataMasterService";
+
+import { kegiatanRapatService } from "@/services/kegiatanRapatService";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { NextRequest } from "next/server";
-import { Role } from "@/app/generated/prisma"; // pastikan path sesuai
+import { Role } from "@/app/generated/prisma";
 import { headers } from "next/headers";
+import {
+  kegiatanRapatQuerySchema,
+  kegiatanRapatSchema,
+} from "@/schema/kegiatanRapatSchema";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+// ========================
+// POST - Create Kegiatan
+// ========================
+
 export const POST = async (req: NextRequest) => {
-  const allowedRoles: Role[] = ["ADMIN"];
+  const allowedRoles: Role[] = ["ADMIN", "LURAH", "PERANGKAT_DESA"];
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session) {
@@ -39,22 +44,22 @@ export const POST = async (req: NextRequest) => {
 
   try {
     const body = await req.json();
-    const parsed = dataMasterSchema.safeParse(body);
+    const parsed = kegiatanRapatSchema.safeParse(body);
 
     if (!parsed.success) return handleZodValidation(parsed);
 
-    // Gabungkan data validasi dengan ID user yang memproses
+    // Gabungkan data validasi dengan ID user yang membuat
     const data = {
       ...parsed.data,
-      diprosesOlehId: session.user.id, // akan digunakan untuk connect ke User
+      dibuatOlehId: session.user.id, // akan digunakan untuk connect ke User
     };
 
-    const dataMaster = await dataMasterService.create(data);
+    const kegiatanRapat = await kegiatanRapatService.create(data);
 
     return handleResponse({
       success: true,
-      message: "Data Berhasil Ditambahkan",
-      data: dataMaster,
+      message: "Kegiatan Berhasil Ditambahkan",
+      data: kegiatanRapat,
       status: 201,
     });
   } catch (err) {
@@ -77,8 +82,12 @@ export const POST = async (req: NextRequest) => {
   }
 };
 
+// ========================
+// GET - List Kegiatan
+// ========================
+
 export const GET = async (req: NextRequest) => {
-  const allowedRoles: Role[] = ["ADMIN"];
+  const allowedRoles: Role[] = ["ADMIN", "LURAH", "PERANGKAT_DESA"];
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session) {
@@ -100,13 +109,15 @@ export const GET = async (req: NextRequest) => {
   try {
     const searchParams = req.nextUrl.searchParams;
 
-    // Parameter filter (existing)
+    // Parameter filter
     const q = searchParams.get("q") || undefined;
+    const judul = searchParams.get("judul") || undefined;
+    const lokasi = searchParams.get("lokasi") || undefined;
     const domainIsuId = searchParams.get("domainIsuId") || undefined;
-    const lokasiRt = searchParams.get("lokasiRt") || undefined;
-    const lokasiRw = searchParams.get("lokasiRw") || undefined;
-    const nilai = searchParams.get("nilai") || undefined;
+    const aiModel = searchParams.get("aiModel") || undefined;
+    const createdAt = searchParams.get("createdAt") || undefined;
     const updatedAt = searchParams.get("updatedAt") || undefined;
+    const tanggal = searchParams.get("tanggal") || undefined;
 
     // Parameter sorting & pagination
     const sortBy = searchParams.get("sortBy") || "updatedAt";
@@ -115,14 +126,16 @@ export const GET = async (req: NextRequest) => {
     const page = Number(searchParams.get("page")) || 1;
     const limit = Number(searchParams.get("limit")) || 10;
 
-    // Validasi filter dengan schema yang sudah ada
-    const parsed = dataMasterQuerySchema.safeParse({
+    // Validasi filter dengan schema
+    const parsed = kegiatanRapatQuerySchema.safeParse({
       q,
+      judul,
+      lokasi,
       domainIsuId,
-      lokasiRt,
-      lokasiRw,
-      nilai,
+      aiModel,
+      createdAt,
       updatedAt,
+      tanggal,
     });
 
     if (!parsed.success) return handleZodValidation(parsed);
@@ -130,13 +143,34 @@ export const GET = async (req: NextRequest) => {
     const data = parsed.data;
 
     // Bangun filter tanggal
+    let createdAtFrom: Date | undefined;
+    let createdAtTo: Date | undefined;
+    if (data.createdAt) {
+      if (!dayjs(data.createdAt, "YYYY-MM-DD", true).isValid()) {
+        return handleResponse({
+          success: false,
+          message: "Format tanggal createdAt tidak valid (harus YYYY-MM-DD)",
+          status: 400,
+        });
+      }
+
+      createdAtFrom = dayjs
+        .tz(`${data.createdAt} 00:00:00`, "Asia/Jakarta")
+        .utc()
+        .toDate();
+      createdAtTo = dayjs
+        .tz(`${data.createdAt} 23:59:59`, "Asia/Jakarta")
+        .utc()
+        .toDate();
+    }
+
     let updatedAtFrom: Date | undefined;
     let updatedAtTo: Date | undefined;
     if (data.updatedAt) {
       if (!dayjs(data.updatedAt, "YYYY-MM-DD", true).isValid()) {
         return handleResponse({
           success: false,
-          message: "Format tanggal tidak valid (harus YYYY-MM-DD)",
+          message: "Format tanggal updatedAt tidak valid (harus YYYY-MM-DD)",
           status: 400,
         });
       }
@@ -151,16 +185,41 @@ export const GET = async (req: NextRequest) => {
         .toDate();
     }
 
+    let tanggalFrom: Date | undefined;
+    let tanggalTo: Date | undefined;
+    if (data.tanggal) {
+      if (!dayjs(data.tanggal, "YYYY-MM-DD", true).isValid()) {
+        return handleResponse({
+          success: false,
+          message: "Format tanggal kegiatan tidak valid (harus YYYY-MM-DD)",
+          status: 400,
+        });
+      }
+
+      tanggalFrom = dayjs
+        .tz(`${data.tanggal} 00:00:00`, "Asia/Jakarta")
+        .utc()
+        .toDate();
+      tanggalTo = dayjs
+        .tz(`${data.tanggal} 23:59:59`, "Asia/Jakarta")
+        .utc()
+        .toDate();
+    }
+
     // Panggil service dengan semua parameter
-    const result = await dataMasterService.getAll({
+    const result = await kegiatanRapatService.getAll({
       // Filter
       search: data.q,
+      judul: data.judul,
+      lokasi: data.lokasi,
       domainIsuId: data.domainIsuId,
-      lokasiRt: data.lokasiRt,
-      lokasiRw: data.lokasiRw,
-      kritikalitas: data.kritikalitas,
+      aiModel: data.aiModel,
+      createdAtFrom,
+      createdAtTo,
       updatedAtFrom,
       updatedAtTo,
+      tanggalFrom,
+      tanggalTo,
       // Sorting
       sortBy,
       sortOrder,
@@ -172,7 +231,7 @@ export const GET = async (req: NextRequest) => {
     if (result.data.length === 0) {
       return handleResponse({
         success: true,
-        message: "Data Master Masih Kosong",
+        message: "Kegiatan Masih Kosong",
         data: [],
         status: 200,
       });

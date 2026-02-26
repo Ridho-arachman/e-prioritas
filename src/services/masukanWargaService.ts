@@ -1,11 +1,33 @@
 import { Prisma, StatusMasukan } from "@/app/generated/prisma";
 import prisma from "@/lib/prisma";
 
+//////////////////////////////////////////////////////////////
+// DOMAIN DTO (MANUAL TYPES)
+//////////////////////////////////////////////////////////////
+
+export interface CreateMasukanDTO {
+  namaPengirim?: string | null;
+  nomorHp?: string | null;
+  judul: string;
+  deskripsi: string;
+  lokasiRt: string;
+  lokasiRw: string;
+  domainIsuId: string;
+}
+
+export interface UpdateStatusMasukanDTO {
+  status: StatusMasukan;
+  diverifikasiOlehId?: string | null;
+  alasanPenolakan?: string | null;
+}
+
 export interface GetAllMasukanParams {
   q?: string;
   status?: StatusMasukan;
   domainIsuId?: string;
   diverifikasiOlehId?: string;
+  lokasiRt?: string;
+  lokasiRw?: string;
   createdAt?: string;
   page?: number;
   perPage?: number;
@@ -13,30 +35,33 @@ export interface GetAllMasukanParams {
   sortOrder?: "asc" | "desc";
 }
 
-type whereQuerySchema = Prisma.MasukanWargaWhereInput;
-type createDataSchema = Prisma.MasukanWargaCreateInput | any;
-type updateDataSchema = Prisma.MasukanWargaUpdateInput | any;
+type WhereInput = Prisma.MasukanWargaWhereInput;
 
 export const masukanWargaService = {
-  create: async (data: createDataSchema) => {
-    const { kategoriId, verifiedByUserId, ...rest } = data;
+  ////////////////////////////////////////////////////////////
+  // CREATE
+  ////////////////////////////////////////////////////////////
 
+  create: async (data: CreateMasukanDTO) => {
     return prisma.masukanWarga.create({
       data: {
-        ...rest,
-        ...(kategoriId && { kategori: { connect: { id: kategoriId } } }),
-        ...(verifiedByUserId && {
-          verifiedBy: { connect: { id: verifiedByUserId } },
-        }),
+        ...data,
+        status: StatusMasukan.MENUNGGU,
       },
     });
   },
+
+  ////////////////////////////////////////////////////////////
+  // GET ALL (FILTER + PAGINATION + SORT)
+  ////////////////////////////////////////////////////////////
 
   getAllMasukan: async ({
     q,
     status,
     domainIsuId,
     diverifikasiOlehId,
+    lokasiRt,
+    lokasiRw,
     createdAt,
     page = 1,
     perPage = 10,
@@ -46,39 +71,33 @@ export const masukanWargaService = {
     const skip = (page - 1) * perPage;
     const take = perPage;
 
-    // Validasi dan mapping field sorting
+    ////////////////////////////////////////////////////////////
+    // SORTING SAFETY
+    ////////////////////////////////////////////////////////////
+
     const validSortFields = [
-      "id",
-      "namaPengirim",
-      "nomorHp",
-      "judul",
-      "deskripsi",
-      "lokasiRt",
-      "lokasiRw",
-      "status",
       "createdAt",
       "updatedAt",
-      "domainIsu.namaKategori", // Untuk sorting berdasarkan nama domain isu
+      "judul",
+      "status",
+      "namaPengirim",
+      "lokasiRt",
+      "lokasiRw",
     ];
 
-    // Map frontend sort field ke field Prisma
-    let sortField = validSortFields.includes(sortBy) ? sortBy : "createdAt";
-    const order = sortOrder === "desc" ? "desc" : "asc";
+    const order = sortOrder === "asc" ? "asc" : "desc";
+    const sortField = validSortFields.includes(sortBy) ? sortBy : "createdAt";
 
-    // Handle nested sorting (domainIsu)
-    let orderBy: any = {};
-    if (sortField === "domainIsu.namaKategori") {
-      orderBy = {
-        domainIsu: {
-          namaKategori: order,
-        },
-      };
-    } else {
-      orderBy = { [sortField]: order };
-    }
+    const orderBy: Prisma.MasukanWargaOrderByWithRelationInput = {
+      [sortField]: order,
+    };
 
-    // Filter tanggal
-    let createdAtFilter = {};
+    ////////////////////////////////////////////////////////////
+    // DATE FILTER
+    ////////////////////////////////////////////////////////////
+
+    let createdAtFilter: WhereInput = {};
+
     if (createdAt) {
       const startDate = new Date(createdAt);
       startDate.setHours(0, 0, 0, 0);
@@ -94,8 +113,11 @@ export const masukanWargaService = {
       };
     }
 
-    // Build where clause
-    const where: any = {
+    ////////////////////////////////////////////////////////////
+    // WHERE CLAUSE
+    ////////////////////////////////////////////////////////////
+
+    const where: WhereInput = {
       AND: [
         q
           ? {
@@ -107,38 +129,47 @@ export const masukanWargaService = {
               ],
             }
           : {},
+
         status ? { status } : {},
         domainIsuId ? { domainIsuId } : {},
         diverifikasiOlehId ? { diverifikasiOlehId } : {},
+        lokasiRt ? { lokasiRt } : {},
+        lokasiRw ? { lokasiRw } : {},
+
         createdAtFilter,
-      ].filter(Boolean), // Hapus empty objects
+      ],
     };
 
-    // Hitung total data
-    const total = await prisma.masukanWarga.count({ where });
+    ////////////////////////////////////////////////////////////
+    // QUERY
+    ////////////////////////////////////////////////////////////
 
-    // Ambil data dengan relations
-    const data = await prisma.masukanWarga.findMany({
-      where,
-      orderBy,
-      skip,
-      take,
-      include: {
-        domainIsu: {
-          select: {
-            id: true,
-            nama: true,
+    const [total, data] = await Promise.all([
+      prisma.masukanWarga.count({ where }),
+
+      prisma.masukanWarga.findMany({
+        where,
+        orderBy,
+        skip,
+        take,
+        include: {
+          domainIsu: {
+            select: {
+              id: true,
+              nama: true,
+            },
+          },
+
+          diverifikasiOleh: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
           },
         },
-        diverifikasiOleh: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
-    });
+      }),
+    ]);
 
     return {
       data,
@@ -153,26 +184,64 @@ export const masukanWargaService = {
     };
   },
 
-  getById: async (id?: string) => {
+  ////////////////////////////////////////////////////////////
+  // GET BY ID
+  ////////////////////////////////////////////////////////////
+
+  getById: async (id: string) => {
     return prisma.masukanWarga.findUniqueOrThrow({
       where: { id },
+
       include: {
-        domainIsu: { select: { id: true, nama: true } },
-        diverifikasiOleh: { select: { id: true, name: true, email: true } },
+        domainIsu: {
+          select: { id: true, nama: true },
+        },
+
+        diverifikasiOleh: {
+          select: { id: true, name: true, email: true },
+        },
+
+        relasiRapat: true,
       },
     });
   },
 
-  update: async (id: string, data: updateDataSchema) => {
+  ////////////////////////////////////////////////////////////
+  // UPDATE STATUS
+  ////////////////////////////////////////////////////////////
+
+  updateStatus: async (id: string, data: UpdateStatusMasukanDTO) => {
+    ////////////////////////////////////////////////////////////
+    // BUSINESS RULE HARDENING
+    ////////////////////////////////////////////////////////////
+
+    if (data.status === StatusMasukan.DITOLAK && !data.alasanPenolakan) {
+      throw new Error("Alasan penolakan wajib jika status DITOLAK");
+    }
+
     return prisma.masukanWarga.update({
       where: { id },
+
       data: {
-        alasanPenolakan:
-          data.status === "DITOLAK" ? data.alasanPenolakan : null,
         status: data.status,
-        diverifikasiOlehId: data.diverifikasiOlehId
-          ? data.diverifikasiOlehId
-          : null,
+
+        ////////////////////////////////////////////////////////////
+        // RELATION SAFE UPDATE (PRISMA WAY)
+        ////////////////////////////////////////////////////////////
+
+        diverifikasiOleh:
+          data.status === StatusMasukan.MENUNGGU
+            ? { disconnect: true }
+            : data.diverifikasiOlehId
+              ? { connect: { id: data.diverifikasiOlehId } }
+              : undefined,
+
+        ////////////////////////////////////////////////////////////
+        // BUSINESS RULE
+        ////////////////////////////////////////////////////////////
+
+        alasanPenolakan:
+          data.status === StatusMasukan.DITOLAK ? data.alasanPenolakan : null,
       },
     });
   },

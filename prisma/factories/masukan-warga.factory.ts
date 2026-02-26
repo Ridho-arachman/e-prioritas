@@ -1,42 +1,57 @@
 import { fakerID_ID as faker } from "@faker-js/faker";
-import { StatusMasukan } from "../../src/app/generated/prisma";
 import prisma from "@/lib/prisma";
+import type { Prisma, StatusMasukan } from "@/app/generated/prisma";
 
-export async function masukanWargaFactory(domainIds: string[], count = 3) {
-  const results = [];
+interface MasukanWargaFactoryOptions {
+  countPerDomain?: number;
+  diverifikasiOlehId?: string;
+}
 
-  for (const domainId of domainIds) {
-    for (let i = 0; i < count; i++) {
-      results.push(
-        prisma.masukanWarga.create({
-          data: {
-            judul: faker.lorem.sentence(5).slice(0, 255), // Batasi max 255 karakter
-            deskripsi: faker.lorem.paragraph().slice(0, 2000), // Batasi jika perlu
-            lokasiRt: faker.number
-              .int({ min: 1, max: 10 })
-              .toString()
-              .padStart(3, "0"), // RT: 001-010
-            lokasiRw: faker.number
-              .int({ min: 1, max: 10 })
-              .toString()
-              .padStart(3, "0"), // RW: 001-010
-            domainIsuId: domainId,
-            nomorHp: faker.phone.number().slice(0, 15), // Batasi max 15 karakter
-            namaPengirim: faker.person.fullName().slice(0, 255), // Batasi max 255
-            status: faker.helpers.arrayElement([
-              StatusMasukan.MENUNGGU,
-              StatusMasukan.DIVERIFIKASI,
-              StatusMasukan.DITOLAK,
-            ]),
-            // Jika ada field lain yang required, tambahkan di sini
-            alasanPenolakan: faker.helpers.maybe(() => faker.lorem.sentence(), {
-              probability: 0.3,
-            }),
-          },
-        }),
-      );
+export async function masukanWargaFactory(
+  domainIds: string[],
+  options?: MasukanWargaFactoryOptions,
+) {
+  const countPerDomain = options?.countPerDomain ?? 20;
+  const diverifikasiOlehId = options?.diverifikasiOlehId;
+
+  const statusOptions: StatusMasukan[] = [
+    "DIVERIFIKASI",
+    "DIVERIFIKASI",
+    "DIVERIFIKASI",
+    "DIVERIFIKASI",
+    "DIVERIFIKASI",
+    "DIVERIFIKASI",
+    "DIVERIFIKASI",
+    "MENUNGGU",
+    "MENUNGGU",
+    "MENUNGGU",
+    "MENUNGGU",
+    "DIPROSES",
+  ];
+
+  const items: Prisma.MasukanWargaCreateManyInput[] = [];
+
+  for (const domainIsuId of domainIds) {
+    for (let i = 0; i < countPerDomain; i++) {
+      const status = faker.helpers.arrayElement(statusOptions);
+      const shouldSetVerifier =
+        status === "DIVERIFIKASI" && !!diverifikasiOlehId;
+
+      items.push({
+        namaPengirim: faker.person.fullName().substring(0, 255),
+        nomorHp: `08${faker.string.numeric(10)}`,
+        judul: faker.lorem.sentence(5).substring(0, 255),
+        deskripsi: faker.lorem.paragraphs(2),
+        lokasiRt: faker.string.numeric(3).substring(0, 3),
+        lokasiRw: faker.string.numeric(3).substring(0, 3),
+        domainIsuId,
+        status,
+        diverifikasiOlehId: shouldSetVerifier ? diverifikasiOlehId : undefined,
+        isRelevant: true,
+        isLocked: false,
+      });
     }
   }
 
-  return Promise.all(results);
+  return await prisma.masukanWarga.createMany({ data: items });
 }

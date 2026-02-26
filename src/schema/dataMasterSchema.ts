@@ -1,48 +1,74 @@
+import { NilaiKritikalitas } from "@/app/generated/prisma";
 import z from "zod";
-
-// Helper untuk mengubah input string menjadi number atau null
-const stringToNumber = (val: unknown) => {
-  if (val === "" || val === null || val === undefined) return null;
-  const num = Number(val);
-  return isNaN(num) ? null : num;
-};
 
 export const dataMasterSchema = z.object({
   domainIsuId: z.string().cuid("Domain Isu ID tidak valid"),
-  namaAtribut: z.string().min(1, "Nama atribut tidak boleh kosong"),
-  nilai: z.string().min(1, "Nilai tidak boleh kosong"),
 
-  // Langsung terima number atau null (tanpa preprocess)
-  lokasiRt: z.number().int().min(1).max(999).nullable().optional(),
-  lokasiRw: z.number().int().min(1).max(999).nullable().optional(),
-  jumlah: z.number().int().min(0).nullable().optional(),
+  namaAtribut: z
+    .string()
+    .trim()
+    .min(1, "Nama atribut tidak boleh kosong")
+    .max(100, "Maksimal 100 karakter"),
 
-  sumberData: z.string().nullable().optional(),
-});
+  kritikalitas: z.nativeEnum(NilaiKritikalitas, {
+    message: "Kritikalitas tidak valid",
+  }),
 
-// Schema untuk query parameters (GET)
-export const dataMasterQuerySchema = z.object({
-  q: z.string().optional(), // pencarian di namaAtribut
-  domainIsuId: z.string().cuid().optional(),
+  jumlah: z
+    .number()
+    .int("Jumlah harus bilangan bulat")
+    .min(0, "Jumlah tidak boleh negatif")
+    .nullable()
+    .optional(),
+
   lokasiRt: z
-    .preprocess(
-      (val) => (val === undefined || val === "" ? undefined : Number(val)),
-      z.number().int().min(1).max(999),
-    )
+    .string()
+    .trim()
+    .max(3, "RT maksimal 3 karakter")
+    .nullable()
     .optional(),
+
   lokasiRw: z
-    .preprocess(
-      (val) => (val === undefined || val === "" ? undefined : Number(val)),
-      z.number().int().min(1).max(999),
-    )
+    .string()
+    .trim()
+    .max(3, "RW maksimal 3 karakter")
+    .nullable()
     .optional(),
-  nilai: z.string().optional(), // pencarian exact match atau contains
-  updatedAt: z.string().optional(), // format YYYY-MM-DD
+
+  sumberData: z.string().trim().nullable().optional(),
+  isActive: z.boolean().optional().default(true),
+
+  // ✅ Tambahkan: tahunData (Int?)
+  tahunData: z.number().int().min(2020).max(2030).nullable().optional(),
+
+  // ✅ Tambahkan: diprosesOlehId (String?)
+  diprosesOlehId: z.string().cuid().nullable().optional(),
 });
 
-// Schema untuk parameter ID (misal untuk detail/update)
 export const dataMasterParamSchema = z.object({
   id: z.string().cuid("ID data master tidak valid"),
+});
+
+export const dataMasterQuerySchema = z.object({
+  q: z.string().optional(),
+
+  domainIsuId: z.string().cuid().optional(),
+
+  kritikalitas: z
+    .nativeEnum(NilaiKritikalitas, {
+      message: "Filter kritikalitas tidak valid",
+    })
+    .optional(),
+
+  lokasiRt: z.string().optional(),
+  lokasiRw: z.string().optional(),
+
+  updatedAt: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, {
+      message: "Format tanggal harus YYYY-MM-DD",
+    })
+    .optional(),
 });
 
 export const dataMasterArraySchema = z.array(dataMasterSchema);

@@ -49,6 +49,9 @@ const POST = async (
 
     const parsedId = masukanWargaByIdSchema.safeParse({ id });
 
+    console.log("parsed", parsed);
+    console.log("parsedId", parsedId);
+
     if (!parsedId.success) return handleZodValidation(parsedId);
     if (!parsed.success) return handleZodValidation(parsed);
 
@@ -61,7 +64,7 @@ const POST = async (
     }
 
     //UPDATE
-    const masukan = await masukanWargaService.update(masukanId, data);
+    const masukan = await masukanWargaService.updateStatus(masukanId, data);
 
     return handleResponse({
       success: true,
@@ -71,6 +74,7 @@ const POST = async (
     });
   } catch (err) {
     //PRISMA ERROR
+
     const prismaResponse = handlePrismaError(err);
     if (prismaResponse) {
       return handleResponse({

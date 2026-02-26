@@ -74,7 +74,7 @@ export function buildPrompt(args: PromptArgs): string {
             ],
           },
           null,
-          2
+          2,
         )}
     `;
 

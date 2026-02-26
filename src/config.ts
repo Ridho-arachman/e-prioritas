@@ -5,7 +5,7 @@ export const config = {
   appUrl: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
   prisma: {
     user: {
-      userId: "ZAZW2VDe753WUUcZYxipARmXzq5qW9EX",
+      userId: "v1ZwubsEM4V43tEodlVJkUFWKYQfl8Fc",
     },
     domainIsu: [
       {

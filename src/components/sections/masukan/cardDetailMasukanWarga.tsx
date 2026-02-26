@@ -58,13 +58,16 @@ export default function CardDetailMasukanWarga() {
     MENUNGGU: "bg-yellow-500 text-white",
     DIVERIFIKASI: "bg-green-600 text-white",
     DITOLAK: "bg-red-600 text-white",
+    DIPROSES: "bg-blue-500 text-white",
+    DISELESAIKAN: "bg-purple-600 text-white",
+    KADALUWARSA: "bg-gray-500 text-white",
   };
 
-  // pastikan status dari API dianggap MasukanStatus
+  // pastikan status dari API dianggap StatusMasukan
   const statusKey: StatusMasukan =
     (masukan?.status as StatusMasukan) ?? "MENUNGGU";
 
-  const statusColor = statusColorMap[statusKey];
+  const statusColor = statusColorMap[statusKey] ?? "bg-gray-400 text-white";
 
   // Format tanggal Indonesia
   const formatDate = (date: string) => {
@@ -140,7 +143,7 @@ export default function CardDetailMasukanWarga() {
 
             {/* Detail Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {[...Array(6)].map((_, i) => (
+              {[...Array(7)].map((_, i) => (
                 <div key={i} className="space-y-2">
                   <Skeleton className="h-4 w-24 md:w-32" />
                   <Skeleton className="h-4 w-32 md:w-48" />
@@ -219,15 +222,17 @@ export default function CardDetailMasukanWarga() {
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {/* Header User dengan Status */}
+          {/* Header Pengirim dengan Status */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="w-full sm:w-auto">
               <h3 className="text-base md:text-lg font-semibold wrap-break-word">
                 {masukan.namaPengirim}
               </h3>
-              <p className="text-xs md:text-sm text-muted-foreground wrap-break-word">
-                {masukan.emailPengirim}
-              </p>
+              {masukan.nomorHp && (
+                <p className="text-xs md:text-sm text-muted-foreground wrap-break-word">
+                  {masukan.nomorHp}
+                </p>
+              )}
             </div>
             <Badge
               className={cn(
@@ -263,7 +268,7 @@ export default function CardDetailMasukanWarga() {
 
             <div className="space-y-1">
               <Label className="text-xs md:text-sm text-muted-foreground">
-                Kategori
+                Kategori (Domain Isu)
               </Label>
               <p className="text-sm md:text-base font-medium wrap-break-word">
                 {masukan.domainIsu?.nama ?? "-"}
@@ -297,13 +302,25 @@ export default function CardDetailMasukanWarga() {
               </p>
             </div>
 
+            {/* Nomor HP (jika ada) */}
+            {masukan.nomorHp && (
+              <div className="space-y-1">
+                <Label className="text-xs md:text-sm text-muted-foreground">
+                  Nomor HP
+                </Label>
+                <p className="text-sm md:text-base font-medium wrap-break-word">
+                  {masukan.nomorHp}
+                </p>
+              </div>
+            )}
+
             {/* Deskripsi - Full Width */}
             <div className="col-span-1 sm:col-span-2 lg:col-span-3 space-y-2">
               <Label className="text-xs md:text-sm text-muted-foreground">
                 Deskripsi Masukan
               </Label>
               <p className="text-sm md:text-base whitespace-pre-wrap wrap-break-word bg-muted/50 p-3 md:p-4 rounded-lg">
-                {masukan.deskripsiMasukan}
+                {masukan.deskripsi}
               </p>
             </div>
 
@@ -318,6 +335,25 @@ export default function CardDetailMasukanWarga() {
                 </p>
               </div>
             )}
+
+            {/* Rekomendasi Links - Jika Ada */}
+            {masukan.rekomendasiLinks &&
+              masukan.rekomendasiLinks.length > 0 && (
+                <div className="col-span-1 sm:col-span-2 lg:col-span-3 space-y-2">
+                  <Label className="text-xs md:text-sm text-muted-foreground">
+                    Rekomendasi Terkait
+                  </Label>
+                  <div className="bg-muted/50 p-3 md:p-4 rounded-lg space-y-2">
+                    {masukan.rekomendasiLinks.map((link: any) => (
+                      <div key={link.rekomendasiId} className="text-sm">
+                        {/* Sesuaikan tampilan dengan data yang tersedia, misalnya link ke rekomendasi */}
+                        <span>Rekomendasi ID: {link.rekomendasiId}</span>
+                        {/* Atau tampilkan informasi lain jika ada relasi lebih lanjut */}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
           </div>
 
           {/* Action Buttons - Responsive */}
