@@ -10,9 +10,8 @@ import { Spinner } from "../../ui/spinner";
 import { Field, FieldError, FieldLabel } from "../../ui/field";
 import { notifier } from "../../../lib/ToastNotifier";
 import { useRouter } from "next/navigation";
-import { createMasukanWargaSchema } from "@/schema/masukanWarga";
-import { useCreateMasukanWarga } from "@/hooks/api/useMasukanWarga";
-import { useGetAllKategoriNoProtected } from "@/hooks/api/useKategori";
+import { createMasukanWargaFormSchema } from "@/schema/masukanWarga";
+
 import {
   Select,
   SelectContent,
@@ -22,42 +21,63 @@ import {
   SelectItem,
   SelectLabel,
 } from "../../ui/select";
-import { Kategori } from "@prisma/client";
-import { MessageSquare, Mail, MapPin, User, ClipboardList } from "lucide-react";
+
+import {
+  MessageSquare,
+  MapPin,
+  User,
+  ClipboardList,
+  Phone,
+  Heading,
+} from "lucide-react";
+import { useGet, usePost } from "@/hooks/useApi";
+import { DomainIsu } from "@/app/generated/prisma";
 
 export default function MasukanWargaFormAdd() {
   const router = useRouter();
-  const { execute, loading } = useCreateMasukanWarga();
-  const { data, isLoading } = useGetAllKategoriNoProtected();
-  const kategori: any = data?.data ?? [];
+  const { post: execute, loading } = usePost("/masukan-warga");
+  const { data, isLoading } = useGet("/kategori");
 
-  const form = useForm<z.infer<typeof createMasukanWargaSchema>>({
-    resolver: zodResolver(createMasukanWargaSchema),
+  const domainIsu = data?.data ?? []; // ✅ Akses data.data sesuai response handler
+
+  const form = useForm<z.infer<typeof createMasukanWargaFormSchema>>({
+    resolver: zodResolver(createMasukanWargaFormSchema),
     defaultValues: {
       namaPengirim: "",
-      emailPengirim: "",
+      nomorHp: "",
+      judul: "",
       lokasiRt: "",
       lokasiRw: "",
-      deskripsiMasukan: "",
-      kategoriId: "",
+      deskripsi: "",
+      domainIsuId: "",
     },
   });
 
-  async function onSubmit(data: z.infer<typeof createMasukanWargaSchema>) {
-    const { data: res, error } = await execute(
-      "/masukan-warga",
-      data,
-      { headers: { "Content-Type": "application/json" } },
-      "/masukan-warga",
-    );
+  async function onSubmit(data: z.infer<typeof createMasukanWargaFormSchema>) {
+    // ✅ Kirim hanya field yang relevan untuk create (opsional: filter field server-side)
+    const payload = {
+      namaPengirim: data.namaPengirim,
+      nomorHp: data.nomorHp,
+      judul: data.judul,
+      lokasiRt: data.lokasiRt,
+      lokasiRw: data.lokasiRw,
+      deskripsi: data.deskripsi,
+      domainIsuId: data.domainIsuId,
+      // isLocked & expiresAt akan pakai default dari schema/backend
+    };
+
+    const { data: res, error } = await execute(payload);
 
     if (error) {
       notifier.error(error);
       return;
     }
 
-    notifier.success(res?.message || "Masukan warga berhasil dikirim");
-    router.back();
+    notifier.success(
+      "Berhasil",
+      res?.message || "Masukan warga berhasil dikirim",
+    );
+    form.reset();
   }
 
   return (
@@ -94,20 +114,43 @@ export default function MasukanWargaFormAdd() {
           )}
         />
 
-        {/* Email */}
+        {/* Nomor HP */}
         <Controller
           control={form.control}
-          name="emailPengirim"
+          name="nomorHp"
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+              <FieldLabel htmlFor={field.name}>Nomor HP</FieldLabel>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   {...field}
                   id={field.name}
-                  type="email"
-                  placeholder="contoh@email.com"
+                  type="tel"
+                  placeholder="081234567890"
+                  autoComplete="off"
+                  className="pl-9"
+                  readOnly={loading}
+                />
+              </div>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        {/* Judul */}
+        <Controller
+          control={form.control}
+          name="judul"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>Judul Masukan</FieldLabel>
+              <div className="relative">
+                <Heading className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  {...field}
+                  id={field.name}
+                  placeholder="Contoh: Perbaikan lampu jalan"
                   autoComplete="off"
                   className="pl-9"
                   readOnly={loading}
@@ -130,7 +173,7 @@ export default function MasukanWargaFormAdd() {
                 <Input
                   {...field}
                   id={field.name}
-                  placeholder="Contoh: 003"
+                  placeholder="003"
                   autoComplete="off"
                   className="pl-9"
                   readOnly={loading}
@@ -153,7 +196,7 @@ export default function MasukanWargaFormAdd() {
                 <Input
                   {...field}
                   id={field.name}
-                  placeholder="Contoh: 001"
+                  placeholder="001"
                   autoComplete="off"
                   className="pl-9"
                   readOnly={loading}
@@ -167,7 +210,7 @@ export default function MasukanWargaFormAdd() {
         {/* Deskripsi */}
         <Controller
           control={form.control}
-          name="deskripsiMasukan"
+          name="deskripsi"
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor={field.name}>Deskripsi Masukan</FieldLabel>
@@ -176,7 +219,7 @@ export default function MasukanWargaFormAdd() {
                 <Textarea
                   {...field}
                   id={field.name}
-                  placeholder="Tulis masukan atau saran Anda..."
+                  placeholder="Tulis masukan atau saran Anda secara lengkap..."
                   className="pl-9"
                   rows={4}
                   readOnly={loading}
@@ -187,13 +230,13 @@ export default function MasukanWargaFormAdd() {
           )}
         />
 
-        {/* Kategori */}
+        {/* Domain Isu (Kategori) */}
         <Controller
           control={form.control}
-          name="kategoriId"
+          name="domainIsuId"
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor={field.name}>Kategori</FieldLabel>
+              <FieldLabel htmlFor={field.name}>Kategori Masukan</FieldLabel>
               <Select
                 onValueChange={field.onChange}
                 value={field.value}
@@ -205,9 +248,9 @@ export default function MasukanWargaFormAdd() {
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Kategori</SelectLabel>
-                    {kategori.map((item: Kategori) => (
+                    {domainIsu.map((item: DomainIsu) => (
                       <SelectItem key={item.id} value={item.id}>
-                        {item.namaKategori}
+                        {item.nama}
                       </SelectItem>
                     ))}
                   </SelectGroup>

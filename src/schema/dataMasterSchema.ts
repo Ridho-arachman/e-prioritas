@@ -1,8 +1,9 @@
 import { NilaiKritikalitas } from "@/app/generated/prisma";
 import z from "zod";
 
-export const dataMasterSchema = z.object({
-  domainIsuId: z.string().cuid("Domain Isu ID tidak valid"),
+// Schema untuk CREATE (semua field wajib kecuali yang nullable di Prisma)
+export const dataMasterCreateSchema = z.object({
+  domainIsuId: z.string().min(1, "Domain Isu ID diperlukan"), // Foreign key, tidak perlu .cuid() kecuali yakin semua ID pakai cuid
 
   namaAtribut: z
     .string()
@@ -11,7 +12,7 @@ export const dataMasterSchema = z.object({
     .max(100, "Maksimal 100 karakter"),
 
   kritikalitas: z.nativeEnum(NilaiKritikalitas, {
-    message: "Kritikalitas tidak valid",
+    message: "Nilai kritikalitas tidak valid",
   }),
 
   jumlah: z
@@ -21,54 +22,46 @@ export const dataMasterSchema = z.object({
     .nullable()
     .optional(),
 
-  lokasiRt: z
-    .string()
-    .trim()
-    .max(3, "RT maksimal 3 karakter")
+  isActive: z.boolean().optional(), // Default true di Prisma
+
+  tahunData: z
+    .number()
+    .int("Tahun data harus bilangan bulat")
     .nullable()
     .optional(),
 
-  lokasiRw: z
-    .string()
-    .trim()
-    .max(3, "RW maksimal 3 karakter")
-    .nullable()
-    .optional(),
-
-  sumberData: z.string().trim().nullable().optional(),
-  isActive: z.boolean().optional().default(true),
-
-  // ✅ Tambahkan: tahunData (Int?)
-  tahunData: z.number().int().min(2020).max(2030).nullable().optional(),
-
-  // ✅ Tambahkan: diprosesOlehId (String?)
-  diprosesOlehId: z.string().cuid().nullable().optional(),
+  diprosesOlehId: z.string().nullable().optional(), // Nullable, validasi cuid opsional jika diperlukan
 });
 
-export const dataMasterParamSchema = z.object({
-  id: z.string().cuid("ID data master tidak valid"),
-});
+// Schema untuk UPDATE (semua field opsional)
+export const dataMasterUpdateSchema = dataMasterCreateSchema.partial();
 
+// Schema untuk query params
 export const dataMasterQuerySchema = z.object({
   q: z.string().optional(),
-
-  domainIsuId: z.string().cuid().optional(),
-
-  kritikalitas: z
-    .nativeEnum(NilaiKritikalitas, {
-      message: "Filter kritikalitas tidak valid",
-    })
-    .optional(),
-
-  lokasiRt: z.string().optional(),
-  lokasiRw: z.string().optional(),
-
+  domainIsuId: z.string().optional(),
+  kritikalitas: z.preprocess((val) => {
+    if (typeof val !== "string") return undefined;
+    const trimmed = val.trim();
+    if (trimmed === "" || trimmed.toLowerCase() === "all") return undefined;
+    return trimmed.toUpperCase();
+  }, z.nativeEnum(NilaiKritikalitas).optional()),
   updatedAt: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, {
       message: "Format tanggal harus YYYY-MM-DD",
     })
     .optional(),
+  page: z.coerce.number().int().min(1).optional().default(1),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(10),
+  sortBy: z.string().optional(),
+  sortOrder: z.enum(["asc", "desc"]).optional().default("desc"),
 });
 
-export const dataMasterArraySchema = z.array(dataMasterSchema);
+// Schema untuk validasi ID di path parameter
+export const dataMasterParamSchema = z.object({
+  id: z.string().min(1, "ID diperlukan"),
+});
+
+// Schema untuk array (import bulk)
+export const dataMasterArraySchema = z.array(dataMasterCreateSchema);

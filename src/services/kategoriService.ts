@@ -15,7 +15,11 @@ export const kategoriService = {
     return prisma.domainIsu.create({ data });
   },
 
-  getAll: async ({ nama, page = 1, perPage = 10 }: GetAllKategoriParams) => {
+  getAll: async (params?: GetAllKategoriParams) => {
+    const nama = params?.nama;
+    const page = params?.page ?? 1;
+    const perPage = params?.perPage ?? 10;
+
     const skip = (page - 1) * perPage;
     const take = perPage;
 

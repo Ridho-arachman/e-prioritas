@@ -4,6 +4,29 @@ import { StatusMasukan } from "@/app/generated/prisma";
 //////////////////////////////////////////////////////////////
 // CREATE MASUKAN WARGA
 //////////////////////////////////////////////////////////////
+export const createMasukanWargaFormSchema = z.object({
+  namaPengirim: z
+    .string()
+    .trim()
+    .min(1, "Nama pengirim tidak boleh kosong")
+    .max(255),
+  nomorHp: z
+    .string()
+    .trim()
+    .regex(/^08[0-9]{8,12}$/, "Format harus 08xxxxxxxxxx"),
+  judul: z.string().trim().min(1, "Judul tidak boleh kosong").max(255),
+  lokasiRt: z
+    .string()
+    .trim()
+    .regex(/^[0-9]{3}$/, "RT harus 3 digit"),
+  lokasiRw: z
+    .string()
+    .trim()
+    .regex(/^[0-9]{3}$/, "RW harus 3 digit"),
+  deskripsi: z.string().trim().min(1, "Deskripsi tidak boleh kosong"),
+  domainIsuId: z.string().trim().cuid("Domain isu tidak valid"),
+  // ❌ Tidak ada isLocked/expiresAt - ini urusan backend
+});
 
 export const createMasukanWargaSchema = z.object({
   namaPengirim: z

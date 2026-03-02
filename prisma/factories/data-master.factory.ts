@@ -29,11 +29,8 @@ export async function dataMasterFactory(
         namaAtribut: faker.lorem.words(2).substring(0, 100),
         kritikalitas: faker.helpers.arrayElement(kritikalitasOptions),
         jumlah: faker.number.int({ min: 1, max: 100 }),
-        lokasiRt: faker.string.numeric(3).substring(0, 3),
-        lokasiRw: faker.string.numeric(3).substring(0, 3),
         isActive: true,
         tahunData: faker.number.int({ min: 2022, max: 2024 }),
-        sumberData: faker.helpers.arrayElement(sumberOptions),
         diprosesOlehId: userId || undefined,
       });
     }

@@ -85,9 +85,9 @@ export default function KegiatanRapatFormEdit() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Background Effects */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-100/40 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-blue-100/40 via-transparent to-transparent" />
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl" />
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-400/10 rounded-full blur-3xl" />
 
@@ -104,11 +104,11 @@ export default function KegiatanRapatFormEdit() {
               <span className="hidden sm:inline">Kembali</span>
             </Button>
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+              <div className="w-12 h-12 rounded-xl bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
                 <Edit3Icon className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-800 via-blue-700 to-indigo-700 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold bg-linear-to-r from-slate-800 via-blue-700 to-indigo-700 bg-clip-text text-transparent">
                   Edit Kegiatan
                 </h1>
                 <p className="text-sm text-slate-500 mt-1">
@@ -134,7 +134,7 @@ export default function KegiatanRapatFormEdit() {
         {/* Form Card */}
         <Card className="mb-8 border-0 shadow-xl shadow-slate-200/50 bg-white/80 backdrop-blur-xl rounded-2xl overflow-hidden">
           {/* Top Gradient Bar */}
-          <div className="h-2 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500" />
+          <div className="h-2 bg-linear-to-r from-blue-500 via-indigo-500 to-purple-500" />
 
           <CardContent className="p-0">
             <form>
@@ -269,7 +269,7 @@ export default function KegiatanRapatFormEdit() {
                       </Select>
                       {kegiatan.domainIsu && (
                         <div className="flex items-start gap-2 p-3 rounded-xl bg-blue-50 border border-blue-100">
-                          <LightbulbIcon className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                          <LightbulbIcon className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                           <p className="text-sm text-blue-700">
                             {kegiatan.domainIsu.deskripsi}
                           </p>
@@ -281,11 +281,11 @@ export default function KegiatanRapatFormEdit() {
                   {/* Sidebar */}
                   <div className="space-y-6">
                     {/* Info Card */}
-                    <Card className="border-0 bg-gradient-to-br from-blue-50 to-white rounded-2xl shadow-md overflow-hidden">
-                      <div className="h-1.5 bg-gradient-to-r from-blue-500 to-indigo-500" />
+                    <Card className="border-0 bg-linear-to-br from-blue-50 to-white rounded-2xl shadow-md overflow-hidden">
+                      <div className="h-1.5 bg-linear-to-r from-blue-500 to-indigo-500" />
                       <CardContent className="p-5 space-y-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
                             <UserIcon className="h-5 w-5 text-white" />
                           </div>
                           <div>
@@ -337,11 +337,11 @@ export default function KegiatanRapatFormEdit() {
                     </Card>
 
                     {/* AI Options Card */}
-                    <Card className="border-0 bg-gradient-to-br from-purple-50 to-white rounded-2xl shadow-md overflow-hidden">
-                      <div className="h-1.5 bg-gradient-to-r from-purple-500 to-pink-500" />
+                    <Card className="border-0 bg-linear-to-br from-purple-50 to-white rounded-2xl shadow-md overflow-hidden">
+                      <div className="h-1.5 bg-linear-to-r from-purple-500 to-pink-500" />
                       <CardContent className="p-5 space-y-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
+                          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
                             <BrainIcon className="h-5 w-5 text-white" />
                           </div>
                           <div>
@@ -414,11 +414,11 @@ export default function KegiatanRapatFormEdit() {
                     </Card>
 
                     {/* Preview Card */}
-                    <Card className="border-0 bg-gradient-to-br from-slate-50 to-white rounded-2xl shadow-md overflow-hidden">
-                      <div className="h-1.5 bg-gradient-to-r from-slate-400 to-slate-600" />
+                    <Card className="border-0 bg-linear-to-br from-slate-50 to-white rounded-2xl shadow-md overflow-hidden">
+                      <div className="h-1.5 bg-linear-to-r from-slate-400 to-slate-600" />
                       <CardContent className="p-5 space-y-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center shadow-lg shadow-slate-500/30">
+                          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-slate-400 to-slate-600 flex items-center justify-center shadow-lg shadow-slate-500/30">
                             <EyeIcon className="h-5 w-5 text-white" />
                           </div>
                           <div>
@@ -513,7 +513,7 @@ export default function KegiatanRapatFormEdit() {
                     </Button>
                     <Button
                       type="submit"
-                      className="gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl font-medium px-6"
+                      className="gap-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl font-medium px-6"
                     >
                       <SaveIcon className="h-4 w-4" />
                       Simpan Perubahan

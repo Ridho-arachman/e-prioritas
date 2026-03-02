@@ -9,7 +9,7 @@ const GET = async (req: NextRequest) => {
     const data = await kategoriService.getAll();
 
     //JIKA DATA KOSONG
-    if (data.length === 0) {
+    if (data.data.length === 0) {
       return handleResponse({
         success: true,
         message: "Data kategori masih kosong",

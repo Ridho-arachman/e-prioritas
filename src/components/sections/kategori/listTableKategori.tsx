@@ -299,17 +299,17 @@ export default function ListTableKategori() {
             </div>
           )}
 
-          {/* Data tidak ditemukan */}
-          {data?.length === 0 && queryString && (
-            <div className="p-4">
-              <DataTidakDitemukan />
-            </div>
-          )}
-
           {/* Data kosong */}
           {data?.length === 0 && !queryString && (
             <div className="p-4">
               <DataKosong />
+            </div>
+          )}
+
+          {/* Data tidak ditemukan */}
+          {data?.length === 0 && queryString && (
+            <div className="p-4">
+              <DataTidakDitemukan />
             </div>
           )}
 

@@ -1,6 +1,7 @@
+// src/app/admin/jadwal-program/add/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -32,55 +33,49 @@ import {
   LightbulbIcon,
   BrainIcon,
   Loader2Icon,
+  CpuIcon,
 } from "lucide-react";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
+import { useGet, usePost } from "@/hooks/useApi";
+import { notifier } from "@/lib/ToastNotifier";
+import { AxiosError } from "axios";
 
 // ========================
-// ENUM & TIPE
+// ENUM (Match Backend Prisma)
 // ========================
 
-export enum DomainIsuOption {
-  INFRASTRUKTUR = "1",
-  KESEHATAN = "2",
-  PENDIDIKAN = "3",
-  EKONOMI = "4",
+export enum ModeRekomendasi {
+  FUSI_DATA = "FUSI_DATA",
+  DATA_MASTER_SAJA = "DATA_MASTER_SAJA",
 }
 
-const domainIsuOptions = [
-  {
-    id: "1",
-    code: "INFRASTRUKTUR",
-    nama: "Infrastruktur",
-    deskripsi: "Jalan, jembatan, drainase, fasilitas umum",
-  },
-  {
-    id: "2",
-    code: "KESEHATAN",
-    nama: "Kesehatan",
-    deskripsi: "Posyandu, stunting, sanitasi, layanan kesehatan",
-  },
-  {
-    id: "3",
-    code: "PENDIDIKAN",
-    nama: "Pendidikan",
-    deskripsi: "PAUD, TPA, beasiswa, pelatihan keterampilan",
-  },
-  {
-    id: "4",
-    code: "EKONOMI",
-    nama: "Ekonomi",
-    deskripsi: "UMKM, pasar desa, pelatihan wirausaha",
-  },
-];
+export enum StatusRekomendasi {
+  DRAFT = "DRAFT",
+  DIAJUKAN = "DIAJUKAN",
+  DISETUJUI = "DISETUJUI",
+  DITOLAK = "DITOLAK",
+}
+
+// ========================
+// TIPE DATA (Match Backend)
+// ========================
+
+export interface DomainIsu {
+  id: string;
+  code: string;
+  nama: string;
+  deskripsi?: string | null;
+}
 
 interface FormState {
   judul: string;
   deskripsi: string;
-  tanggal: string;
-  waktu: string;
+  tanggal: string; // ISO string: YYYY-MM-DDTHH:mm:ss
   lokasi: string;
-  domainIsuId: string;
+  domainIsuId: string; // ✅ Required (tidak nullable di schema)
+  mode: ModeRekomendasi; // ✅ Required enum
+  judulLaporan: string; // ✅ Required
   enableAI: boolean;
   aiModel: string;
 }
@@ -89,19 +84,22 @@ const initialForm: FormState = {
   judul: "",
   deskripsi: "",
   tanggal: "",
-  waktu: "",
   lokasi: "",
   domainIsuId: "",
+  mode: ModeRekomendasi.FUSI_DATA, // ✅ Default value match backend
+  judulLaporan: "",
   enableAI: true,
-  aiModel: "gemini-1.5-pro",
+  aiModel: "gemini-2.5-flash",
 };
 
 interface FormErrors {
   judul?: string;
   deskripsi?: string;
   tanggal?: string;
-  waktu?: string;
   lokasi?: string;
+  domainIsuId?: string; // ✅ Required
+  mode?: string;
+  judulLaporan?: string; // ✅ Required
 }
 
 // ========================
@@ -115,12 +113,22 @@ export default function TambahKegiatanRapat() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
 
+  // ✅ FIX: Endpoint yang benar untuk domain isu (match backend)
+  const { data: domainIsuList, isLoading: isLoadingDomain } = useGet(
+    "/protected/kategori",
+  );
+  const { post } = usePost("/protected/kegiatan-rapat");
+
+  // ✅ FIX: Tambah selectedDomain variable (sebelumnya undefined)
+  const selectedDomain = domainIsuList?.find(
+    (d: DomainIsu) => d.id === form.domainIsuId,
+  );
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { id, value } = e.target;
     setForm({ ...form, [id]: value });
-    // Clear error when user types
     if (errors[id as keyof FormErrors]) {
       setErrors({ ...errors, [id]: undefined });
     }
@@ -130,6 +138,13 @@ export default function TambahKegiatanRapat() {
     setForm({ ...form, domainIsuId: value });
     if (errors.domainIsuId) {
       setErrors({ ...errors, domainIsuId: undefined });
+    }
+  };
+
+  const handleModeChange = (value: ModeRekomendasi) => {
+    setForm({ ...form, mode: value });
+    if (errors.mode) {
+      setErrors({ ...errors, mode: undefined });
     }
   };
 
@@ -144,35 +159,42 @@ export default function TambahKegiatanRapat() {
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
+    // ✅ Match zod: judul min 1, max 255
     if (!form.judul.trim()) {
       newErrors.judul = "Judul kegiatan wajib diisi";
     } else if (form.judul.length < 5) {
       newErrors.judul = "Judul minimal 5 karakter";
+    } else if (form.judul.length > 255) {
+      newErrors.judul = "Judul maksimal 255 karakter";
     }
 
+    // ✅ Match zod: deskripsi min 1
     if (!form.deskripsi.trim()) {
       newErrors.deskripsi = "Deskripsi wajib diisi";
     } else if (form.deskripsi.length < 20) {
       newErrors.deskripsi = "Deskripsi minimal 20 karakter";
     }
 
+    // ✅ Match zod: tanggal ISO 8601
     if (!form.tanggal) {
-      newErrors.tanggal = "Tanggal wajib dipilih";
-    } else {
-      const selectedDate = new Date(form.tanggal);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (selectedDate < today) {
-        newErrors.tanggal = "Tanggal tidak boleh di masa lalu";
-      }
+      newErrors.tanggal = "Tanggal & waktu wajib dipilih";
     }
 
-    if (!form.waktu) {
-      newErrors.waktu = "Waktu wajib dipilih";
+    // ✅ Match zod: domainIsuId required, cuid
+    if (!form.domainIsuId) {
+      newErrors.domainIsuId = "Domain isu wajib dipilih";
     }
 
-    if (!form.lokasi.trim()) {
-      newErrors.lokasi = "Lokasi wajib diisi";
+    // ✅ Match zod: mode required enum
+    if (!form.mode) {
+      newErrors.mode = "Mode rekomendasi wajib dipilih";
+    }
+
+    // ✅ Match zod: judulLaporan required, min 1, max 255
+    if (!form.judulLaporan.trim()) {
+      newErrors.judulLaporan = "Judul laporan wajib diisi";
+    } else if (form.judulLaporan.length > 255) {
+      newErrors.judulLaporan = "Judul laporan maksimal 255 karakter";
     }
 
     setErrors(newErrors);
@@ -181,41 +203,59 @@ export default function TambahKegiatanRapat() {
 
   const handleSubmit = async () => {
     if (!validateForm()) {
+      // Scroll to first error
+      const firstError = Object.keys(errors)[0];
+      if (firstError) {
+        document
+          .getElementById(firstError)
+          ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       return;
     }
 
     setIsSubmitting(true);
 
-    // Simulasi API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      // ✅ Prepare payload match backend CreateKegiatanRapatInput + zod schema
+      const payload = {
+        judul: form.judul,
+        deskripsi: form.deskripsi,
+        tanggal: form.tanggal, // ISO string (match zod union)
+        lokasi: form.lokasi || null, // nullable
+        domainIsuId: form.domainIsuId, // required
+        mode: form.mode, // required enum
+        judulLaporan: form.judulLaporan, // required
+        aiModel: form.enableAI ? form.aiModel : null, // nullable
+        // fingerprint & statusRekomendasi auto-generated by backend
+      };
 
-    // TODO: Integrasi API sebenarnya
-    console.log("Form submitted:", {
-      ...form,
-      tanggalLengkap: `${form.tanggal}T${form.waktu}`,
-    });
+      const res = await post(payload);
 
-    setIsSubmitting(false);
-    router.push("/admin/kegiatan-rapat");
+      notifier.success(
+        "Berhasil",
+        res?.message || "Kegiatan berhasil ditambahkan",
+      );
+      router.push("/admin/jadwal-program");
+      router.refresh();
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      notifier.error(
+        "Gagal",
+        err?.response?.data?.message || "Gagal menyimpan kegiatan",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCancel = () => {
     router.back();
   };
 
-  const getTodayDate = () => {
-    const today = new Date();
-    return format(today, "yyyy-MM-dd");
-  };
-
-  const selectedDomain = domainIsuOptions.find(
-    (d) => d.id === form.domainIsuId,
-  );
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Background Effects */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-100/40 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-blue-100/40 via-transparent to-transparent" />
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl" />
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-400/10 rounded-full blur-3xl" />
 
@@ -232,7 +272,7 @@ export default function TambahKegiatanRapat() {
               <span className="hidden sm:inline">Kembali</span>
             </Button>
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-800 via-blue-700 to-indigo-700 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold bg-linear-to-r from-slate-800 via-blue-700 to-indigo-700 bg-clip-text text-transparent">
                 Tambah Kegiatan
               </h1>
               <p className="text-sm text-slate-500 mt-1">
@@ -245,7 +285,7 @@ export default function TambahKegiatanRapat() {
         {/* Form Card */}
         <Card className="mb-8 border-0 shadow-xl shadow-slate-200/50 bg-white/80 backdrop-blur-xl rounded-2xl overflow-hidden">
           {/* Top Gradient Bar */}
-          <div className="h-2 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500" />
+          <div className="h-2 bg-linear-to-r from-blue-500 via-indigo-500 to-purple-500" />
 
           <CardContent className="p-0">
             {/* Form Content */}
@@ -267,6 +307,7 @@ export default function TambahKegiatanRapat() {
                       value={form.judul}
                       onChange={handleInputChange}
                       placeholder="Contoh: Musrenbang Kelurahan 2026"
+                      maxLength={255}
                       className={`bg-white border-slate-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 h-12 ${
                         errors.judul
                           ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
@@ -280,7 +321,7 @@ export default function TambahKegiatanRapat() {
                       </div>
                     )}
                     <p className="text-xs text-slate-500">
-                      {form.judul.length}/100 karakter
+                      {form.judul.length}/255 karakter
                     </p>
                   </div>
 
@@ -316,7 +357,7 @@ export default function TambahKegiatanRapat() {
                     </p>
                   </div>
 
-                  {/* Tanggal & Waktu */}
+                  {/* Tanggal & Waktu (Combined to ISO) */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label
@@ -329,9 +370,23 @@ export default function TambahKegiatanRapat() {
                       <Input
                         id="tanggal"
                         type="date"
-                        value={form.tanggal}
-                        onChange={handleInputChange}
-                        min={getTodayDate()}
+                        value={form.tanggal ? form.tanggal.split("T")[0] : ""}
+                        onChange={(e) => {
+                          const date = e.target.value;
+                          const time = form.tanggal
+                            ? form.tanggal
+                                .split("T")[1]
+                                ?.split(":")
+                                .slice(0, 2)
+                                .join(":")
+                            : "09:00";
+                          setForm({
+                            ...form,
+                            tanggal: `${date}T${time || "09:00"}:00`,
+                          });
+                          if (errors.tanggal)
+                            setErrors({ ...errors, tanggal: undefined });
+                        }}
                         className={`bg-white border-slate-200 rounded-xl text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 h-12 ${
                           errors.tanggal
                             ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
@@ -357,69 +412,84 @@ export default function TambahKegiatanRapat() {
                       <Input
                         id="waktu"
                         type="time"
-                        value={form.waktu}
-                        onChange={handleInputChange}
+                        value={
+                          form.tanggal
+                            ? form.tanggal.split("T")[1]?.slice(0, 5)
+                            : ""
+                        }
+                        onChange={(e) => {
+                          const time = e.target.value;
+                          const date = form.tanggal
+                            ? form.tanggal.split("T")[0]
+                            : new Date().toISOString().split("T")[0];
+                          setForm({ ...form, tanggal: `${date}T${time}:00` });
+                          if (errors.tanggal)
+                            setErrors({ ...errors, tanggal: undefined });
+                        }}
                         className={`bg-white border-slate-200 rounded-xl text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 h-12 ${
-                          errors.waktu
+                          errors.tanggal
                             ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
                             : ""
                         }`}
                       />
-                      {errors.waktu && (
-                        <div className="flex items-center gap-1.5 text-sm text-red-600">
-                          <AlertCircleIcon className="h-4 w-4" />
-                          {errors.waktu}
-                        </div>
-                      )}
                     </div>
                   </div>
 
-                  {/* Lokasi */}
+                  {/* Lokasi (Optional - nullable di schema) */}
                   <div className="space-y-2">
                     <Label
                       htmlFor="lokasi"
                       className="text-slate-700 font-semibold flex items-center gap-2"
                     >
                       <MapPinIcon className="h-4 w-4 text-blue-600" />
-                      Lokasi Kegiatan *
+                      Lokasi Kegiatan
                     </Label>
                     <Input
                       id="lokasi"
                       value={form.lokasi}
                       onChange={handleInputChange}
                       placeholder="Contoh: Aula Kelurahan Panggungjati"
+                      maxLength={100}
                       className={`bg-white border-slate-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 h-12 ${
                         errors.lokasi
                           ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
                           : ""
                       }`}
                     />
-                    {errors.lokasi && (
-                      <div className="flex items-center gap-1.5 text-sm text-red-600">
-                        <AlertCircleIcon className="h-4 w-4" />
-                        {errors.lokasi}
-                      </div>
-                    )}
+                    <p className="text-xs text-slate-500">
+                      Opsional, maksimal 100 karakter
+                    </p>
                   </div>
 
-                  {/* Domain Isu */}
+                  {/* Domain Isu (Required - match zod cuid) */}
                   <div className="space-y-2">
                     <Label
                       htmlFor="domainIsuId"
                       className="text-slate-700 font-semibold flex items-center gap-2"
                     >
                       <TargetIcon className="h-4 w-4 text-blue-600" />
-                      Domain Isu
+                      Domain Isu *
                     </Label>
                     <Select
                       value={form.domainIsuId}
                       onValueChange={handleDomainChange}
+                      disabled={isLoadingDomain || !domainIsuList}
                     >
-                      <SelectTrigger className="bg-white border-slate-200 rounded-xl text-slate-700 h-12">
-                        <SelectValue placeholder="Pilih domain isu (opsional)" />
+                      <SelectTrigger
+                        className={`bg-white border-slate-200 rounded-xl text-slate-700 h-12 ${
+                          errors.domainIsuId
+                            ? "border-red-300 focus:border-red-500"
+                            : ""
+                        }`}
+                      >
+                        <SelectValue
+                          placeholder={
+                            isLoadingDomain ? "Memuat..." : "Pilih domain isu"
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent className="bg-white border border-slate-200">
-                        {domainIsuOptions.map((d) => (
+                        {domainIsuList?.map((d: DomainIsu) => (
                           <SelectItem
                             key={d.id}
                             value={d.id}
@@ -430,25 +500,111 @@ export default function TambahKegiatanRapat() {
                         ))}
                       </SelectContent>
                     </Select>
+                    {errors.domainIsuId && (
+                      <div className="flex items-center gap-1.5 text-sm text-red-600">
+                        <AlertCircleIcon className="h-4 w-4" />
+                        {errors.domainIsuId}
+                      </div>
+                    )}
                     {selectedDomain && (
                       <div className="flex items-start gap-2 p-3 rounded-xl bg-blue-50 border border-blue-100">
-                        <LightbulbIcon className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <LightbulbIcon className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                         <p className="text-sm text-blue-700">
                           {selectedDomain.deskripsi}
                         </p>
                       </div>
                     )}
                   </div>
+
+                  {/* Mode Rekomendasi (Required enum - match zod) */}
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="mode"
+                      className="text-slate-700 font-semibold flex items-center gap-2"
+                    >
+                      <CpuIcon className="h-4 w-4 text-blue-600" />
+                      Mode Rekomendasi *
+                    </Label>
+                    <Select value={form.mode} onValueChange={handleModeChange}>
+                      <SelectTrigger
+                        className={`bg-white border-slate-200 rounded-xl text-slate-700 h-12 ${
+                          errors.mode
+                            ? "border-red-300 focus:border-red-500"
+                            : ""
+                        }`}
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white border border-slate-200">
+                        <SelectItem
+                          value={ModeRekomendasi.FUSI_DATA}
+                          className="text-slate-700 focus:bg-slate-50"
+                        >
+                          Fusi Data (Masukan Warga + Data Master)
+                        </SelectItem>
+                        <SelectItem
+                          value={ModeRekomendasi.DATA_MASTER_SAJA}
+                          className="text-slate-700 focus:bg-slate-50"
+                        >
+                          Data Master Only
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {errors.mode && (
+                      <div className="flex items-center gap-1.5 text-sm text-red-600">
+                        <AlertCircleIcon className="h-4 w-4" />
+                        {errors.mode}
+                      </div>
+                    )}
+                    <p className="text-xs text-slate-500">
+                      • <strong>Fusi Data</strong>: Gabungkan masukan warga &
+                      data master untuk rekomendasi komprehensif
+                      <br />• <strong>Data Master Only</strong>: Hanya gunakan
+                      data master untuk rekomendasi berbasis data internal
+                    </p>
+                  </div>
+
+                  {/* Judul Laporan (Required - match zod) */}
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="judulLaporan"
+                      className="text-slate-700 font-semibold flex items-center gap-2"
+                    >
+                      <FileTextIcon className="h-4 w-4 text-blue-600" />
+                      Judul Laporan *
+                    </Label>
+                    <Input
+                      id="judulLaporan"
+                      value={form.judulLaporan}
+                      onChange={handleInputChange}
+                      placeholder="Contoh: Laporan Prioritas Pembangunan Infrastruktur 2026"
+                      maxLength={255}
+                      className={`bg-white border-slate-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 h-12 ${
+                        errors.judulLaporan
+                          ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
+                          : ""
+                      }`}
+                    />
+                    {errors.judulLaporan && (
+                      <div className="flex items-center gap-1.5 text-sm text-red-600">
+                        <AlertCircleIcon className="h-4 w-4" />
+                        {errors.judulLaporan}
+                      </div>
+                    )}
+                    <p className="text-xs text-slate-500">
+                      {form.judulLaporan.length}/255 karakter
+                    </p>
+                  </div>
                 </div>
 
                 {/* Sidebar */}
                 <div className="space-y-6">
                   {/* AI Options Card */}
-                  <Card className="border-0 bg-gradient-to-br from-purple-50 to-white rounded-2xl shadow-md overflow-hidden">
-                    <div className="h-1.5 bg-gradient-to-r from-purple-500 to-pink-500" />
+                  <Card className="border-0 bg-linear-to-br from-purple-50 to-white rounded-2xl shadow-md overflow-hidden">
+                    <div className="h-1.5 bg-linear-to-r from-purple-500 to-pink-500" />
                     <CardContent className="p-5 space-y-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
+                        <div className="w-10 h-10 rounded-xl bg-linear-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
                           <BrainIcon className="h-5 w-5 text-white" />
                         </div>
                         <div>
@@ -491,22 +647,16 @@ export default function TambahKegiatanRapat() {
                             </SelectTrigger>
                             <SelectContent className="bg-white border border-purple-200">
                               <SelectItem
-                                value="gemini-1.5-pro"
+                                value="gemini-2.5-flash"
                                 className="text-slate-700 focus:bg-purple-50"
                               >
-                                Gemini 1.5 Pro
+                                Gemini 2.5 Flash (Rekomendasi)
                               </SelectItem>
                               <SelectItem
-                                value="gemini-1.5-flash"
+                                value="gemini-2.5-pro"
                                 className="text-slate-700 focus:bg-purple-50"
                               >
-                                Gemini 1.5 Flash
-                              </SelectItem>
-                              <SelectItem
-                                value="gemini-2.0"
-                                className="text-slate-700 focus:bg-purple-50"
-                              >
-                                Gemini 2.0 (Experimental)
+                                Gemini 2.5 Pro
                               </SelectItem>
                             </SelectContent>
                           </Select>
@@ -520,11 +670,11 @@ export default function TambahKegiatanRapat() {
                   </Card>
 
                   {/* Preview Card */}
-                  <Card className="border-0 bg-gradient-to-br from-slate-50 to-white rounded-2xl shadow-md overflow-hidden">
-                    <div className="h-1.5 bg-gradient-to-r from-slate-400 to-slate-600" />
+                  <Card className="border-0 bg-linear-to-br from-slate-50 to-white rounded-2xl shadow-md overflow-hidden">
+                    <div className="h-1.5 bg-linear-to-r from-slate-400 to-slate-600" />
                     <CardContent className="p-5 space-y-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center shadow-lg shadow-slate-500/30">
+                        <div className="w-10 h-10 rounded-xl bg-linear-to-br from-slate-400 to-slate-600 flex items-center justify-center shadow-lg shadow-slate-500/30">
                           <CheckCircleIcon className="h-5 w-5 text-white" />
                         </div>
                         <div>
@@ -546,11 +696,23 @@ export default function TambahKegiatanRapat() {
                             {form.judul || "—"}
                           </p>
                         </div>
+                        <div>
+                          <p className="text-xs text-slate-500 uppercase tracking-wider font-medium mb-1">
+                            Judul Laporan
+                          </p>
+                          <p className="text-sm font-medium text-slate-800 line-clamp-2">
+                            {form.judulLaporan || "—"}
+                          </p>
+                        </div>
                         <div className="flex items-center gap-2">
                           <CalendarIcon className="h-3.5 w-3.5 text-slate-400" />
                           <span className="text-sm text-slate-600">
-                            {form.tanggal && form.waktu
-                              ? `${format(new Date(form.tanggal), "dd MMM yyyy", { locale: id })} ${form.waktu} WIB`
+                            {form.tanggal
+                              ? format(
+                                  new Date(form.tanggal),
+                                  "dd MMM yyyy HH:mm",
+                                  { locale: id },
+                                ) + " WIB"
                               : "—"}
                           </span>
                         </div>
@@ -571,16 +733,27 @@ export default function TambahKegiatanRapat() {
                             </Badge>
                           </div>
                         )}
+                        <div className="flex items-center gap-2">
+                          <CpuIcon className="h-3.5 w-3.5 text-slate-400" />
+                          <Badge
+                            variant="outline"
+                            className="bg-purple-50 text-purple-700 border-purple-200 text-xs"
+                          >
+                            {form.mode === ModeRekomendasi.FUSI_DATA
+                              ? "Fusi Data"
+                              : "Data Master"}
+                          </Badge>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
 
                   {/* Info Card */}
-                  <Card className="border-0 bg-gradient-to-br from-amber-50 to-white rounded-2xl shadow-md overflow-hidden">
-                    <div className="h-1.5 bg-gradient-to-r from-amber-400 to-orange-400" />
+                  <Card className="border-0 bg-linear-to-br from-amber-50 to-white rounded-2xl shadow-md overflow-hidden">
+                    <div className="h-1.5 bg-linear-to-r from-amber-400 to-orange-400" />
                     <CardContent className="p-5">
                       <div className="flex items-start gap-3">
-                        <AlertCircleIcon className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                        <AlertCircleIcon className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
                         <div className="space-y-2">
                           <h3 className="font-semibold text-slate-800 text-sm">
                             Informasi
@@ -588,9 +761,7 @@ export default function TambahKegiatanRapat() {
                           <ul className="text-xs text-slate-600 space-y-1.5">
                             <li className="flex items-start gap-1.5">
                               <span className="text-amber-500">•</span>
-                              <span>
-                                Kegiatan akan muncul di dashboard publik
-                              </span>
+                              <span>Field bertanda * wajib diisi</span>
                             </li>
                             <li className="flex items-start gap-1.5">
                               <span className="text-amber-500">•</span>
@@ -645,7 +816,7 @@ export default function TambahKegiatanRapat() {
                   <Button
                     onClick={handleSubmit}
                     disabled={isSubmitting}
-                    className="gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl font-medium px-6"
+                    className="gap-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl font-medium px-6"
                   >
                     {isSubmitting ? (
                       <>
@@ -669,7 +840,7 @@ export default function TambahKegiatanRapat() {
         {showPreview && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <Card className="w-full max-w-2xl border-0 shadow-2xl bg-white rounded-2xl overflow-hidden">
-              <div className="h-2 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500" />
+              <div className="h-2 bg-linear-to-r from-blue-500 via-indigo-500 to-purple-500" />
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-bold text-slate-800">
@@ -686,7 +857,7 @@ export default function TambahKegiatanRapat() {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100">
+                  <div className="p-4 rounded-xl bg-linear-to-br from-blue-50 to-indigo-50 border border-blue-100">
                     <h3 className="text-lg font-bold text-slate-800 mb-2">
                       {form.judul || "(Belum ada judul)"}
                     </h3>
@@ -694,8 +865,12 @@ export default function TambahKegiatanRapat() {
                       <div className="flex items-center gap-1.5">
                         <CalendarIcon className="h-4 w-4" />
                         <span>
-                          {form.tanggal && form.waktu
-                            ? `${format(new Date(form.tanggal), "EEEE, dd MMMM yyyy", { locale: id })} ${form.waktu} WIB`
+                          {form.tanggal
+                            ? format(
+                                new Date(form.tanggal),
+                                "EEEE, dd MMMM yyyy HH:mm",
+                                { locale: id },
+                              ) + " WIB"
                             : "(Tanggal belum dipilih)"}
                         </span>
                       </div>
@@ -704,6 +879,15 @@ export default function TambahKegiatanRapat() {
                         <span>{form.lokasi || "(Lokasi belum diisi)"}</span>
                       </div>
                     </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-semibold text-slate-700 mb-2">
+                      Judul Laporan
+                    </h4>
+                    <p className="text-slate-600 leading-relaxed">
+                      {form.judulLaporan || "(Belum ada judul laporan)"}
+                    </p>
                   </div>
 
                   <div>
@@ -728,6 +912,20 @@ export default function TambahKegiatanRapat() {
                       </Badge>
                     </div>
                   )}
+
+                  <div>
+                    <h4 className="text-sm font-semibold text-slate-700 mb-2">
+                      Mode Rekomendasi
+                    </h4>
+                    <Badge
+                      variant="outline"
+                      className={`${form.mode === ModeRekomendasi.FUSI_DATA ? "bg-purple-50 text-purple-700 border-purple-200" : "bg-amber-50 text-amber-700 border-amber-200"}`}
+                    >
+                      {form.mode === ModeRekomendasi.FUSI_DATA
+                        ? "Fusi Data"
+                        : "Data Master Only"}
+                    </Badge>
+                  </div>
 
                   {form.enableAI && (
                     <div className="p-4 rounded-xl bg-purple-50 border border-purple-100">
@@ -760,7 +958,7 @@ export default function TambahKegiatanRapat() {
                   <Button
                     onClick={handleSubmit}
                     disabled={isSubmitting}
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl"
+                    className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl"
                   >
                     {isSubmitting ? "Menyimpan..." : "Konfirmasi & Simpan"}
                   </Button>

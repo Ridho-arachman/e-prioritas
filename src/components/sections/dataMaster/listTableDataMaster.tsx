@@ -5,12 +5,13 @@ import {
   XIcon,
   ChevronLeft,
   ChevronRight,
-  X,
   Trash,
   Filter,
   ArrowUp,
   ArrowDown,
   SlidersHorizontal,
+  Upload,
+  Download,
 } from "lucide-react";
 import { useDebounce } from "use-debounce";
 import { useState, useEffect } from "react";
@@ -64,40 +65,56 @@ import {
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import * as XLSX from "xlsx";
 
-// Tipe data dari Prisma
+// Import schema dari file terpisah
+import {
+  dataMasterArraySchema,
+  dataMasterCreateSchema,
+} from "@/schema/dataMasterSchema";
+
+// Import tipe dari Prisma
 import { DataMaster, DomainIsu, User } from "@/app/generated/prisma";
+import z from "zod";
 
 type DataMasterWithRelations = DataMaster & {
-  domainIsu: Pick<DomainIsu, "nama">;
-  diprosesOleh: Pick<User, "name"> | null;
+  domainIsu: Pick<DomainIsu, "id" | "nama" | "code">;
+  diprosesOleh: Pick<User, "id" | "name" | "email"> | null;
 };
+
+// Valid sort fields (harus sama dengan backend)
+const VALID_SORT_FIELDS = [
+  "namaAtribut",
+  "kritikalitas",
+  "jumlah",
+  "tahunData",
+  "isActive",
+  "createdAt",
+  "updatedAt",
+] as const;
+type ValidSortField = (typeof VALID_SORT_FIELDS)[number];
 
 export default function ListTableDataMaster() {
   const router = useRouter();
   const [selectedDeleteId, setSelectedDeleteId] = useState<string | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importLoading, setImportLoading] = useState(false);
 
   // Query states
   const [q, setQ] = useQueryState("q", { defaultValue: "" });
   const [domainIsuId, setDomainIsuId] = useQueryState("domainIsuId", {
     defaultValue: "",
   });
-  const [lokasiRt, setLokasiRt] = useQueryState("lokasiRt", {
+  const [kritikalitas, setKritikalitas] = useQueryState("kritikalitas", {
     defaultValue: "",
   });
-  const [lokasiRw, setLokasiRw] = useQueryState("lokasiRw", {
-    defaultValue: "",
-  });
-  const [nilai, setNilai] = useQueryState("nilai", { defaultValue: "" });
-  const [updatedAt, setUpdatedAt] = useQueryState("updatedAt", {
-    defaultValue: "",
-  });
-  const [page, setPage] = useQueryState("page", { defaultValue: "1" });
-  const [perPage] = useQueryState("perPage", { defaultValue: "10" });
 
-  // Sorting states
+  const [page, setPage] = useQueryState("page", { defaultValue: "1" });
+  const [limit] = useQueryState("limit", { defaultValue: "10" });
+
   const [sortBy, setSortBy] = useQueryState("sortBy", {
     defaultValue: "updatedAt",
   });
@@ -106,23 +123,23 @@ export default function ListTableDataMaster() {
   });
 
   const [debouncedQ] = useDebounce(q, 500);
-
   const pageNumber = Number(page);
-  const perPageNumber = Number(perPage);
+  const limitNumber = Number(limit);
 
+  // Build query string
   const queryString = buildQuery({
-    q: debouncedQ,
-    domainIsuId,
-    lokasiRt,
-    lokasiRw,
-    nilai,
-    updatedAt,
+    q: debouncedQ || undefined,
+    domainIsuId: domainIsuId || undefined,
+    kritikalitas: kritikalitas || undefined,
     page: pageNumber,
-    perPage: perPageNumber,
-    sortBy,
+    limit: limitNumber,
+    sortBy: VALID_SORT_FIELDS.includes(sortBy as ValidSortField)
+      ? sortBy
+      : "updatedAt",
     sortOrder,
   });
 
+  // Fetch data
   const {
     data: response,
     meta,
@@ -131,27 +148,23 @@ export default function ListTableDataMaster() {
     mutate,
   } = useGet(`/protected/data-master${queryString}`);
 
-  // Perbaikan: akses response.data
   const data: DataMasterWithRelations[] = response ?? [];
-
   const { del: deleteDataMaster, loading: deleteLoading } = useDelete();
 
-  // Ambil data domain isu untuk dropdown filter
+  // Fetch domain isu untuk filter dropdown
   const { data: domainResponse } = useGet(`/protected/kategori`);
-  const domainList = domainResponse ?? [];
+  const domainList: DomainIsu[] = domainResponse ?? [];
 
   const cellCenter =
     "text-center align-middle truncate max-w-[150px] whitespace-nowrap";
 
-  // Sorting configuration
-  const sortOptions = [
-    { value: "domainIsuId", label: "Domain Isu" },
+  // Sort options
+  const sortOptions: { value: ValidSortField; label: string }[] = [
     { value: "namaAtribut", label: "Nama Atribut" },
-    { value: "nilai", label: "Nilai" },
+    { value: "kritikalitas", label: "Kritikalitas" },
     { value: "jumlah", label: "Jumlah" },
-    { value: "lokasiRt", label: "RT" },
-    { value: "lokasiRw", label: "RW" },
-    { value: "sumberData", label: "Sumber Data" },
+    { value: "tahunData", label: "Tahun Data" },
+    { value: "isActive", label: "Status" },
     { value: "updatedAt", label: "Tanggal Diperbarui" },
     { value: "createdAt", label: "Tanggal Dibuat" },
   ];
@@ -159,10 +172,7 @@ export default function ListTableDataMaster() {
   const hasSignificantFilter =
     (debouncedQ?.trim() !== "" && debouncedQ !== undefined) ||
     domainIsuId !== "" ||
-    lokasiRt !== "" ||
-    lokasiRw !== "" ||
-    nilai !== "" ||
-    updatedAt !== "";
+    kritikalitas !== "";
 
   useEffect(() => {
     setIsMounted(true);
@@ -172,19 +182,22 @@ export default function ListTableDataMaster() {
     if (!selectedDeleteId) return;
     try {
       const res = await deleteDataMaster(
-        `/protected/data-master/${selectedDeleteId}`,
+        `/api/data-master/${selectedDeleteId}`,
       );
-      notifier.success("Berhasil", res?.message);
+      notifier.success("Berhasil", res?.message || "Data berhasil dihapus");
       mutate();
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
-      notifier.error("Gagal", err?.response?.data?.message);
+      notifier.error(
+        "Gagal",
+        err?.response?.data?.message || "Terjadi kesalahan",
+      );
     } finally {
       setSelectedDeleteId(null);
     }
   };
 
-  const handleSortChange = (field: string) => {
+  const handleSortChange = (field: ValidSortField) => {
     if (sortBy === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
@@ -195,88 +208,200 @@ export default function ListTableDataMaster() {
 
   const clearFilters = () => {
     setDomainIsuId("");
-    setLokasiRt("");
-    setLokasiRw("");
-    setNilai("");
-    setUpdatedAt("");
+    setKritikalitas("");
     setSortBy("updatedAt");
     setSortOrder("desc");
     setIsFilterOpen(false);
+    setPage("1");
   };
 
   useEffect(() => {
     if (pageNumber !== 1) {
       setPage("1");
     }
-  }, [
-    debouncedQ,
-    domainIsuId,
-    lokasiRt,
-    lokasiRw,
-    nilai,
-    updatedAt,
-    sortBy,
-    sortOrder,
-  ]);
+  }, [debouncedQ, domainIsuId, kritikalitas, sortBy, sortOrder]);
 
   const hasActiveFilters =
     domainIsuId !== "" ||
-    lokasiRt !== "" ||
-    lokasiRw !== "" ||
-    nilai !== "" ||
-    updatedAt !== "" ||
+    kritikalitas !== "" ||
     sortBy !== "updatedAt" ||
     sortOrder !== "desc";
 
+  // ─────────────────────────────────────────────────────────────
+  // Import Excel
+  // ─────────────────────────────────────────────────────────────
+  const readExcelFile = (
+    file: File,
+  ): Promise<z.infer<typeof dataMasterCreateSchema>[]> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target?.result as ArrayBuffer);
+          const workbook = XLSX.read(data, { type: "array" });
+
+          let sheetName = workbook.SheetNames.find((name) =>
+            name.toLowerCase().includes("datamaster"),
+          );
+          if (!sheetName) {
+            sheetName = workbook.SheetNames[0];
+          }
+          if (!sheetName) throw new Error("Sheet tidak ditemukan");
+
+          const sheet = workbook.Sheets[sheetName];
+          const rows = XLSX.utils.sheet_to_json(sheet, {
+            header: 1,
+            defval: "",
+          }) as any[][];
+
+          // Lewati baris header (baris pertama)
+          const dataRows = rows
+            .slice(1)
+            .filter((row) => row.some((cell) => cell !== null && cell !== ""));
+
+          const cleanString = (val: any): string =>
+            val !== null && val !== undefined ? String(val).trim() : "";
+
+          const mapped = dataRows.map((row) => {
+            // Mapping berdasarkan posisi kolom (0-based index):
+            // Kolom A (0): domainIsuId
+            // Kolom B (1): namaAtribut
+            // Kolom C (2): jumlah
+            // Kolom D (3): tahunData
+            // Kolom E (4): kritikalitas
+            // Kolom F (5): keterangan (diabaikan)
+            // Kolom G (6): isActive
+
+            const domainIsuId = cleanString(row[0]);
+            const namaAtribut = cleanString(row[1]);
+
+            // Jumlah
+            const jumlahRaw = row[2];
+            const jumlah =
+              jumlahRaw !== "" && jumlahRaw !== null ? Number(jumlahRaw) : null;
+
+            // Tahun Data
+            const tahunDataRaw = row[3];
+            const tahunData =
+              tahunDataRaw !== "" && tahunDataRaw !== null
+                ? Number(tahunDataRaw)
+                : null;
+
+            // Kritikalitas
+            const kritikalitasRaw = cleanString(row[4]).toUpperCase();
+            const validKritikalitas: "KRITIS" | "TINGGI" | "SEDANG" | "RENDAH" =
+              ["KRITIS", "TINGGI", "SEDANG", "RENDAH"].includes(kritikalitasRaw)
+                ? (kritikalitasRaw as "KRITIS" | "TINGGI" | "SEDANG" | "RENDAH")
+                : "SEDANG";
+
+            // isActive
+            const isActiveRaw = row[6];
+            const isActive =
+              isActiveRaw === true ||
+              isActiveRaw === "TRUE" ||
+              isActiveRaw === 1 ||
+              isActiveRaw === "1" ||
+              isActiveRaw === "true"
+                ? true
+                : false;
+
+            return {
+              domainIsuId,
+              namaAtribut,
+              kritikalitas: validKritikalitas,
+              jumlah,
+              tahunData,
+              isActive,
+              // diprosesOlehId akan diisi oleh backend
+            };
+          });
+
+          resolve(mapped);
+        } catch (error) {
+          reject(error);
+        }
+      };
+      reader.onerror = (error) => reject(error);
+      reader.readAsArrayBuffer(file);
+    });
+  };
+
+  const handleImport = async () => {
+    if (!importFile) {
+      notifier.error("Pilih file terlebih dahulu");
+      return;
+    }
+    setImportLoading(true);
+    try {
+      const rawData = await readExcelFile(importFile);
+
+      // Validasi dengan schema dari import
+      const parsed = dataMasterArraySchema.safeParse(rawData);
+      if (!parsed.success) {
+        const errors = parsed.error.issues
+          .map((e) => `${e.path.join(".")}: ${e.message}`)
+          .join("; ");
+        notifier.error("Format file tidak valid", errors);
+        return;
+      }
+
+      // Kirim ke endpoint import yang baru
+      const res = await fetch("/api/protected/data-master/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: parsed.data }),
+      });
+
+      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(result.message || "Gagal import data");
+      }
+
+      notifier.success("Berhasil", result.message);
+      mutate();
+      setIsImportOpen(false);
+      setImportFile(null);
+    } catch (error) {
+      const err = error as Error;
+      notifier.error("Gagal import", err.message);
+    } finally {
+      setImportLoading(false);
+    }
+  };
+
+  // Loading state
   if (!isMounted) {
     return (
-      <div className="p-4 md:p-6">
-        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-4">
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="animate-pulse bg-muted h-10 w-40 rounded"></div>
-            <div className="animate-pulse bg-muted h-10 w-32 rounded"></div>
+      <Card className="min-w-0 overflow-hidden">
+        <CardContent className="p-4 md:p-6">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-12 text-center">No</TableHead>
+                  <TableHead className="text-center">Domain Isu</TableHead>
+                  <TableHead className="text-center">Nama Atribut</TableHead>
+                  <TableHead className="text-center">Kritikalitas</TableHead>
+                  <TableHead className="text-center">Jumlah</TableHead>
+                  <TableHead className="text-center">Tahun Data</TableHead>
+                  <TableHead className="text-center">Diproses Oleh</TableHead>
+                  <TableHead className="text-center">Diperbarui Pada</TableHead>
+                  <TableHead className="w-40 text-center">Aksi</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableSkeleton rows={5} />
+              </TableBody>
+            </Table>
           </div>
-          <div className="flex gap-2">
-            <div className="animate-pulse bg-muted h-10 w-40 rounded"></div>
-            <div className="animate-pulse bg-muted h-10 w-10 rounded"></div>
-          </div>
-        </div>
-        <div className="hidden md:block">
-          <div className="border rounded-lg overflow-hidden">
-            <div className="grid grid-cols-11 gap-4 p-4 border-b bg-muted/50">
-              {[...Array(11)].map((_, i) => (
-                <div
-                  key={i}
-                  className="animate-pulse bg-muted h-6 rounded"
-                ></div>
-              ))}
-            </div>
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="grid grid-cols-11 gap-4 p-4 border-b">
-                {[...Array(11)].map((_, j) => (
-                  <div
-                    key={j}
-                    className="animate-pulse bg-muted h-6 rounded"
-                  ></div>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="md:hidden space-y-4">
-          {[...Array(3)].map((_, i) => (
-            <div
-              key={i}
-              className="animate-pulse bg-muted rounded-lg h-24"
-            ></div>
-          ))}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
     <Card className="min-w-0 overflow-hidden">
+      {/* Alert Dialog Hapus */}
       <AlertDialog
         open={!!selectedDeleteId}
         onOpenChange={(open) => !open && setSelectedDeleteId(null)}
@@ -310,6 +435,63 @@ export default function ListTableDataMaster() {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Dialog Import Excel */}
+      <Dialog open={isImportOpen} onOpenChange={setIsImportOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Import Data Master dari Excel</DialogTitle>
+            <DialogDescription>
+              Upload file Excel dengan format yang sesuai.
+              <br />
+              <strong>Kolom wajib:</strong> domainIsuId, namaAtribut,
+              kritikalitas
+              <br />
+              <strong>Kolom opsional:</strong> jumlah, tahunData, isActive
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <Link
+              href="/Template_Import_DataMaster_FINAL.xlsm"
+              target="_blank"
+              download
+            >
+              <Download className="mr-2 h-4 w-4" /> Download Template Excel
+            </Link>
+            <Input
+              type="file"
+              accept=".xlsx, .xls, .xlsm"
+              onChange={(e) => setImportFile(e.target.files?.[0] || null)}
+            />
+            {importFile && (
+              <p className="text-sm text-muted-foreground break-all">
+                📄 {importFile.name}
+              </p>
+            )}
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsImportOpen(false);
+                setImportFile(null);
+              }}
+              disabled={importLoading}
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={handleImport}
+              disabled={!importFile || importLoading}
+            >
+              {importLoading && (
+                <Spinner className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              {importLoading ? "Mengimport..." : "Import"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <CardHeader className="space-y-4">
         <div className="mb-4 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
           <div className="flex flex-col lg:flex-row gap-4">
@@ -318,7 +500,15 @@ export default function ListTableDataMaster() {
                 <Plus className="mr-2 h-4 w-4" /> Tambah Data Master
               </Button>
             </Link>
+            <Button
+              variant="outline"
+              onClick={() => setIsImportOpen(true)}
+              className="cursor-pointer"
+            >
+              <Upload className="mr-2 h-4 w-4" /> Import Excel
+            </Button>
 
+            {/* Filter Dialog */}
             <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
               <Button
                 variant="outline"
@@ -329,21 +519,12 @@ export default function ListTableDataMaster() {
                 Filter & Sort
                 {hasActiveFilters && (
                   <Badge variant="secondary" className="ml-2">
-                    {
-                      [
-                        domainIsuId,
-                        lokasiRt,
-                        lokasiRw,
-                        nilai,
-                        updatedAt,
-                      ].filter(Boolean).length
-                    }{" "}
-                    + {sortBy !== "updatedAt" || sortOrder !== "desc" ? 1 : 0}
+                    {[domainIsuId, kritikalitas].filter(Boolean).length +
+                      (sortBy !== "updatedAt" || sortOrder !== "desc" ? 1 : 0)}
                   </Badge>
                 )}
               </Button>
-
-              <DialogContent className="sm:max-w-106.25">
+              <DialogContent className="sm:max-w-lg">
                 <DialogHeader>
                   <DialogTitle>
                     <div className="flex items-center gap-2">
@@ -355,12 +536,12 @@ export default function ListTableDataMaster() {
                     Atur filter dan urutan data master
                   </DialogDescription>
                 </DialogHeader>
-
                 <div className="grid gap-6 py-4">
+                  {/* Filter: Domain Isu */}
                   <div className="grid gap-2">
                     <Label>Domain Isu</Label>
                     <Select
-                      value={domainIsuId}
+                      value={domainIsuId || "ALL"}
                       onValueChange={(val) =>
                         setDomainIsuId(val === "ALL" ? "" : val)
                       }
@@ -369,8 +550,8 @@ export default function ListTableDataMaster() {
                         <SelectValue placeholder="Pilih domain isu" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="ALL">Semua</SelectItem>
-                        {domainList.map((domain: any) => (
+                        <SelectItem value="ALL">Semua Domain</SelectItem>
+                        {domainList.map((domain) => (
                           <SelectItem key={domain.id} value={domain.id}>
                             {domain.nama}
                           </SelectItem>
@@ -379,54 +560,37 @@ export default function ListTableDataMaster() {
                     </Select>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-2">
-                      <Label>RT</Label>
-                      <Input
-                        type="number"
-                        min={1}
-                        max={999}
-                        value={lokasiRt}
-                        onChange={(e) => setLokasiRt(e.target.value)}
-                        placeholder="Contoh: 1"
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label>RW</Label>
-                      <Input
-                        type="number"
-                        min={1}
-                        max={999}
-                        value={lokasiRw}
-                        onChange={(e) => setLokasiRw(e.target.value)}
-                        placeholder="Contoh: 5"
-                      />
-                    </div>
-                  </div>
-
+                  {/* Filter: Kritikalitas */}
                   <div className="grid gap-2">
-                    <Label>Nilai (teks)</Label>
-                    <Input
-                      value={nilai}
-                      onChange={(e) => setNilai(e.target.value)}
-                      placeholder="Cari nilai..."
-                    />
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label>Tanggal Diperbarui</Label>
-                    <Input
-                      type="date"
-                      value={updatedAt}
-                      onChange={(e) => setUpdatedAt(e.target.value)}
-                    />
+                    <Label>Kritikalitas</Label>
+                    <Select
+                      value={kritikalitas || "ALL"}
+                      onValueChange={(val) =>
+                        setKritikalitas(val === "ALL" ? "" : val)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih kritikalitas" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ALL">Semua</SelectItem>
+                        <SelectItem value="KRITIS">🔴 KRITIS</SelectItem>
+                        <SelectItem value="TINGGI">🟠 TINGGI</SelectItem>
+                        <SelectItem value="SEDANG">🟡 SEDANG</SelectItem>
+                        <SelectItem value="RENDAH">🟢 RENDAH</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <Separator />
 
+                  {/* Sorting */}
                   <div className="grid gap-2">
                     <Label>Urutkan Berdasarkan</Label>
-                    <Select value={sortBy} onValueChange={setSortBy}>
+                    <Select
+                      value={sortBy}
+                      onValueChange={(val: ValidSortField) => setSortBy(val)}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Pilih kolom" />
                       </SelectTrigger>
@@ -438,39 +602,41 @@ export default function ListTableDataMaster() {
                         ))}
                       </SelectContent>
                     </Select>
-
                     <div className="flex gap-2">
                       <Button
                         variant={sortOrder === "asc" ? "default" : "outline"}
                         className="flex-1 cursor-pointer"
                         onClick={() => setSortOrder("asc")}
+                        size="sm"
                       >
                         <ArrowUp className="mr-2 h-4 w-4" />
-                        Ascending
+                        Asc
                       </Button>
                       <Button
                         variant={sortOrder === "desc" ? "default" : "outline"}
                         className="flex-1 cursor-pointer"
                         onClick={() => setSortOrder("desc")}
+                        size="sm"
                       >
                         <ArrowDown className="mr-2 h-4 w-4" />
-                        Descending
+                        Desc
                       </Button>
                     </div>
                   </div>
                 </div>
-
                 <div className="flex justify-between gap-2">
                   <Button
                     variant="outline"
                     onClick={clearFilters}
                     className="cursor-pointer"
+                    size="sm"
                   >
-                    Reset
+                    Reset Filter
                   </Button>
                   <Button
                     onClick={() => setIsFilterOpen(false)}
                     className="cursor-pointer"
+                    size="sm"
                   >
                     Terapkan
                   </Button>
@@ -479,104 +645,28 @@ export default function ListTableDataMaster() {
             </Dialog>
           </div>
 
+          {/* Search Box */}
           <div className="flex gap-2">
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Cari nama atribut / nilai / sumber data..."
-              className="cursor-pointer min-w-62.5"
+              placeholder="Cari nama atribut..."
+              className="min-w-62.5"
             />
             {q && (
               <Button
                 variant="outline"
+                size="icon"
                 onClick={() => setQ("")}
-                className="cursor-pointer"
+                className="cursor-pointer shrink-0"
               >
                 <XIcon className="h-4 w-4" />
               </Button>
             )}
           </div>
         </div>
-
-        {hasActiveFilters && (
-          <div className="flex flex-wrap gap-2">
-            {domainIsuId && (
-              <Badge variant="secondary" className="gap-2">
-                Domain:{" "}
-                {domainList.find((d: any) => d.id === domainIsuId)?.nama ||
-                  domainIsuId}
-                <button
-                  onClick={() => setDomainIsuId("")}
-                  className="hover:text-red-500"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            )}
-            {lokasiRt && (
-              <Badge variant="secondary" className="gap-2">
-                RT: {lokasiRt}
-                <button
-                  onClick={() => setLokasiRt("")}
-                  className="hover:text-red-500"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            )}
-            {lokasiRw && (
-              <Badge variant="secondary" className="gap-2">
-                RW: {lokasiRw}
-                <button
-                  onClick={() => setLokasiRw("")}
-                  className="hover:text-red-500"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            )}
-            {nilai && (
-              <Badge variant="secondary" className="gap-2">
-                Nilai: {nilai}
-                <button
-                  onClick={() => setNilai("")}
-                  className="hover:text-red-500"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            )}
-            {updatedAt && (
-              <Badge variant="secondary" className="gap-2">
-                Tanggal: {updatedAt}
-                <button
-                  onClick={() => setUpdatedAt("")}
-                  className="hover:text-red-500"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            )}
-            {(sortBy !== "updatedAt" || sortOrder !== "desc") && (
-              <Badge variant="secondary" className="gap-2">
-                Sort: {sortOptions.find((opt) => opt.value === sortBy)?.label}{" "}
-                {sortOrder === "asc" ? "↑" : "↓"}
-                <button
-                  onClick={() => {
-                    setSortBy("updatedAt");
-                    setSortOrder("desc");
-                  }}
-                  className="hover:text-red-500"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            )}
-          </div>
-        )}
       </CardHeader>
 
-      {/* Kontainer tabel dengan overflow-x-auto untuk scroll horizontal di dalam tabel */}
       <CardContent className="max-w-full p-4 md:p-6">
         <div className="overflow-x-auto">
           <Table className="table-fixed w-full">
@@ -585,22 +675,11 @@ export default function ListTableDataMaster() {
                 <TableHead className="text-center w-12 whitespace-nowrap px-2">
                   No
                 </TableHead>
-                <TableHead
-                  className="text-center cursor-pointer hover:bg-muted/50 whitespace-nowrap px-2 min-w-25"
-                  onClick={() => handleSortChange("domainIsuId")}
-                >
-                  <div className="flex items-center justify-center gap-1">
-                    Domain Isu
-                    {sortBy === "domainIsuId" &&
-                      (sortOrder === "asc" ? (
-                        <ArrowUp className="h-3 w-3 shrink-0" />
-                      ) : (
-                        <ArrowDown className="h-3 w-3 shrink-0" />
-                      ))}
-                  </div>
+                <TableHead className="text-center whitespace-nowrap px-2">
+                  Domain Isu
                 </TableHead>
                 <TableHead
-                  className="text-center cursor-pointer hover:bg-muted/50 whitespace-nowrap px-2 min-w-30"
+                  className="text-center cursor-pointer hover:bg-muted/50 whitespace-nowrap px-2"
                   onClick={() => handleSortChange("namaAtribut")}
                 >
                   <div className="flex items-center justify-center gap-1">
@@ -614,12 +693,12 @@ export default function ListTableDataMaster() {
                   </div>
                 </TableHead>
                 <TableHead
-                  className="text-center cursor-pointer hover:bg-muted/50 whitespace-nowrap px-2 min-w-20"
-                  onClick={() => handleSortChange("nilai")}
+                  className="text-center cursor-pointer hover:bg-muted/50 whitespace-nowrap px-2"
+                  onClick={() => handleSortChange("kritikalitas")}
                 >
                   <div className="flex items-center justify-center gap-1">
-                    Nilai
-                    {sortBy === "nilai" &&
+                    Kritikalitas
+                    {sortBy === "kritikalitas" &&
                       (sortOrder === "asc" ? (
                         <ArrowUp className="h-3 w-3 shrink-0" />
                       ) : (
@@ -628,35 +707,7 @@ export default function ListTableDataMaster() {
                   </div>
                 </TableHead>
                 <TableHead
-                  className="text-center cursor-pointer hover:bg-muted/50 whitespace-nowrap px-2 min-w-15"
-                  onClick={() => handleSortChange("lokasiRt")}
-                >
-                  <div className="flex items-center justify-center gap-1">
-                    RT
-                    {sortBy === "lokasiRt" &&
-                      (sortOrder === "asc" ? (
-                        <ArrowUp className="h-3 w-3 shrink-0" />
-                      ) : (
-                        <ArrowDown className="h-3 w-3 shrink-0" />
-                      ))}
-                  </div>
-                </TableHead>
-                <TableHead
-                  className="text-center cursor-pointer hover:bg-muted/50 whitespace-nowrap px-2 min-w-15"
-                  onClick={() => handleSortChange("lokasiRw")}
-                >
-                  <div className="flex items-center justify-center gap-1">
-                    RW
-                    {sortBy === "lokasiRw" &&
-                      (sortOrder === "asc" ? (
-                        <ArrowUp className="h-3 w-3 shrink-0" />
-                      ) : (
-                        <ArrowDown className="h-3 w-3 shrink-0" />
-                      ))}
-                  </div>
-                </TableHead>
-                <TableHead
-                  className="text-center cursor-pointer hover:bg-muted/50 whitespace-nowrap px-2 min-w-17.5"
+                  className="text-center cursor-pointer hover:bg-muted/50 whitespace-nowrap px-2"
                   onClick={() => handleSortChange("jumlah")}
                 >
                   <div className="flex items-center justify-center gap-1">
@@ -670,12 +721,12 @@ export default function ListTableDataMaster() {
                   </div>
                 </TableHead>
                 <TableHead
-                  className="text-center cursor-pointer hover:bg-muted/50 whitespace-nowrap px-2 min-w-27.5"
-                  onClick={() => handleSortChange("sumberData")}
+                  className="text-center cursor-pointer hover:bg-muted/50 whitespace-nowrap px-2"
+                  onClick={() => handleSortChange("tahunData")}
                 >
                   <div className="flex items-center justify-center gap-1">
-                    Sumber Data
-                    {sortBy === "sumberData" &&
+                    Tahun Data
+                    {sortBy === "tahunData" &&
                       (sortOrder === "asc" ? (
                         <ArrowUp className="h-3 w-3 shrink-0" />
                       ) : (
@@ -683,11 +734,11 @@ export default function ListTableDataMaster() {
                       ))}
                   </div>
                 </TableHead>
-                <TableHead className="text-center whitespace-break-spaces px-2 min-w-27.5">
+                <TableHead className="text-center whitespace-nowrap px-2">
                   Diproses Oleh
                 </TableHead>
                 <TableHead
-                  className="text-center cursor-pointer hover:bg-muted/50 whitespace-nowrap px-2 min-w-25"
+                  className="text-center cursor-pointer hover:bg-muted/50 whitespace-nowrap px-2"
                   onClick={() => handleSortChange("updatedAt")}
                 >
                   <div className="flex items-center justify-center gap-1">
@@ -705,29 +756,30 @@ export default function ListTableDataMaster() {
                 </TableHead>
               </TableRow>
             </TableHeader>
-
             <TableBody>
               {isLoading && !data && <TableSkeleton rows={5} />}
 
               {error && (
                 <TableRow>
-                  <TableCell colSpan={11} className="text-center">
-                    <DataError message={error?.message} />
+                  <TableCell colSpan={9} className="text-center py-8">
+                    <DataError
+                      message={error?.message || "Gagal memuat data"}
+                    />
                   </TableCell>
                 </TableRow>
               )}
 
-              {data?.length === 0 && !hasSignificantFilter && (
+              {data?.length === 0 && !hasSignificantFilter && !isLoading && (
                 <TableRow>
-                  <TableCell colSpan={11} className="text-center">
-                    <DataKosong />
+                  <TableCell colSpan={9} className="text-center py-8">
+                    <DataKosong title="Data Master Masih Kosong" />
                   </TableCell>
                 </TableRow>
               )}
 
-              {data?.length === 0 && hasSignificantFilter && (
+              {data?.length === 0 && hasSignificantFilter && !isLoading && (
                 <TableRow>
-                  <TableCell colSpan={11} className="text-center">
+                  <TableCell colSpan={9} className="text-center py-8">
                     <DataTidakDitemukan />
                   </TableCell>
                 </TableRow>
@@ -741,32 +793,42 @@ export default function ListTableDataMaster() {
                     onClick={() => router.push(`/admin/kelola-data/${item.id}`)}
                   >
                     <TableCell className={cellCenter}>
-                      {(pageNumber - 1) * perPageNumber + index + 1}
-                    </TableCell>
-                    <TableCell className={cellCenter}>
-                      {item.domainIsu?.nama || "-"}
-                    </TableCell>
-                    <TableCell className={cellCenter}>
-                      {item.namaAtribut}
+                      {(pageNumber - 1) * limitNumber + index + 1}
                     </TableCell>
                     <TableCell className={cellCenter}>
                       <Badge variant="outline" className="whitespace-nowrap">
-                        {item.kritikalitas}
+                        {item.domainIsu?.nama || "-"}
                       </Badge>
                     </TableCell>
-                    <TableCell className={cellCenter}>
-                      {item.lokasiRt ?? "-"}
+                    <TableCell className={cellCenter} title={item.namaAtribut}>
+                      {item.namaAtribut}
                     </TableCell>
                     <TableCell className={cellCenter}>
-                      {item.lokasiRw ?? "-"}
+                      <Badge
+                        variant={
+                          item.kritikalitas === "KRITIS"
+                            ? "destructive"
+                            : item.kritikalitas === "TINGGI"
+                              ? "default"
+                              : item.kritikalitas === "SEDANG"
+                                ? "secondary"
+                                : "outline"
+                        }
+                        className="whitespace-nowrap"
+                      >
+                        {item.kritikalitas}
+                      </Badge>
                     </TableCell>
                     <TableCell className={cellCenter}>
                       {item.jumlah ?? "-"}
                     </TableCell>
                     <TableCell className={cellCenter}>
-                      {item.sumberData || "-"}
+                      {item.tahunData ?? "-"}
                     </TableCell>
-                    <TableCell className={cellCenter}>
+                    <TableCell
+                      className={cellCenter}
+                      title={item.diprosesOleh?.email}
+                    >
                       {item.diprosesOleh?.name ?? "-"}
                     </TableCell>
                     <TableCell className={cellCenter}>
@@ -780,6 +842,7 @@ export default function ListTableDataMaster() {
                       <div className="flex justify-center gap-2 whitespace-nowrap">
                         <Button
                           size="sm"
+                          variant="secondary"
                           onClick={(e) => {
                             e.stopPropagation();
                             router.push(`/admin/kelola-data/${item.id}`);
@@ -807,34 +870,43 @@ export default function ListTableDataMaster() {
           </Table>
         </div>
 
-        <div className="flex justify-between items-center mt-4">
-          <div className="text-sm text-muted-foreground">
-            Total: {meta?.total || 0} Data
+        {/* Pagination */}
+        {data?.length > 0 && (
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-4 pt-4 border-t">
+            <div className="text-sm text-muted-foreground">
+              Menampilkan {(pageNumber - 1) * limitNumber + 1} -{" "}
+              {Math.min(pageNumber * limitNumber, meta?.total || 0)} dari{" "}
+              {meta?.total || 0} data
+            </div>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setPage(String(Math.max(1, pageNumber - 1)))}
+                disabled={pageNumber === 1}
+                className="cursor-pointer"
+              >
+                <ChevronLeft className="h-4 w-4" /> Prev
+              </Button>
+              <span className="px-4 py-2 bg-muted rounded-md text-sm">
+                Halaman {pageNumber} dari {meta?.totalPages || 1}
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  setPage(
+                    String(Math.min(meta?.totalPages || 1, pageNumber + 1)),
+                  )
+                }
+                disabled={pageNumber >= (meta?.totalPages || 1)}
+                className="cursor-pointer"
+              >
+                Next <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setPage(String(pageNumber - 1))}
-              disabled={pageNumber === 1}
-              className="cursor-pointer"
-            >
-              <ChevronLeft className="h-4 w-4" /> Prev
-            </Button>
-            <span className="px-4 py-2 bg-muted rounded-md">
-              Halaman {pageNumber} dari {meta?.totalPages || 1}
-            </span>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setPage(String(pageNumber + 1))}
-              disabled={pageNumber >= (meta?.totalPages || 1)}
-              className="cursor-pointer"
-            >
-              Next <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );

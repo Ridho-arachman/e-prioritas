@@ -1,37 +1,51 @@
-import { handleResponse } from "@/lib/handleResponse";
-import { NextRequest } from "next/server";
+import { auth } from "@/lib/auth";
 import { handlePrismaError } from "@/lib/handlePrismaError";
 import { handleZodValidation } from "@/lib/handleZodValidation";
-import { dataMasterService } from "@/services/dataMasterService";
+import { handleResponse } from "@/lib/handleResponse";
 import {
-  dataMasterParamSchema, // schema untuk validasi ID
-  dataMasterSchema, // schema untuk create (bisa dipartial untuk update)
+  dataMasterParamSchema,
+  dataMasterUpdateSchema,
 } from "@/schema/dataMasterSchema";
+import { dataMasterService } from "@/services/dataMasterService";
+import { NextRequest } from "next/server";
 import { Role } from "@/app/generated/prisma";
-import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
-// Tipe context untuk params (sesuaikan jika diperlukan)
 type Params = { id: string };
-type RouteContext = { params: Params };
+type RouteContext = { params: Promise<Params> };
 
-export const GET = async (_req: NextRequest, ctx: RouteContext) => {
-  const allowedRoles: Role[] = ["ADMIN"];
+const allowedRoles: Role[] = ["ADMIN"];
+
+// Helper cek auth (bisa dipisah ke file utils jika ingin)
+const checkAuth = async () => {
   const session = await auth.api.getSession({ headers: await headers() });
-
   if (!session) {
-    return handleResponse({
-      success: false,
+    return {
+      authorized: false,
       message: "User belum login",
-      status: 403,
-    });
+      status: 401,
+      user: null,
+    };
   }
-
   if (!allowedRoles.includes(session.user.role as Role)) {
-    return handleResponse({
-      success: false,
+    return {
+      authorized: false,
       message: "Akses ditolak",
       status: 403,
+      user: null,
+    };
+  }
+  return { authorized: true, user: session.user };
+};
+
+// GET by ID
+export const GET = async (_req: NextRequest, ctx: RouteContext) => {
+  const authCheck = await checkAuth();
+  if (!authCheck.authorized) {
+    return handleResponse({
+      success: false,
+      message: authCheck.message,
+      status: authCheck.status,
     });
   }
 
@@ -40,8 +54,7 @@ export const GET = async (_req: NextRequest, ctx: RouteContext) => {
     const parsedId = dataMasterParamSchema.safeParse({ id });
     if (!parsedId.success) return handleZodValidation(parsedId);
 
-    const dataMasterId = parsedId.data.id;
-    const data = await dataMasterService.getById(dataMasterId);
+    const data = await dataMasterService.getById(parsedId.data.id);
 
     return handleResponse({
       success: true,
@@ -58,7 +71,6 @@ export const GET = async (_req: NextRequest, ctx: RouteContext) => {
         status: prismaResponse.status,
       });
     }
-
     return handleResponse({
       success: false,
       message: "Terjadi error pada server",
@@ -67,23 +79,14 @@ export const GET = async (_req: NextRequest, ctx: RouteContext) => {
   }
 };
 
+// PUT (update) by ID
 export const PUT = async (req: NextRequest, ctx: RouteContext) => {
-  const allowedRoles: Role[] = ["ADMIN"];
-  const session = await auth.api.getSession({ headers: await headers() });
-
-  if (!session) {
+  const authCheck = await checkAuth();
+  if (!authCheck.authorized) {
     return handleResponse({
       success: false,
-      message: "User belum login",
-      status: 403,
-    });
-  }
-
-  if (!allowedRoles.includes(session.user.role as Role)) {
-    return handleResponse({
-      success: false,
-      message: "Akses ditolak",
-      status: 403,
+      message: authCheck.message,
+      status: authCheck.status,
     });
   }
 
@@ -91,22 +94,18 @@ export const PUT = async (req: NextRequest, ctx: RouteContext) => {
     const { id } = await ctx.params;
     const body = await req.json();
 
-    // Validasi ID
     const parsedId = dataMasterParamSchema.safeParse({ id });
     if (!parsedId.success) return handleZodValidation(parsedId);
 
-    // Untuk update, semua field bersifat opsional → gunakan partial dari schema
-    const updateSchema = dataMasterSchema.partial();
-    const parsedBody = updateSchema.safeParse(body);
+    const parsedBody = dataMasterUpdateSchema.safeParse(body);
     if (!parsedBody.success) return handleZodValidation(parsedBody);
 
-    // Tambahkan informasi user yang melakukan update
     const updateData = {
       ...parsedBody.data,
-      diprosesOlehId: session.user.id, // catat siapa yang terakhir mengubah
+      diprosesOlehId: authCheck.user?.id,
     };
 
-    const dataMaster = await dataMasterService.update(
+    const updated = await dataMasterService.update(
       parsedId.data.id,
       updateData,
     );
@@ -114,7 +113,7 @@ export const PUT = async (req: NextRequest, ctx: RouteContext) => {
     return handleResponse({
       success: true,
       message: "Data Master berhasil diupdate",
-      data: dataMaster,
+      data: updated,
       status: 200,
     });
   } catch (err) {
@@ -126,7 +125,6 @@ export const PUT = async (req: NextRequest, ctx: RouteContext) => {
         status: prismaResponse.status,
       });
     }
-
     return handleResponse({
       success: false,
       message: "Terjadi error pada server",
@@ -135,23 +133,14 @@ export const PUT = async (req: NextRequest, ctx: RouteContext) => {
   }
 };
 
+// DELETE by ID
 export const DELETE = async (_req: NextRequest, ctx: RouteContext) => {
-  const allowedRoles: Role[] = ["ADMIN"];
-  const session = await auth.api.getSession({ headers: await headers() });
-
-  if (!session) {
+  const authCheck = await checkAuth();
+  if (!authCheck.authorized) {
     return handleResponse({
       success: false,
-      message: "User belum login",
-      status: 403,
-    });
-  }
-
-  if (!allowedRoles.includes(session.user.role as Role)) {
-    return handleResponse({
-      success: false,
-      message: "Akses ditolak",
-      status: 403,
+      message: authCheck.message,
+      status: authCheck.status,
     });
   }
 
@@ -160,13 +149,11 @@ export const DELETE = async (_req: NextRequest, ctx: RouteContext) => {
     const parsedId = dataMasterParamSchema.safeParse({ id });
     if (!parsedId.success) return handleZodValidation(parsedId);
 
-    const dataMasterId = parsedId.data.id;
-    const dataMaster = await dataMasterService.deleteById(dataMasterId);
+    await dataMasterService.deleteById(parsedId.data.id);
 
     return handleResponse({
       success: true,
-      message: "Data master berhasil dihapus",
-      data: dataMaster,
+      message: "Data Master berhasil dihapus",
       status: 200,
     });
   } catch (err) {
@@ -178,7 +165,6 @@ export const DELETE = async (_req: NextRequest, ctx: RouteContext) => {
         status: prismaResponse.status,
       });
     }
-
     return handleResponse({
       success: false,
       message: "Terjadi error pada server",

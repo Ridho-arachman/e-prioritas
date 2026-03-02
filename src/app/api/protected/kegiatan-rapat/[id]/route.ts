@@ -1,12 +1,17 @@
+// src/app/api/protected/kegiatan-rapat/[id]/route.ts
 import { auth } from "@/lib/auth";
 import { handlePrismaError } from "@/lib/handlePrismaError";
 import { handleResponse } from "@/lib/handleResponse";
 import { kegiatanRapatService } from "@/services/kegiatanRapatService";
 import { NextRequest } from "next/server";
-import { Role } from "@/app/generated/prisma";
+import { Role, StatusRekomendasi } from "@/app/generated/prisma";
 import { headers } from "next/headers";
+import { kegiatanRapatSchema } from "@/schema/kegiatanRapatSchema";
 
-// GET - Detail Kegiatan by ID
+// ========================
+// GET - Detail by ID
+// ========================
+
 export const GET = async (
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -37,10 +42,14 @@ export const GET = async (
     return handleResponse({
       success: true,
       message: "Data Berhasil Ditemukan",
-      data: kegiatanRapat,
+      data: {
+        ...kegiatanRapat,
+        _rekomendasiParsed: kegiatanRapat.rekomendasiItems,
+      },
       status: 200,
     });
   } catch (err) {
+    console.error("GET BY ID ERROR:", err);
     const prismaResponse = handlePrismaError(err);
     if (prismaResponse) {
       return handleResponse({
@@ -49,7 +58,6 @@ export const GET = async (
         status: prismaResponse.status,
       });
     }
-
     return handleResponse({
       success: false,
       message: "Terjadi error pada server",
@@ -58,7 +66,10 @@ export const GET = async (
   }
 };
 
-// PUT - Update Kegiatan by ID
+// ========================
+// PUT - Update by ID
+// ========================
+
 export const PUT = async (
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -85,7 +96,18 @@ export const PUT = async (
   try {
     const body = await req.json();
     const { id } = await params;
-    const kegiatanRapat = await kegiatanRapatService.update(id, body);
+
+    const parsed = kegiatanRapatSchema.partial().safeParse(body);
+    if (!parsed.success) {
+      return handleResponse({
+        success: false,
+        message: "Validasi gagal",
+        errors: parsed.error.flatten().fieldErrors,
+        status: 400,
+      });
+    }
+
+    const kegiatanRapat = await kegiatanRapatService.update(id, parsed.data);
 
     return handleResponse({
       success: true,
@@ -94,6 +116,7 @@ export const PUT = async (
       status: 200,
     });
   } catch (err) {
+    console.error("UPDATE ERROR:", err);
     const prismaResponse = handlePrismaError(err);
     if (prismaResponse) {
       return handleResponse({
@@ -102,7 +125,6 @@ export const PUT = async (
         status: prismaResponse.status,
       });
     }
-
     return handleResponse({
       success: false,
       message: "Terjadi error pada server",
@@ -111,9 +133,12 @@ export const PUT = async (
   }
 };
 
-// DELETE - Delete Kegiatan by ID
+// ========================
+// DELETE - Delete by ID
+// ========================
+
 export const DELETE = async (
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) => {
   const allowedRoles: Role[] = ["ADMIN", "LURAH"];
@@ -145,6 +170,7 @@ export const DELETE = async (
       status: 200,
     });
   } catch (err) {
+    console.error("DELETE ERROR:", err);
     const prismaResponse = handlePrismaError(err);
     if (prismaResponse) {
       return handleResponse({
@@ -153,7 +179,6 @@ export const DELETE = async (
         status: prismaResponse.status,
       });
     }
-
     return handleResponse({
       success: false,
       message: "Terjadi error pada server",

@@ -5562,11 +5562,8 @@ export namespace Prisma {
     namaAtribut: string | null
     kritikalitas: $Enums.NilaiKritikalitas | null
     jumlah: number | null
-    lokasiRt: string | null
-    lokasiRw: string | null
     isActive: boolean | null
     tahunData: number | null
-    sumberData: string | null
     diprosesOlehId: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -5578,11 +5575,8 @@ export namespace Prisma {
     namaAtribut: string | null
     kritikalitas: $Enums.NilaiKritikalitas | null
     jumlah: number | null
-    lokasiRt: string | null
-    lokasiRw: string | null
     isActive: boolean | null
     tahunData: number | null
-    sumberData: string | null
     diprosesOlehId: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -5594,11 +5588,8 @@ export namespace Prisma {
     namaAtribut: number
     kritikalitas: number
     jumlah: number
-    lokasiRt: number
-    lokasiRw: number
     isActive: number
     tahunData: number
-    sumberData: number
     diprosesOlehId: number
     createdAt: number
     updatedAt: number
@@ -5622,11 +5613,8 @@ export namespace Prisma {
     namaAtribut?: true
     kritikalitas?: true
     jumlah?: true
-    lokasiRt?: true
-    lokasiRw?: true
     isActive?: true
     tahunData?: true
-    sumberData?: true
     diprosesOlehId?: true
     createdAt?: true
     updatedAt?: true
@@ -5638,11 +5626,8 @@ export namespace Prisma {
     namaAtribut?: true
     kritikalitas?: true
     jumlah?: true
-    lokasiRt?: true
-    lokasiRw?: true
     isActive?: true
     tahunData?: true
-    sumberData?: true
     diprosesOlehId?: true
     createdAt?: true
     updatedAt?: true
@@ -5654,11 +5639,8 @@ export namespace Prisma {
     namaAtribut?: true
     kritikalitas?: true
     jumlah?: true
-    lokasiRt?: true
-    lokasiRw?: true
     isActive?: true
     tahunData?: true
-    sumberData?: true
     diprosesOlehId?: true
     createdAt?: true
     updatedAt?: true
@@ -5757,11 +5739,8 @@ export namespace Prisma {
     namaAtribut: string
     kritikalitas: $Enums.NilaiKritikalitas
     jumlah: number | null
-    lokasiRt: string | null
-    lokasiRw: string | null
     isActive: boolean
     tahunData: number | null
-    sumberData: string | null
     diprosesOlehId: string | null
     createdAt: Date
     updatedAt: Date
@@ -5792,11 +5771,8 @@ export namespace Prisma {
     namaAtribut?: boolean
     kritikalitas?: boolean
     jumlah?: boolean
-    lokasiRt?: boolean
-    lokasiRw?: boolean
     isActive?: boolean
     tahunData?: boolean
-    sumberData?: boolean
     diprosesOlehId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -5810,11 +5786,8 @@ export namespace Prisma {
     namaAtribut?: boolean
     kritikalitas?: boolean
     jumlah?: boolean
-    lokasiRt?: boolean
-    lokasiRw?: boolean
     isActive?: boolean
     tahunData?: boolean
-    sumberData?: boolean
     diprosesOlehId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -5828,11 +5801,8 @@ export namespace Prisma {
     namaAtribut?: boolean
     kritikalitas?: boolean
     jumlah?: boolean
-    lokasiRt?: boolean
-    lokasiRw?: boolean
     isActive?: boolean
     tahunData?: boolean
-    sumberData?: boolean
     diprosesOlehId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -5846,17 +5816,14 @@ export namespace Prisma {
     namaAtribut?: boolean
     kritikalitas?: boolean
     jumlah?: boolean
-    lokasiRt?: boolean
-    lokasiRw?: boolean
     isActive?: boolean
     tahunData?: boolean
-    sumberData?: boolean
     diprosesOlehId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type DataMasterOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "domainIsuId" | "namaAtribut" | "kritikalitas" | "jumlah" | "lokasiRt" | "lokasiRw" | "isActive" | "tahunData" | "sumberData" | "diprosesOlehId" | "createdAt" | "updatedAt", ExtArgs["result"]["dataMaster"]>
+  export type DataMasterOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "domainIsuId" | "namaAtribut" | "kritikalitas" | "jumlah" | "isActive" | "tahunData" | "diprosesOlehId" | "createdAt" | "updatedAt", ExtArgs["result"]["dataMaster"]>
   export type DataMasterInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
     diprosesOleh?: boolean | DataMaster$diprosesOlehArgs<ExtArgs>
@@ -5882,11 +5849,8 @@ export namespace Prisma {
       namaAtribut: string
       kritikalitas: $Enums.NilaiKritikalitas
       jumlah: number | null
-      lokasiRt: string | null
-      lokasiRw: string | null
       isActive: boolean
       tahunData: number | null
-      sumberData: string | null
       diprosesOlehId: string | null
       createdAt: Date
       updatedAt: Date
@@ -6320,11 +6284,8 @@ export namespace Prisma {
     readonly namaAtribut: FieldRef<"DataMaster", 'String'>
     readonly kritikalitas: FieldRef<"DataMaster", 'NilaiKritikalitas'>
     readonly jumlah: FieldRef<"DataMaster", 'Int'>
-    readonly lokasiRt: FieldRef<"DataMaster", 'String'>
-    readonly lokasiRw: FieldRef<"DataMaster", 'String'>
     readonly isActive: FieldRef<"DataMaster", 'Boolean'>
     readonly tahunData: FieldRef<"DataMaster", 'Int'>
-    readonly sumberData: FieldRef<"DataMaster", 'String'>
     readonly diprosesOlehId: FieldRef<"DataMaster", 'String'>
     readonly createdAt: FieldRef<"DataMaster", 'DateTime'>
     readonly updatedAt: FieldRef<"DataMaster", 'DateTime'>
@@ -12479,11 +12440,8 @@ export namespace Prisma {
     namaAtribut: 'namaAtribut',
     kritikalitas: 'kritikalitas',
     jumlah: 'jumlah',
-    lokasiRt: 'lokasiRt',
-    lokasiRw: 'lokasiRw',
     isActive: 'isActive',
     tahunData: 'tahunData',
-    sumberData: 'sumberData',
     diprosesOlehId: 'diprosesOlehId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -13060,11 +13018,8 @@ export namespace Prisma {
     namaAtribut?: StringFilter<"DataMaster"> | string
     kritikalitas?: EnumNilaiKritikalitasFilter<"DataMaster"> | $Enums.NilaiKritikalitas
     jumlah?: IntNullableFilter<"DataMaster"> | number | null
-    lokasiRt?: StringNullableFilter<"DataMaster"> | string | null
-    lokasiRw?: StringNullableFilter<"DataMaster"> | string | null
     isActive?: BoolFilter<"DataMaster"> | boolean
     tahunData?: IntNullableFilter<"DataMaster"> | number | null
-    sumberData?: StringNullableFilter<"DataMaster"> | string | null
     diprosesOlehId?: StringNullableFilter<"DataMaster"> | string | null
     createdAt?: DateTimeFilter<"DataMaster"> | Date | string
     updatedAt?: DateTimeFilter<"DataMaster"> | Date | string
@@ -13078,11 +13033,8 @@ export namespace Prisma {
     namaAtribut?: SortOrder
     kritikalitas?: SortOrder
     jumlah?: SortOrderInput | SortOrder
-    lokasiRt?: SortOrderInput | SortOrder
-    lokasiRw?: SortOrderInput | SortOrder
     isActive?: SortOrder
     tahunData?: SortOrderInput | SortOrder
-    sumberData?: SortOrderInput | SortOrder
     diprosesOlehId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -13092,7 +13044,7 @@ export namespace Prisma {
 
   export type DataMasterWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    domainIsuId_namaAtribut_lokasiRt_lokasiRw?: DataMasterDomainIsuIdNamaAtributLokasiRtLokasiRwCompoundUniqueInput
+    domainIsuId_namaAtribut?: DataMasterDomainIsuIdNamaAtributCompoundUniqueInput
     AND?: DataMasterWhereInput | DataMasterWhereInput[]
     OR?: DataMasterWhereInput[]
     NOT?: DataMasterWhereInput | DataMasterWhereInput[]
@@ -13100,17 +13052,14 @@ export namespace Prisma {
     namaAtribut?: StringFilter<"DataMaster"> | string
     kritikalitas?: EnumNilaiKritikalitasFilter<"DataMaster"> | $Enums.NilaiKritikalitas
     jumlah?: IntNullableFilter<"DataMaster"> | number | null
-    lokasiRt?: StringNullableFilter<"DataMaster"> | string | null
-    lokasiRw?: StringNullableFilter<"DataMaster"> | string | null
     isActive?: BoolFilter<"DataMaster"> | boolean
     tahunData?: IntNullableFilter<"DataMaster"> | number | null
-    sumberData?: StringNullableFilter<"DataMaster"> | string | null
     diprosesOlehId?: StringNullableFilter<"DataMaster"> | string | null
     createdAt?: DateTimeFilter<"DataMaster"> | Date | string
     updatedAt?: DateTimeFilter<"DataMaster"> | Date | string
     domainIsu?: XOR<DomainIsuScalarRelationFilter, DomainIsuWhereInput>
     diprosesOleh?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
-  }, "id" | "domainIsuId_namaAtribut_lokasiRt_lokasiRw">
+  }, "id" | "domainIsuId_namaAtribut">
 
   export type DataMasterOrderByWithAggregationInput = {
     id?: SortOrder
@@ -13118,11 +13067,8 @@ export namespace Prisma {
     namaAtribut?: SortOrder
     kritikalitas?: SortOrder
     jumlah?: SortOrderInput | SortOrder
-    lokasiRt?: SortOrderInput | SortOrder
-    lokasiRw?: SortOrderInput | SortOrder
     isActive?: SortOrder
     tahunData?: SortOrderInput | SortOrder
-    sumberData?: SortOrderInput | SortOrder
     diprosesOlehId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -13142,11 +13088,8 @@ export namespace Prisma {
     namaAtribut?: StringWithAggregatesFilter<"DataMaster"> | string
     kritikalitas?: EnumNilaiKritikalitasWithAggregatesFilter<"DataMaster"> | $Enums.NilaiKritikalitas
     jumlah?: IntNullableWithAggregatesFilter<"DataMaster"> | number | null
-    lokasiRt?: StringNullableWithAggregatesFilter<"DataMaster"> | string | null
-    lokasiRw?: StringNullableWithAggregatesFilter<"DataMaster"> | string | null
     isActive?: BoolWithAggregatesFilter<"DataMaster"> | boolean
     tahunData?: IntNullableWithAggregatesFilter<"DataMaster"> | number | null
-    sumberData?: StringNullableWithAggregatesFilter<"DataMaster"> | string | null
     diprosesOlehId?: StringNullableWithAggregatesFilter<"DataMaster"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"DataMaster"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"DataMaster"> | Date | string
@@ -13909,11 +13852,8 @@ export namespace Prisma {
     namaAtribut: string
     kritikalitas: $Enums.NilaiKritikalitas
     jumlah?: number | null
-    lokasiRt?: string | null
-    lokasiRw?: string | null
     isActive?: boolean
     tahunData?: number | null
-    sumberData?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     domainIsu: DomainIsuCreateNestedOneWithoutDataMasterInput
@@ -13926,11 +13866,8 @@ export namespace Prisma {
     namaAtribut: string
     kritikalitas: $Enums.NilaiKritikalitas
     jumlah?: number | null
-    lokasiRt?: string | null
-    lokasiRw?: string | null
     isActive?: boolean
     tahunData?: number | null
-    sumberData?: string | null
     diprosesOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -13941,11 +13878,8 @@ export namespace Prisma {
     namaAtribut?: StringFieldUpdateOperationsInput | string
     kritikalitas?: EnumNilaiKritikalitasFieldUpdateOperationsInput | $Enums.NilaiKritikalitas
     jumlah?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
-    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     tahunData?: NullableIntFieldUpdateOperationsInput | number | null
-    sumberData?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     domainIsu?: DomainIsuUpdateOneRequiredWithoutDataMasterNestedInput
@@ -13958,11 +13892,8 @@ export namespace Prisma {
     namaAtribut?: StringFieldUpdateOperationsInput | string
     kritikalitas?: EnumNilaiKritikalitasFieldUpdateOperationsInput | $Enums.NilaiKritikalitas
     jumlah?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
-    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     tahunData?: NullableIntFieldUpdateOperationsInput | number | null
-    sumberData?: NullableStringFieldUpdateOperationsInput | string | null
     diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -13974,11 +13905,8 @@ export namespace Prisma {
     namaAtribut: string
     kritikalitas: $Enums.NilaiKritikalitas
     jumlah?: number | null
-    lokasiRt?: string | null
-    lokasiRw?: string | null
     isActive?: boolean
     tahunData?: number | null
-    sumberData?: string | null
     diprosesOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -13989,11 +13917,8 @@ export namespace Prisma {
     namaAtribut?: StringFieldUpdateOperationsInput | string
     kritikalitas?: EnumNilaiKritikalitasFieldUpdateOperationsInput | $Enums.NilaiKritikalitas
     jumlah?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
-    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     tahunData?: NullableIntFieldUpdateOperationsInput | number | null
-    sumberData?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -14004,11 +13929,8 @@ export namespace Prisma {
     namaAtribut?: StringFieldUpdateOperationsInput | string
     kritikalitas?: EnumNilaiKritikalitasFieldUpdateOperationsInput | $Enums.NilaiKritikalitas
     jumlah?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
-    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     tahunData?: NullableIntFieldUpdateOperationsInput | number | null
-    sumberData?: NullableStringFieldUpdateOperationsInput | string | null
     diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14862,11 +14784,9 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
-  export type DataMasterDomainIsuIdNamaAtributLokasiRtLokasiRwCompoundUniqueInput = {
+  export type DataMasterDomainIsuIdNamaAtributCompoundUniqueInput = {
     domainIsuId: string
     namaAtribut: string
-    lokasiRt: string
-    lokasiRw: string
   }
 
   export type DataMasterCountOrderByAggregateInput = {
@@ -14875,11 +14795,8 @@ export namespace Prisma {
     namaAtribut?: SortOrder
     kritikalitas?: SortOrder
     jumlah?: SortOrder
-    lokasiRt?: SortOrder
-    lokasiRw?: SortOrder
     isActive?: SortOrder
     tahunData?: SortOrder
-    sumberData?: SortOrder
     diprosesOlehId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -14896,11 +14813,8 @@ export namespace Prisma {
     namaAtribut?: SortOrder
     kritikalitas?: SortOrder
     jumlah?: SortOrder
-    lokasiRt?: SortOrder
-    lokasiRw?: SortOrder
     isActive?: SortOrder
     tahunData?: SortOrder
-    sumberData?: SortOrder
     diprosesOlehId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -14912,11 +14826,8 @@ export namespace Prisma {
     namaAtribut?: SortOrder
     kritikalitas?: SortOrder
     jumlah?: SortOrder
-    lokasiRt?: SortOrder
-    lokasiRw?: SortOrder
     isActive?: SortOrder
     tahunData?: SortOrder
-    sumberData?: SortOrder
     diprosesOlehId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -16292,11 +16203,8 @@ export namespace Prisma {
     namaAtribut: string
     kritikalitas: $Enums.NilaiKritikalitas
     jumlah?: number | null
-    lokasiRt?: string | null
-    lokasiRw?: string | null
     isActive?: boolean
     tahunData?: number | null
-    sumberData?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     diprosesOleh?: UserCreateNestedOneWithoutDataMasterDibuatInput
@@ -16307,11 +16215,8 @@ export namespace Prisma {
     namaAtribut: string
     kritikalitas: $Enums.NilaiKritikalitas
     jumlah?: number | null
-    lokasiRt?: string | null
-    lokasiRw?: string | null
     isActive?: boolean
     tahunData?: number | null
-    sumberData?: string | null
     diprosesOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -16441,11 +16346,8 @@ export namespace Prisma {
     namaAtribut?: StringFilter<"DataMaster"> | string
     kritikalitas?: EnumNilaiKritikalitasFilter<"DataMaster"> | $Enums.NilaiKritikalitas
     jumlah?: IntNullableFilter<"DataMaster"> | number | null
-    lokasiRt?: StringNullableFilter<"DataMaster"> | string | null
-    lokasiRw?: StringNullableFilter<"DataMaster"> | string | null
     isActive?: BoolFilter<"DataMaster"> | boolean
     tahunData?: IntNullableFilter<"DataMaster"> | number | null
-    sumberData?: StringNullableFilter<"DataMaster"> | string | null
     diprosesOlehId?: StringNullableFilter<"DataMaster"> | string | null
     createdAt?: DateTimeFilter<"DataMaster"> | Date | string
     updatedAt?: DateTimeFilter<"DataMaster"> | Date | string
@@ -16645,11 +16547,8 @@ export namespace Prisma {
     namaAtribut: string
     kritikalitas: $Enums.NilaiKritikalitas
     jumlah?: number | null
-    lokasiRt?: string | null
-    lokasiRw?: string | null
     isActive?: boolean
     tahunData?: number | null
-    sumberData?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     domainIsu: DomainIsuCreateNestedOneWithoutDataMasterInput
@@ -16661,11 +16560,8 @@ export namespace Prisma {
     namaAtribut: string
     kritikalitas: $Enums.NilaiKritikalitas
     jumlah?: number | null
-    lokasiRt?: string | null
-    lokasiRw?: string | null
     isActive?: boolean
     tahunData?: number | null
-    sumberData?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -17901,11 +17797,8 @@ export namespace Prisma {
     namaAtribut: string
     kritikalitas: $Enums.NilaiKritikalitas
     jumlah?: number | null
-    lokasiRt?: string | null
-    lokasiRw?: string | null
     isActive?: boolean
     tahunData?: number | null
-    sumberData?: string | null
     diprosesOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -17994,11 +17887,8 @@ export namespace Prisma {
     namaAtribut?: StringFieldUpdateOperationsInput | string
     kritikalitas?: EnumNilaiKritikalitasFieldUpdateOperationsInput | $Enums.NilaiKritikalitas
     jumlah?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
-    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     tahunData?: NullableIntFieldUpdateOperationsInput | number | null
-    sumberData?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     diprosesOleh?: UserUpdateOneWithoutDataMasterDibuatNestedInput
@@ -18009,11 +17899,8 @@ export namespace Prisma {
     namaAtribut?: StringFieldUpdateOperationsInput | string
     kritikalitas?: EnumNilaiKritikalitasFieldUpdateOperationsInput | $Enums.NilaiKritikalitas
     jumlah?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
-    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     tahunData?: NullableIntFieldUpdateOperationsInput | number | null
-    sumberData?: NullableStringFieldUpdateOperationsInput | string | null
     diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -18024,11 +17911,8 @@ export namespace Prisma {
     namaAtribut?: StringFieldUpdateOperationsInput | string
     kritikalitas?: EnumNilaiKritikalitasFieldUpdateOperationsInput | $Enums.NilaiKritikalitas
     jumlah?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
-    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     tahunData?: NullableIntFieldUpdateOperationsInput | number | null
-    sumberData?: NullableStringFieldUpdateOperationsInput | string | null
     diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -18156,11 +18040,8 @@ export namespace Prisma {
     namaAtribut: string
     kritikalitas: $Enums.NilaiKritikalitas
     jumlah?: number | null
-    lokasiRt?: string | null
-    lokasiRw?: string | null
     isActive?: boolean
     tahunData?: number | null
-    sumberData?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -18376,11 +18257,8 @@ export namespace Prisma {
     namaAtribut?: StringFieldUpdateOperationsInput | string
     kritikalitas?: EnumNilaiKritikalitasFieldUpdateOperationsInput | $Enums.NilaiKritikalitas
     jumlah?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
-    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     tahunData?: NullableIntFieldUpdateOperationsInput | number | null
-    sumberData?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     domainIsu?: DomainIsuUpdateOneRequiredWithoutDataMasterNestedInput
@@ -18392,11 +18270,8 @@ export namespace Prisma {
     namaAtribut?: StringFieldUpdateOperationsInput | string
     kritikalitas?: EnumNilaiKritikalitasFieldUpdateOperationsInput | $Enums.NilaiKritikalitas
     jumlah?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
-    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     tahunData?: NullableIntFieldUpdateOperationsInput | number | null
-    sumberData?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -18407,11 +18282,8 @@ export namespace Prisma {
     namaAtribut?: StringFieldUpdateOperationsInput | string
     kritikalitas?: EnumNilaiKritikalitasFieldUpdateOperationsInput | $Enums.NilaiKritikalitas
     jumlah?: NullableIntFieldUpdateOperationsInput | number | null
-    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
-    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     tahunData?: NullableIntFieldUpdateOperationsInput | number | null
-    sumberData?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

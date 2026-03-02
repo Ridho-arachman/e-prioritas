@@ -1,49 +1,56 @@
 import { NilaiKritikalitas, Prisma } from "@/app/generated/prisma";
 import prisma from "@/lib/prisma";
 
-type CreateDataInput = {
+const VALID_SORT_FIELDS = [
+  "namaAtribut",
+  "kritikalitas",
+  "jumlah",
+  "tahunData",
+  "isActive",
+  "createdAt",
+  "updatedAt",
+] as const;
+type ValidSortField = (typeof VALID_SORT_FIELDS)[number];
+
+export type DataMasterCreateInput = {
   domainIsuId: string;
   namaAtribut: string;
   kritikalitas: NilaiKritikalitas;
   jumlah?: number | null;
-  lokasiRt?: string | null;
-  lokasiRw?: string | null;
-  sumberData?: string | null;
+  tahunData?: number | null;
+  isActive?: boolean;
   diprosesOlehId?: string | null;
 };
 
-type UpdateDataInput = Partial<CreateDataInput>;
+export type DataMasterUpdateInput = Partial<DataMasterCreateInput>;
 
 export type DataMasterGetAllParams = {
   domainIsuId?: string;
   kritikalitas?: NilaiKritikalitas;
-  lokasiRt?: string;
-  lokasiRw?: string;
   updatedAtFrom?: Date;
   updatedAtTo?: Date;
   search?: string;
-
   sortBy?: string;
   sortOrder?: "asc" | "desc";
-
   page?: number;
   limit?: number;
 };
 
 export const dataMasterService = {
-  create: async (input: CreateDataInput) => {
+  create: async (input: DataMasterCreateInput) => {
     return prisma.dataMaster.create({
       data: input,
       include: {
-        diprosesOleh: { select: { name: true } },
-        domainIsu: { select: { nama: true } },
+        diprosesOleh: { select: { id: true, name: true, email: true } },
+        domainIsu: { select: { id: true, nama: true, code: true } },
       },
     });
   },
 
-  createMany: async (inputs: CreateDataInput[]) => {
+  createMany: async (inputs: DataMasterCreateInput[]) => {
     return prisma.dataMaster.createMany({
       data: inputs,
+      skipDuplicates: true,
     });
   },
 
@@ -51,8 +58,6 @@ export const dataMasterService = {
     const {
       domainIsuId,
       kritikalitas,
-      lokasiRt,
-      lokasiRw,
       updatedAtFrom,
       updatedAtTo,
       search,
@@ -62,37 +67,42 @@ export const dataMasterService = {
       limit = 10,
     } = params || {};
 
+    const safeSortBy: ValidSortField = VALID_SORT_FIELDS.includes(
+      sortBy as ValidSortField,
+    )
+      ? (sortBy as ValidSortField)
+      : "updatedAt";
+
     const where: Prisma.DataMasterWhereInput = {};
 
     if (domainIsuId) where.domainIsuId = domainIsuId;
     if (kritikalitas) where.kritikalitas = kritikalitas;
-    if (lokasiRt) where.lokasiRt = lokasiRt;
-    if (lokasiRw) where.lokasiRw = lokasiRw;
 
     if (updatedAtFrom || updatedAtTo) {
-      where.updatedAt = {};
-      if (updatedAtFrom) where.updatedAt.gte = updatedAtFrom;
-      if (updatedAtTo) where.updatedAt.lte = updatedAtTo;
+      where.updatedAt = {
+        ...(updatedAtFrom && { gte: updatedAtFrom }),
+        ...(updatedAtTo && { lte: updatedAtTo }),
+      };
     }
 
     if (search) {
-      where.OR = [
-        { namaAtribut: { contains: search, mode: "insensitive" } },
-        { sumberData: { contains: search, mode: "insensitive" } },
-      ];
+      where.OR = [{ namaAtribut: { contains: search, mode: "insensitive" } }];
     }
 
     const skip = (page - 1) * limit;
+    const orderBy: Prisma.DataMasterOrderByWithRelationInput = {
+      [safeSortBy]: sortOrder,
+    };
 
     const [data, total] = await prisma.$transaction([
       prisma.dataMaster.findMany({
         where,
-        orderBy: { [sortBy]: sortOrder },
+        orderBy,
         skip,
         take: limit,
         include: {
-          diprosesOleh: { select: { name: true } },
-          domainIsu: { select: { nama: true } },
+          diprosesOleh: { select: { id: true, name: true, email: true } },
+          domainIsu: { select: { id: true, nama: true, code: true } },
         },
       }),
       prisma.dataMaster.count({ where }),
@@ -111,16 +121,20 @@ export const dataMasterService = {
     return prisma.dataMaster.findUniqueOrThrow({
       where: { id },
       include: {
-        diprosesOleh: { select: { name: true } },
-        domainIsu: { select: { nama: true } },
+        diprosesOleh: { select: { id: true, name: true, email: true } },
+        domainIsu: { select: { id: true, nama: true, code: true } },
       },
     });
   },
 
-  update: async (id: string, data: UpdateDataInput) => {
+  update: async (id: string, data: DataMasterUpdateInput) => {
     return prisma.dataMaster.update({
       where: { id },
       data,
+      include: {
+        diprosesOleh: { select: { id: true, name: true, email: true } },
+        domainIsu: { select: { id: true, nama: true, code: true } },
+      },
     });
   },
 
@@ -129,4 +143,12 @@ export const dataMasterService = {
       where: { id },
     });
   },
+
+  // ✅ Tambahan: soft delete (jika diperlukan di masa depan)
+  // softDelete: async (id: string) => {
+  //   return prisma.dataMaster.update({
+  //     where: { id },
+  //     data: { isActive: false },
+  //   });
+  // },
 };

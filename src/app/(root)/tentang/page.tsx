@@ -199,7 +199,7 @@ export default function TentangPage() {
         <Card className="overflow-hidden">
           <CardContent className="p-0">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.576856006567!2d106.12643537452654!3d-6.18789316060372!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e422f28b497f541%3A0x6a0f44e78a63583b!2sKantor%20Kelurahan%20Panggungjati!5e0!3m2!1sid!2sid!4v1701389270557!5m2!1sid!2sid"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d10525.24507717553!2d106.12355801789452!3d-6.11530055437781!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e418ae26af8c891%3A0xf4d482e29cf682f1!2sPanggungjati%2C%20Kec.%20Taktakan%2C%20Kota%20Serang%2C%20Banten!5e0!3m2!1sid!2sid!4v1772262400387!5m2!1sid!2sid"
               width="100%"
               height="450"
               style={{ border: 0 }}

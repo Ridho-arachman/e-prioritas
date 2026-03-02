@@ -168,11 +168,8 @@ exports.Prisma.DataMasterScalarFieldEnum = {
   namaAtribut: 'namaAtribut',
   kritikalitas: 'kritikalitas',
   jumlah: 'jumlah',
-  lokasiRt: 'lokasiRt',
-  lokasiRw: 'lokasiRw',
   isActive: 'isActive',
   tahunData: 'tahunData',
-  sumberData: 'sumberData',
   diprosesOlehId: 'diprosesOlehId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

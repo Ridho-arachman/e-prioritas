@@ -1,4 +1,6 @@
+// src/app/admin/jadwal-program/page.tsx
 "use client";
+
 import {
   ChevronLeft,
   ChevronRight,
@@ -20,6 +22,7 @@ import {
   ArrowRightIcon,
   Eye,
   Plus,
+  CpuIcon,
 } from "lucide-react";
 import { useDebounce } from "use-debounce";
 import { useState, useEffect } from "react";
@@ -65,13 +68,16 @@ import {
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 
-// ========================
-// ENUM (Sesuai Schema)
-// ========================
+// ═══════════════════════════════════════════════════════════════
+// 📦 ENUMS (Sesuai Schema Prisma)
+// ═══════════════════════════════════════════════════════════════
+
 export enum StatusMasukan {
   MENUNGGU = "MENUNGGU",
   DIVERIFIKASI = "DIVERIFIKASI",
   DITOLAK = "DITOLAK",
+  DIPROSES = "DIPROSES",
+  DISELESAIKAN = "DISELESAIKAN",
 }
 
 export enum StatusRekomendasi {
@@ -81,15 +87,28 @@ export enum StatusRekomendasi {
   DITOLAK = "DITOLAK",
 }
 
+export enum ModeRekomendasi {
+  FUSI_DATA = "FUSI_DATA",
+  DATA_MASTER_SAJA = "DATA_MASTER_SAJA",
+}
+
 export enum Role {
   LURAH = "LURAH",
   PERANGKAT_DESA = "PERANGKAT_DESA",
   ADMIN = "ADMIN",
 }
 
-// ========================
-// TIPE DATA
-// ========================
+export enum NilaiKritikalitas {
+  KRITIS = "KRITIS",
+  TINGGI = "TINGGI",
+  SEDANG = "SEDANG",
+  RENDAH = "RENDAH",
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 📦 BASE ENTITIES
+// ═══════════════════════════════════════════════════════════════
+
 export interface DomainIsu {
   id: string;
   code: string;
@@ -120,20 +139,45 @@ export interface MasukanWarga {
   updatedAt: Date | string;
 }
 
-export interface Rekomendasi {
-  id: string;
-  kegiatanRapatId: string;
-  domainIsuId: string;
-  domainIsu?: DomainIsu;
-  judul: string;
-  ringkasan: string;
+// ═══════════════════════════════════════════════════════════════
+// 📦 REKOMENDASI (JSON STRUCTURE - Bukan Table)
+// ═══════════════════════════════════════════════════════════════
+
+export interface RekomendasiEvidence {
+  masukanWargaCount?: number;
+  dataMasterCount?: number;
+  kritikalitas?: NilaiKritikalitas;
+}
+
+export interface RekomendasiItem {
+  prioritasKe: number;
   deskripsi: string;
   skorPrioritas: number;
-  status: StatusRekomendasi;
-  masukanLinks?: { masukan: MasukanWarga }[];
-  createdAt: Date | string;
-  updatedAt: Date | string;
+  alasanAnalisis: string;
+  domainIsuId: string;
+  lokasiRt?: string;
+  lokasiRw?: string;
+  fingerprint: string;
+  evidence?: RekomendasiEvidence;
 }
+
+export interface RekomendasiMetadata {
+  generatedAt: string;
+  aiModel: string;
+  modeRekomendasi: ModeRekomendasi;
+  domainIsuCode: string;
+  totalMasukanDianalisis: number;
+  totalDataMasterDianalisis: number;
+}
+
+export interface RekomendasiSnapshot {
+  metadata: RekomendasiMetadata;
+  prioritas: RekomendasiItem[];
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 📦 KEGIATAN RAPAT (Main Entity)
+// ═══════════════════════════════════════════════════════════════
 
 export interface KegiatanRapat {
   id: string;
@@ -141,20 +185,27 @@ export interface KegiatanRapat {
   deskripsi: string;
   tanggal: Date | string;
   lokasi?: string | null;
-  domainIsuId?: string | null;
+  domainIsuId: string;
   domainIsu?: DomainIsu | null;
   dibuatOlehId: string;
   dibuatOleh: User;
+  mode: ModeRekomendasi;
+  judulLaporan: string;
+  rekomendasiItems?: RekomendasiSnapshot | null;
+  fingerprint: string;
+  statusRekomendasi: StatusRekomendasi;
   aiModel?: string | null;
   aiProcessedAt?: Date | string | null;
-  rekomendasi?: Rekomendasi[];
+  diprosesOlehId?: string | null;
+  diprosesOleh?: User | null;
   createdAt: Date | string;
   updatedAt: Date | string;
 }
 
-// ========================
-// HELPER
-// ========================
+// ═══════════════════════════════════════════════════════════════
+// 🔧 HELPER FUNCTIONS
+// ═══════════════════════════════════════════════════════════════
+
 const toDate = (val: Date | string): Date =>
   val instanceof Date ? val : new Date(val);
 
@@ -173,16 +224,31 @@ const getStatusColor = (status: StatusRekomendasi) => {
   }
 };
 
-const getDomainGradient = (domainId: string | null | undefined) => {
-  switch (domainId) {
-    case "1":
+const getModeBadgeColor = (mode: ModeRekomendasi) => {
+  switch (mode) {
+    case ModeRekomendasi.FUSI_DATA:
+      return "bg-blue-50 text-blue-700 border-blue-200";
+    case ModeRekomendasi.DATA_MASTER_SAJA:
+      return "bg-purple-50 text-purple-700 border-purple-200";
+    default:
+      return "bg-slate-50 text-slate-700 border-slate-200";
+  }
+};
+
+const getDomainGradient = (domainCode: string | null | undefined) => {
+  switch (domainCode) {
+    case "INFRASTRUKTUR":
       return "from-blue-500 to-cyan-500";
-    case "2":
+    case "KESEHATAN":
       return "from-rose-500 to-pink-500";
-    case "3":
+    case "PENDIDIKAN":
       return "from-violet-500 to-purple-500";
-    case "4":
+    case "EKONOMI":
       return "from-amber-500 to-orange-500";
+    case "KEAMANAN":
+      return "from-red-500 to-rose-500";
+    case "LINGKUNGAN":
+      return "from-green-500 to-emerald-500";
     default:
       return "from-slate-400 to-gray-400";
   }
@@ -196,9 +262,20 @@ const formatJam = (val: Date | string) => {
   return format(toDate(val), "HH:mm", { locale: id });
 };
 
-// ========================
-// KOMPONEN UTAMA
-// ========================
+const parseRekomendasiItems = (items: any): RekomendasiSnapshot | null => {
+  try {
+    if (!items || typeof items !== "object") return null;
+    if (!items.metadata || !Array.isArray(items.prioritas)) return null;
+    return items as RekomendasiSnapshot;
+  } catch {
+    return null;
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════
+// 🎯 MAIN COMPONENT
+// ═══════════════════════════════════════════════════════════════
+
 export default function ListJadwalKegiatan() {
   const router = useRouter();
   const [selectedDeleteId, setSelectedDeleteId] = useState<string | null>(null);
@@ -211,25 +288,25 @@ export default function ListJadwalKegiatan() {
     defaultValue: "",
   });
   const [page, setPage] = useQueryState("page", { defaultValue: "1" });
-  const [perPage] = useQueryState("perPage", { defaultValue: "10" });
+  const [limit] = useQueryState("limit", { defaultValue: "10" });
 
   // Sorting states
   const [sortBy, setSortBy] = useQueryState("sortBy", {
-    defaultValue: "tanggal",
+    defaultValue: "updatedAt",
   });
   const [sortOrder, setSortOrder] = useQueryState("sortOrder", {
-    defaultValue: "asc",
+    defaultValue: "desc",
   });
 
   const [debouncedQ] = useDebounce(q, 500);
   const pageNumber = Number(page);
-  const perPageNumber = Number(perPage);
+  const limitNumber = Number(limit);
 
   const queryString = buildQuery({
     q: debouncedQ,
     domainIsuId: domainIsuId || undefined,
     page: pageNumber,
-    perPage: perPageNumber,
+    limit: limitNumber,
     sortBy,
     sortOrder,
   });
@@ -240,19 +317,15 @@ export default function ListJadwalKegiatan() {
 
   const { del: deleteKegiatan, loading: deleteLoading } = useDelete();
 
-  const domainIsuOptions = [
-    { value: "all", label: "Semua Domain" },
-    { value: "1", label: "Infrastruktur" },
-    { value: "2", label: "Kesehatan" },
-    { value: "3", label: "Pendidikan" },
-    { value: "4", label: "Ekonomi" },
-  ];
+  // Fetch domain isu options
+  const { data: domainIsuOptions } = useGet("/protected/kategori");
 
   const sortOptions = [
-    { value: "tanggal", label: "Tanggal" },
+    { value: "tanggal", label: "Tanggal Kegiatan" },
     { value: "judul", label: "Judul" },
     { value: "createdAt", label: "Tanggal Dibuat" },
     { value: "updatedAt", label: "Terakhir Update" },
+    { value: "statusRekomendasi", label: "Status Rekomendasi" },
   ];
 
   const hasSignificantFilter =
@@ -281,13 +354,13 @@ export default function ListJadwalKegiatan() {
 
   const clearFilters = () => {
     setDomainIsuId("");
-    setSortBy("tanggal");
-    setSortOrder("asc");
+    setSortBy("updatedAt");
+    setSortOrder("desc");
     setIsFilterOpen(false);
   };
 
   const hasActiveFilters =
-    domainIsuId !== "" || sortBy !== "tanggal" || sortOrder !== "asc";
+    domainIsuId !== "" || sortBy !== "updatedAt" || sortOrder !== "desc";
 
   // Tampilkan loading saat belum mounted (SSR)
   if (!isMounted) {
@@ -372,7 +445,6 @@ export default function ListJadwalKegiatan() {
                   </p>
                 </div>
               </div>
-              {/* ✅ FIX: Button Tambah dipindah ke halaman /add */}
               <Button
                 onClick={() => router.push("/admin/jadwal-program/add")}
                 className="gap-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl px-6 py-3 transition-all duration-300 hover:shadow-blue-500/50 hover:scale-105 font-medium"
@@ -383,7 +455,8 @@ export default function ListJadwalKegiatan() {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {/* Total Kegiatan */}
               <div className="group relative bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300">
                 <div className="absolute inset-0 bg-linear-to-br from-blue-50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="relative">
@@ -400,40 +473,26 @@ export default function ListJadwalKegiatan() {
                   </p>
                 </div>
               </div>
-              <div className="group relative bg-white rounded-2xl p-5 border border-slate-200 hover:border-emerald-400 hover:shadow-lg hover:shadow-emerald-500/10 transition-all duration-300">
-                <div className="absolute inset-0 bg-linear-to-br from-emerald-50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="relative">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
-                      <FileText className="h-4 w-4 text-emerald-600" />
-                    </div>
-                    <p className="text-slate-500 text-xs uppercase tracking-wider font-medium">
-                      Rekomendasi
-                    </p>
-                  </div>
-                  <p className="text-3xl font-bold text-slate-800">
-                    {data?.reduce(
-                      (acc: number, item: KegiatanRapat) =>
-                        acc + (item.rekomendasi?.length || 0),
-                      0,
-                    ) || 0}
-                  </p>
-                </div>
-              </div>
+
+              {/* Domain Isu */}
               <div className="group relative bg-white rounded-2xl p-5 border border-slate-200 hover:border-amber-400 hover:shadow-lg hover:shadow-amber-500/10 transition-all duration-300">
                 <div className="absolute inset-0 bg-linear-to-br from-amber-50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="relative">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
-                      <Users className="h-4 w-4 text-amber-600" />
+                      <CpuIcon className="h-4 w-4 text-amber-600" />
                     </div>
                     <p className="text-slate-500 text-xs uppercase tracking-wider font-medium">
                       Domain Isu
                     </p>
                   </div>
-                  <p className="text-3xl font-bold text-slate-800">4</p>
+                  <p className="text-3xl font-bold text-slate-800">
+                    {domainIsuOptions?.length || 6}
+                  </p>
                 </div>
               </div>
+
+              {/* Halaman */}
               <div className="group relative bg-white rounded-2xl p-5 border border-slate-200 hover:border-violet-400 hover:shadow-lg hover:shadow-violet-500/10 transition-all duration-300">
                 <div className="absolute inset-0 bg-linear-to-br from-violet-50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="relative">
@@ -456,20 +515,42 @@ export default function ListJadwalKegiatan() {
           {/* Toolbar */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-10">
             <div className="flex flex-wrap items-center gap-3">
-              {/* Search */}
+              {/* ✅ Search Input - FIXED */}
               <div className="relative group">
-                <div className="absolute inset-0 bg-linear-to-r from-blue-500/10 to-indigo-500/10 rounded-xl blur opacity-0 group-focus-within:opacity-100 transition-opacity" />
-                <XIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                {/* FIX: pointer-events-none agar tidak blokir input */}
+                <div className="absolute inset-0 bg-linear-to-r from-blue-500/10 to-indigo-500/10 rounded-xl blur opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none" />
+
+                {/* FIX: pointer-events-none pada icon dekoratif */}
+                <XIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
+
                 <Input
-                  placeholder="Cari kegiatan, rekomendasi, atau masukan..."
-                  className="pl-12 pr-4 py-3 w-72 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-sm"
+                  placeholder="Cari nama kegiatan..."
+                  // FIX: Tambah relative z-10 agar input di atas overlay
+                  className="pl-12 pr-12 py-3 w-72 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-sm relative z-10"
                   value={q}
-                  onChange={(e) => setQ(e.target.value)}
+                  onChange={(e) => {
+                    setQ(e.target.value);
+                    setPage("1"); // Reset ke halaman 1 saat search berubah
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                      setQ("");
+                      setPage("1");
+                    }
+                  }}
                 />
+
+                {/* FIX: Clear Button - Tambah z-20 dan e.stopPropagation() */}
                 {q && (
                   <button
-                    onClick={() => setQ("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setQ("");
+                      setPage("1");
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full p-1 transition-all z-20"
+                    type="button"
+                    aria-label="Clear search"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -488,7 +569,7 @@ export default function ListJadwalKegiatan() {
                   {hasActiveFilters && (
                     <Badge variant="secondary" className="ml-2">
                       {domainIsuId !== "" ? 1 : 0} +{" "}
-                      {sortBy !== "tanggal" || sortOrder !== "asc" ? 1 : 0}
+                      {sortBy !== "updatedAt" || sortOrder !== "desc" ? 1 : 0}
                     </Badge>
                   )}
                 </Button>
@@ -518,14 +599,17 @@ export default function ListJadwalKegiatan() {
                           <SelectValue placeholder="Pilih domain" />
                         </SelectTrigger>
                         <SelectContent>
-                          {domainIsuOptions.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
+                          <SelectItem value="all">Semua Domain</SelectItem>
+                          {domainIsuOptions?.map((option: DomainIsu) => (
+                            <SelectItem key={option.id} value={option.id}>
+                              {option.nama}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
+
+                    {/* Sort Options */}
                     <div className="grid gap-2">
                       <Label>Urutkan Berdasarkan</Label>
                       <Select value={sortBy} onValueChange={setSortBy}>
@@ -584,6 +668,7 @@ export default function ListJadwalKegiatan() {
                 className="bg-slate-100 border-slate-200 text-slate-600 px-4 py-2 rounded-xl font-medium"
               >
                 {data?.length || 0} kegiatan
+                {q && ` (filtered from ${meta?.total || 0})`}
               </Badge>
             </div>
           </div>
@@ -594,8 +679,9 @@ export default function ListJadwalKegiatan() {
               {domainIsuId !== "" && (
                 <Badge variant="secondary" className="gap-2">
                   Domain:{" "}
-                  {domainIsuOptions.find((opt) => opt.value === domainIsuId)
-                    ?.label || domainIsuId}
+                  {domainIsuOptions?.find(
+                    (opt: DomainIsu) => opt.id === domainIsuId,
+                  )?.nama || domainIsuId}
                   <button
                     onClick={() => setDomainIsuId("")}
                     className="hover:text-red-500"
@@ -604,14 +690,14 @@ export default function ListJadwalKegiatan() {
                   </button>
                 </Badge>
               )}
-              {(sortBy !== "tanggal" || sortOrder !== "asc") && (
+              {(sortBy !== "updatedAt" || sortOrder !== "desc") && (
                 <Badge variant="secondary" className="gap-2">
                   Sort: {sortOptions.find((opt) => opt.value === sortBy)?.label}{" "}
                   {sortOrder === "asc" ? "↑" : "↓"}
                   <button
                     onClick={() => {
-                      setSortBy("tanggal");
-                      setSortOrder("asc");
+                      setSortBy("updatedAt");
+                      setSortOrder("desc");
                     }}
                     className="hover:text-red-500"
                   >
@@ -667,7 +753,13 @@ export default function ListJadwalKegiatan() {
                   <div className="absolute left-4 top-0 bottom-0 w-1 bg-linear-to-b from-blue-400 via-indigo-400 to-purple-400 rounded-full" />
                   <div className="space-y-6">
                     {data?.map((k: KegiatanRapat) => {
-                      const gradient = getDomainGradient(k.domainIsuId);
+                      const gradient = getDomainGradient(k.domainIsu?.code);
+                      const rekomendasiData = parseRekomendasiItems(
+                        k.rekomendasiItems,
+                      );
+                      const prioritasCount =
+                        rekomendasiData?.prioritas?.length || 0;
+
                       return (
                         <div key={k.id} className="relative group">
                           {/* Timeline Dot */}
@@ -709,14 +801,24 @@ export default function ListJadwalKegiatan() {
                                       <h3 className="text-xl font-bold text-slate-800 group-hover/card:text-blue-600 transition-colors">
                                         {k.judul}
                                       </h3>
-                                      {k.domainIsu && (
+                                      <div className="flex flex-wrap gap-2 mt-2">
+                                        {k.domainIsu && (
+                                          <Badge
+                                            variant="outline"
+                                            className={`${getStatusColor(StatusRekomendasi.DRAFT)} font-medium`}
+                                          >
+                                            {k.domainIsu.nama}
+                                          </Badge>
+                                        )}
                                         <Badge
                                           variant="outline"
-                                          className={`mt-2 ${getStatusColor(StatusRekomendasi.DRAFT)} font-medium`}
+                                          className={`${getModeBadgeColor(k.mode)} font-medium`}
                                         >
-                                          {k.domainIsu.nama}
+                                          {k.mode === "FUSI_DATA"
+                                            ? "Fusi Data"
+                                            : "Data Master"}
                                         </Badge>
-                                      )}
+                                      </div>
                                     </div>
                                     {k.aiModel && (
                                       <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-50 border border-purple-200">
@@ -751,25 +853,27 @@ export default function ListJadwalKegiatan() {
                                     {k.deskripsi}
                                   </p>
 
-                                  {/* Rekomendasi Section */}
-                                  {k.rekomendasi &&
-                                    k.rekomendasi.length > 0 && (
-                                      <div className="space-y-4">
-                                        <div className="flex items-center gap-2">
-                                          <div className="flex-1 h-px bg-linear-to-r from-slate-200 to-transparent" />
-                                          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-50 border border-slate-200">
-                                            <FileText className="h-4 w-4 text-blue-600" />
-                                            <span className="text-xs text-slate-600 uppercase tracking-wider font-semibold">
-                                              {k.rekomendasi.length} Rekomendasi
-                                              AI
-                                            </span>
-                                          </div>
-                                          <div className="flex-1 h-px bg-linear-to-l from-slate-200 to-transparent" />
+                                  {/* ✅ Rekomendasi Section (dari JSON) */}
+                                  {rekomendasiData && prioritasCount > 0 && (
+                                    <div className="space-y-4">
+                                      <div className="flex items-center gap-2">
+                                        <div className="flex-1 h-px bg-linear-to-r from-slate-200 to-transparent" />
+                                        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-50 border border-slate-200">
+                                          <FileText className="h-4 w-4 text-blue-600" />
+                                          <span className="text-xs text-slate-600 uppercase tracking-wider font-semibold">
+                                            {prioritasCount} Prioritas AI
+                                          </span>
                                         </div>
-                                        <div className="grid gap-3 md:grid-cols-2">
-                                          {k.rekomendasi.map((rec) => (
+                                        <div className="flex-1 h-px bg-linear-to-l from-slate-200 to-transparent" />
+                                      </div>
+                                      <div className="grid gap-3 md:grid-cols-2">
+                                        {rekomendasiData.prioritas.map(
+                                          (
+                                            rec: RekomendasiItem,
+                                            idx: number,
+                                          ) => (
                                             <div
-                                              key={rec.id}
+                                              key={rec.fingerprint || idx}
                                               className="group/rec relative bg-linear-to-br from-slate-50 to-white rounded-xl p-4 border border-slate-200 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300"
                                             >
                                               {/* Priority Score Badge */}
@@ -784,68 +888,52 @@ export default function ListJadwalKegiatan() {
                                               <div className="flex items-center gap-2 mb-2">
                                                 <Badge
                                                   variant="outline"
-                                                  className={`${getStatusColor(rec.status)} text-xs font-medium`}
+                                                  className="text-xs font-medium bg-blue-50 text-blue-700 border-blue-200"
                                                 >
-                                                  {rec.status}
+                                                  Prioritas #{rec.prioritasKe}
                                                 </Badge>
                                               </div>
                                               <p className="text-sm font-semibold text-slate-800 mb-2 line-clamp-1">
-                                                {rec.judul}
+                                                {rec.deskripsi}
                                               </p>
                                               <p className="text-xs text-slate-500 line-clamp-2 mb-3">
-                                                {rec.ringkasan}
+                                                {rec.alasanAnalisis}
                                               </p>
-                                              {/* Masukan Warga */}
-                                              {rec.masukanLinks &&
-                                                rec.masukanLinks.length > 0 && (
-                                                  <div className="pt-3 border-t border-slate-200">
-                                                    <div className="flex items-center justify-between mb-2">
-                                                      <div className="flex items-center gap-1.5">
-                                                        <Users className="h-3.5 w-3.5 text-slate-400" />
-                                                        <span className="text-xs text-slate-500 font-medium">
-                                                          {
-                                                            rec.masukanLinks
-                                                              .length
-                                                          }{" "}
-                                                          masukan
-                                                        </span>
-                                                      </div>
-                                                      <ArrowRightIcon className="h-3.5 w-3.5 text-slate-400" />
+
+                                              {/* Evidence */}
+                                              {rec.evidence && (
+                                                <div className="pt-3 border-t border-slate-200">
+                                                  <div className="flex items-center justify-between mb-2">
+                                                    <div className="flex items-center gap-1.5">
+                                                      <Users className="h-3.5 w-3.5 text-slate-400" />
+                                                      <span className="text-xs text-slate-500 font-medium">
+                                                        {rec.evidence
+                                                          .masukanWargaCount ||
+                                                          0}{" "}
+                                                        masukan
+                                                      </span>
                                                     </div>
-                                                    <div className="flex flex-wrap gap-1.5">
-                                                      {rec.masukanLinks
-                                                        .slice(0, 3)
-                                                        .map((ml) => (
-                                                          <Badge
-                                                            key={ml.masukan.id}
-                                                            variant="secondary"
-                                                            className="text-xs bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 font-medium"
-                                                            title={`RT ${ml.masukan.lokasiRt}/RW ${ml.masukan.lokasiRw}`}
-                                                          >
-                                                            {ml.masukan.namaPengirim?.split(
-                                                              " ",
-                                                            )[0] || "Anonim"}
-                                                          </Badge>
-                                                        ))}
-                                                      {rec.masukanLinks.length >
-                                                        3 && (
-                                                        <Badge
-                                                          variant="secondary"
-                                                          className="text-xs bg-slate-100 text-slate-500 font-medium"
-                                                        >
-                                                          +
-                                                          {rec.masukanLinks
-                                                            .length - 3}
-                                                        </Badge>
-                                                      )}
-                                                    </div>
+                                                    {rec.evidence
+                                                      .kritikalitas && (
+                                                      <Badge
+                                                        variant="secondary"
+                                                        className="text-xs"
+                                                      >
+                                                        {
+                                                          rec.evidence
+                                                            .kritikalitas
+                                                        }
+                                                      </Badge>
+                                                    )}
                                                   </div>
-                                                )}
+                                                </div>
+                                              )}
                                             </div>
-                                          ))}
-                                        </div>
+                                          ),
+                                        )}
                                       </div>
-                                    )}
+                                    </div>
+                                  )}
 
                                   {/* Action Buttons */}
                                   <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-slate-100">
@@ -900,16 +988,16 @@ export default function ListJadwalKegiatan() {
                 </div>
 
                 {/* Pagination */}
-                {meta && meta.totalPages > 1 && (
+                {meta && (
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 mt-8 border-t border-slate-200">
                     <p className="text-sm text-slate-500 font-medium">
                       Menampilkan{" "}
                       <span className="font-semibold text-slate-800">
-                        {(pageNumber - 1) * perPageNumber + 1}
+                        {(pageNumber - 1) * limitNumber + 1}
                       </span>{" "}
                       -{" "}
                       <span className="font-semibold text-slate-800">
-                        {Math.min(pageNumber * perPageNumber, meta.total)}
+                        {Math.min(pageNumber * limitNumber, meta.total)}
                       </span>{" "}
                       dari{" "}
                       <span className="font-semibold text-slate-800">

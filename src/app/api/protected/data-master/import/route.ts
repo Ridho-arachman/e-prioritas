@@ -9,17 +9,17 @@ import { Role } from "@/app/generated/prisma";
 import { headers } from "next/headers";
 
 export const POST = async (req: NextRequest) => {
-  const allowedRoles: Role[] = ["ADMIN"];
+  // Cek autentikasi dan otorisasi
   const session = await auth.api.getSession({ headers: await headers() });
-
   if (!session) {
     return handleResponse({
       success: false,
       message: "User belum login",
-      status: 403,
+      status: 401,
     });
   }
 
+  const allowedRoles: Role[] = ["ADMIN"];
   if (!allowedRoles.includes(session.user.role as Role)) {
     return handleResponse({
       success: false,
@@ -31,20 +31,36 @@ export const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();
 
-    // Validasi array data
-    const parsed = dataMasterArraySchema.safeParse(body.data);
+    // Menerima format: langsung array atau { data: [...] }
+    let items = body;
+    if (
+      body &&
+      typeof body === "object" &&
+      "data" in body &&
+      Array.isArray(body.data)
+    ) {
+      items = body.data;
+    }
+
+    if (!Array.isArray(items)) {
+      return handleResponse({
+        success: false,
+        message:
+          "Request body harus berupa array atau object dengan properti 'data' berisi array",
+        status: 400,
+      });
+    }
+
+    const parsed = dataMasterArraySchema.safeParse(items);
     if (!parsed.success) return handleZodValidation(parsed);
 
-    // Mapping: tambahkan diprosesOlehId dari session user (sebagai scalar)
     const data = parsed.data.map((item) => ({
       ...item,
       diprosesOlehId: session.user.id,
     }));
 
-    // Simpan banyak data sekaligus
     const result = await dataMasterService.createMany(data);
 
-    // createMany mengembalikan { count }
     return handleResponse({
       success: true,
       message: `${result.count} data berhasil ditambahkan`,
@@ -52,6 +68,7 @@ export const POST = async (req: NextRequest) => {
       status: 201,
     });
   } catch (err) {
+    console.error("[IMPORT_DATA_MASTER_POST]", err);
     const prismaResponse = handlePrismaError(err);
     if (prismaResponse) {
       return handleResponse({
@@ -60,7 +77,6 @@ export const POST = async (req: NextRequest) => {
         status: prismaResponse.status,
       });
     }
-
     return handleResponse({
       success: false,
       message: "Terjadi error pada server",

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useParams } from "next/navigation";
-import { Field, FieldLabel } from "@/components/ui/field";
+import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import {
   Select,
   SelectContent,
@@ -18,58 +18,67 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 
-import { dataMasterSchema } from "@/schema/dataMasterSchema";
+// Import schema yang benar
+import { dataMasterUpdateSchema } from "@/schema/dataMasterSchema";
 import { Skeleton } from "../../ui/skeleton";
 import { useGet, usePut } from "@/hooks/useApi";
 import { AxiosError } from "axios";
 import { ApiError } from "@/types/ApiError";
 
-import { DataMaster, DomainIsu, User } from "@/app/generated/prisma";
+import {
+  DataMaster,
+  DomainIsu,
+  User,
+  NilaiKritikalitas,
+} from "@/app/generated/prisma";
 import z from "zod";
-import { formatWilayah } from "@/utils/formatRtRw";
 
 type DataMasterWithRelations = DataMaster & {
-  domainIsu: Pick<DomainIsu, "nama">;
-  diprosesOleh: Pick<User, "name"> | null;
+  domainIsu: Pick<DomainIsu, "id" | "nama">;
+  diprosesOleh: Pick<User, "name" | "email"> | null;
 };
 
-type DataMasterEditForm = z.infer<typeof dataMasterSchema>;
+type DataMasterEditForm = z.infer<typeof dataMasterUpdateSchema>;
 
-const KRITIKALITAS_OPTIONS = ["KRITIS", "TINGGI", "SEDANG", "RENDAH"];
+const KRITIKALITAS_OPTIONS: NilaiKritikalitas[] = [
+  "KRITIS",
+  "TINGGI",
+  "SEDANG",
+  "RENDAH",
+];
 
 export default function DataMasterFormEdit() {
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
 
+  // Ambil detail data master
   const {
     data: response,
     isLoading,
     error,
   } = useGet(`/protected/data-master/${id}`);
 
-  const detail = (response as DataMasterWithRelations) || null;
+  const detail = response as DataMasterWithRelations | undefined;
 
+  // Ambil daftar domain isu
   const { data: domainResponse } = useGet(`/protected/kategori`);
   const domainList = domainResponse ?? [];
 
   const { put: execute, loading } = usePut(`/protected/data-master/${id}`);
 
   const form = useForm<DataMasterEditForm>({
-    resolver: zodResolver(dataMasterSchema),
-
-    // ✅ CRITICAL FIX
+    resolver: zodResolver(dataMasterUpdateSchema),
     defaultValues: {
       domainIsuId: "",
       namaAtribut: "",
       kritikalitas: undefined,
-      lokasiRt: null,
-      lokasiRw: null,
       jumlah: null,
-      sumberData: null,
+      tahunData: null,
+      isActive: true,
     },
   });
 
-  // ✅ Hydrate form dari DB
+  // Hydrate form dari data detail
   useEffect(() => {
     if (!detail) return;
 
@@ -77,10 +86,9 @@ export default function DataMasterFormEdit() {
       domainIsuId: detail.domainIsuId,
       namaAtribut: detail.namaAtribut,
       kritikalitas: detail.kritikalitas,
-      lokasiRt: detail.lokasiRt ?? null,
-      lokasiRw: detail.lokasiRw ?? null,
       jumlah: detail.jumlah ?? null,
-      sumberData: detail.sumberData ?? null,
+      tahunData: detail.tahunData ?? null,
+      isActive: detail.isActive,
     });
   }, [detail, form]);
 
@@ -108,12 +116,12 @@ export default function DataMasterFormEdit() {
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-      {/* Domain */}
+      {/* Domain Isu */}
       <Controller
         control={form.control}
         name="domainIsuId"
-        render={({ field }) => (
-          <Field>
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
             <FieldLabel>Domain Isu</FieldLabel>
             <Select
               value={field.value ?? ""}
@@ -125,13 +133,14 @@ export default function DataMasterFormEdit() {
                 <SelectValue placeholder="Pilih domain isu" />
               </SelectTrigger>
               <SelectContent>
-                {domainList.map((domain: any) => (
+                {domainList.map((domain: DomainIsu) => (
                   <SelectItem key={domain.id} value={domain.id}>
                     {domain.nama}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
       />
@@ -140,10 +149,11 @@ export default function DataMasterFormEdit() {
       <Controller
         control={form.control}
         name="namaAtribut"
-        render={({ field }) => (
-          <Field>
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
             <FieldLabel>Nama Atribut</FieldLabel>
             <Input {...field} value={field.value ?? ""} readOnly={loading} />
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
       />
@@ -152,8 +162,8 @@ export default function DataMasterFormEdit() {
       <Controller
         control={form.control}
         name="kritikalitas"
-        render={({ field }) => (
-          <Field>
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
             <FieldLabel>Kritikalitas</FieldLabel>
             <Select
               value={field.value ?? ""}
@@ -172,86 +182,92 @@ export default function DataMasterFormEdit() {
                 ))}
               </SelectContent>
             </Select>
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
       />
 
-      {/* RT / RW */}
-      <div className="grid grid-cols-2 gap-4">
-        <Controller
-          control={form.control}
-          name="lokasiRt"
-          render={({ field }) => (
-            <Field>
-              <FieldLabel>RT</FieldLabel>
-              <Input
-                type="number"
-                value={field.value ?? ""}
-                onChange={(e) => field.onChange(formatWilayah(e.target.value))}
-              />
-            </Field>
-          )}
-        />
-
-        <Controller
-          control={form.control}
-          name="lokasiRw"
-          render={({ field }) => (
-            <Field>
-              <FieldLabel>RW</FieldLabel>
-              <Input
-                type="number"
-                value={field.value ?? ""}
-                onChange={(e) => field.onChange(formatWilayah(e.target.value))}
-              />
-            </Field>
-          )}
-        />
-      </div>
+      {/* Tahun Data */}
+      <Controller
+        control={form.control}
+        name="tahunData"
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel>Tahun Data</FieldLabel>
+            <Input
+              type="number"
+              min={2000}
+              max={2100}
+              value={field.value ?? ""}
+              onChange={(e) => {
+                const val = e.target.value;
+                field.onChange(val === "" ? null : Number(val));
+              }}
+              readOnly={loading}
+            />
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
 
       {/* Jumlah */}
       <Controller
         control={form.control}
         name="jumlah"
-        render={({ field }) => (
-          <Field>
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
             <FieldLabel>Jumlah</FieldLabel>
             <Input
               type="number"
+              min={0}
               value={field.value ?? ""}
               onChange={(e) =>
                 field.onChange(
                   e.target.value === "" ? null : Number(e.target.value),
                 )
               }
+              readOnly={loading}
             />
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
       />
 
-      {/* Sumber */}
+      {/* Status Aktif */}
       <Controller
         control={form.control}
-        name="sumberData"
+        name="isActive"
         render={({ field }) => (
           <Field>
-            <FieldLabel>Sumber Data</FieldLabel>
-            <Input
-              value={field.value ?? ""}
-              onChange={(e) =>
-                field.onChange(e.target.value === "" ? null : e.target.value)
-              }
-            />
+            <FieldLabel>Status</FieldLabel>
+            <Select
+              onValueChange={(val) => field.onChange(val === "true")}
+              value={field.value ? "true" : "false"}
+              disabled={loading}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Pilih status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="true">Aktif</SelectItem>
+                <SelectItem value="false">Non-Aktif</SelectItem>
+              </SelectContent>
+            </Select>
           </Field>
         )}
       />
 
-      {/* Info */}
+      {/* Info diproses oleh */}
       {detail.diprosesOleh && (
         <div className="text-sm text-muted-foreground border-t pt-4">
           <p>
             Diproses oleh{" "}
             <Badge variant="outline">{detail.diprosesOleh.name}</Badge>
+            {detail.diprosesOleh.email && ` (${detail.diprosesOleh.email})`}
+          </p>
+          <p className="text-xs">
+            Terakhir diperbarui:{" "}
+            {new Date(detail.updatedAt).toLocaleString("id-ID")}
           </p>
         </div>
       )}
@@ -262,7 +278,8 @@ export default function DataMasterFormEdit() {
         </Button>
 
         <Button type="submit" disabled={loading}>
-          {loading ? <Spinner /> : "Simpan Perubahan"}
+          {loading ? <Spinner className="mr-2 h-4 w-4" /> : null}
+          {loading ? "Menyimpan..." : "Simpan Perubahan"}
         </Button>
       </div>
     </form>
