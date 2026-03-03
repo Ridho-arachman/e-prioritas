@@ -198,6 +198,13 @@ exports.Prisma.KegiatanRapatMasukanScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.KegiatanRapatDataMasterScalarFieldEnum = {
+  id: 'id',
+  kegiatanRapatId: 'kegiatanRapatId',
+  dataMasterId: 'dataMasterId',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SessionScalarFieldEnum = {
   id: 'id',
   expiresAt: 'expiresAt',
@@ -302,6 +309,7 @@ exports.Prisma.ModelName = {
   DataMaster: 'DataMaster',
   KegiatanRapat: 'KegiatanRapat',
   KegiatanRapatMasukan: 'KegiatanRapatMasukan',
+  KegiatanRapatDataMaster: 'KegiatanRapatDataMaster',
   Session: 'Session',
   Account: 'Account',
   Verification: 'Verification'

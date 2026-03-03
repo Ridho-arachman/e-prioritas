@@ -28,6 +28,21 @@ export type GeminiResponse = {
       kritikalitas?: "KRITIS" | "TINGGI" | "SEDANG" | "RENDAH";
     };
   }>;
+  inputData?: {
+    masukan: Array<{
+      id: string;
+      judul: string;
+      deskripsi: string;
+      lokasiRt: string;
+      lokasiRw: string;
+    }>;
+    dataMaster: Array<{
+      id: string;
+      namaAtribut: string;
+      kritikalitas: "KRITIS" | "TINGGI" | "SEDANG" | "RENDAH";
+      jumlah: number | null;
+    }>;
+  };
 };
 
 export async function geminiAi(prompt: string): Promise<GeminiResponse> {

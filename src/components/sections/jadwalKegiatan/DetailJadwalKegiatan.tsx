@@ -68,7 +68,6 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useQueryState } from "nuqs";
-import { buildQuery } from "@/utils/query";
 import { useDebounce } from "use-debounce";
 
 // ═══════════════════════════════════════════════════════════════
@@ -162,6 +161,8 @@ export interface RekomendasiItem {
   lokasiRw?: string;
   fingerprint: string;
   evidence?: RekomendasiEvidence;
+  usedMasukanIds?: string[]; // ✅ field baru untuk ID masukan terkait
+  usedDataMasterIds?: string[]; // ✅ field baru untuk ID data master terkait
 }
 
 export interface RekomendasiMetadata {
@@ -174,8 +175,23 @@ export interface RekomendasiMetadata {
 }
 
 export interface RekomendasiSnapshot {
-  metadata: RekomendasiMetadata; // ✅ FIX: pakai "metadata" bukan "meta"
+  metadata: RekomendasiMetadata;
   prioritas: RekomendasiItem[];
+  inputData?: {
+    masukan: Array<{
+      id: string;
+      judul: string;
+      deskripsi: string;
+      lokasiRt: string;
+      lokasiRw: string;
+    }>;
+    dataMaster: Array<{
+      id: string;
+      namaAtribut: string;
+      kritikalitas: NilaiKritikalitas;
+      jumlah: number | null;
+    }>;
+  };
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -194,7 +210,7 @@ export interface KegiatanRapat {
   dibuatOleh: User;
   mode: ModeRekomendasi;
   judulLaporan: string;
-  rekomendasiItems?: RekomendasiSnapshot | null; // ✅ JSON field
+  rekomendasiItems?: RekomendasiSnapshot | null;
   fingerprint: string;
   statusRekomendasi: StatusRekomendasi;
   aiModel?: string | null;
@@ -272,14 +288,10 @@ const getPriorityBadge = (index: number) => {
   return badges[index % badges.length];
 };
 
-// ✅ FIX: Parser cek "metadata" (match dengan backend service)
 const parseRekomendasiItems = (items: any): RekomendasiSnapshot | null => {
   try {
     if (!items || typeof items !== "object") return null;
-
-    // ✅ FIX: Cek "metadata" bukan "meta" (match dengan kegiatanRapatService)
     if (!items.metadata || !Array.isArray(items.prioritas)) return null;
-
     return items as RekomendasiSnapshot;
   } catch (e) {
     console.error("Failed to parse rekomendasiItems:", e, items);
@@ -301,26 +313,30 @@ export default function KegiatanRapatDetail() {
   const [isExporting, setIsExporting] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  // State untuk expand/collapse preview data per prioritas
+  const [expandedPriorities, setExpandedPriorities] = useState<
+    Record<string, boolean>
+  >({});
 
-  // Query states untuk search di dalam detail page
   const [q, setQ] = useQueryState("q", { defaultValue: "" });
   const [debouncedQ] = useDebounce(q, 500);
 
-  // ✅ Fetch data dari API Backend
   const {
     data: kegiatan,
     error,
     isLoading,
   } = useGet(`/protected/kegiatan-rapat/${id}`);
 
-  // ✅ Delete function
   const { del: deleteKegiatan } = useDelete();
 
-  // ✅ Parse rekomendasiItems JSON - FIX: pakai "metadata"
   const rekomendasiData = parseRekomendasiItems(kegiatan?.rekomendasiItems);
   const prioritasList = rekomendasiData?.prioritas || [];
 
-  // Debug logs
+  console.log("=== RENDER DETAIL PAGE ===");
+  console.log("kegiatan:", kegiatan);
+  console.log("rekomendasiData:", rekomendasiData);
+  console.log("prioritasList:", prioritasList);
+
   useEffect(() => {
     console.log("=== DEBUG DETAIL PAGE ===");
     console.log("kegiatan.rekomendasiItems:", kegiatan?.rekomendasiItems);
@@ -328,7 +344,6 @@ export default function KegiatanRapatDetail() {
     console.log("prioritasList length:", prioritasList.length);
   }, [kegiatan, prioritasList.length]);
 
-  // Handle Delete
   const handleDelete = async () => {
     if (!selectedDeleteId) return;
     setIsDeleting(true);
@@ -350,7 +365,6 @@ export default function KegiatanRapatDetail() {
     }
   };
 
-  // Handle Export PDF
   const handleExportPDF = async () => {
     if (!id) return;
     setIsExporting(true);
@@ -381,16 +395,21 @@ export default function KegiatanRapatDetail() {
     }
   };
 
-  // Handle Ajukan Rekomendasi
   const handleAjukanRekomendasi = async () => {
     notifier.info("Info", "Fitur ajukan rekomendasi akan segera tersedia");
+  };
+
+  const toggleExpand = (fingerprint: string) => {
+    setExpandedPriorities((prev) => ({
+      ...prev,
+      [fingerprint]: !prev[fingerprint],
+    }));
   };
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // Loading State
   if (!isMounted || isLoading) {
     return (
       <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
@@ -404,7 +423,6 @@ export default function KegiatanRapatDetail() {
     );
   }
 
-  // Error State
   if (error || !kegiatan) {
     return (
       <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
@@ -433,12 +451,9 @@ export default function KegiatanRapatDetail() {
 
   return (
     <>
-      {/* Delete Confirmation Dialog */}
       <AlertDialog
         open={!!selectedDeleteId}
-        onOpenChange={(open) => {
-          if (!open) setSelectedDeleteId(null);
-        }}
+        onOpenChange={(open) => !open && setSelectedDeleteId(null)}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -471,13 +486,12 @@ export default function KegiatanRapatDetail() {
       </AlertDialog>
 
       <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        {/* Background Effects */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-blue-100/40 via-transparent to-transparent" />
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-400/10 rounded-full blur-3xl" />
 
         <div className="max-w-6xl mx-auto relative z-10">
-          {/* Header dengan Navigation */}
+          {/* Header Navigation */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div className="flex items-center gap-4">
               <Button
@@ -504,29 +518,24 @@ export default function KegiatanRapatDetail() {
                 }
                 className="gap-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl"
               >
-                <EditIcon className="h-4 w-4" />
-                Edit Kegiatan
+                <EditIcon className="h-4 w-4" /> Edit Kegiatan
               </Button>
               <Button
                 variant="destructive"
                 onClick={() => setSelectedDeleteId(kegiatan.id)}
                 className="gap-2 bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/30 rounded-xl"
               >
-                <TrashIcon className="h-4 w-4" />
-                Hapus
+                <TrashIcon className="h-4 w-4" /> Hapus
               </Button>
             </div>
           </div>
 
           {/* Card Detail Kegiatan */}
           <Card className="mb-8 border-0 shadow-xl shadow-slate-200/50 bg-white/80 backdrop-blur-xl rounded-2xl overflow-hidden">
-            {/* Top Gradient Bar */}
             <div className="h-2 bg-linear-to-r from-blue-500 via-indigo-500 to-purple-500" />
             <CardContent className="p-0">
-              {/* Header Section */}
               <div className="p-6 sm:p-8 border-b border-slate-100">
                 <div className="flex flex-col lg:flex-row lg:items-start gap-6">
-                  {/* Date Badge */}
                   <div className="shrink-0">
                     <div className="relative">
                       <div className="absolute inset-0 bg-linear-to-br from-blue-500 to-indigo-500 rounded-2xl blur-lg opacity-20" />
@@ -544,8 +553,6 @@ export default function KegiatanRapatDetail() {
                       </div>
                     </div>
                   </div>
-
-                  {/* Content */}
                   <div className="flex-1">
                     <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
                       <div>
@@ -585,7 +592,6 @@ export default function KegiatanRapatDetail() {
                         {kegiatan.statusRekomendasi}
                       </Badge>
                     </div>
-
                     <div className="flex flex-wrap gap-4 text-sm text-slate-500 mb-4">
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center">
@@ -609,7 +615,6 @@ export default function KegiatanRapatDetail() {
                         </div>
                       </div>
                     </div>
-
                     <div className="prose prose-slate max-w-none">
                       <p className="text-slate-600 leading-relaxed whitespace-pre-line">
                         {kegiatan.deskripsi}
@@ -618,8 +623,6 @@ export default function KegiatanRapatDetail() {
                   </div>
                 </div>
               </div>
-
-              {/* Meta Info */}
               <div className="px-6 sm:px-8 py-4 bg-slate-50/50 border-t border-slate-100">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   <div>
@@ -666,7 +669,6 @@ export default function KegiatanRapatDetail() {
           {/* Rekomendasi Section */}
           {prioritasList.length > 0 && (
             <div className="space-y-6">
-              {/* Header Rekomendasi */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
@@ -677,7 +679,6 @@ export default function KegiatanRapatDetail() {
                       Rekomendasi Prioritas AI
                     </h2>
                     <p className="text-sm text-slate-500">
-                      {/* ✅ FIX: Akses metadata.domainIsuCode */}
                       {rekomendasiData?.metadata?.domainIsuCode} •{" "}
                       {rekomendasiData?.metadata?.modeRekomendasi}
                     </p>
@@ -695,7 +696,6 @@ export default function KegiatanRapatDetail() {
 
               {/* Search & Filter Toolbar */}
               <div className="flex flex-wrap items-center gap-3">
-                {/* Search Input */}
                 <div className="relative group">
                   <div className="absolute inset-0 bg-linear-to-r from-blue-500/10 to-indigo-500/10 rounded-xl blur opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none" />
                   <XIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
@@ -704,16 +704,11 @@ export default function KegiatanRapatDetail() {
                     className="pl-12 pr-12 py-3 w-72 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-sm relative z-10"
                     value={q}
                     onChange={(e) => setQ(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Escape") setQ("");
-                    }}
+                    onKeyDown={(e) => e.key === "Escape" && setQ("")}
                   />
                   {q && (
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setQ("");
-                      }}
+                      onClick={() => setQ("")}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full p-1 transition-all z-20"
                       type="button"
                       aria-label="Clear search"
@@ -722,23 +717,20 @@ export default function KegiatanRapatDetail() {
                     </button>
                   )}
                 </div>
-
-                {/* Filter Button */}
                 <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
                   <Button
                     variant="outline"
                     className="cursor-pointer border-slate-200"
                     onClick={() => setIsFilterOpen(true)}
                   >
-                    <Filter className="mr-2 h-4 w-4" />
-                    Filter
+                    <Filter className="mr-2 h-4 w-4" /> Filter
                   </Button>
                   <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                       <DialogTitle>
                         <div className="flex items-center gap-2">
-                          <SlidersHorizontal className="h-5 w-5" />
-                          Filter Prioritas
+                          <SlidersHorizontal className="h-5 w-5" /> Filter
+                          Prioritas
                         </div>
                       </DialogTitle>
                       <DialogDescription>
@@ -791,19 +783,19 @@ export default function KegiatanRapatDetail() {
                     const priorityBadge = getPriorityBadge(idx);
                     const priorityColor = getPriorityColor(idx);
                     const totalMasukan = item.evidence?.masukanWargaCount || 0;
+                    const isExpanded =
+                      expandedPriorities[item.fingerprint] || false;
 
                     return (
                       <Card
                         key={item.fingerprint || idx}
                         className="group border-0 shadow-lg shadow-slate-200/50 bg-white rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-500 hover:-translate-y-1"
                       >
-                        {/* Top Gradient Bar */}
                         <div
                           className={`h-2 bg-linear-to-r ${priorityColor}`}
                         />
                         <CardContent className="p-6 sm:p-8">
                           <div className="flex flex-col lg:flex-row gap-6">
-                            {/* Priority Number */}
                             <div className="shrink-0">
                               <div className="relative">
                                 <div
@@ -816,8 +808,6 @@ export default function KegiatanRapatDetail() {
                                 </div>
                               </div>
                             </div>
-
-                            {/* Content */}
                             <div className="flex-1">
                               <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
                                 <div className="space-y-2">
@@ -850,7 +840,6 @@ export default function KegiatanRapatDetail() {
                                   </div>
                                 </div>
                               </div>
-
                               <div className="space-y-3 mb-4">
                                 <div className="flex items-start gap-2">
                                   <CheckCircleIcon className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
@@ -864,8 +853,6 @@ export default function KegiatanRapatDetail() {
                                   </div>
                                 </div>
                               </div>
-
-                              {/* Evidence Section */}
                               {item.evidence && (
                                 <div className="mt-6 pt-6 border-t border-slate-100">
                                   <div className="flex items-center justify-between mb-4">
@@ -906,6 +893,140 @@ export default function KegiatanRapatDetail() {
                                   </div>
                                 </div>
                               )}
+
+                              {/* Tombol Lihat Data Input */}
+                              <div className="mt-4 flex justify-end">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => toggleExpand(item.fingerprint)}
+                                  className="text-xs gap-1"
+                                >
+                                  <Eye className="h-3 w-3" />
+                                  {isExpanded
+                                    ? "Sembunyikan Data"
+                                    : "Lihat Data Input"}
+                                </Button>
+                              </div>
+
+                              {/* Panel Preview Data Input (berdasarkan usedMasukanIds / usedDataMasterIds) */}
+                              {isExpanded && rekomendasiData?.inputData && (
+                                <div className="mt-4 pt-4 border-t border-slate-100">
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {/* Masukan Warga */}
+                                    {item.usedMasukanIds &&
+                                      item.usedMasukanIds.length > 0 && (
+                                        <div>
+                                          <h5 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
+                                            <UsersIcon className="h-4 w-4" />{" "}
+                                            Masukan Warga Terkait
+                                          </h5>
+                                          <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
+                                            {rekomendasiData.inputData.masukan
+                                              .filter((m) =>
+                                                item.usedMasukanIds?.includes(
+                                                  m.id,
+                                                ),
+                                              )
+                                              .map((m, i) => (
+                                                <div
+                                                  key={i}
+                                                  className="text-xs bg-slate-50 p-2 rounded border border-slate-100"
+                                                >
+                                                  <p className="font-medium">
+                                                    {m.judul}
+                                                  </p>
+                                                  <p className="text-slate-600 line-clamp-2">
+                                                    {m.deskripsi}
+                                                  </p>
+                                                  <Badge
+                                                    variant="outline"
+                                                    className="mt-1"
+                                                  >
+                                                    RT {m.lokasiRt}/RW{" "}
+                                                    {m.lokasiRw}
+                                                  </Badge>
+                                                </div>
+                                              ))}
+                                            {item.usedMasukanIds.length >
+                                              rekomendasiData.inputData.masukan
+                                                .length && (
+                                              <p className="text-xs text-slate-400 italic">
+                                                *dan{" "}
+                                                {item.usedMasukanIds.length -
+                                                  rekomendasiData.inputData
+                                                    .masukan.length}{" "}
+                                                data lainnya (tidak ditampilkan)
+                                              </p>
+                                            )}
+                                          </div>
+                                        </div>
+                                      )}
+                                    {/* Data Master */}
+                                    {item.usedDataMasterIds &&
+                                      item.usedDataMasterIds.length > 0 && (
+                                        <div>
+                                          <h5 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
+                                            <TargetIcon className="h-4 w-4" />{" "}
+                                            Data Master Terkait
+                                          </h5>
+                                          <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
+                                            {rekomendasiData.inputData.dataMaster
+                                              .filter((d) =>
+                                                item.usedDataMasterIds?.includes(
+                                                  d.id,
+                                                ),
+                                              )
+                                              .map((d, i) => (
+                                                <div
+                                                  key={i}
+                                                  className="text-xs bg-slate-50 p-2 rounded border border-slate-100"
+                                                >
+                                                  <p className="font-medium">
+                                                    {d.namaAtribut}
+                                                  </p>
+                                                  <div className="flex items-center gap-2 mt-1">
+                                                    <Badge
+                                                      className={`text-xs ${
+                                                        d.kritikalitas ===
+                                                        "KRITIS"
+                                                          ? "bg-red-100 text-red-700"
+                                                          : d.kritikalitas ===
+                                                              "TINGGI"
+                                                            ? "bg-orange-100 text-orange-700"
+                                                            : d.kritikalitas ===
+                                                                "SEDANG"
+                                                              ? "bg-yellow-100 text-yellow-700"
+                                                              : "bg-green-100 text-green-700"
+                                                      }`}
+                                                    >
+                                                      {d.kritikalitas}
+                                                    </Badge>
+                                                    {d.jumlah !== null && (
+                                                      <span>
+                                                        Jml: {d.jumlah}
+                                                      </span>
+                                                    )}
+                                                  </div>
+                                                </div>
+                                              ))}
+                                            {item.usedDataMasterIds.length >
+                                              rekomendasiData.inputData
+                                                .dataMaster.length && (
+                                              <p className="text-xs text-slate-400 italic">
+                                                *dan{" "}
+                                                {item.usedDataMasterIds.length -
+                                                  rekomendasiData.inputData
+                                                    .dataMaster.length}{" "}
+                                                data lainnya (tidak ditampilkan)
+                                              </p>
+                                            )}
+                                          </div>
+                                        </div>
+                                      )}
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </CardContent>
@@ -914,7 +1035,6 @@ export default function KegiatanRapatDetail() {
                   })}
               </div>
 
-              {/* No Results */}
               {debouncedQ &&
                 prioritasList.filter(
                   (item) =>
@@ -934,7 +1054,6 @@ export default function KegiatanRapatDetail() {
             </div>
           )}
 
-          {/* No Rekomendasi State */}
           {prioritasList.length === 0 && (
             <Card className="border-0 bg-white rounded-2xl p-12 text-center shadow-lg">
               <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-slate-50 flex items-center justify-center">

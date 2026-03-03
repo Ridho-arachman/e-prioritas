@@ -44,6 +44,11 @@ export type KegiatanRapat = $Result.DefaultSelection<Prisma.$KegiatanRapatPayloa
  */
 export type KegiatanRapatMasukan = $Result.DefaultSelection<Prisma.$KegiatanRapatMasukanPayload>
 /**
+ * Model KegiatanRapatDataMaster
+ * 
+ */
+export type KegiatanRapatDataMaster = $Result.DefaultSelection<Prisma.$KegiatanRapatDataMasterPayload>
+/**
  * Model Session
  * 
  */
@@ -308,6 +313,16 @@ export class PrismaClient<
     * ```
     */
   get kegiatanRapatMasukan(): Prisma.KegiatanRapatMasukanDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.kegiatanRapatDataMaster`: Exposes CRUD operations for the **KegiatanRapatDataMaster** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more KegiatanRapatDataMasters
+    * const kegiatanRapatDataMasters = await prisma.kegiatanRapatDataMaster.findMany()
+    * ```
+    */
+  get kegiatanRapatDataMaster(): Prisma.KegiatanRapatDataMasterDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.session`: Exposes CRUD operations for the **Session** model.
@@ -778,6 +793,7 @@ export namespace Prisma {
     DataMaster: 'DataMaster',
     KegiatanRapat: 'KegiatanRapat',
     KegiatanRapatMasukan: 'KegiatanRapatMasukan',
+    KegiatanRapatDataMaster: 'KegiatanRapatDataMaster',
     Session: 'Session',
     Account: 'Account',
     Verification: 'Verification'
@@ -796,7 +812,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "domainIsu" | "user" | "masukanWarga" | "dataMaster" | "kegiatanRapat" | "kegiatanRapatMasukan" | "session" | "account" | "verification"
+      modelProps: "domainIsu" | "user" | "masukanWarga" | "dataMaster" | "kegiatanRapat" | "kegiatanRapatMasukan" | "kegiatanRapatDataMaster" | "session" | "account" | "verification"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1244,6 +1260,80 @@ export namespace Prisma {
           }
         }
       }
+      KegiatanRapatDataMaster: {
+        payload: Prisma.$KegiatanRapatDataMasterPayload<ExtArgs>
+        fields: Prisma.KegiatanRapatDataMasterFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.KegiatanRapatDataMasterFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatDataMasterPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.KegiatanRapatDataMasterFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatDataMasterPayload>
+          }
+          findFirst: {
+            args: Prisma.KegiatanRapatDataMasterFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatDataMasterPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.KegiatanRapatDataMasterFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatDataMasterPayload>
+          }
+          findMany: {
+            args: Prisma.KegiatanRapatDataMasterFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatDataMasterPayload>[]
+          }
+          create: {
+            args: Prisma.KegiatanRapatDataMasterCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatDataMasterPayload>
+          }
+          createMany: {
+            args: Prisma.KegiatanRapatDataMasterCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.KegiatanRapatDataMasterCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatDataMasterPayload>[]
+          }
+          delete: {
+            args: Prisma.KegiatanRapatDataMasterDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatDataMasterPayload>
+          }
+          update: {
+            args: Prisma.KegiatanRapatDataMasterUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatDataMasterPayload>
+          }
+          deleteMany: {
+            args: Prisma.KegiatanRapatDataMasterDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.KegiatanRapatDataMasterUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.KegiatanRapatDataMasterUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatDataMasterPayload>[]
+          }
+          upsert: {
+            args: Prisma.KegiatanRapatDataMasterUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KegiatanRapatDataMasterPayload>
+          }
+          aggregate: {
+            args: Prisma.KegiatanRapatDataMasterAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateKegiatanRapatDataMaster>
+          }
+          groupBy: {
+            args: Prisma.KegiatanRapatDataMasterGroupByArgs<ExtArgs>
+            result: $Utils.Optional<KegiatanRapatDataMasterGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.KegiatanRapatDataMasterCountArgs<ExtArgs>
+            result: $Utils.Optional<KegiatanRapatDataMasterCountAggregateOutputType> | number
+          }
+        }
+      }
       Session: {
         payload: Prisma.$SessionPayload<ExtArgs>
         fields: Prisma.SessionFieldRefs
@@ -1580,6 +1670,7 @@ export namespace Prisma {
     dataMaster?: DataMasterOmit
     kegiatanRapat?: KegiatanRapatOmit
     kegiatanRapatMasukan?: KegiatanRapatMasukanOmit
+    kegiatanRapatDataMaster?: KegiatanRapatDataMasterOmit
     session?: SessionOmit
     account?: AccountOmit
     verification?: VerificationOmit
@@ -1815,15 +1906,48 @@ export namespace Prisma {
 
 
   /**
+   * Count Type DataMasterCountOutputType
+   */
+
+  export type DataMasterCountOutputType = {
+    dataMasterRelasi: number
+  }
+
+  export type DataMasterCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    dataMasterRelasi?: boolean | DataMasterCountOutputTypeCountDataMasterRelasiArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * DataMasterCountOutputType without action
+   */
+  export type DataMasterCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataMasterCountOutputType
+     */
+    select?: DataMasterCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * DataMasterCountOutputType without action
+   */
+  export type DataMasterCountOutputTypeCountDataMasterRelasiArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: KegiatanRapatDataMasterWhereInput
+  }
+
+
+  /**
    * Count Type KegiatanRapatCountOutputType
    */
 
   export type KegiatanRapatCountOutputType = {
     masukanRelasi: number
+    dataMasterRelasi: number
   }
 
   export type KegiatanRapatCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     masukanRelasi?: boolean | KegiatanRapatCountOutputTypeCountMasukanRelasiArgs
+    dataMasterRelasi?: boolean | KegiatanRapatCountOutputTypeCountDataMasterRelasiArgs
   }
 
   // Custom InputTypes
@@ -1842,6 +1966,13 @@ export namespace Prisma {
    */
   export type KegiatanRapatCountOutputTypeCountMasukanRelasiArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: KegiatanRapatMasukanWhereInput
+  }
+
+  /**
+   * KegiatanRapatCountOutputType without action
+   */
+  export type KegiatanRapatCountOutputTypeCountDataMasterRelasiArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: KegiatanRapatDataMasterWhereInput
   }
 
 
@@ -5726,6 +5857,8 @@ export namespace Prisma {
     updatedAt?: boolean
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
     diprosesOleh?: boolean | DataMaster$diprosesOlehArgs<ExtArgs>
+    dataMasterRelasi?: boolean | DataMaster$dataMasterRelasiArgs<ExtArgs>
+    _count?: boolean | DataMasterCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["dataMaster"]>
 
   export type DataMasterSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -5775,6 +5908,8 @@ export namespace Prisma {
   export type DataMasterInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
     diprosesOleh?: boolean | DataMaster$diprosesOlehArgs<ExtArgs>
+    dataMasterRelasi?: boolean | DataMaster$dataMasterRelasiArgs<ExtArgs>
+    _count?: boolean | DataMasterCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type DataMasterIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
@@ -5790,6 +5925,7 @@ export namespace Prisma {
     objects: {
       domainIsu: Prisma.$DomainIsuPayload<ExtArgs>
       diprosesOleh: Prisma.$UserPayload<ExtArgs> | null
+      dataMasterRelasi: Prisma.$KegiatanRapatDataMasterPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -6198,6 +6334,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     domainIsu<T extends DomainIsuDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DomainIsuDefaultArgs<ExtArgs>>): Prisma__DomainIsuClient<$Result.GetResult<Prisma.$DomainIsuPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     diprosesOleh<T extends DataMaster$diprosesOlehArgs<ExtArgs> = {}>(args?: Subset<T, DataMaster$diprosesOlehArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    dataMasterRelasi<T extends DataMaster$dataMasterRelasiArgs<ExtArgs> = {}>(args?: Subset<T, DataMaster$dataMasterRelasiArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatDataMasterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6652,6 +6789,30 @@ export namespace Prisma {
   }
 
   /**
+   * DataMaster.dataMasterRelasi
+   */
+  export type DataMaster$dataMasterRelasiArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KegiatanRapatDataMaster
+     */
+    select?: KegiatanRapatDataMasterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KegiatanRapatDataMaster
+     */
+    omit?: KegiatanRapatDataMasterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KegiatanRapatDataMasterInclude<ExtArgs> | null
+    where?: KegiatanRapatDataMasterWhereInput
+    orderBy?: KegiatanRapatDataMasterOrderByWithRelationInput | KegiatanRapatDataMasterOrderByWithRelationInput[]
+    cursor?: KegiatanRapatDataMasterWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: KegiatanRapatDataMasterScalarFieldEnum | KegiatanRapatDataMasterScalarFieldEnum[]
+  }
+
+  /**
    * DataMaster without action
    */
   export type DataMasterDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6930,6 +7091,7 @@ export namespace Prisma {
     dibuatOleh?: boolean | UserDefaultArgs<ExtArgs>
     diprosesOleh?: boolean | KegiatanRapat$diprosesOlehArgs<ExtArgs>
     masukanRelasi?: boolean | KegiatanRapat$masukanRelasiArgs<ExtArgs>
+    dataMasterRelasi?: boolean | KegiatanRapat$dataMasterRelasiArgs<ExtArgs>
     _count?: boolean | KegiatanRapatCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["kegiatanRapat"]>
 
@@ -7005,6 +7167,7 @@ export namespace Prisma {
     dibuatOleh?: boolean | UserDefaultArgs<ExtArgs>
     diprosesOleh?: boolean | KegiatanRapat$diprosesOlehArgs<ExtArgs>
     masukanRelasi?: boolean | KegiatanRapat$masukanRelasiArgs<ExtArgs>
+    dataMasterRelasi?: boolean | KegiatanRapat$dataMasterRelasiArgs<ExtArgs>
     _count?: boolean | KegiatanRapatCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type KegiatanRapatIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7025,6 +7188,7 @@ export namespace Prisma {
       dibuatOleh: Prisma.$UserPayload<ExtArgs>
       diprosesOleh: Prisma.$UserPayload<ExtArgs> | null
       masukanRelasi: Prisma.$KegiatanRapatMasukanPayload<ExtArgs>[]
+      dataMasterRelasi: Prisma.$KegiatanRapatDataMasterPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -7442,6 +7606,7 @@ export namespace Prisma {
     dibuatOleh<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     diprosesOleh<T extends KegiatanRapat$diprosesOlehArgs<ExtArgs> = {}>(args?: Subset<T, KegiatanRapat$diprosesOlehArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     masukanRelasi<T extends KegiatanRapat$masukanRelasiArgs<ExtArgs> = {}>(args?: Subset<T, KegiatanRapat$masukanRelasiArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatMasukanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    dataMasterRelasi<T extends KegiatanRapat$dataMasterRelasiArgs<ExtArgs> = {}>(args?: Subset<T, KegiatanRapat$dataMasterRelasiArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatDataMasterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7924,6 +8089,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: KegiatanRapatMasukanScalarFieldEnum | KegiatanRapatMasukanScalarFieldEnum[]
+  }
+
+  /**
+   * KegiatanRapat.dataMasterRelasi
+   */
+  export type KegiatanRapat$dataMasterRelasiArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KegiatanRapatDataMaster
+     */
+    select?: KegiatanRapatDataMasterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KegiatanRapatDataMaster
+     */
+    omit?: KegiatanRapatDataMasterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KegiatanRapatDataMasterInclude<ExtArgs> | null
+    where?: KegiatanRapatDataMasterWhereInput
+    orderBy?: KegiatanRapatDataMasterOrderByWithRelationInput | KegiatanRapatDataMasterOrderByWithRelationInput[]
+    cursor?: KegiatanRapatDataMasterWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: KegiatanRapatDataMasterScalarFieldEnum | KegiatanRapatDataMasterScalarFieldEnum[]
   }
 
   /**
@@ -8995,6 +9184,1059 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: KegiatanRapatMasukanInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model KegiatanRapatDataMaster
+   */
+
+  export type AggregateKegiatanRapatDataMaster = {
+    _count: KegiatanRapatDataMasterCountAggregateOutputType | null
+    _min: KegiatanRapatDataMasterMinAggregateOutputType | null
+    _max: KegiatanRapatDataMasterMaxAggregateOutputType | null
+  }
+
+  export type KegiatanRapatDataMasterMinAggregateOutputType = {
+    id: string | null
+    kegiatanRapatId: string | null
+    dataMasterId: string | null
+    createdAt: Date | null
+  }
+
+  export type KegiatanRapatDataMasterMaxAggregateOutputType = {
+    id: string | null
+    kegiatanRapatId: string | null
+    dataMasterId: string | null
+    createdAt: Date | null
+  }
+
+  export type KegiatanRapatDataMasterCountAggregateOutputType = {
+    id: number
+    kegiatanRapatId: number
+    dataMasterId: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type KegiatanRapatDataMasterMinAggregateInputType = {
+    id?: true
+    kegiatanRapatId?: true
+    dataMasterId?: true
+    createdAt?: true
+  }
+
+  export type KegiatanRapatDataMasterMaxAggregateInputType = {
+    id?: true
+    kegiatanRapatId?: true
+    dataMasterId?: true
+    createdAt?: true
+  }
+
+  export type KegiatanRapatDataMasterCountAggregateInputType = {
+    id?: true
+    kegiatanRapatId?: true
+    dataMasterId?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type KegiatanRapatDataMasterAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which KegiatanRapatDataMaster to aggregate.
+     */
+    where?: KegiatanRapatDataMasterWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of KegiatanRapatDataMasters to fetch.
+     */
+    orderBy?: KegiatanRapatDataMasterOrderByWithRelationInput | KegiatanRapatDataMasterOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: KegiatanRapatDataMasterWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` KegiatanRapatDataMasters from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` KegiatanRapatDataMasters.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned KegiatanRapatDataMasters
+    **/
+    _count?: true | KegiatanRapatDataMasterCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: KegiatanRapatDataMasterMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: KegiatanRapatDataMasterMaxAggregateInputType
+  }
+
+  export type GetKegiatanRapatDataMasterAggregateType<T extends KegiatanRapatDataMasterAggregateArgs> = {
+        [P in keyof T & keyof AggregateKegiatanRapatDataMaster]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateKegiatanRapatDataMaster[P]>
+      : GetScalarType<T[P], AggregateKegiatanRapatDataMaster[P]>
+  }
+
+
+
+
+  export type KegiatanRapatDataMasterGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: KegiatanRapatDataMasterWhereInput
+    orderBy?: KegiatanRapatDataMasterOrderByWithAggregationInput | KegiatanRapatDataMasterOrderByWithAggregationInput[]
+    by: KegiatanRapatDataMasterScalarFieldEnum[] | KegiatanRapatDataMasterScalarFieldEnum
+    having?: KegiatanRapatDataMasterScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: KegiatanRapatDataMasterCountAggregateInputType | true
+    _min?: KegiatanRapatDataMasterMinAggregateInputType
+    _max?: KegiatanRapatDataMasterMaxAggregateInputType
+  }
+
+  export type KegiatanRapatDataMasterGroupByOutputType = {
+    id: string
+    kegiatanRapatId: string
+    dataMasterId: string
+    createdAt: Date
+    _count: KegiatanRapatDataMasterCountAggregateOutputType | null
+    _min: KegiatanRapatDataMasterMinAggregateOutputType | null
+    _max: KegiatanRapatDataMasterMaxAggregateOutputType | null
+  }
+
+  type GetKegiatanRapatDataMasterGroupByPayload<T extends KegiatanRapatDataMasterGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<KegiatanRapatDataMasterGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof KegiatanRapatDataMasterGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], KegiatanRapatDataMasterGroupByOutputType[P]>
+            : GetScalarType<T[P], KegiatanRapatDataMasterGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type KegiatanRapatDataMasterSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    kegiatanRapatId?: boolean
+    dataMasterId?: boolean
+    createdAt?: boolean
+    kegiatanRapat?: boolean | KegiatanRapatDefaultArgs<ExtArgs>
+    dataMaster?: boolean | DataMasterDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["kegiatanRapatDataMaster"]>
+
+  export type KegiatanRapatDataMasterSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    kegiatanRapatId?: boolean
+    dataMasterId?: boolean
+    createdAt?: boolean
+    kegiatanRapat?: boolean | KegiatanRapatDefaultArgs<ExtArgs>
+    dataMaster?: boolean | DataMasterDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["kegiatanRapatDataMaster"]>
+
+  export type KegiatanRapatDataMasterSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    kegiatanRapatId?: boolean
+    dataMasterId?: boolean
+    createdAt?: boolean
+    kegiatanRapat?: boolean | KegiatanRapatDefaultArgs<ExtArgs>
+    dataMaster?: boolean | DataMasterDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["kegiatanRapatDataMaster"]>
+
+  export type KegiatanRapatDataMasterSelectScalar = {
+    id?: boolean
+    kegiatanRapatId?: boolean
+    dataMasterId?: boolean
+    createdAt?: boolean
+  }
+
+  export type KegiatanRapatDataMasterOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "kegiatanRapatId" | "dataMasterId" | "createdAt", ExtArgs["result"]["kegiatanRapatDataMaster"]>
+  export type KegiatanRapatDataMasterInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    kegiatanRapat?: boolean | KegiatanRapatDefaultArgs<ExtArgs>
+    dataMaster?: boolean | DataMasterDefaultArgs<ExtArgs>
+  }
+  export type KegiatanRapatDataMasterIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    kegiatanRapat?: boolean | KegiatanRapatDefaultArgs<ExtArgs>
+    dataMaster?: boolean | DataMasterDefaultArgs<ExtArgs>
+  }
+  export type KegiatanRapatDataMasterIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    kegiatanRapat?: boolean | KegiatanRapatDefaultArgs<ExtArgs>
+    dataMaster?: boolean | DataMasterDefaultArgs<ExtArgs>
+  }
+
+  export type $KegiatanRapatDataMasterPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "KegiatanRapatDataMaster"
+    objects: {
+      kegiatanRapat: Prisma.$KegiatanRapatPayload<ExtArgs>
+      dataMaster: Prisma.$DataMasterPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      kegiatanRapatId: string
+      dataMasterId: string
+      createdAt: Date
+    }, ExtArgs["result"]["kegiatanRapatDataMaster"]>
+    composites: {}
+  }
+
+  type KegiatanRapatDataMasterGetPayload<S extends boolean | null | undefined | KegiatanRapatDataMasterDefaultArgs> = $Result.GetResult<Prisma.$KegiatanRapatDataMasterPayload, S>
+
+  type KegiatanRapatDataMasterCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<KegiatanRapatDataMasterFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: KegiatanRapatDataMasterCountAggregateInputType | true
+    }
+
+  export interface KegiatanRapatDataMasterDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['KegiatanRapatDataMaster'], meta: { name: 'KegiatanRapatDataMaster' } }
+    /**
+     * Find zero or one KegiatanRapatDataMaster that matches the filter.
+     * @param {KegiatanRapatDataMasterFindUniqueArgs} args - Arguments to find a KegiatanRapatDataMaster
+     * @example
+     * // Get one KegiatanRapatDataMaster
+     * const kegiatanRapatDataMaster = await prisma.kegiatanRapatDataMaster.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends KegiatanRapatDataMasterFindUniqueArgs>(args: SelectSubset<T, KegiatanRapatDataMasterFindUniqueArgs<ExtArgs>>): Prisma__KegiatanRapatDataMasterClient<$Result.GetResult<Prisma.$KegiatanRapatDataMasterPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one KegiatanRapatDataMaster that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {KegiatanRapatDataMasterFindUniqueOrThrowArgs} args - Arguments to find a KegiatanRapatDataMaster
+     * @example
+     * // Get one KegiatanRapatDataMaster
+     * const kegiatanRapatDataMaster = await prisma.kegiatanRapatDataMaster.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends KegiatanRapatDataMasterFindUniqueOrThrowArgs>(args: SelectSubset<T, KegiatanRapatDataMasterFindUniqueOrThrowArgs<ExtArgs>>): Prisma__KegiatanRapatDataMasterClient<$Result.GetResult<Prisma.$KegiatanRapatDataMasterPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first KegiatanRapatDataMaster that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KegiatanRapatDataMasterFindFirstArgs} args - Arguments to find a KegiatanRapatDataMaster
+     * @example
+     * // Get one KegiatanRapatDataMaster
+     * const kegiatanRapatDataMaster = await prisma.kegiatanRapatDataMaster.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends KegiatanRapatDataMasterFindFirstArgs>(args?: SelectSubset<T, KegiatanRapatDataMasterFindFirstArgs<ExtArgs>>): Prisma__KegiatanRapatDataMasterClient<$Result.GetResult<Prisma.$KegiatanRapatDataMasterPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first KegiatanRapatDataMaster that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KegiatanRapatDataMasterFindFirstOrThrowArgs} args - Arguments to find a KegiatanRapatDataMaster
+     * @example
+     * // Get one KegiatanRapatDataMaster
+     * const kegiatanRapatDataMaster = await prisma.kegiatanRapatDataMaster.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends KegiatanRapatDataMasterFindFirstOrThrowArgs>(args?: SelectSubset<T, KegiatanRapatDataMasterFindFirstOrThrowArgs<ExtArgs>>): Prisma__KegiatanRapatDataMasterClient<$Result.GetResult<Prisma.$KegiatanRapatDataMasterPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more KegiatanRapatDataMasters that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KegiatanRapatDataMasterFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all KegiatanRapatDataMasters
+     * const kegiatanRapatDataMasters = await prisma.kegiatanRapatDataMaster.findMany()
+     * 
+     * // Get first 10 KegiatanRapatDataMasters
+     * const kegiatanRapatDataMasters = await prisma.kegiatanRapatDataMaster.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const kegiatanRapatDataMasterWithIdOnly = await prisma.kegiatanRapatDataMaster.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends KegiatanRapatDataMasterFindManyArgs>(args?: SelectSubset<T, KegiatanRapatDataMasterFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatDataMasterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a KegiatanRapatDataMaster.
+     * @param {KegiatanRapatDataMasterCreateArgs} args - Arguments to create a KegiatanRapatDataMaster.
+     * @example
+     * // Create one KegiatanRapatDataMaster
+     * const KegiatanRapatDataMaster = await prisma.kegiatanRapatDataMaster.create({
+     *   data: {
+     *     // ... data to create a KegiatanRapatDataMaster
+     *   }
+     * })
+     * 
+     */
+    create<T extends KegiatanRapatDataMasterCreateArgs>(args: SelectSubset<T, KegiatanRapatDataMasterCreateArgs<ExtArgs>>): Prisma__KegiatanRapatDataMasterClient<$Result.GetResult<Prisma.$KegiatanRapatDataMasterPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many KegiatanRapatDataMasters.
+     * @param {KegiatanRapatDataMasterCreateManyArgs} args - Arguments to create many KegiatanRapatDataMasters.
+     * @example
+     * // Create many KegiatanRapatDataMasters
+     * const kegiatanRapatDataMaster = await prisma.kegiatanRapatDataMaster.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends KegiatanRapatDataMasterCreateManyArgs>(args?: SelectSubset<T, KegiatanRapatDataMasterCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many KegiatanRapatDataMasters and returns the data saved in the database.
+     * @param {KegiatanRapatDataMasterCreateManyAndReturnArgs} args - Arguments to create many KegiatanRapatDataMasters.
+     * @example
+     * // Create many KegiatanRapatDataMasters
+     * const kegiatanRapatDataMaster = await prisma.kegiatanRapatDataMaster.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many KegiatanRapatDataMasters and only return the `id`
+     * const kegiatanRapatDataMasterWithIdOnly = await prisma.kegiatanRapatDataMaster.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends KegiatanRapatDataMasterCreateManyAndReturnArgs>(args?: SelectSubset<T, KegiatanRapatDataMasterCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatDataMasterPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a KegiatanRapatDataMaster.
+     * @param {KegiatanRapatDataMasterDeleteArgs} args - Arguments to delete one KegiatanRapatDataMaster.
+     * @example
+     * // Delete one KegiatanRapatDataMaster
+     * const KegiatanRapatDataMaster = await prisma.kegiatanRapatDataMaster.delete({
+     *   where: {
+     *     // ... filter to delete one KegiatanRapatDataMaster
+     *   }
+     * })
+     * 
+     */
+    delete<T extends KegiatanRapatDataMasterDeleteArgs>(args: SelectSubset<T, KegiatanRapatDataMasterDeleteArgs<ExtArgs>>): Prisma__KegiatanRapatDataMasterClient<$Result.GetResult<Prisma.$KegiatanRapatDataMasterPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one KegiatanRapatDataMaster.
+     * @param {KegiatanRapatDataMasterUpdateArgs} args - Arguments to update one KegiatanRapatDataMaster.
+     * @example
+     * // Update one KegiatanRapatDataMaster
+     * const kegiatanRapatDataMaster = await prisma.kegiatanRapatDataMaster.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends KegiatanRapatDataMasterUpdateArgs>(args: SelectSubset<T, KegiatanRapatDataMasterUpdateArgs<ExtArgs>>): Prisma__KegiatanRapatDataMasterClient<$Result.GetResult<Prisma.$KegiatanRapatDataMasterPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more KegiatanRapatDataMasters.
+     * @param {KegiatanRapatDataMasterDeleteManyArgs} args - Arguments to filter KegiatanRapatDataMasters to delete.
+     * @example
+     * // Delete a few KegiatanRapatDataMasters
+     * const { count } = await prisma.kegiatanRapatDataMaster.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends KegiatanRapatDataMasterDeleteManyArgs>(args?: SelectSubset<T, KegiatanRapatDataMasterDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more KegiatanRapatDataMasters.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KegiatanRapatDataMasterUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many KegiatanRapatDataMasters
+     * const kegiatanRapatDataMaster = await prisma.kegiatanRapatDataMaster.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends KegiatanRapatDataMasterUpdateManyArgs>(args: SelectSubset<T, KegiatanRapatDataMasterUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more KegiatanRapatDataMasters and returns the data updated in the database.
+     * @param {KegiatanRapatDataMasterUpdateManyAndReturnArgs} args - Arguments to update many KegiatanRapatDataMasters.
+     * @example
+     * // Update many KegiatanRapatDataMasters
+     * const kegiatanRapatDataMaster = await prisma.kegiatanRapatDataMaster.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more KegiatanRapatDataMasters and only return the `id`
+     * const kegiatanRapatDataMasterWithIdOnly = await prisma.kegiatanRapatDataMaster.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends KegiatanRapatDataMasterUpdateManyAndReturnArgs>(args: SelectSubset<T, KegiatanRapatDataMasterUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatDataMasterPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one KegiatanRapatDataMaster.
+     * @param {KegiatanRapatDataMasterUpsertArgs} args - Arguments to update or create a KegiatanRapatDataMaster.
+     * @example
+     * // Update or create a KegiatanRapatDataMaster
+     * const kegiatanRapatDataMaster = await prisma.kegiatanRapatDataMaster.upsert({
+     *   create: {
+     *     // ... data to create a KegiatanRapatDataMaster
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the KegiatanRapatDataMaster we want to update
+     *   }
+     * })
+     */
+    upsert<T extends KegiatanRapatDataMasterUpsertArgs>(args: SelectSubset<T, KegiatanRapatDataMasterUpsertArgs<ExtArgs>>): Prisma__KegiatanRapatDataMasterClient<$Result.GetResult<Prisma.$KegiatanRapatDataMasterPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of KegiatanRapatDataMasters.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KegiatanRapatDataMasterCountArgs} args - Arguments to filter KegiatanRapatDataMasters to count.
+     * @example
+     * // Count the number of KegiatanRapatDataMasters
+     * const count = await prisma.kegiatanRapatDataMaster.count({
+     *   where: {
+     *     // ... the filter for the KegiatanRapatDataMasters we want to count
+     *   }
+     * })
+    **/
+    count<T extends KegiatanRapatDataMasterCountArgs>(
+      args?: Subset<T, KegiatanRapatDataMasterCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], KegiatanRapatDataMasterCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a KegiatanRapatDataMaster.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KegiatanRapatDataMasterAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends KegiatanRapatDataMasterAggregateArgs>(args: Subset<T, KegiatanRapatDataMasterAggregateArgs>): Prisma.PrismaPromise<GetKegiatanRapatDataMasterAggregateType<T>>
+
+    /**
+     * Group by KegiatanRapatDataMaster.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KegiatanRapatDataMasterGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends KegiatanRapatDataMasterGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: KegiatanRapatDataMasterGroupByArgs['orderBy'] }
+        : { orderBy?: KegiatanRapatDataMasterGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, KegiatanRapatDataMasterGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetKegiatanRapatDataMasterGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the KegiatanRapatDataMaster model
+   */
+  readonly fields: KegiatanRapatDataMasterFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for KegiatanRapatDataMaster.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__KegiatanRapatDataMasterClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    kegiatanRapat<T extends KegiatanRapatDefaultArgs<ExtArgs> = {}>(args?: Subset<T, KegiatanRapatDefaultArgs<ExtArgs>>): Prisma__KegiatanRapatClient<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    dataMaster<T extends DataMasterDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DataMasterDefaultArgs<ExtArgs>>): Prisma__DataMasterClient<$Result.GetResult<Prisma.$DataMasterPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the KegiatanRapatDataMaster model
+   */
+  interface KegiatanRapatDataMasterFieldRefs {
+    readonly id: FieldRef<"KegiatanRapatDataMaster", 'String'>
+    readonly kegiatanRapatId: FieldRef<"KegiatanRapatDataMaster", 'String'>
+    readonly dataMasterId: FieldRef<"KegiatanRapatDataMaster", 'String'>
+    readonly createdAt: FieldRef<"KegiatanRapatDataMaster", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * KegiatanRapatDataMaster findUnique
+   */
+  export type KegiatanRapatDataMasterFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KegiatanRapatDataMaster
+     */
+    select?: KegiatanRapatDataMasterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KegiatanRapatDataMaster
+     */
+    omit?: KegiatanRapatDataMasterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KegiatanRapatDataMasterInclude<ExtArgs> | null
+    /**
+     * Filter, which KegiatanRapatDataMaster to fetch.
+     */
+    where: KegiatanRapatDataMasterWhereUniqueInput
+  }
+
+  /**
+   * KegiatanRapatDataMaster findUniqueOrThrow
+   */
+  export type KegiatanRapatDataMasterFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KegiatanRapatDataMaster
+     */
+    select?: KegiatanRapatDataMasterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KegiatanRapatDataMaster
+     */
+    omit?: KegiatanRapatDataMasterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KegiatanRapatDataMasterInclude<ExtArgs> | null
+    /**
+     * Filter, which KegiatanRapatDataMaster to fetch.
+     */
+    where: KegiatanRapatDataMasterWhereUniqueInput
+  }
+
+  /**
+   * KegiatanRapatDataMaster findFirst
+   */
+  export type KegiatanRapatDataMasterFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KegiatanRapatDataMaster
+     */
+    select?: KegiatanRapatDataMasterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KegiatanRapatDataMaster
+     */
+    omit?: KegiatanRapatDataMasterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KegiatanRapatDataMasterInclude<ExtArgs> | null
+    /**
+     * Filter, which KegiatanRapatDataMaster to fetch.
+     */
+    where?: KegiatanRapatDataMasterWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of KegiatanRapatDataMasters to fetch.
+     */
+    orderBy?: KegiatanRapatDataMasterOrderByWithRelationInput | KegiatanRapatDataMasterOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for KegiatanRapatDataMasters.
+     */
+    cursor?: KegiatanRapatDataMasterWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` KegiatanRapatDataMasters from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` KegiatanRapatDataMasters.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of KegiatanRapatDataMasters.
+     */
+    distinct?: KegiatanRapatDataMasterScalarFieldEnum | KegiatanRapatDataMasterScalarFieldEnum[]
+  }
+
+  /**
+   * KegiatanRapatDataMaster findFirstOrThrow
+   */
+  export type KegiatanRapatDataMasterFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KegiatanRapatDataMaster
+     */
+    select?: KegiatanRapatDataMasterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KegiatanRapatDataMaster
+     */
+    omit?: KegiatanRapatDataMasterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KegiatanRapatDataMasterInclude<ExtArgs> | null
+    /**
+     * Filter, which KegiatanRapatDataMaster to fetch.
+     */
+    where?: KegiatanRapatDataMasterWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of KegiatanRapatDataMasters to fetch.
+     */
+    orderBy?: KegiatanRapatDataMasterOrderByWithRelationInput | KegiatanRapatDataMasterOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for KegiatanRapatDataMasters.
+     */
+    cursor?: KegiatanRapatDataMasterWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` KegiatanRapatDataMasters from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` KegiatanRapatDataMasters.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of KegiatanRapatDataMasters.
+     */
+    distinct?: KegiatanRapatDataMasterScalarFieldEnum | KegiatanRapatDataMasterScalarFieldEnum[]
+  }
+
+  /**
+   * KegiatanRapatDataMaster findMany
+   */
+  export type KegiatanRapatDataMasterFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KegiatanRapatDataMaster
+     */
+    select?: KegiatanRapatDataMasterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KegiatanRapatDataMaster
+     */
+    omit?: KegiatanRapatDataMasterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KegiatanRapatDataMasterInclude<ExtArgs> | null
+    /**
+     * Filter, which KegiatanRapatDataMasters to fetch.
+     */
+    where?: KegiatanRapatDataMasterWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of KegiatanRapatDataMasters to fetch.
+     */
+    orderBy?: KegiatanRapatDataMasterOrderByWithRelationInput | KegiatanRapatDataMasterOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing KegiatanRapatDataMasters.
+     */
+    cursor?: KegiatanRapatDataMasterWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` KegiatanRapatDataMasters from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` KegiatanRapatDataMasters.
+     */
+    skip?: number
+    distinct?: KegiatanRapatDataMasterScalarFieldEnum | KegiatanRapatDataMasterScalarFieldEnum[]
+  }
+
+  /**
+   * KegiatanRapatDataMaster create
+   */
+  export type KegiatanRapatDataMasterCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KegiatanRapatDataMaster
+     */
+    select?: KegiatanRapatDataMasterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KegiatanRapatDataMaster
+     */
+    omit?: KegiatanRapatDataMasterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KegiatanRapatDataMasterInclude<ExtArgs> | null
+    /**
+     * The data needed to create a KegiatanRapatDataMaster.
+     */
+    data: XOR<KegiatanRapatDataMasterCreateInput, KegiatanRapatDataMasterUncheckedCreateInput>
+  }
+
+  /**
+   * KegiatanRapatDataMaster createMany
+   */
+  export type KegiatanRapatDataMasterCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many KegiatanRapatDataMasters.
+     */
+    data: KegiatanRapatDataMasterCreateManyInput | KegiatanRapatDataMasterCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * KegiatanRapatDataMaster createManyAndReturn
+   */
+  export type KegiatanRapatDataMasterCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KegiatanRapatDataMaster
+     */
+    select?: KegiatanRapatDataMasterSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the KegiatanRapatDataMaster
+     */
+    omit?: KegiatanRapatDataMasterOmit<ExtArgs> | null
+    /**
+     * The data used to create many KegiatanRapatDataMasters.
+     */
+    data: KegiatanRapatDataMasterCreateManyInput | KegiatanRapatDataMasterCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KegiatanRapatDataMasterIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * KegiatanRapatDataMaster update
+   */
+  export type KegiatanRapatDataMasterUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KegiatanRapatDataMaster
+     */
+    select?: KegiatanRapatDataMasterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KegiatanRapatDataMaster
+     */
+    omit?: KegiatanRapatDataMasterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KegiatanRapatDataMasterInclude<ExtArgs> | null
+    /**
+     * The data needed to update a KegiatanRapatDataMaster.
+     */
+    data: XOR<KegiatanRapatDataMasterUpdateInput, KegiatanRapatDataMasterUncheckedUpdateInput>
+    /**
+     * Choose, which KegiatanRapatDataMaster to update.
+     */
+    where: KegiatanRapatDataMasterWhereUniqueInput
+  }
+
+  /**
+   * KegiatanRapatDataMaster updateMany
+   */
+  export type KegiatanRapatDataMasterUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update KegiatanRapatDataMasters.
+     */
+    data: XOR<KegiatanRapatDataMasterUpdateManyMutationInput, KegiatanRapatDataMasterUncheckedUpdateManyInput>
+    /**
+     * Filter which KegiatanRapatDataMasters to update
+     */
+    where?: KegiatanRapatDataMasterWhereInput
+    /**
+     * Limit how many KegiatanRapatDataMasters to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * KegiatanRapatDataMaster updateManyAndReturn
+   */
+  export type KegiatanRapatDataMasterUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KegiatanRapatDataMaster
+     */
+    select?: KegiatanRapatDataMasterSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the KegiatanRapatDataMaster
+     */
+    omit?: KegiatanRapatDataMasterOmit<ExtArgs> | null
+    /**
+     * The data used to update KegiatanRapatDataMasters.
+     */
+    data: XOR<KegiatanRapatDataMasterUpdateManyMutationInput, KegiatanRapatDataMasterUncheckedUpdateManyInput>
+    /**
+     * Filter which KegiatanRapatDataMasters to update
+     */
+    where?: KegiatanRapatDataMasterWhereInput
+    /**
+     * Limit how many KegiatanRapatDataMasters to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KegiatanRapatDataMasterIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * KegiatanRapatDataMaster upsert
+   */
+  export type KegiatanRapatDataMasterUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KegiatanRapatDataMaster
+     */
+    select?: KegiatanRapatDataMasterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KegiatanRapatDataMaster
+     */
+    omit?: KegiatanRapatDataMasterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KegiatanRapatDataMasterInclude<ExtArgs> | null
+    /**
+     * The filter to search for the KegiatanRapatDataMaster to update in case it exists.
+     */
+    where: KegiatanRapatDataMasterWhereUniqueInput
+    /**
+     * In case the KegiatanRapatDataMaster found by the `where` argument doesn't exist, create a new KegiatanRapatDataMaster with this data.
+     */
+    create: XOR<KegiatanRapatDataMasterCreateInput, KegiatanRapatDataMasterUncheckedCreateInput>
+    /**
+     * In case the KegiatanRapatDataMaster was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<KegiatanRapatDataMasterUpdateInput, KegiatanRapatDataMasterUncheckedUpdateInput>
+  }
+
+  /**
+   * KegiatanRapatDataMaster delete
+   */
+  export type KegiatanRapatDataMasterDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KegiatanRapatDataMaster
+     */
+    select?: KegiatanRapatDataMasterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KegiatanRapatDataMaster
+     */
+    omit?: KegiatanRapatDataMasterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KegiatanRapatDataMasterInclude<ExtArgs> | null
+    /**
+     * Filter which KegiatanRapatDataMaster to delete.
+     */
+    where: KegiatanRapatDataMasterWhereUniqueInput
+  }
+
+  /**
+   * KegiatanRapatDataMaster deleteMany
+   */
+  export type KegiatanRapatDataMasterDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which KegiatanRapatDataMasters to delete
+     */
+    where?: KegiatanRapatDataMasterWhereInput
+    /**
+     * Limit how many KegiatanRapatDataMasters to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * KegiatanRapatDataMaster without action
+   */
+  export type KegiatanRapatDataMasterDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KegiatanRapatDataMaster
+     */
+    select?: KegiatanRapatDataMasterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KegiatanRapatDataMaster
+     */
+    omit?: KegiatanRapatDataMasterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KegiatanRapatDataMasterInclude<ExtArgs> | null
   }
 
 
@@ -12427,6 +13669,16 @@ export namespace Prisma {
   export type KegiatanRapatMasukanScalarFieldEnum = (typeof KegiatanRapatMasukanScalarFieldEnum)[keyof typeof KegiatanRapatMasukanScalarFieldEnum]
 
 
+  export const KegiatanRapatDataMasterScalarFieldEnum: {
+    id: 'id',
+    kegiatanRapatId: 'kegiatanRapatId',
+    dataMasterId: 'dataMasterId',
+    createdAt: 'createdAt'
+  };
+
+  export type KegiatanRapatDataMasterScalarFieldEnum = (typeof KegiatanRapatDataMasterScalarFieldEnum)[keyof typeof KegiatanRapatDataMasterScalarFieldEnum]
+
+
   export const SessionScalarFieldEnum: {
     id: 'id',
     expiresAt: 'expiresAt',
@@ -12949,6 +14201,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"DataMaster"> | Date | string
     domainIsu?: XOR<DomainIsuScalarRelationFilter, DomainIsuWhereInput>
     diprosesOleh?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    dataMasterRelasi?: KegiatanRapatDataMasterListRelationFilter
   }
 
   export type DataMasterOrderByWithRelationInput = {
@@ -12964,6 +14217,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     domainIsu?: DomainIsuOrderByWithRelationInput
     diprosesOleh?: UserOrderByWithRelationInput
+    dataMasterRelasi?: KegiatanRapatDataMasterOrderByRelationAggregateInput
   }
 
   export type DataMasterWhereUniqueInput = Prisma.AtLeast<{
@@ -12983,6 +14237,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"DataMaster"> | Date | string
     domainIsu?: XOR<DomainIsuScalarRelationFilter, DomainIsuWhereInput>
     diprosesOleh?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    dataMasterRelasi?: KegiatanRapatDataMasterListRelationFilter
   }, "id" | "domainIsuId_namaAtribut">
 
   export type DataMasterOrderByWithAggregationInput = {
@@ -13044,6 +14299,7 @@ export namespace Prisma {
     dibuatOleh?: XOR<UserScalarRelationFilter, UserWhereInput>
     diprosesOleh?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     masukanRelasi?: KegiatanRapatMasukanListRelationFilter
+    dataMasterRelasi?: KegiatanRapatDataMasterListRelationFilter
   }
 
   export type KegiatanRapatOrderByWithRelationInput = {
@@ -13068,6 +14324,7 @@ export namespace Prisma {
     dibuatOleh?: UserOrderByWithRelationInput
     diprosesOleh?: UserOrderByWithRelationInput
     masukanRelasi?: KegiatanRapatMasukanOrderByRelationAggregateInput
+    dataMasterRelasi?: KegiatanRapatDataMasterOrderByRelationAggregateInput
   }
 
   export type KegiatanRapatWhereUniqueInput = Prisma.AtLeast<{
@@ -13095,6 +14352,7 @@ export namespace Prisma {
     dibuatOleh?: XOR<UserScalarRelationFilter, UserWhereInput>
     diprosesOleh?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     masukanRelasi?: KegiatanRapatMasukanListRelationFilter
+    dataMasterRelasi?: KegiatanRapatDataMasterListRelationFilter
   }, "id" | "fingerprint">
 
   export type KegiatanRapatOrderByWithAggregationInput = {
@@ -13195,6 +14453,60 @@ export namespace Prisma {
     kegiatanRapatId?: StringWithAggregatesFilter<"KegiatanRapatMasukan"> | string
     masukanId?: StringWithAggregatesFilter<"KegiatanRapatMasukan"> | string
     createdAt?: DateTimeWithAggregatesFilter<"KegiatanRapatMasukan"> | Date | string
+  }
+
+  export type KegiatanRapatDataMasterWhereInput = {
+    AND?: KegiatanRapatDataMasterWhereInput | KegiatanRapatDataMasterWhereInput[]
+    OR?: KegiatanRapatDataMasterWhereInput[]
+    NOT?: KegiatanRapatDataMasterWhereInput | KegiatanRapatDataMasterWhereInput[]
+    id?: StringFilter<"KegiatanRapatDataMaster"> | string
+    kegiatanRapatId?: StringFilter<"KegiatanRapatDataMaster"> | string
+    dataMasterId?: StringFilter<"KegiatanRapatDataMaster"> | string
+    createdAt?: DateTimeFilter<"KegiatanRapatDataMaster"> | Date | string
+    kegiatanRapat?: XOR<KegiatanRapatScalarRelationFilter, KegiatanRapatWhereInput>
+    dataMaster?: XOR<DataMasterScalarRelationFilter, DataMasterWhereInput>
+  }
+
+  export type KegiatanRapatDataMasterOrderByWithRelationInput = {
+    id?: SortOrder
+    kegiatanRapatId?: SortOrder
+    dataMasterId?: SortOrder
+    createdAt?: SortOrder
+    kegiatanRapat?: KegiatanRapatOrderByWithRelationInput
+    dataMaster?: DataMasterOrderByWithRelationInput
+  }
+
+  export type KegiatanRapatDataMasterWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    kegiatanRapatId_dataMasterId?: KegiatanRapatDataMasterKegiatanRapatIdDataMasterIdCompoundUniqueInput
+    AND?: KegiatanRapatDataMasterWhereInput | KegiatanRapatDataMasterWhereInput[]
+    OR?: KegiatanRapatDataMasterWhereInput[]
+    NOT?: KegiatanRapatDataMasterWhereInput | KegiatanRapatDataMasterWhereInput[]
+    kegiatanRapatId?: StringFilter<"KegiatanRapatDataMaster"> | string
+    dataMasterId?: StringFilter<"KegiatanRapatDataMaster"> | string
+    createdAt?: DateTimeFilter<"KegiatanRapatDataMaster"> | Date | string
+    kegiatanRapat?: XOR<KegiatanRapatScalarRelationFilter, KegiatanRapatWhereInput>
+    dataMaster?: XOR<DataMasterScalarRelationFilter, DataMasterWhereInput>
+  }, "id" | "kegiatanRapatId_dataMasterId">
+
+  export type KegiatanRapatDataMasterOrderByWithAggregationInput = {
+    id?: SortOrder
+    kegiatanRapatId?: SortOrder
+    dataMasterId?: SortOrder
+    createdAt?: SortOrder
+    _count?: KegiatanRapatDataMasterCountOrderByAggregateInput
+    _max?: KegiatanRapatDataMasterMaxOrderByAggregateInput
+    _min?: KegiatanRapatDataMasterMinOrderByAggregateInput
+  }
+
+  export type KegiatanRapatDataMasterScalarWhereWithAggregatesInput = {
+    AND?: KegiatanRapatDataMasterScalarWhereWithAggregatesInput | KegiatanRapatDataMasterScalarWhereWithAggregatesInput[]
+    OR?: KegiatanRapatDataMasterScalarWhereWithAggregatesInput[]
+    NOT?: KegiatanRapatDataMasterScalarWhereWithAggregatesInput | KegiatanRapatDataMasterScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"KegiatanRapatDataMaster"> | string
+    kegiatanRapatId?: StringWithAggregatesFilter<"KegiatanRapatDataMaster"> | string
+    dataMasterId?: StringWithAggregatesFilter<"KegiatanRapatDataMaster"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"KegiatanRapatDataMaster"> | Date | string
   }
 
   export type SessionWhereInput = {
@@ -13754,6 +15066,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     domainIsu: DomainIsuCreateNestedOneWithoutDataMasterInput
     diprosesOleh?: UserCreateNestedOneWithoutDataMasterDibuatInput
+    dataMasterRelasi?: KegiatanRapatDataMasterCreateNestedManyWithoutDataMasterInput
   }
 
   export type DataMasterUncheckedCreateInput = {
@@ -13767,6 +15080,7 @@ export namespace Prisma {
     diprosesOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    dataMasterRelasi?: KegiatanRapatDataMasterUncheckedCreateNestedManyWithoutDataMasterInput
   }
 
   export type DataMasterUpdateInput = {
@@ -13780,6 +15094,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     domainIsu?: DomainIsuUpdateOneRequiredWithoutDataMasterNestedInput
     diprosesOleh?: UserUpdateOneWithoutDataMasterDibuatNestedInput
+    dataMasterRelasi?: KegiatanRapatDataMasterUpdateManyWithoutDataMasterNestedInput
   }
 
   export type DataMasterUncheckedUpdateInput = {
@@ -13793,6 +15108,7 @@ export namespace Prisma {
     diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    dataMasterRelasi?: KegiatanRapatDataMasterUncheckedUpdateManyWithoutDataMasterNestedInput
   }
 
   export type DataMasterCreateManyInput = {
@@ -13851,6 +15167,7 @@ export namespace Prisma {
     dibuatOleh: UserCreateNestedOneWithoutKegiatanRapatDibuatInput
     diprosesOleh?: UserCreateNestedOneWithoutKegiatanRapatDiprosesInput
     masukanRelasi?: KegiatanRapatMasukanCreateNestedManyWithoutKegiatanRapatInput
+    dataMasterRelasi?: KegiatanRapatDataMasterCreateNestedManyWithoutKegiatanRapatInput
   }
 
   export type KegiatanRapatUncheckedCreateInput = {
@@ -13872,6 +15189,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     masukanRelasi?: KegiatanRapatMasukanUncheckedCreateNestedManyWithoutKegiatanRapatInput
+    dataMasterRelasi?: KegiatanRapatDataMasterUncheckedCreateNestedManyWithoutKegiatanRapatInput
   }
 
   export type KegiatanRapatUpdateInput = {
@@ -13893,6 +15211,7 @@ export namespace Prisma {
     dibuatOleh?: UserUpdateOneRequiredWithoutKegiatanRapatDibuatNestedInput
     diprosesOleh?: UserUpdateOneWithoutKegiatanRapatDiprosesNestedInput
     masukanRelasi?: KegiatanRapatMasukanUpdateManyWithoutKegiatanRapatNestedInput
+    dataMasterRelasi?: KegiatanRapatDataMasterUpdateManyWithoutKegiatanRapatNestedInput
   }
 
   export type KegiatanRapatUncheckedUpdateInput = {
@@ -13914,6 +15233,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     masukanRelasi?: KegiatanRapatMasukanUncheckedUpdateManyWithoutKegiatanRapatNestedInput
+    dataMasterRelasi?: KegiatanRapatDataMasterUncheckedUpdateManyWithoutKegiatanRapatNestedInput
   }
 
   export type KegiatanRapatCreateManyInput = {
@@ -14017,6 +15337,53 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     kegiatanRapatId?: StringFieldUpdateOperationsInput | string
     masukanId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KegiatanRapatDataMasterCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    kegiatanRapat: KegiatanRapatCreateNestedOneWithoutDataMasterRelasiInput
+    dataMaster: DataMasterCreateNestedOneWithoutDataMasterRelasiInput
+  }
+
+  export type KegiatanRapatDataMasterUncheckedCreateInput = {
+    id?: string
+    kegiatanRapatId: string
+    dataMasterId: string
+    createdAt?: Date | string
+  }
+
+  export type KegiatanRapatDataMasterUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    kegiatanRapat?: KegiatanRapatUpdateOneRequiredWithoutDataMasterRelasiNestedInput
+    dataMaster?: DataMasterUpdateOneRequiredWithoutDataMasterRelasiNestedInput
+  }
+
+  export type KegiatanRapatDataMasterUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kegiatanRapatId?: StringFieldUpdateOperationsInput | string
+    dataMasterId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KegiatanRapatDataMasterCreateManyInput = {
+    id?: string
+    kegiatanRapatId: string
+    dataMasterId: string
+    createdAt?: Date | string
+  }
+
+  export type KegiatanRapatDataMasterUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KegiatanRapatDataMasterUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kegiatanRapatId?: StringFieldUpdateOperationsInput | string
+    dataMasterId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -14643,6 +16010,16 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
+  export type KegiatanRapatDataMasterListRelationFilter = {
+    every?: KegiatanRapatDataMasterWhereInput
+    some?: KegiatanRapatDataMasterWhereInput
+    none?: KegiatanRapatDataMasterWhereInput
+  }
+
+  export type KegiatanRapatDataMasterOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type DataMasterDomainIsuIdNamaAtributCompoundUniqueInput = {
     domainIsuId: string
     namaAtribut: string
@@ -14927,6 +16304,37 @@ export namespace Prisma {
     id?: SortOrder
     kegiatanRapatId?: SortOrder
     masukanId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DataMasterScalarRelationFilter = {
+    is?: DataMasterWhereInput
+    isNot?: DataMasterWhereInput
+  }
+
+  export type KegiatanRapatDataMasterKegiatanRapatIdDataMasterIdCompoundUniqueInput = {
+    kegiatanRapatId: string
+    dataMasterId: string
+  }
+
+  export type KegiatanRapatDataMasterCountOrderByAggregateInput = {
+    id?: SortOrder
+    kegiatanRapatId?: SortOrder
+    dataMasterId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type KegiatanRapatDataMasterMaxOrderByAggregateInput = {
+    id?: SortOrder
+    kegiatanRapatId?: SortOrder
+    dataMasterId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type KegiatanRapatDataMasterMinOrderByAggregateInput = {
+    id?: SortOrder
+    kegiatanRapatId?: SortOrder
+    dataMasterId?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -15549,6 +16957,20 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type KegiatanRapatDataMasterCreateNestedManyWithoutDataMasterInput = {
+    create?: XOR<KegiatanRapatDataMasterCreateWithoutDataMasterInput, KegiatanRapatDataMasterUncheckedCreateWithoutDataMasterInput> | KegiatanRapatDataMasterCreateWithoutDataMasterInput[] | KegiatanRapatDataMasterUncheckedCreateWithoutDataMasterInput[]
+    connectOrCreate?: KegiatanRapatDataMasterCreateOrConnectWithoutDataMasterInput | KegiatanRapatDataMasterCreateOrConnectWithoutDataMasterInput[]
+    createMany?: KegiatanRapatDataMasterCreateManyDataMasterInputEnvelope
+    connect?: KegiatanRapatDataMasterWhereUniqueInput | KegiatanRapatDataMasterWhereUniqueInput[]
+  }
+
+  export type KegiatanRapatDataMasterUncheckedCreateNestedManyWithoutDataMasterInput = {
+    create?: XOR<KegiatanRapatDataMasterCreateWithoutDataMasterInput, KegiatanRapatDataMasterUncheckedCreateWithoutDataMasterInput> | KegiatanRapatDataMasterCreateWithoutDataMasterInput[] | KegiatanRapatDataMasterUncheckedCreateWithoutDataMasterInput[]
+    connectOrCreate?: KegiatanRapatDataMasterCreateOrConnectWithoutDataMasterInput | KegiatanRapatDataMasterCreateOrConnectWithoutDataMasterInput[]
+    createMany?: KegiatanRapatDataMasterCreateManyDataMasterInputEnvelope
+    connect?: KegiatanRapatDataMasterWhereUniqueInput | KegiatanRapatDataMasterWhereUniqueInput[]
+  }
+
   export type EnumNilaiKritikalitasFieldUpdateOperationsInput = {
     set?: $Enums.NilaiKritikalitas
   }
@@ -15579,6 +17001,34 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutDataMasterDibuatInput, UserUpdateWithoutDataMasterDibuatInput>, UserUncheckedUpdateWithoutDataMasterDibuatInput>
   }
 
+  export type KegiatanRapatDataMasterUpdateManyWithoutDataMasterNestedInput = {
+    create?: XOR<KegiatanRapatDataMasterCreateWithoutDataMasterInput, KegiatanRapatDataMasterUncheckedCreateWithoutDataMasterInput> | KegiatanRapatDataMasterCreateWithoutDataMasterInput[] | KegiatanRapatDataMasterUncheckedCreateWithoutDataMasterInput[]
+    connectOrCreate?: KegiatanRapatDataMasterCreateOrConnectWithoutDataMasterInput | KegiatanRapatDataMasterCreateOrConnectWithoutDataMasterInput[]
+    upsert?: KegiatanRapatDataMasterUpsertWithWhereUniqueWithoutDataMasterInput | KegiatanRapatDataMasterUpsertWithWhereUniqueWithoutDataMasterInput[]
+    createMany?: KegiatanRapatDataMasterCreateManyDataMasterInputEnvelope
+    set?: KegiatanRapatDataMasterWhereUniqueInput | KegiatanRapatDataMasterWhereUniqueInput[]
+    disconnect?: KegiatanRapatDataMasterWhereUniqueInput | KegiatanRapatDataMasterWhereUniqueInput[]
+    delete?: KegiatanRapatDataMasterWhereUniqueInput | KegiatanRapatDataMasterWhereUniqueInput[]
+    connect?: KegiatanRapatDataMasterWhereUniqueInput | KegiatanRapatDataMasterWhereUniqueInput[]
+    update?: KegiatanRapatDataMasterUpdateWithWhereUniqueWithoutDataMasterInput | KegiatanRapatDataMasterUpdateWithWhereUniqueWithoutDataMasterInput[]
+    updateMany?: KegiatanRapatDataMasterUpdateManyWithWhereWithoutDataMasterInput | KegiatanRapatDataMasterUpdateManyWithWhereWithoutDataMasterInput[]
+    deleteMany?: KegiatanRapatDataMasterScalarWhereInput | KegiatanRapatDataMasterScalarWhereInput[]
+  }
+
+  export type KegiatanRapatDataMasterUncheckedUpdateManyWithoutDataMasterNestedInput = {
+    create?: XOR<KegiatanRapatDataMasterCreateWithoutDataMasterInput, KegiatanRapatDataMasterUncheckedCreateWithoutDataMasterInput> | KegiatanRapatDataMasterCreateWithoutDataMasterInput[] | KegiatanRapatDataMasterUncheckedCreateWithoutDataMasterInput[]
+    connectOrCreate?: KegiatanRapatDataMasterCreateOrConnectWithoutDataMasterInput | KegiatanRapatDataMasterCreateOrConnectWithoutDataMasterInput[]
+    upsert?: KegiatanRapatDataMasterUpsertWithWhereUniqueWithoutDataMasterInput | KegiatanRapatDataMasterUpsertWithWhereUniqueWithoutDataMasterInput[]
+    createMany?: KegiatanRapatDataMasterCreateManyDataMasterInputEnvelope
+    set?: KegiatanRapatDataMasterWhereUniqueInput | KegiatanRapatDataMasterWhereUniqueInput[]
+    disconnect?: KegiatanRapatDataMasterWhereUniqueInput | KegiatanRapatDataMasterWhereUniqueInput[]
+    delete?: KegiatanRapatDataMasterWhereUniqueInput | KegiatanRapatDataMasterWhereUniqueInput[]
+    connect?: KegiatanRapatDataMasterWhereUniqueInput | KegiatanRapatDataMasterWhereUniqueInput[]
+    update?: KegiatanRapatDataMasterUpdateWithWhereUniqueWithoutDataMasterInput | KegiatanRapatDataMasterUpdateWithWhereUniqueWithoutDataMasterInput[]
+    updateMany?: KegiatanRapatDataMasterUpdateManyWithWhereWithoutDataMasterInput | KegiatanRapatDataMasterUpdateManyWithWhereWithoutDataMasterInput[]
+    deleteMany?: KegiatanRapatDataMasterScalarWhereInput | KegiatanRapatDataMasterScalarWhereInput[]
+  }
+
   export type DomainIsuCreateNestedOneWithoutKegiatanRapatInput = {
     create?: XOR<DomainIsuCreateWithoutKegiatanRapatInput, DomainIsuUncheckedCreateWithoutKegiatanRapatInput>
     connectOrCreate?: DomainIsuCreateOrConnectWithoutKegiatanRapatInput
@@ -15604,11 +17054,25 @@ export namespace Prisma {
     connect?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
   }
 
+  export type KegiatanRapatDataMasterCreateNestedManyWithoutKegiatanRapatInput = {
+    create?: XOR<KegiatanRapatDataMasterCreateWithoutKegiatanRapatInput, KegiatanRapatDataMasterUncheckedCreateWithoutKegiatanRapatInput> | KegiatanRapatDataMasterCreateWithoutKegiatanRapatInput[] | KegiatanRapatDataMasterUncheckedCreateWithoutKegiatanRapatInput[]
+    connectOrCreate?: KegiatanRapatDataMasterCreateOrConnectWithoutKegiatanRapatInput | KegiatanRapatDataMasterCreateOrConnectWithoutKegiatanRapatInput[]
+    createMany?: KegiatanRapatDataMasterCreateManyKegiatanRapatInputEnvelope
+    connect?: KegiatanRapatDataMasterWhereUniqueInput | KegiatanRapatDataMasterWhereUniqueInput[]
+  }
+
   export type KegiatanRapatMasukanUncheckedCreateNestedManyWithoutKegiatanRapatInput = {
     create?: XOR<KegiatanRapatMasukanCreateWithoutKegiatanRapatInput, KegiatanRapatMasukanUncheckedCreateWithoutKegiatanRapatInput> | KegiatanRapatMasukanCreateWithoutKegiatanRapatInput[] | KegiatanRapatMasukanUncheckedCreateWithoutKegiatanRapatInput[]
     connectOrCreate?: KegiatanRapatMasukanCreateOrConnectWithoutKegiatanRapatInput | KegiatanRapatMasukanCreateOrConnectWithoutKegiatanRapatInput[]
     createMany?: KegiatanRapatMasukanCreateManyKegiatanRapatInputEnvelope
     connect?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
+  }
+
+  export type KegiatanRapatDataMasterUncheckedCreateNestedManyWithoutKegiatanRapatInput = {
+    create?: XOR<KegiatanRapatDataMasterCreateWithoutKegiatanRapatInput, KegiatanRapatDataMasterUncheckedCreateWithoutKegiatanRapatInput> | KegiatanRapatDataMasterCreateWithoutKegiatanRapatInput[] | KegiatanRapatDataMasterUncheckedCreateWithoutKegiatanRapatInput[]
+    connectOrCreate?: KegiatanRapatDataMasterCreateOrConnectWithoutKegiatanRapatInput | KegiatanRapatDataMasterCreateOrConnectWithoutKegiatanRapatInput[]
+    createMany?: KegiatanRapatDataMasterCreateManyKegiatanRapatInputEnvelope
+    connect?: KegiatanRapatDataMasterWhereUniqueInput | KegiatanRapatDataMasterWhereUniqueInput[]
   }
 
   export type EnumModeRekomendasiFieldUpdateOperationsInput = {
@@ -15663,6 +17127,20 @@ export namespace Prisma {
     deleteMany?: KegiatanRapatMasukanScalarWhereInput | KegiatanRapatMasukanScalarWhereInput[]
   }
 
+  export type KegiatanRapatDataMasterUpdateManyWithoutKegiatanRapatNestedInput = {
+    create?: XOR<KegiatanRapatDataMasterCreateWithoutKegiatanRapatInput, KegiatanRapatDataMasterUncheckedCreateWithoutKegiatanRapatInput> | KegiatanRapatDataMasterCreateWithoutKegiatanRapatInput[] | KegiatanRapatDataMasterUncheckedCreateWithoutKegiatanRapatInput[]
+    connectOrCreate?: KegiatanRapatDataMasterCreateOrConnectWithoutKegiatanRapatInput | KegiatanRapatDataMasterCreateOrConnectWithoutKegiatanRapatInput[]
+    upsert?: KegiatanRapatDataMasterUpsertWithWhereUniqueWithoutKegiatanRapatInput | KegiatanRapatDataMasterUpsertWithWhereUniqueWithoutKegiatanRapatInput[]
+    createMany?: KegiatanRapatDataMasterCreateManyKegiatanRapatInputEnvelope
+    set?: KegiatanRapatDataMasterWhereUniqueInput | KegiatanRapatDataMasterWhereUniqueInput[]
+    disconnect?: KegiatanRapatDataMasterWhereUniqueInput | KegiatanRapatDataMasterWhereUniqueInput[]
+    delete?: KegiatanRapatDataMasterWhereUniqueInput | KegiatanRapatDataMasterWhereUniqueInput[]
+    connect?: KegiatanRapatDataMasterWhereUniqueInput | KegiatanRapatDataMasterWhereUniqueInput[]
+    update?: KegiatanRapatDataMasterUpdateWithWhereUniqueWithoutKegiatanRapatInput | KegiatanRapatDataMasterUpdateWithWhereUniqueWithoutKegiatanRapatInput[]
+    updateMany?: KegiatanRapatDataMasterUpdateManyWithWhereWithoutKegiatanRapatInput | KegiatanRapatDataMasterUpdateManyWithWhereWithoutKegiatanRapatInput[]
+    deleteMany?: KegiatanRapatDataMasterScalarWhereInput | KegiatanRapatDataMasterScalarWhereInput[]
+  }
+
   export type KegiatanRapatMasukanUncheckedUpdateManyWithoutKegiatanRapatNestedInput = {
     create?: XOR<KegiatanRapatMasukanCreateWithoutKegiatanRapatInput, KegiatanRapatMasukanUncheckedCreateWithoutKegiatanRapatInput> | KegiatanRapatMasukanCreateWithoutKegiatanRapatInput[] | KegiatanRapatMasukanUncheckedCreateWithoutKegiatanRapatInput[]
     connectOrCreate?: KegiatanRapatMasukanCreateOrConnectWithoutKegiatanRapatInput | KegiatanRapatMasukanCreateOrConnectWithoutKegiatanRapatInput[]
@@ -15675,6 +17153,20 @@ export namespace Prisma {
     update?: KegiatanRapatMasukanUpdateWithWhereUniqueWithoutKegiatanRapatInput | KegiatanRapatMasukanUpdateWithWhereUniqueWithoutKegiatanRapatInput[]
     updateMany?: KegiatanRapatMasukanUpdateManyWithWhereWithoutKegiatanRapatInput | KegiatanRapatMasukanUpdateManyWithWhereWithoutKegiatanRapatInput[]
     deleteMany?: KegiatanRapatMasukanScalarWhereInput | KegiatanRapatMasukanScalarWhereInput[]
+  }
+
+  export type KegiatanRapatDataMasterUncheckedUpdateManyWithoutKegiatanRapatNestedInput = {
+    create?: XOR<KegiatanRapatDataMasterCreateWithoutKegiatanRapatInput, KegiatanRapatDataMasterUncheckedCreateWithoutKegiatanRapatInput> | KegiatanRapatDataMasterCreateWithoutKegiatanRapatInput[] | KegiatanRapatDataMasterUncheckedCreateWithoutKegiatanRapatInput[]
+    connectOrCreate?: KegiatanRapatDataMasterCreateOrConnectWithoutKegiatanRapatInput | KegiatanRapatDataMasterCreateOrConnectWithoutKegiatanRapatInput[]
+    upsert?: KegiatanRapatDataMasterUpsertWithWhereUniqueWithoutKegiatanRapatInput | KegiatanRapatDataMasterUpsertWithWhereUniqueWithoutKegiatanRapatInput[]
+    createMany?: KegiatanRapatDataMasterCreateManyKegiatanRapatInputEnvelope
+    set?: KegiatanRapatDataMasterWhereUniqueInput | KegiatanRapatDataMasterWhereUniqueInput[]
+    disconnect?: KegiatanRapatDataMasterWhereUniqueInput | KegiatanRapatDataMasterWhereUniqueInput[]
+    delete?: KegiatanRapatDataMasterWhereUniqueInput | KegiatanRapatDataMasterWhereUniqueInput[]
+    connect?: KegiatanRapatDataMasterWhereUniqueInput | KegiatanRapatDataMasterWhereUniqueInput[]
+    update?: KegiatanRapatDataMasterUpdateWithWhereUniqueWithoutKegiatanRapatInput | KegiatanRapatDataMasterUpdateWithWhereUniqueWithoutKegiatanRapatInput[]
+    updateMany?: KegiatanRapatDataMasterUpdateManyWithWhereWithoutKegiatanRapatInput | KegiatanRapatDataMasterUpdateManyWithWhereWithoutKegiatanRapatInput[]
+    deleteMany?: KegiatanRapatDataMasterScalarWhereInput | KegiatanRapatDataMasterScalarWhereInput[]
   }
 
   export type KegiatanRapatCreateNestedOneWithoutMasukanRelasiInput = {
@@ -15703,6 +17195,34 @@ export namespace Prisma {
     upsert?: MasukanWargaUpsertWithoutRelasiRapatInput
     connect?: MasukanWargaWhereUniqueInput
     update?: XOR<XOR<MasukanWargaUpdateToOneWithWhereWithoutRelasiRapatInput, MasukanWargaUpdateWithoutRelasiRapatInput>, MasukanWargaUncheckedUpdateWithoutRelasiRapatInput>
+  }
+
+  export type KegiatanRapatCreateNestedOneWithoutDataMasterRelasiInput = {
+    create?: XOR<KegiatanRapatCreateWithoutDataMasterRelasiInput, KegiatanRapatUncheckedCreateWithoutDataMasterRelasiInput>
+    connectOrCreate?: KegiatanRapatCreateOrConnectWithoutDataMasterRelasiInput
+    connect?: KegiatanRapatWhereUniqueInput
+  }
+
+  export type DataMasterCreateNestedOneWithoutDataMasterRelasiInput = {
+    create?: XOR<DataMasterCreateWithoutDataMasterRelasiInput, DataMasterUncheckedCreateWithoutDataMasterRelasiInput>
+    connectOrCreate?: DataMasterCreateOrConnectWithoutDataMasterRelasiInput
+    connect?: DataMasterWhereUniqueInput
+  }
+
+  export type KegiatanRapatUpdateOneRequiredWithoutDataMasterRelasiNestedInput = {
+    create?: XOR<KegiatanRapatCreateWithoutDataMasterRelasiInput, KegiatanRapatUncheckedCreateWithoutDataMasterRelasiInput>
+    connectOrCreate?: KegiatanRapatCreateOrConnectWithoutDataMasterRelasiInput
+    upsert?: KegiatanRapatUpsertWithoutDataMasterRelasiInput
+    connect?: KegiatanRapatWhereUniqueInput
+    update?: XOR<XOR<KegiatanRapatUpdateToOneWithWhereWithoutDataMasterRelasiInput, KegiatanRapatUpdateWithoutDataMasterRelasiInput>, KegiatanRapatUncheckedUpdateWithoutDataMasterRelasiInput>
+  }
+
+  export type DataMasterUpdateOneRequiredWithoutDataMasterRelasiNestedInput = {
+    create?: XOR<DataMasterCreateWithoutDataMasterRelasiInput, DataMasterUncheckedCreateWithoutDataMasterRelasiInput>
+    connectOrCreate?: DataMasterCreateOrConnectWithoutDataMasterRelasiInput
+    upsert?: DataMasterUpsertWithoutDataMasterRelasiInput
+    connect?: DataMasterWhereUniqueInput
+    update?: XOR<XOR<DataMasterUpdateToOneWithWhereWithoutDataMasterRelasiInput, DataMasterUpdateWithoutDataMasterRelasiInput>, DataMasterUncheckedUpdateWithoutDataMasterRelasiInput>
   }
 
   export type UserCreateNestedOneWithoutSessionsInput = {
@@ -16084,6 +17604,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     diprosesOleh?: UserCreateNestedOneWithoutDataMasterDibuatInput
+    dataMasterRelasi?: KegiatanRapatDataMasterCreateNestedManyWithoutDataMasterInput
   }
 
   export type DataMasterUncheckedCreateWithoutDomainIsuInput = {
@@ -16096,6 +17617,7 @@ export namespace Prisma {
     diprosesOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    dataMasterRelasi?: KegiatanRapatDataMasterUncheckedCreateNestedManyWithoutDataMasterInput
   }
 
   export type DataMasterCreateOrConnectWithoutDomainIsuInput = {
@@ -16126,6 +17648,7 @@ export namespace Prisma {
     dibuatOleh: UserCreateNestedOneWithoutKegiatanRapatDibuatInput
     diprosesOleh?: UserCreateNestedOneWithoutKegiatanRapatDiprosesInput
     masukanRelasi?: KegiatanRapatMasukanCreateNestedManyWithoutKegiatanRapatInput
+    dataMasterRelasi?: KegiatanRapatDataMasterCreateNestedManyWithoutKegiatanRapatInput
   }
 
   export type KegiatanRapatUncheckedCreateWithoutDomainIsuInput = {
@@ -16146,6 +17669,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     masukanRelasi?: KegiatanRapatMasukanUncheckedCreateNestedManyWithoutKegiatanRapatInput
+    dataMasterRelasi?: KegiatanRapatDataMasterUncheckedCreateNestedManyWithoutKegiatanRapatInput
   }
 
   export type KegiatanRapatCreateOrConnectWithoutDomainIsuInput = {
@@ -16324,6 +17848,7 @@ export namespace Prisma {
     domainIsu: DomainIsuCreateNestedOneWithoutKegiatanRapatInput
     dibuatOleh: UserCreateNestedOneWithoutKegiatanRapatDibuatInput
     masukanRelasi?: KegiatanRapatMasukanCreateNestedManyWithoutKegiatanRapatInput
+    dataMasterRelasi?: KegiatanRapatDataMasterCreateNestedManyWithoutKegiatanRapatInput
   }
 
   export type KegiatanRapatUncheckedCreateWithoutDiprosesOlehInput = {
@@ -16344,6 +17869,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     masukanRelasi?: KegiatanRapatMasukanUncheckedCreateNestedManyWithoutKegiatanRapatInput
+    dataMasterRelasi?: KegiatanRapatDataMasterUncheckedCreateNestedManyWithoutKegiatanRapatInput
   }
 
   export type KegiatanRapatCreateOrConnectWithoutDiprosesOlehInput = {
@@ -16374,6 +17900,7 @@ export namespace Prisma {
     domainIsu: DomainIsuCreateNestedOneWithoutKegiatanRapatInput
     diprosesOleh?: UserCreateNestedOneWithoutKegiatanRapatDiprosesInput
     masukanRelasi?: KegiatanRapatMasukanCreateNestedManyWithoutKegiatanRapatInput
+    dataMasterRelasi?: KegiatanRapatDataMasterCreateNestedManyWithoutKegiatanRapatInput
   }
 
   export type KegiatanRapatUncheckedCreateWithoutDibuatOlehInput = {
@@ -16394,6 +17921,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     masukanRelasi?: KegiatanRapatMasukanUncheckedCreateNestedManyWithoutKegiatanRapatInput
+    dataMasterRelasi?: KegiatanRapatDataMasterUncheckedCreateNestedManyWithoutKegiatanRapatInput
   }
 
   export type KegiatanRapatCreateOrConnectWithoutDibuatOlehInput = {
@@ -16416,6 +17944,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     domainIsu: DomainIsuCreateNestedOneWithoutDataMasterInput
+    dataMasterRelasi?: KegiatanRapatDataMasterCreateNestedManyWithoutDataMasterInput
   }
 
   export type DataMasterUncheckedCreateWithoutDiprosesOlehInput = {
@@ -16428,6 +17957,7 @@ export namespace Prisma {
     tahunData?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    dataMasterRelasi?: KegiatanRapatDataMasterUncheckedCreateNestedManyWithoutDataMasterInput
   }
 
   export type DataMasterCreateOrConnectWithoutDiprosesOlehInput = {
@@ -16915,6 +18445,28 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutDataMasterDibuatInput, UserUncheckedCreateWithoutDataMasterDibuatInput>
   }
 
+  export type KegiatanRapatDataMasterCreateWithoutDataMasterInput = {
+    id?: string
+    createdAt?: Date | string
+    kegiatanRapat: KegiatanRapatCreateNestedOneWithoutDataMasterRelasiInput
+  }
+
+  export type KegiatanRapatDataMasterUncheckedCreateWithoutDataMasterInput = {
+    id?: string
+    kegiatanRapatId: string
+    createdAt?: Date | string
+  }
+
+  export type KegiatanRapatDataMasterCreateOrConnectWithoutDataMasterInput = {
+    where: KegiatanRapatDataMasterWhereUniqueInput
+    create: XOR<KegiatanRapatDataMasterCreateWithoutDataMasterInput, KegiatanRapatDataMasterUncheckedCreateWithoutDataMasterInput>
+  }
+
+  export type KegiatanRapatDataMasterCreateManyDataMasterInputEnvelope = {
+    data: KegiatanRapatDataMasterCreateManyDataMasterInput | KegiatanRapatDataMasterCreateManyDataMasterInput[]
+    skipDuplicates?: boolean
+  }
+
   export type DomainIsuUpsertWithoutDataMasterInput = {
     update: XOR<DomainIsuUpdateWithoutDataMasterInput, DomainIsuUncheckedUpdateWithoutDataMasterInput>
     create: XOR<DomainIsuCreateWithoutDataMasterInput, DomainIsuUncheckedCreateWithoutDataMasterInput>
@@ -16993,6 +18545,32 @@ export namespace Prisma {
     kegiatanRapatDibuat?: KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type KegiatanRapatDataMasterUpsertWithWhereUniqueWithoutDataMasterInput = {
+    where: KegiatanRapatDataMasterWhereUniqueInput
+    update: XOR<KegiatanRapatDataMasterUpdateWithoutDataMasterInput, KegiatanRapatDataMasterUncheckedUpdateWithoutDataMasterInput>
+    create: XOR<KegiatanRapatDataMasterCreateWithoutDataMasterInput, KegiatanRapatDataMasterUncheckedCreateWithoutDataMasterInput>
+  }
+
+  export type KegiatanRapatDataMasterUpdateWithWhereUniqueWithoutDataMasterInput = {
+    where: KegiatanRapatDataMasterWhereUniqueInput
+    data: XOR<KegiatanRapatDataMasterUpdateWithoutDataMasterInput, KegiatanRapatDataMasterUncheckedUpdateWithoutDataMasterInput>
+  }
+
+  export type KegiatanRapatDataMasterUpdateManyWithWhereWithoutDataMasterInput = {
+    where: KegiatanRapatDataMasterScalarWhereInput
+    data: XOR<KegiatanRapatDataMasterUpdateManyMutationInput, KegiatanRapatDataMasterUncheckedUpdateManyWithoutDataMasterInput>
+  }
+
+  export type KegiatanRapatDataMasterScalarWhereInput = {
+    AND?: KegiatanRapatDataMasterScalarWhereInput | KegiatanRapatDataMasterScalarWhereInput[]
+    OR?: KegiatanRapatDataMasterScalarWhereInput[]
+    NOT?: KegiatanRapatDataMasterScalarWhereInput | KegiatanRapatDataMasterScalarWhereInput[]
+    id?: StringFilter<"KegiatanRapatDataMaster"> | string
+    kegiatanRapatId?: StringFilter<"KegiatanRapatDataMaster"> | string
+    dataMasterId?: StringFilter<"KegiatanRapatDataMaster"> | string
+    createdAt?: DateTimeFilter<"KegiatanRapatDataMaster"> | Date | string
   }
 
   export type DomainIsuCreateWithoutKegiatanRapatInput = {
@@ -17123,6 +18701,28 @@ export namespace Prisma {
 
   export type KegiatanRapatMasukanCreateManyKegiatanRapatInputEnvelope = {
     data: KegiatanRapatMasukanCreateManyKegiatanRapatInput | KegiatanRapatMasukanCreateManyKegiatanRapatInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type KegiatanRapatDataMasterCreateWithoutKegiatanRapatInput = {
+    id?: string
+    createdAt?: Date | string
+    dataMaster: DataMasterCreateNestedOneWithoutDataMasterRelasiInput
+  }
+
+  export type KegiatanRapatDataMasterUncheckedCreateWithoutKegiatanRapatInput = {
+    id?: string
+    dataMasterId: string
+    createdAt?: Date | string
+  }
+
+  export type KegiatanRapatDataMasterCreateOrConnectWithoutKegiatanRapatInput = {
+    where: KegiatanRapatDataMasterWhereUniqueInput
+    create: XOR<KegiatanRapatDataMasterCreateWithoutKegiatanRapatInput, KegiatanRapatDataMasterUncheckedCreateWithoutKegiatanRapatInput>
+  }
+
+  export type KegiatanRapatDataMasterCreateManyKegiatanRapatInputEnvelope = {
+    data: KegiatanRapatDataMasterCreateManyKegiatanRapatInput | KegiatanRapatDataMasterCreateManyKegiatanRapatInput[]
     skipDuplicates?: boolean
   }
 
@@ -17269,6 +18869,22 @@ export namespace Prisma {
     data: XOR<KegiatanRapatMasukanUpdateManyMutationInput, KegiatanRapatMasukanUncheckedUpdateManyWithoutKegiatanRapatInput>
   }
 
+  export type KegiatanRapatDataMasterUpsertWithWhereUniqueWithoutKegiatanRapatInput = {
+    where: KegiatanRapatDataMasterWhereUniqueInput
+    update: XOR<KegiatanRapatDataMasterUpdateWithoutKegiatanRapatInput, KegiatanRapatDataMasterUncheckedUpdateWithoutKegiatanRapatInput>
+    create: XOR<KegiatanRapatDataMasterCreateWithoutKegiatanRapatInput, KegiatanRapatDataMasterUncheckedCreateWithoutKegiatanRapatInput>
+  }
+
+  export type KegiatanRapatDataMasterUpdateWithWhereUniqueWithoutKegiatanRapatInput = {
+    where: KegiatanRapatDataMasterWhereUniqueInput
+    data: XOR<KegiatanRapatDataMasterUpdateWithoutKegiatanRapatInput, KegiatanRapatDataMasterUncheckedUpdateWithoutKegiatanRapatInput>
+  }
+
+  export type KegiatanRapatDataMasterUpdateManyWithWhereWithoutKegiatanRapatInput = {
+    where: KegiatanRapatDataMasterScalarWhereInput
+    data: XOR<KegiatanRapatDataMasterUpdateManyMutationInput, KegiatanRapatDataMasterUncheckedUpdateManyWithoutKegiatanRapatInput>
+  }
+
   export type KegiatanRapatCreateWithoutMasukanRelasiInput = {
     id?: string
     judul: string
@@ -17287,6 +18903,7 @@ export namespace Prisma {
     domainIsu: DomainIsuCreateNestedOneWithoutKegiatanRapatInput
     dibuatOleh: UserCreateNestedOneWithoutKegiatanRapatDibuatInput
     diprosesOleh?: UserCreateNestedOneWithoutKegiatanRapatDiprosesInput
+    dataMasterRelasi?: KegiatanRapatDataMasterCreateNestedManyWithoutKegiatanRapatInput
   }
 
   export type KegiatanRapatUncheckedCreateWithoutMasukanRelasiInput = {
@@ -17307,6 +18924,7 @@ export namespace Prisma {
     diprosesOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    dataMasterRelasi?: KegiatanRapatDataMasterUncheckedCreateNestedManyWithoutKegiatanRapatInput
   }
 
   export type KegiatanRapatCreateOrConnectWithoutMasukanRelasiInput = {
@@ -17380,6 +18998,7 @@ export namespace Prisma {
     domainIsu?: DomainIsuUpdateOneRequiredWithoutKegiatanRapatNestedInput
     dibuatOleh?: UserUpdateOneRequiredWithoutKegiatanRapatDibuatNestedInput
     diprosesOleh?: UserUpdateOneWithoutKegiatanRapatDiprosesNestedInput
+    dataMasterRelasi?: KegiatanRapatDataMasterUpdateManyWithoutKegiatanRapatNestedInput
   }
 
   export type KegiatanRapatUncheckedUpdateWithoutMasukanRelasiInput = {
@@ -17400,6 +19019,7 @@ export namespace Prisma {
     diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    dataMasterRelasi?: KegiatanRapatDataMasterUncheckedUpdateManyWithoutKegiatanRapatNestedInput
   }
 
   export type MasukanWargaUpsertWithoutRelasiRapatInput = {
@@ -17441,6 +19061,174 @@ export namespace Prisma {
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     diverifikasiOlehId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KegiatanRapatCreateWithoutDataMasterRelasiInput = {
+    id?: string
+    judul: string
+    deskripsi: string
+    tanggal: Date | string
+    lokasi?: string | null
+    mode: $Enums.ModeRekomendasi
+    judulLaporan: string
+    rekomendasiItems: JsonNullValueInput | InputJsonValue
+    fingerprint: string
+    statusRekomendasi?: $Enums.StatusRekomendasi
+    aiModel?: string | null
+    aiProcessedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    domainIsu: DomainIsuCreateNestedOneWithoutKegiatanRapatInput
+    dibuatOleh: UserCreateNestedOneWithoutKegiatanRapatDibuatInput
+    diprosesOleh?: UserCreateNestedOneWithoutKegiatanRapatDiprosesInput
+    masukanRelasi?: KegiatanRapatMasukanCreateNestedManyWithoutKegiatanRapatInput
+  }
+
+  export type KegiatanRapatUncheckedCreateWithoutDataMasterRelasiInput = {
+    id?: string
+    judul: string
+    deskripsi: string
+    tanggal: Date | string
+    lokasi?: string | null
+    domainIsuId: string
+    dibuatOlehId: string
+    mode: $Enums.ModeRekomendasi
+    judulLaporan: string
+    rekomendasiItems: JsonNullValueInput | InputJsonValue
+    fingerprint: string
+    statusRekomendasi?: $Enums.StatusRekomendasi
+    aiModel?: string | null
+    aiProcessedAt?: Date | string | null
+    diprosesOlehId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    masukanRelasi?: KegiatanRapatMasukanUncheckedCreateNestedManyWithoutKegiatanRapatInput
+  }
+
+  export type KegiatanRapatCreateOrConnectWithoutDataMasterRelasiInput = {
+    where: KegiatanRapatWhereUniqueInput
+    create: XOR<KegiatanRapatCreateWithoutDataMasterRelasiInput, KegiatanRapatUncheckedCreateWithoutDataMasterRelasiInput>
+  }
+
+  export type DataMasterCreateWithoutDataMasterRelasiInput = {
+    id?: string
+    namaAtribut: string
+    kritikalitas: $Enums.NilaiKritikalitas
+    jumlah?: number | null
+    isActive?: boolean
+    tahunData?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    domainIsu: DomainIsuCreateNestedOneWithoutDataMasterInput
+    diprosesOleh?: UserCreateNestedOneWithoutDataMasterDibuatInput
+  }
+
+  export type DataMasterUncheckedCreateWithoutDataMasterRelasiInput = {
+    id?: string
+    domainIsuId: string
+    namaAtribut: string
+    kritikalitas: $Enums.NilaiKritikalitas
+    jumlah?: number | null
+    isActive?: boolean
+    tahunData?: number | null
+    diprosesOlehId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DataMasterCreateOrConnectWithoutDataMasterRelasiInput = {
+    where: DataMasterWhereUniqueInput
+    create: XOR<DataMasterCreateWithoutDataMasterRelasiInput, DataMasterUncheckedCreateWithoutDataMasterRelasiInput>
+  }
+
+  export type KegiatanRapatUpsertWithoutDataMasterRelasiInput = {
+    update: XOR<KegiatanRapatUpdateWithoutDataMasterRelasiInput, KegiatanRapatUncheckedUpdateWithoutDataMasterRelasiInput>
+    create: XOR<KegiatanRapatCreateWithoutDataMasterRelasiInput, KegiatanRapatUncheckedCreateWithoutDataMasterRelasiInput>
+    where?: KegiatanRapatWhereInput
+  }
+
+  export type KegiatanRapatUpdateToOneWithWhereWithoutDataMasterRelasiInput = {
+    where?: KegiatanRapatWhereInput
+    data: XOR<KegiatanRapatUpdateWithoutDataMasterRelasiInput, KegiatanRapatUncheckedUpdateWithoutDataMasterRelasiInput>
+  }
+
+  export type KegiatanRapatUpdateWithoutDataMasterRelasiInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    judul?: StringFieldUpdateOperationsInput | string
+    deskripsi?: StringFieldUpdateOperationsInput | string
+    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
+    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
+    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
+    judulLaporan?: StringFieldUpdateOperationsInput | string
+    rekomendasiItems?: JsonNullValueInput | InputJsonValue
+    fingerprint?: StringFieldUpdateOperationsInput | string
+    statusRekomendasi?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
+    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
+    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    domainIsu?: DomainIsuUpdateOneRequiredWithoutKegiatanRapatNestedInput
+    dibuatOleh?: UserUpdateOneRequiredWithoutKegiatanRapatDibuatNestedInput
+    diprosesOleh?: UserUpdateOneWithoutKegiatanRapatDiprosesNestedInput
+    masukanRelasi?: KegiatanRapatMasukanUpdateManyWithoutKegiatanRapatNestedInput
+  }
+
+  export type KegiatanRapatUncheckedUpdateWithoutDataMasterRelasiInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    judul?: StringFieldUpdateOperationsInput | string
+    deskripsi?: StringFieldUpdateOperationsInput | string
+    tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
+    lokasi?: NullableStringFieldUpdateOperationsInput | string | null
+    domainIsuId?: StringFieldUpdateOperationsInput | string
+    dibuatOlehId?: StringFieldUpdateOperationsInput | string
+    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
+    judulLaporan?: StringFieldUpdateOperationsInput | string
+    rekomendasiItems?: JsonNullValueInput | InputJsonValue
+    fingerprint?: StringFieldUpdateOperationsInput | string
+    statusRekomendasi?: EnumStatusRekomendasiFieldUpdateOperationsInput | $Enums.StatusRekomendasi
+    aiModel?: NullableStringFieldUpdateOperationsInput | string | null
+    aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    masukanRelasi?: KegiatanRapatMasukanUncheckedUpdateManyWithoutKegiatanRapatNestedInput
+  }
+
+  export type DataMasterUpsertWithoutDataMasterRelasiInput = {
+    update: XOR<DataMasterUpdateWithoutDataMasterRelasiInput, DataMasterUncheckedUpdateWithoutDataMasterRelasiInput>
+    create: XOR<DataMasterCreateWithoutDataMasterRelasiInput, DataMasterUncheckedCreateWithoutDataMasterRelasiInput>
+    where?: DataMasterWhereInput
+  }
+
+  export type DataMasterUpdateToOneWithWhereWithoutDataMasterRelasiInput = {
+    where?: DataMasterWhereInput
+    data: XOR<DataMasterUpdateWithoutDataMasterRelasiInput, DataMasterUncheckedUpdateWithoutDataMasterRelasiInput>
+  }
+
+  export type DataMasterUpdateWithoutDataMasterRelasiInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    namaAtribut?: StringFieldUpdateOperationsInput | string
+    kritikalitas?: EnumNilaiKritikalitasFieldUpdateOperationsInput | $Enums.NilaiKritikalitas
+    jumlah?: NullableIntFieldUpdateOperationsInput | number | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    tahunData?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    domainIsu?: DomainIsuUpdateOneRequiredWithoutDataMasterNestedInput
+    diprosesOleh?: UserUpdateOneWithoutDataMasterDibuatNestedInput
+  }
+
+  export type DataMasterUncheckedUpdateWithoutDataMasterRelasiInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    domainIsuId?: StringFieldUpdateOperationsInput | string
+    namaAtribut?: StringFieldUpdateOperationsInput | string
+    kritikalitas?: EnumNilaiKritikalitasFieldUpdateOperationsInput | $Enums.NilaiKritikalitas
+    jumlah?: NullableIntFieldUpdateOperationsInput | number | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    tahunData?: NullableIntFieldUpdateOperationsInput | number | null
+    diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -17724,6 +19512,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     diprosesOleh?: UserUpdateOneWithoutDataMasterDibuatNestedInput
+    dataMasterRelasi?: KegiatanRapatDataMasterUpdateManyWithoutDataMasterNestedInput
   }
 
   export type DataMasterUncheckedUpdateWithoutDomainIsuInput = {
@@ -17736,6 +19525,7 @@ export namespace Prisma {
     diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    dataMasterRelasi?: KegiatanRapatDataMasterUncheckedUpdateManyWithoutDataMasterNestedInput
   }
 
   export type DataMasterUncheckedUpdateManyWithoutDomainIsuInput = {
@@ -17768,6 +19558,7 @@ export namespace Prisma {
     dibuatOleh?: UserUpdateOneRequiredWithoutKegiatanRapatDibuatNestedInput
     diprosesOleh?: UserUpdateOneWithoutKegiatanRapatDiprosesNestedInput
     masukanRelasi?: KegiatanRapatMasukanUpdateManyWithoutKegiatanRapatNestedInput
+    dataMasterRelasi?: KegiatanRapatDataMasterUpdateManyWithoutKegiatanRapatNestedInput
   }
 
   export type KegiatanRapatUncheckedUpdateWithoutDomainIsuInput = {
@@ -17788,6 +19579,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     masukanRelasi?: KegiatanRapatMasukanUncheckedUpdateManyWithoutKegiatanRapatNestedInput
+    dataMasterRelasi?: KegiatanRapatDataMasterUncheckedUpdateManyWithoutKegiatanRapatNestedInput
   }
 
   export type KegiatanRapatUncheckedUpdateManyWithoutDomainIsuInput = {
@@ -17968,6 +19760,7 @@ export namespace Prisma {
     domainIsu?: DomainIsuUpdateOneRequiredWithoutKegiatanRapatNestedInput
     dibuatOleh?: UserUpdateOneRequiredWithoutKegiatanRapatDibuatNestedInput
     masukanRelasi?: KegiatanRapatMasukanUpdateManyWithoutKegiatanRapatNestedInput
+    dataMasterRelasi?: KegiatanRapatDataMasterUpdateManyWithoutKegiatanRapatNestedInput
   }
 
   export type KegiatanRapatUncheckedUpdateWithoutDiprosesOlehInput = {
@@ -17988,6 +19781,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     masukanRelasi?: KegiatanRapatMasukanUncheckedUpdateManyWithoutKegiatanRapatNestedInput
+    dataMasterRelasi?: KegiatanRapatDataMasterUncheckedUpdateManyWithoutKegiatanRapatNestedInput
   }
 
   export type KegiatanRapatUncheckedUpdateManyWithoutDiprosesOlehInput = {
@@ -18027,6 +19821,7 @@ export namespace Prisma {
     domainIsu?: DomainIsuUpdateOneRequiredWithoutKegiatanRapatNestedInput
     diprosesOleh?: UserUpdateOneWithoutKegiatanRapatDiprosesNestedInput
     masukanRelasi?: KegiatanRapatMasukanUpdateManyWithoutKegiatanRapatNestedInput
+    dataMasterRelasi?: KegiatanRapatDataMasterUpdateManyWithoutKegiatanRapatNestedInput
   }
 
   export type KegiatanRapatUncheckedUpdateWithoutDibuatOlehInput = {
@@ -18047,6 +19842,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     masukanRelasi?: KegiatanRapatMasukanUncheckedUpdateManyWithoutKegiatanRapatNestedInput
+    dataMasterRelasi?: KegiatanRapatDataMasterUncheckedUpdateManyWithoutKegiatanRapatNestedInput
   }
 
   export type KegiatanRapatUncheckedUpdateManyWithoutDibuatOlehInput = {
@@ -18078,6 +19874,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     domainIsu?: DomainIsuUpdateOneRequiredWithoutDataMasterNestedInput
+    dataMasterRelasi?: KegiatanRapatDataMasterUpdateManyWithoutDataMasterNestedInput
   }
 
   export type DataMasterUncheckedUpdateWithoutDiprosesOlehInput = {
@@ -18090,6 +19887,7 @@ export namespace Prisma {
     tahunData?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    dataMasterRelasi?: KegiatanRapatDataMasterUncheckedUpdateManyWithoutDataMasterNestedInput
   }
 
   export type DataMasterUncheckedUpdateManyWithoutDiprosesOlehInput = {
@@ -18215,9 +20013,39 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type KegiatanRapatDataMasterCreateManyDataMasterInput = {
+    id?: string
+    kegiatanRapatId: string
+    createdAt?: Date | string
+  }
+
+  export type KegiatanRapatDataMasterUpdateWithoutDataMasterInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    kegiatanRapat?: KegiatanRapatUpdateOneRequiredWithoutDataMasterRelasiNestedInput
+  }
+
+  export type KegiatanRapatDataMasterUncheckedUpdateWithoutDataMasterInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kegiatanRapatId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KegiatanRapatDataMasterUncheckedUpdateManyWithoutDataMasterInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kegiatanRapatId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type KegiatanRapatMasukanCreateManyKegiatanRapatInput = {
     id?: string
     masukanId: string
+    createdAt?: Date | string
+  }
+
+  export type KegiatanRapatDataMasterCreateManyKegiatanRapatInput = {
+    id?: string
+    dataMasterId: string
     createdAt?: Date | string
   }
 
@@ -18236,6 +20064,24 @@ export namespace Prisma {
   export type KegiatanRapatMasukanUncheckedUpdateManyWithoutKegiatanRapatInput = {
     id?: StringFieldUpdateOperationsInput | string
     masukanId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KegiatanRapatDataMasterUpdateWithoutKegiatanRapatInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    dataMaster?: DataMasterUpdateOneRequiredWithoutDataMasterRelasiNestedInput
+  }
+
+  export type KegiatanRapatDataMasterUncheckedUpdateWithoutKegiatanRapatInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dataMasterId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KegiatanRapatDataMasterUncheckedUpdateManyWithoutKegiatanRapatInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dataMasterId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

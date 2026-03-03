@@ -51,7 +51,7 @@ export function MasukanTerlibatTable({
               <TableRow className="cursor-pointer hover:bg-muted/50">
                 <TableCell>{item.masukan.id}</TableCell>
 
-                <TableCell className="max-w-[400px] text-sm truncate">
+                <TableCell className="max-w-100 text-sm truncate">
                   {truncate(item.masukan.deskripsiMasukan, 80)}
                 </TableCell>
 

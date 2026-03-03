@@ -147,6 +147,8 @@ model DataMaster {
   diprosesOlehId String?
   diprosesOleh   User?   @relation("PembuatDataMaster", fields: [diprosesOlehId], references: [id])
 
+  dataMasterRelasi KegiatanRapatDataMaster[]
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -191,6 +193,7 @@ model KegiatanRapat {
 
   // Relasi ke junction table (MENGGABUNGKAN)
   masukanRelasi  KegiatanRapatMasukan[]
+  dataMasterRelasi KegiatanRapatDataMaster[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -214,7 +217,7 @@ model KegiatanRapatMasukan {
 
   
   // Relasi
-  kegiatanRapat   KegiatanRapat @relation(fields: [kegiatanRapatId], references: [id])
+  kegiatanRapat   KegiatanRapat @relation(fields: [kegiatanRapatId], references: [id], onDelete: Cascade)
   masukan         MasukanWarga  @relation(fields: [masukanId], references: [id])
 
   createdAt DateTime @default(now())
@@ -223,6 +226,24 @@ model KegiatanRapatMasukan {
   @@index([kegiatanRapatId])
   @@index([masukanId])
   @@map("kegiatan_rapat_masukan")
+}
+
+model KegiatanRapatDataMaster {
+  id              String @id @default(cuid())
+  
+  kegiatanRapatId String
+  dataMasterId    String
+
+  // Relasi
+  kegiatanRapat   KegiatanRapat @relation(fields: [kegiatanRapatId], references: [id], onDelete: Cascade)
+  dataMaster      DataMaster    @relation(fields: [dataMasterId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([kegiatanRapatId, dataMasterId])
+  @@index([kegiatanRapatId])
+  @@index([dataMasterId])
+  @@map("kegiatan_rapat_data_master")
 }
 
 //////////////////////////

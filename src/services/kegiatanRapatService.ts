@@ -19,7 +19,6 @@ import { geminiAi, type GeminiResponse } from "@/lib/gemini";
 // ========================
 
 export type CreateKegiatanRapatInput = {
-  // Required fields (sesuai schema Prisma)
   judul: string;
   deskripsi: string;
   tanggal: Date | string;
@@ -28,8 +27,6 @@ export type CreateKegiatanRapatInput = {
   mode: ModeRekomendasi;
   judulLaporan: string;
   fingerprint?: string;
-
-  // Optional fields
   lokasi?: string | null;
   aiModel?: string | null;
   aiProcessedAt?: Date | string | null;
@@ -46,7 +43,6 @@ export type UpdateKegiatanRapatInput = Partial<
 >;
 
 export type KegiatanRapatGetAllParams = {
-  // Filter
   judul?: string;
   lokasi?: string;
   domainIsuId?: string;
@@ -61,12 +57,8 @@ export type KegiatanRapatGetAllParams = {
   tanggalFrom?: Date;
   tanggalTo?: Date;
   search?: string;
-
-  // Sorting
   sortBy?: keyof Prisma.KegiatanRapatOrderByWithRelationInput;
   sortOrder?: "asc" | "desc";
-
-  // Pagination
   page?: number;
   limit?: number;
 };
@@ -83,6 +75,25 @@ export function generateFingerprint(content: string): string {
 // HELPER: Parse RekomendasiItems JSON
 // ========================
 
+// Tipe RekomendasiItem yang diperbarui dengan field ID
+export type RekomendasiItem = {
+  prioritasKe: number;
+  deskripsi: string;
+  skorPrioritas: number;
+  alasanAnalisis: string;
+  domainIsuId: string;
+  lokasiRt?: string;
+  lokasiRw?: string;
+  fingerprint: string;
+  evidence?: {
+    masukanWargaCount?: number;
+    dataMasterCount?: number;
+    kritikalitas?: "KRITIS" | "TINGGI" | "SEDANG" | "RENDAH";
+  };
+  usedMasukanIds?: string[]; // ID masukan warga yang terkait dengan prioritas ini
+  usedDataMasterIds?: string[]; // ID data master yang terkait dengan prioritas ini
+};
+
 export type RekomendasiSnapshot = {
   metadata: {
     generatedAt: string;
@@ -92,21 +103,22 @@ export type RekomendasiSnapshot = {
     totalMasukanDianalisis: number;
     totalDataMasterDianalisis: number;
   };
-  prioritas: Array<{
-    prioritasKe: number;
-    deskripsi: string;
-    skorPrioritas: number;
-    alasanAnalisis: string;
-    domainIsuId: string;
-    lokasiRt?: string;
-    lokasiRw?: string;
-    fingerprint: string;
-    evidence?: {
-      masukanWargaCount?: number;
-      dataMasterCount?: number;
-      kritikalitas?: "KRITIS" | "TINGGI" | "SEDANG" | "RENDAH";
-    };
-  }>;
+  prioritas: RekomendasiItem[];
+  inputData?: {
+    masukan: Array<{
+      id: string;
+      judul: string;
+      deskripsi: string;
+      lokasiRt: string;
+      lokasiRw: string;
+    }>;
+    dataMaster: Array<{
+      id: string;
+      namaAtribut: string;
+      kritikalitas: "KRITIS" | "TINGGI" | "SEDANG" | "RENDAH";
+      jumlah: number | null;
+    }>;
+  };
 };
 
 export function parseRekomendasiItems(
@@ -254,13 +266,41 @@ export const kegiatanRapatService = {
     };
   },
 
-  // GET BY ID
+  // GET BY ID (dengan include relasi data master)
   getById: async (id: string) => {
     return prisma.kegiatanRapat.findUniqueOrThrow({
       where: { id },
       include: {
         dibuatOleh: { select: { name: true, jabatan: true } },
         domainIsu: { select: { nama: true, code: true } },
+        masukanRelasi: {
+          include: {
+            masukan: {
+              select: {
+                id: true,
+                judul: true,
+                deskripsi: true,
+                lokasiRt: true,
+                lokasiRw: true,
+                namaPengirim: true,
+                status: true,
+              },
+            },
+          },
+        },
+        dataMasterRelasi: {
+          include: {
+            dataMaster: {
+              select: {
+                id: true,
+                namaAtribut: true,
+                kritikalitas: true,
+                jumlah: true,
+                tahunData: true,
+              },
+            },
+          },
+        },
       },
     });
   },
@@ -284,7 +324,7 @@ export const kegiatanRapatService = {
     });
   },
 
-  // GET MASUKAN TERKAIT (Evidence Links)
+  // GET MASUKAN TERKAIT
   getMasukanTerkait: async (kegiatanRapatId: string) => {
     return prisma.kegiatanRapatMasukan.findMany({
       where: { kegiatanRapatId },
@@ -306,7 +346,7 @@ export const kegiatanRapatService = {
   },
 
   // ═══════════════════════════════════════════════════════════════
-  // 🤖 GENERATE REKOMENDASI AI (Integrated with Debug Logs)
+  // 🤖 GENERATE REKOMENDASI AI (dengan alokasi data berdasarkan evidence counts)
   // ═══════════════════════════════════════════════════════════════
 
   generateRekomendasi: async (args: {
@@ -326,27 +366,9 @@ export const kegiatanRapatService = {
       judulLaporan,
     } = args;
 
-    // 1. Fetch data relevan berdasarkan mode
+    // 1. Fetch data relevan
     let masukanWarga: any[] = [];
     if (mode === "FUSI_DATA") {
-      // 🔍 Hitung total data untuk debugging
-      const totalAll = await prisma.masukanWarga.count({
-        where: { domainIsuId },
-      });
-      const totalVerified = await prisma.masukanWarga.count({
-        where: { domainIsuId, status: StatusMasukan.DIVERIFIKASI },
-      });
-      console.log(
-        `[generateRekomendasi] Domain: ${domainIsuCode} (${domainIsuId})`,
-      );
-      console.log(
-        `[generateRekomendasi] Total masukan warga untuk domain ini: ${totalAll}`,
-      );
-      console.log(
-        `[generateRekomendasi] Total terverifikasi: ${totalVerified}`,
-      );
-
-      // Ambil dengan filter standar
       masukanWarga = await prisma.masukanWarga.findMany({
         where: {
           domainIsuId,
@@ -363,32 +385,6 @@ export const kegiatanRapatService = {
         },
         take: 50,
       });
-
-      console.log(
-        `[generateRekomendasi] Yang memenuhi semua filter (status=VERIFIED, isRelevant, expiresAt): ${masukanWarga.length}`,
-      );
-
-      // ⚠️ OPSIONAL: Jika ingin mengambil data tanpa filter expiresAt/isRelevant saat tidak ada data,
-      // aktifkan kode di bawah ini (hanya untuk sementara, misal untuk testing)
-      /*
-      if (masukanWarga.length === 0 && totalVerified > 0) {
-        console.log(`[generateRekomendasi] Mencoba mengambil data tanpa filter expiresAt/isRelevant...`);
-        masukanWarga = await prisma.masukanWarga.findMany({
-          where: { domainIsuId, status: StatusMasukan.DIVERIFIKASI },
-          select: {
-            id: true,
-            judul: true,
-            deskripsi: true,
-            lokasiRt: true,
-            lokasiRw: true,
-            domainIsuId: true,
-            status: true,
-          },
-          take: 50,
-        });
-        console.log(`[generateRekomendasi] Setelah fallback, ditemukan: ${masukanWarga.length}`);
-      }
-      */
     }
 
     const dataMaster = await prisma.dataMaster.findMany({
@@ -403,7 +399,7 @@ export const kegiatanRapatService = {
       take: 50,
     });
 
-    // 2. Fetch exclusion titles (cegah duplikat)
+    // 2. Fetch exclusion titles
     const existingPrioritas = await prisma.kegiatanRapat.findMany({
       where: {
         domainIsuId,
@@ -425,7 +421,7 @@ export const kegiatanRapatService = {
       .filter(Boolean)
       .slice(0, 10);
 
-    // 3. Transform data ke tipe buildPrompt
+    // 3. Transform data
     const masukanInput: MasukanWargaInput[] = masukanWarga.map((m) => ({
       id: m.id,
       judul: m.judul,
@@ -458,25 +454,54 @@ export const kegiatanRapatService = {
     // 5. Call Gemini AI
     const aiResponse = await geminiAi(prompt);
 
-    // 6. Post-process: ensure structure compliance
-    const processedPrioritas = aiResponse.prioritas.map((item, idx) => ({
-      ...item,
-      prioritasKe: idx + 1,
-      fingerprint:
-        item.fingerprint?.trim() ||
-        generateFingerprint(`${kegiatanRapatId}-${idx}-${Date.now()}`),
-      domainIsuId: item.domainIsuId || domainIsuId,
-      evidence: {
-        masukanWargaCount:
-          item.evidence?.masukanWargaCount ??
-          (mode === "FUSI_DATA" ? Math.floor(Math.random() * 10) + 1 : 0),
-        dataMasterCount:
-          item.evidence?.dataMasterCount ?? Math.floor(Math.random() * 5) + 1,
-        kritikalitas: item.evidence?.kritikalitas ?? "SEDANG",
-      },
-    }));
+    // 6. Post-process: alokasi data berdasarkan evidence counts
+    // Urutkan data agar alokasi konsisten (misal berdasarkan id)
+    const sortedMasukan = [...masukanInput].sort((a, b) =>
+      a.id.localeCompare(b.id),
+    );
+    const sortedDataMaster = [...dataMasterInput].sort((a, b) =>
+      a.id.localeCompare(b.id),
+    );
 
-    const finalRekomendasi: GeminiResponse = {
+    let masukanIndex = 0;
+    let dataMasterIndex = 0;
+
+    const processedPrioritas = aiResponse.prioritas.map((item, idx) => {
+      const masukanCount = item.evidence?.masukanWargaCount || 0;
+      const dataMasterCount = item.evidence?.dataMasterCount || 0;
+
+      // Ambil sejumlah masukan dari sortedMasukan sesuai count
+      const usedMasukanIds = sortedMasukan
+        .slice(masukanIndex, masukanIndex + masukanCount)
+        .map((m) => m.id);
+      masukanIndex += masukanCount;
+
+      // Ambil sejumlah data master dari sortedDataMaster sesuai count
+      const usedDataMasterIds = sortedDataMaster
+        .slice(dataMasterIndex, dataMasterIndex + dataMasterCount)
+        .map((d) => d.id);
+      dataMasterIndex += dataMasterCount;
+
+      return {
+        ...item,
+        prioritasKe: idx + 1,
+        fingerprint:
+          item.fingerprint?.trim() ||
+          generateFingerprint(`${kegiatanRapatId}-${idx}-${Date.now()}`),
+        domainIsuId: item.domainIsuId || domainIsuId,
+        evidence: {
+          masukanWargaCount: masukanCount,
+          dataMasterCount: dataMasterCount,
+          kritikalitas: item.evidence?.kritikalitas ?? "SEDANG",
+        },
+        usedMasukanIds,
+        usedDataMasterIds,
+      };
+    });
+
+    const finalRekomendasi: GeminiResponse & {
+      prioritas: Array<RekomendasiItem>;
+    } = {
       ...aiResponse,
       prioritas: processedPrioritas,
       metadata: {
@@ -485,16 +510,36 @@ export const kegiatanRapatService = {
         totalMasukanDianalisis: masukanInput.length,
         totalDataMasterDianalisis: dataMasterInput.length,
       },
+      inputData: {
+        masukan: masukanInput.slice(0, 10).map((m) => ({
+          id: m.id,
+          judul: m.judul,
+          deskripsi:
+            m.deskripsi?.substring(0, 100) +
+            (m.deskripsi?.length > 100 ? "..." : ""),
+          lokasiRt: m.lokasiRt,
+          lokasiRw: m.lokasiRw,
+        })),
+        dataMaster: dataMasterInput.slice(0, 10).map((d) => ({
+          id: d.id,
+          namaAtribut: d.namaAtribut,
+          kritikalitas: d.kritikalitas,
+          jumlah: d.jumlah,
+        })),
+      },
     };
 
-    // 7. 🔥 SIMPAN RELASI MASUKAN WARGA dalam transaksi
+    // 7. Simpan relasi dalam transaksi
     const updated = await prisma.$transaction(async (tx) => {
       // Hapus relasi lama
       await tx.kegiatanRapatMasukan.deleteMany({
         where: { kegiatanRapatId },
       });
+      await tx.kegiatanRapatDataMaster.deleteMany({
+        where: { kegiatanRapatId },
+      });
 
-      // Buat relasi baru jika mode FUSI_DATA dan ada masukan
+      // Buat relasi baru untuk masukan (jika mode FUSI_DATA)
       if (mode === "FUSI_DATA" && masukanWarga.length > 0) {
         await tx.kegiatanRapatMasukan.createMany({
           data: masukanWarga.map((m) => ({
@@ -505,7 +550,18 @@ export const kegiatanRapatService = {
         });
       }
 
-      // Update kegiatan rapat dengan hasil rekomendasi
+      // Buat relasi baru untuk data master (selalu disimpan)
+      if (dataMaster.length > 0) {
+        await tx.kegiatanRapatDataMaster.createMany({
+          data: dataMaster.map((d) => ({
+            kegiatanRapatId,
+            dataMasterId: d.id,
+          })),
+          skipDuplicates: true,
+        });
+      }
+
+      // Update kegiatan rapat
       return tx.kegiatanRapat.update({
         where: { id: kegiatanRapatId },
         data: {
@@ -534,7 +590,7 @@ export const kegiatanRapatService = {
     };
   },
 
-  // ✅ FIX: Regenerate rekomendasi - type annotation eksplisit (no circular reference)
+  // ✅ Regenerate rekomendasi
   regenerateRekomendasi: async (args: {
     kegiatanRapatId: string;
     domainIsuId: string;
@@ -542,13 +598,11 @@ export const kegiatanRapatService = {
     userId: string;
     judulLaporan: string;
   }) => {
-    // Fetch domainIsu code inline
     const domainIsu = await prisma.domainIsu.findUniqueOrThrow({
       where: { id: args.domainIsuId },
       select: { code: true },
     });
 
-    // Call generateRekomendasi dengan domainIsuCode yang sudah di-fetch
     return kegiatanRapatService.generateRekomendasi({
       ...args,
       domainIsuCode: domainIsu.code,
