@@ -89,37 +89,3 @@ export const GET = async (req: NextRequest) => {
     });
   }
 };
-
-export const POST = async (req: NextRequest) => {
-  try {
-    const body = await req.json();
-
-    const masukan = await masukanWargaService.create(body);
-
-    console.error("CREATE MASUKAN ERROR:", masukan);
-
-    return handleResponse({
-      success: true,
-      message: "Masukan berhasil dibuat",
-      data: masukan,
-      status: 201,
-    });
-  } catch (error) {
-    console.log("CREATE MASUKAN ERROR:", error);
-    const prismaResponse = handlePrismaError(error);
-
-    if (prismaResponse) {
-      return handleResponse({
-        success: false,
-        message: prismaResponse.message,
-        status: prismaResponse.status,
-      });
-    }
-
-    return handleResponse({
-      success: false,
-      message: "Gagal membuat masukan",
-      status: 500,
-    });
-  }
-};

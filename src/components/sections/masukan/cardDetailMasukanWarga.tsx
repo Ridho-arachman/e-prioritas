@@ -21,7 +21,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { ArrowLeft } from "lucide-react";
+import {
+  ArrowLeft,
+  RotateCcw,
+  CheckCircle,
+  XCircle,
+  Clock,
+  CheckCheck,
+  Loader2,
+} from "lucide-react";
 
 import { useParams } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
@@ -30,6 +38,7 @@ import { Skeleton } from "../../ui/skeleton";
 import { useGet, usePost } from "@/hooks/useApi";
 import { StatusMasukan } from "@/app/generated/prisma";
 import { cn } from "@/lib/utils";
+import { notifier } from "@/lib/ToastNotifier";
 
 export default function CardDetailMasukanWarga() {
   const router = useRouter();
@@ -38,9 +47,9 @@ export default function CardDetailMasukanWarga() {
 
   const [openRejectModal, setOpenRejectModal] = useState(false);
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
-  const [pendingStatus, setPendingStatus] = useState<
-    "MENUNGGU" | "DIVERIFIKASI" | "DITOLAK" | null
-  >(null);
+  const [pendingStatus, setPendingStatus] = useState<StatusMasukan | null>(
+    null,
+  );
   const [alasan, setAlasan] = useState("");
 
   const {
@@ -51,25 +60,42 @@ export default function CardDetailMasukanWarga() {
   } = useGet(`/protected/masukan/${id}`);
   const { post, loading: updating } = usePost(`/protected/masukan/${id}`);
 
-  console.log("masukan:", masukan);
-
-  // mapping status → warna badge
-  const statusColorMap: Record<StatusMasukan, string> = {
-    MENUNGGU: "bg-yellow-500 text-white",
-    DIVERIFIKASI: "bg-green-600 text-white",
-    DITOLAK: "bg-red-600 text-white",
-    DIPROSES: "bg-blue-500 text-white",
-    DISELESAIKAN: "bg-purple-600 text-white",
-    KADALUWARSA: "bg-gray-500 text-white",
+  // mapping status → warna badge dengan desain lebih modern
+  const statusConfig: Record<
+    StatusMasukan,
+    { color: string; icon: React.ReactNode; label: string }
+  > = {
+    MENUNGGU: {
+      color: "bg-amber-100 text-amber-800 border-amber-200",
+      icon: <Clock className="w-3 h-3 mr-1" />,
+      label: "Menunggu",
+    },
+    DIVERIFIKASI: {
+      color: "bg-emerald-100 text-emerald-800 border-emerald-200",
+      icon: <CheckCircle className="w-3 h-3 mr-1" />,
+      label: "Diverifikasi",
+    },
+    DITOLAK: {
+      color: "bg-rose-100 text-rose-800 border-rose-200",
+      icon: <XCircle className="w-3 h-3 mr-1" />,
+      label: "Ditolak",
+    },
+    DIPROSES: {
+      color: "bg-blue-100 text-blue-800 border-blue-200",
+      icon: <Loader2 className="w-3 h-3 mr-1 animate-spin" />,
+      label: "Diproses",
+    },
+    DISELESAIKAN: {
+      color: "bg-purple-100 text-purple-800 border-purple-200",
+      icon: <CheckCheck className="w-3 h-3 mr-1" />,
+      label: "Selesai",
+    },
   };
 
-  // pastikan status dari API dianggap StatusMasukan
   const statusKey: StatusMasukan =
     (masukan?.status as StatusMasukan) ?? "MENUNGGU";
+  const currentStatus = statusConfig[statusKey];
 
-  const statusColor = statusColorMap[statusKey] ?? "bg-gray-400 text-white";
-
-  // Format tanggal Indonesia
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString("id-ID", {
       day: "numeric",
@@ -80,7 +106,7 @@ export default function CardDetailMasukanWarga() {
     });
   };
 
-  function handleChangeStatus(newStatus: typeof pendingStatus) {
+  function handleChangeStatus(newStatus: StatusMasukan) {
     if (newStatus === "DITOLAK") {
       setPendingStatus("DITOLAK");
       setOpenRejectModal(true);
@@ -105,11 +131,14 @@ export default function CardDetailMasukanWarga() {
           pendingStatus === "DITOLAK" ? alasan.trim() : undefined,
       });
 
-      toast.success(`Status berhasil diubah menjadi ${pendingStatus}`);
+      notifier.success(
+        "Berhasil",
+        `Status berhasil diubah menjadi ${pendingStatus}`,
+      );
       mutate();
     } catch (err) {
       console.log(err);
-      toast.error("Gagal memperbarui status masukan");
+      notifier.error("Gagal", "Gagal memperbarui status masukan");
     } finally {
       setOpenRejectModal(false);
       setOpenConfirmModal(false);
@@ -120,56 +149,37 @@ export default function CardDetailMasukanWarga() {
 
   if (isLoading) {
     return (
-      <div className="p-4 md:p-6 space-y-6">
-        <Card>
+      <div className="p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
+        <Card className="border-none shadow-lg">
           <CardHeader>
-            <div className="space-y-2">
-              <Skeleton className="h-6 w-32 md:w-48" />
-              <Skeleton className="h-4 w-48 md:w-80" />
-            </div>
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="h-4 w-80" />
           </CardHeader>
-
           <CardContent className="space-y-6">
-            {/* Header User */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div className="space-y-2 w-full sm:w-auto">
-                <Skeleton className="h-5 w-32 md:w-40" />
-                <Skeleton className="h-4 w-40 md:w-60" />
+            <div className="flex justify-between items-center">
+              <div className="space-y-2">
+                <Skeleton className="h-6 w-40" />
+                <Skeleton className="h-4 w-52" />
               </div>
-              <Skeleton className="h-6 w-20 md:w-24" />
+              <Skeleton className="h-8 w-24 rounded-full" />
             </div>
-
             <Separator />
-
-            {/* Detail Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {[...Array(7)].map((_, i) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
                 <div key={i} className="space-y-2">
-                  <Skeleton className="h-4 w-24 md:w-32" />
-                  <Skeleton className="h-4 w-32 md:w-48" />
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-5 w-32" />
                 </div>
               ))}
-
-              <div className="col-span-1 sm:col-span-2 space-y-2">
-                <Skeleton className="h-4 w-32 md:w-40" />
-                <Skeleton className="h-16 md:h-20 w-full" />
-              </div>
-
-              <div className="col-span-1 sm:col-span-2 space-y-2">
-                <Skeleton className="h-4 w-32 md:w-40" />
-                <Skeleton className="h-10 w-full" />
+              <div className="col-span-full space-y-2">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-24 w-full rounded-lg" />
               </div>
             </div>
-
-            {/* Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-4">
-              <Skeleton className="h-10 w-full sm:w-40" />
-              <Skeleton className="h-10 w-full sm:w-32" />
-              <Skeleton className="h-10 w-full sm:w-52" />
-            </div>
-
-            <div className="flex justify-end">
-              <Skeleton className="h-10 w-20 md:w-24" />
+            <div className="flex flex-wrap gap-3">
+              <Skeleton className="h-10 w-36" />
+              <Skeleton className="h-10 w-36" />
+              <Skeleton className="h-10 w-36" />
             </div>
           </CardContent>
         </Card>
@@ -179,15 +189,23 @@ export default function CardDetailMasukanWarga() {
 
   if (error || !masukan) {
     return (
-      <div className="p-4 md:p-6 text-center text-red-600">
-        Terjadi kesalahan saat memuat data masukan.
+      <div className="p-4 md:p-6 text-center text-red-600 py-12">
+        <XCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
+        <p className="text-lg">Terjadi kesalahan saat memuat data masukan.</p>
+        <Button
+          variant="outline"
+          onClick={() => router.back()}
+          className="mt-4"
+        >
+          Kembali
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
-      {/* Mobile Back Button - Hanya muncul di mobile */}
+    <div className="p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
+      {/* Header mobile */}
       <div className="flex items-center gap-2 sm:hidden">
         <Button
           variant="ghost"
@@ -200,262 +218,246 @@ export default function CardDetailMasukanWarga() {
         <h1 className="text-lg font-semibold">Detail Masukan</h1>
       </div>
 
-      <Card>
-        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
-          <div>
-            <CardTitle className="text-xl md:text-2xl">
-              Detail Masukan Warga
-            </CardTitle>
-            <CardDescription className="text-sm md:text-base">
-              Data lengkap masukan dari warga berikut status verifikasi
-            </CardDescription>
+      <Card className="border-none shadow-lg overflow-hidden">
+        <CardHeader className="bg-linear-to-r from-slate-50 to-white border-b">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <CardTitle className="text-2xl md:text-3xl text-slate-800">
+                Detail Masukan Warga
+              </CardTitle>
+              <CardDescription className="text-base text-slate-600">
+                Informasi lengkap dan status verifikasi
+              </CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => router.back()}
+              className="hidden sm:flex items-center gap-2 shadow-sm"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Kembali
+            </Button>
           </div>
-          {/* Back Button Desktop */}
-          <Button
-            variant="outline"
-            onClick={() => router.back()}
-            className="hidden sm:flex cursor-pointer items-center gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Kembali
-          </Button>
         </CardHeader>
 
-        <CardContent className="space-y-6">
-          {/* Header Pengirim dengan Status */}
+        <CardContent className="p-6 space-y-6">
+          {/* Header pengirim dengan status */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div className="w-full sm:w-auto">
-              <h3 className="text-base md:text-lg font-semibold wrap-break-word">
+            <div>
+              <h3 className="text-xl font-semibold text-slate-800 flex items-center gap-2">
                 {masukan.namaPengirim}
+                {masukan.nomorHp && (
+                  <span className="text-sm font-normal text-slate-500">
+                    ({masukan.nomorHp})
+                  </span>
+                )}
               </h3>
-              {masukan.nomorHp && (
-                <p className="text-xs md:text-sm text-muted-foreground wrap-break-word">
-                  {masukan.nomorHp}
-                </p>
-              )}
             </div>
             <Badge
               className={cn(
-                statusColor,
-                "text-xs md:text-sm whitespace-nowrap",
+                currentStatus.color,
+                "px-3 py-1.5 text-sm font-medium border flex items-center shadow-sm",
               )}
             >
-              {masukan.status}
+              {currentStatus.icon}
+              {currentStatus.label}
             </Badge>
           </div>
 
-          <Separator />
+          <Separator className="bg-slate-200" />
 
-          {/* Detail Grid - Responsive */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            <div className="space-y-1">
-              <Label className="text-xs md:text-sm text-muted-foreground">
-                Lokasi RT
-              </Label>
-              <p className="text-sm md:text-base font-medium wrap-break-word">
-                {masukan.lokasiRt}
-              </p>
-            </div>
-
-            <div className="space-y-1">
-              <Label className="text-xs md:text-sm text-muted-foreground">
-                Lokasi RW
-              </Label>
-              <p className="text-sm md:text-base font-medium wrap-break-word">
-                {masukan.lokasiRw}
-              </p>
-            </div>
-
-            <div className="space-y-1">
-              <Label className="text-xs md:text-sm text-muted-foreground">
-                Kategori (Domain Isu)
-              </Label>
-              <p className="text-sm md:text-base font-medium wrap-break-word">
-                {masukan.domainIsu?.nama ?? "-"}
-              </p>
-            </div>
-
-            <div className="space-y-1">
-              <Label className="text-xs md:text-sm text-muted-foreground">
-                Diverifikasi Oleh
-              </Label>
-              <p className="text-sm md:text-base font-medium wrap-break-word">
-                {masukan.diverifikasiOleh?.name ?? "-"}
-              </p>
-            </div>
-
-            <div className="space-y-1">
-              <Label className="text-xs md:text-sm text-muted-foreground">
-                Dibuat Pada
-              </Label>
-              <p className="text-sm md:text-base font-medium wrap-break-word">
-                {formatDate(masukan.createdAt)}
-              </p>
-            </div>
-
-            <div className="space-y-1">
-              <Label className="text-xs md:text-sm text-muted-foreground">
-                Diperbarui Pada
-              </Label>
-              <p className="text-sm md:text-base font-medium wrap-break-word">
-                {formatDate(masukan.updatedAt)}
-              </p>
-            </div>
-
-            {/* Nomor HP (jika ada) */}
+          {/* Grid informasi */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <InfoItem label="Lokasi RT" value={masukan.lokasiRt} />
+            <InfoItem label="Lokasi RW" value={masukan.lokasiRw} />
+            <InfoItem
+              label="Kategori (Domain Isu)"
+              value={masukan.domainIsu?.nama ?? "-"}
+            />
+            <InfoItem
+              label="Diverifikasi Oleh"
+              value={masukan.diverifikasiOleh?.name ?? "-"}
+            />
+            <InfoItem
+              label="Dibuat Pada"
+              value={formatDate(masukan.createdAt)}
+            />
+            <InfoItem
+              label="Diperbarui Pada"
+              value={formatDate(masukan.updatedAt)}
+            />
             {masukan.nomorHp && (
-              <div className="space-y-1">
-                <Label className="text-xs md:text-sm text-muted-foreground">
-                  Nomor HP
-                </Label>
-                <p className="text-sm md:text-base font-medium wrap-break-word">
-                  {masukan.nomorHp}
-                </p>
-              </div>
+              <InfoItem label="Nomor HP" value={masukan.nomorHp} />
             )}
-
-            {/* Deskripsi - Full Width */}
-            <div className="col-span-1 sm:col-span-2 lg:col-span-3 space-y-2">
-              <Label className="text-xs md:text-sm text-muted-foreground">
-                Deskripsi Masukan
-              </Label>
-              <p className="text-sm md:text-base whitespace-pre-wrap wrap-break-word bg-muted/50 p-3 md:p-4 rounded-lg">
-                {masukan.deskripsi}
-              </p>
-            </div>
-
-            {/* Alasan Penolakan - Jika Ada */}
-            {masukan.alasanPenolakan && (
-              <div className="col-span-1 sm:col-span-2 lg:col-span-3 space-y-2">
-                <Label className="text-xs md:text-sm text-muted-foreground">
-                  Alasan Penolakan
-                </Label>
-                <p className="text-sm md:text-base text-red-600 bg-red-50 p-3 md:p-4 rounded-lg wrap-break-word">
-                  {masukan.alasanPenolakan}
-                </p>
-              </div>
-            )}
-
-            {/* Rekomendasi Links - Jika Ada */}
-            {masukan.rekomendasiLinks &&
-              masukan.rekomendasiLinks.length > 0 && (
-                <div className="col-span-1 sm:col-span-2 lg:col-span-3 space-y-2">
-                  <Label className="text-xs md:text-sm text-muted-foreground">
-                    Rekomendasi Terkait
-                  </Label>
-                  <div className="bg-muted/50 p-3 md:p-4 rounded-lg space-y-2">
-                    {masukan.rekomendasiLinks.map((link: any) => (
-                      <div key={link.rekomendasiId} className="text-sm">
-                        {/* Sesuaikan tampilan dengan data yang tersedia, misalnya link ke rekomendasi */}
-                        <span>Rekomendasi ID: {link.rekomendasiId}</span>
-                        {/* Atau tampilkan informasi lain jika ada relasi lebih lanjut */}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
           </div>
 
-          {/* Action Buttons - Responsive */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4 justify-between">
-            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-              {masukan.status !== "DIVERIFIKASI" && (
-                <Button
-                  className="cursor-pointer w-full sm:w-auto"
-                  onClick={() => handleChangeStatus("DIVERIFIKASI")}
-                  disabled={updating}
-                >
-                  {updating && pendingStatus === "DIVERIFIKASI" ? (
-                    <>
-                      <Spinner className="mr-2 h-4 w-4" />
-                      Memproses...
-                    </>
-                  ) : (
-                    "✓ Verifikasi Diterima"
-                  )}
-                </Button>
-              )}
-
-              {masukan.status !== "DITOLAK" && (
-                <Button
-                  className="cursor-pointer w-full sm:w-auto"
-                  variant="destructive"
-                  onClick={() => handleChangeStatus("DITOLAK")}
-                  disabled={updating}
-                >
-                  {updating && pendingStatus === "DITOLAK" ? (
-                    <>
-                      <Spinner className="mr-2 h-4 w-4" />
-                      Memproses...
-                    </>
-                  ) : (
-                    "✗ Tolak Masukan"
-                  )}
-                </Button>
-              )}
-
-              {masukan.status !== "MENUNGGU" && (
-                <Button
-                  className="cursor-pointer w-full sm:w-auto"
-                  variant="outline"
-                  onClick={() => handleChangeStatus("MENUNGGU")}
-                  disabled={updating}
-                >
-                  {updating && pendingStatus === "MENUNGGU" ? (
-                    <>
-                      <Spinner className="mr-2 h-4 w-4" />
-                      Memproses...
-                    </>
-                  ) : (
-                    "↺ Kembalikan ke Menunggu"
-                  )}
-                </Button>
-              )}
+          {/* Deskripsi */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-slate-700">
+              Deskripsi Masukan
+            </Label>
+            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-slate-700 whitespace-pre-wrap">
+              {masukan.deskripsi}
             </div>
+          </div>
 
-            {/* Back Button Mobile - Hanya muncul di mobile (sudah ada di header mobile) */}
-            <Button
-              className="cursor-pointer w-full sm:hidden"
-              variant="outline"
-              onClick={() => router.back()}
-            >
-              Kembali
-            </Button>
+          {/* Alasan penolakan jika ada */}
+          {masukan.alasanPenolakan && (
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-rose-700">
+                Alasan Penolakan
+              </Label>
+              <div className="bg-rose-50 p-4 rounded-lg border border-rose-200 text-rose-700">
+                {masukan.alasanPenolakan}
+              </div>
+            </div>
+          )}
+
+          {/* Rekomendasi terkait */}
+          {masukan.relasiRapat && masukan.relasiRapat.length > 0 && (
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-slate-700">
+                Rekomendasi Terkait
+              </Label>
+              <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-3">
+                {masukan.relasiRapat.map((relasi: any) => (
+                  <div
+                    key={relasi.id}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-white rounded-md shadow-sm border border-slate-100"
+                  >
+                    <div>
+                      <p className="font-medium text-slate-800">
+                        {relasi.kegiatanRapat.judul}
+                      </p>
+                      <p className="text-xs text-slate-500 mt-1">
+                        {formatDate(relasi.kegiatanRapat.tanggal)}
+                      </p>
+                    </div>
+                    <Badge variant="outline" className="shrink-0">
+                      {relasi.kegiatanRapat.statusRekomendasi}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Tombol aksi - semua status dapat diubah manual */}
+          <div className="flex flex-wrap gap-3 pt-4 border-t border-slate-200">
+            {masukan.status !== "MENUNGGU" && (
+              <Button
+                variant="outline"
+                onClick={() => handleChangeStatus("MENUNGGU")}
+                disabled={updating}
+                className="flex items-center gap-2"
+              >
+                {updating && pendingStatus === "MENUNGGU" ? (
+                  <Spinner className="h-4 w-4" />
+                ) : (
+                  <RotateCcw className="h-4 w-4" />
+                )}
+                Kembalikan ke Menunggu
+              </Button>
+            )}
+
+            {masukan.status !== "DIVERIFIKASI" && (
+              <Button
+                variant="default"
+                onClick={() => handleChangeStatus("DIVERIFIKASI")}
+                disabled={updating}
+                className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700"
+              >
+                {updating && pendingStatus === "DIVERIFIKASI" ? (
+                  <Spinner className="h-4 w-4" />
+                ) : (
+                  <CheckCircle className="h-4 w-4" />
+                )}
+                Verifikasi Diterima
+              </Button>
+            )}
+
+            {masukan.status !== "DITOLAK" && (
+              <Button
+                variant="destructive"
+                onClick={() => handleChangeStatus("DITOLAK")}
+                disabled={updating}
+                className="flex items-center gap-2"
+              >
+                {updating && pendingStatus === "DITOLAK" ? (
+                  <Spinner className="h-4 w-4" />
+                ) : (
+                  <XCircle className="h-4 w-4" />
+                )}
+                Tolak Masukan
+              </Button>
+            )}
+
+            {masukan.status !== "DIPROSES" && (
+              <Button
+                variant="secondary"
+                onClick={() => handleChangeStatus("DIPROSES")}
+                disabled={updating}
+                className="flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700"
+              >
+                {updating && pendingStatus === "DIPROSES" ? (
+                  <Spinner className="h-4 w-4" />
+                ) : (
+                  <Loader2 className="h-4 w-4" />
+                )}
+                Tandai Diproses
+              </Button>
+            )}
+
+            {masukan.status !== "DISELESAIKAN" && (
+              <Button
+                className="flex items-center gap-2 bg-purple-600 text-white hover:bg-purple-700"
+                onClick={() => handleChangeStatus("DISELESAIKAN")}
+                disabled={updating}
+              >
+                {updating && pendingStatus === "DISELESAIKAN" ? (
+                  <Spinner className="h-4 w-4" />
+                ) : (
+                  <CheckCheck className="h-4 w-4" />
+                )}
+                Tandai Selesai
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
 
       {/* Modal Penolakan */}
       <Dialog open={openRejectModal} onOpenChange={setOpenRejectModal}>
-        <DialogContent className="sm:max-w-lg w-[95vw] sm:w-full">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-lg md:text-xl">
-              Masukkan alasan penolakan
+            <DialogTitle className="text-xl flex items-center gap-2">
+              <XCircle className="h-5 w-5 text-rose-500" />
+              Alasan Penolakan
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="alasan" className="text-sm md:text-base">
-                Alasan Penolakan
+              <Label htmlFor="alasan" className="text-base">
+                Tuliskan alasan penolakan
               </Label>
               <Textarea
                 id="alasan"
-                placeholder="Tuliskan alasan penolakan secara lengkap..."
+                placeholder="Alasan penolakan akan terlihat oleh pengirim..."
                 value={alasan}
                 onChange={(e) => setAlasan(e.target.value)}
                 rows={4}
-                className="text-sm md:text-base"
+                className="resize-none"
               />
-              <p className="text-xs text-muted-foreground">
-                Alasan penolakan akan terlihat oleh pengirim masukan
+              <p className="text-xs text-slate-500">
+                Alasan wajib diisi jika status ditolak.
               </p>
             </div>
           </div>
-          <DialogFooter className="flex-col sm:flex-row gap-2">
+          <DialogFooter className="gap-2 sm:gap-0">
             <Button
               variant="outline"
               onClick={() => setOpenRejectModal(false)}
-              className="w-full sm:w-auto cursor-pointer"
+              disabled={updating}
             >
               Batal
             </Button>
@@ -463,16 +465,9 @@ export default function CardDetailMasukanWarga() {
               variant="destructive"
               onClick={handleConfirmChange}
               disabled={updating}
-              className="w-full sm:w-auto cursor-pointer"
             >
-              {updating ? (
-                <>
-                  <Spinner className="mr-2 h-4 w-4" />
-                  Mengirim...
-                </>
-              ) : (
-                "Kirim"
-              )}
+              {updating && <Spinner className="mr-2 h-4 w-4" />}
+              Kirim
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -480,43 +475,46 @@ export default function CardDetailMasukanWarga() {
 
       {/* Modal Konfirmasi */}
       <Dialog open={openConfirmModal} onOpenChange={setOpenConfirmModal}>
-        <DialogContent className="sm:max-w-md w-[95vw] sm:w-full">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-lg md:text-xl">
-              Konfirmasi Perubahan Status
-            </DialogTitle>
+            <DialogTitle className="text-xl">Konfirmasi Perubahan</DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <p className="text-sm md:text-base">
-              Apakah Anda yakin ingin mengubah status menjadi{" "}
-              <span className="font-semibold">{pendingStatus}</span>?
+            <p className="text-center text-lg">
+              Ubah status menjadi{" "}
+              <span className="font-semibold text-primary">
+                {pendingStatus}
+              </span>
+              ?
             </p>
           </div>
-          <DialogFooter className="flex-col sm:flex-row gap-2">
+          <DialogFooter className="gap-2 sm:gap-0">
             <Button
               variant="outline"
               onClick={() => setOpenConfirmModal(false)}
-              className="w-full sm:w-auto cursor-pointer"
+              disabled={updating}
             >
               Batal
             </Button>
-            <Button
-              onClick={handleConfirmChange}
-              disabled={updating}
-              className="w-full sm:w-auto cursor-pointer"
-            >
-              {updating ? (
-                <>
-                  <Spinner className="mr-2 h-4 w-4" />
-                  Menyimpan...
-                </>
-              ) : (
-                "Ya, Ubah"
-              )}
+            <Button onClick={handleConfirmChange} disabled={updating}>
+              {updating && <Spinner className="mr-2 h-4 w-4" />}
+              Ya, Ubah
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+// Komponen kecil untuk menampilkan item informasi
+function InfoItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="space-y-1">
+      <Label className="text-xs text-slate-500 font-medium">{label}</Label>
+      <p className="text-sm md:text-base font-medium text-slate-800 wrap-break-words">
+        {value}
+      </p>
     </div>
   );
 }
