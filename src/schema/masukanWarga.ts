@@ -25,7 +25,6 @@ export const createMasukanWargaFormSchema = z.object({
     .regex(/^[0-9]{3}$/, "RW harus 3 digit"),
   deskripsi: z.string().trim().min(1, "Deskripsi tidak boleh kosong"),
   domainIsuId: z.string().trim().cuid("Domain isu tidak valid"),
-  // ❌ Tidak ada isLocked/expiresAt - ini urusan backend
 });
 
 export const createMasukanWargaSchema = z.object({
@@ -57,10 +56,6 @@ export const createMasukanWargaSchema = z.object({
     .regex(/^[0-9]{3}$/, "RW harus 3 digit (contoh: 001)"),
 
   deskripsi: z.string().trim().min(1, "Deskripsi tidak boleh kosong"),
-  isLocked: z.boolean().optional().default(false),
-
-  // ✅ Optional: expiresAt untuk relevance tracking
-  expiresAt: z.union([z.date(), z.string()]).optional(),
 
   domainIsuId: z.string().trim().cuid("Domain isu tidak valid"),
 });

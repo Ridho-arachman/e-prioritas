@@ -4281,14 +4281,10 @@ export namespace Prisma {
     deskripsi: string | null
     lokasiRt: string | null
     lokasiRw: string | null
-    isLocked: boolean | null
-    lockedAt: Date | null
     domainIsuId: string | null
     status: $Enums.StatusMasukan | null
     alasanPenolakan: string | null
     diverifikasiOlehId: string | null
-    isRelevant: boolean | null
-    expiresAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4301,14 +4297,10 @@ export namespace Prisma {
     deskripsi: string | null
     lokasiRt: string | null
     lokasiRw: string | null
-    isLocked: boolean | null
-    lockedAt: Date | null
     domainIsuId: string | null
     status: $Enums.StatusMasukan | null
     alasanPenolakan: string | null
     diverifikasiOlehId: string | null
-    isRelevant: boolean | null
-    expiresAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4321,14 +4313,10 @@ export namespace Prisma {
     deskripsi: number
     lokasiRt: number
     lokasiRw: number
-    isLocked: number
-    lockedAt: number
     domainIsuId: number
     status: number
     alasanPenolakan: number
     diverifikasiOlehId: number
-    isRelevant: number
-    expiresAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -4343,14 +4331,10 @@ export namespace Prisma {
     deskripsi?: true
     lokasiRt?: true
     lokasiRw?: true
-    isLocked?: true
-    lockedAt?: true
     domainIsuId?: true
     status?: true
     alasanPenolakan?: true
     diverifikasiOlehId?: true
-    isRelevant?: true
-    expiresAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4363,14 +4347,10 @@ export namespace Prisma {
     deskripsi?: true
     lokasiRt?: true
     lokasiRw?: true
-    isLocked?: true
-    lockedAt?: true
     domainIsuId?: true
     status?: true
     alasanPenolakan?: true
     diverifikasiOlehId?: true
-    isRelevant?: true
-    expiresAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4383,14 +4363,10 @@ export namespace Prisma {
     deskripsi?: true
     lokasiRt?: true
     lokasiRw?: true
-    isLocked?: true
-    lockedAt?: true
     domainIsuId?: true
     status?: true
     alasanPenolakan?: true
     diverifikasiOlehId?: true
-    isRelevant?: true
-    expiresAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -4476,14 +4452,10 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
-    isLocked: boolean
-    lockedAt: Date | null
     domainIsuId: string
     status: $Enums.StatusMasukan
     alasanPenolakan: string | null
     diverifikasiOlehId: string | null
-    isRelevant: boolean
-    expiresAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: MasukanWargaCountAggregateOutputType | null
@@ -4513,14 +4485,10 @@ export namespace Prisma {
     deskripsi?: boolean
     lokasiRt?: boolean
     lokasiRw?: boolean
-    isLocked?: boolean
-    lockedAt?: boolean
     domainIsuId?: boolean
     status?: boolean
     alasanPenolakan?: boolean
     diverifikasiOlehId?: boolean
-    isRelevant?: boolean
-    expiresAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
@@ -4537,14 +4505,10 @@ export namespace Prisma {
     deskripsi?: boolean
     lokasiRt?: boolean
     lokasiRw?: boolean
-    isLocked?: boolean
-    lockedAt?: boolean
     domainIsuId?: boolean
     status?: boolean
     alasanPenolakan?: boolean
     diverifikasiOlehId?: boolean
-    isRelevant?: boolean
-    expiresAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
@@ -4559,14 +4523,10 @@ export namespace Prisma {
     deskripsi?: boolean
     lokasiRt?: boolean
     lokasiRw?: boolean
-    isLocked?: boolean
-    lockedAt?: boolean
     domainIsuId?: boolean
     status?: boolean
     alasanPenolakan?: boolean
     diverifikasiOlehId?: boolean
-    isRelevant?: boolean
-    expiresAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
@@ -4581,19 +4541,15 @@ export namespace Prisma {
     deskripsi?: boolean
     lokasiRt?: boolean
     lokasiRw?: boolean
-    isLocked?: boolean
-    lockedAt?: boolean
     domainIsuId?: boolean
     status?: boolean
     alasanPenolakan?: boolean
     diverifikasiOlehId?: boolean
-    isRelevant?: boolean
-    expiresAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type MasukanWargaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "namaPengirim" | "nomorHp" | "judul" | "deskripsi" | "lokasiRt" | "lokasiRw" | "isLocked" | "lockedAt" | "domainIsuId" | "status" | "alasanPenolakan" | "diverifikasiOlehId" | "isRelevant" | "expiresAt" | "createdAt" | "updatedAt", ExtArgs["result"]["masukanWarga"]>
+  export type MasukanWargaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "namaPengirim" | "nomorHp" | "judul" | "deskripsi" | "lokasiRt" | "lokasiRw" | "domainIsuId" | "status" | "alasanPenolakan" | "diverifikasiOlehId" | "createdAt" | "updatedAt", ExtArgs["result"]["masukanWarga"]>
   export type MasukanWargaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
     diverifikasiOleh?: boolean | MasukanWarga$diverifikasiOlehArgs<ExtArgs>
@@ -4624,14 +4580,10 @@ export namespace Prisma {
       deskripsi: string
       lokasiRt: string
       lokasiRw: string
-      isLocked: boolean
-      lockedAt: Date | null
       domainIsuId: string
       status: $Enums.StatusMasukan
       alasanPenolakan: string | null
       diverifikasiOlehId: string | null
-      isRelevant: boolean
-      expiresAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["masukanWarga"]>
@@ -5067,14 +5019,10 @@ export namespace Prisma {
     readonly deskripsi: FieldRef<"MasukanWarga", 'String'>
     readonly lokasiRt: FieldRef<"MasukanWarga", 'String'>
     readonly lokasiRw: FieldRef<"MasukanWarga", 'String'>
-    readonly isLocked: FieldRef<"MasukanWarga", 'Boolean'>
-    readonly lockedAt: FieldRef<"MasukanWarga", 'DateTime'>
     readonly domainIsuId: FieldRef<"MasukanWarga", 'String'>
     readonly status: FieldRef<"MasukanWarga", 'StatusMasukan'>
     readonly alasanPenolakan: FieldRef<"MasukanWarga", 'String'>
     readonly diverifikasiOlehId: FieldRef<"MasukanWarga", 'String'>
-    readonly isRelevant: FieldRef<"MasukanWarga", 'Boolean'>
-    readonly expiresAt: FieldRef<"MasukanWarga", 'DateTime'>
     readonly createdAt: FieldRef<"MasukanWarga", 'DateTime'>
     readonly updatedAt: FieldRef<"MasukanWarga", 'DateTime'>
   }
@@ -12419,14 +12367,10 @@ export namespace Prisma {
     deskripsi: 'deskripsi',
     lokasiRt: 'lokasiRt',
     lokasiRw: 'lokasiRw',
-    isLocked: 'isLocked',
-    lockedAt: 'lockedAt',
     domainIsuId: 'domainIsuId',
     status: 'status',
     alasanPenolakan: 'alasanPenolakan',
     diverifikasiOlehId: 'diverifikasiOlehId',
-    isRelevant: 'isRelevant',
-    expiresAt: 'expiresAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -12899,14 +12843,10 @@ export namespace Prisma {
     deskripsi?: StringFilter<"MasukanWarga"> | string
     lokasiRt?: StringFilter<"MasukanWarga"> | string
     lokasiRw?: StringFilter<"MasukanWarga"> | string
-    isLocked?: BoolFilter<"MasukanWarga"> | boolean
-    lockedAt?: DateTimeNullableFilter<"MasukanWarga"> | Date | string | null
     domainIsuId?: StringFilter<"MasukanWarga"> | string
     status?: EnumStatusMasukanFilter<"MasukanWarga"> | $Enums.StatusMasukan
     alasanPenolakan?: StringNullableFilter<"MasukanWarga"> | string | null
     diverifikasiOlehId?: StringNullableFilter<"MasukanWarga"> | string | null
-    isRelevant?: BoolFilter<"MasukanWarga"> | boolean
-    expiresAt?: DateTimeNullableFilter<"MasukanWarga"> | Date | string | null
     createdAt?: DateTimeFilter<"MasukanWarga"> | Date | string
     updatedAt?: DateTimeFilter<"MasukanWarga"> | Date | string
     domainIsu?: XOR<DomainIsuScalarRelationFilter, DomainIsuWhereInput>
@@ -12922,14 +12862,10 @@ export namespace Prisma {
     deskripsi?: SortOrder
     lokasiRt?: SortOrder
     lokasiRw?: SortOrder
-    isLocked?: SortOrder
-    lockedAt?: SortOrderInput | SortOrder
     domainIsuId?: SortOrder
     status?: SortOrder
     alasanPenolakan?: SortOrderInput | SortOrder
     diverifikasiOlehId?: SortOrderInput | SortOrder
-    isRelevant?: SortOrder
-    expiresAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     domainIsu?: DomainIsuOrderByWithRelationInput
@@ -12948,14 +12884,10 @@ export namespace Prisma {
     deskripsi?: StringFilter<"MasukanWarga"> | string
     lokasiRt?: StringFilter<"MasukanWarga"> | string
     lokasiRw?: StringFilter<"MasukanWarga"> | string
-    isLocked?: BoolFilter<"MasukanWarga"> | boolean
-    lockedAt?: DateTimeNullableFilter<"MasukanWarga"> | Date | string | null
     domainIsuId?: StringFilter<"MasukanWarga"> | string
     status?: EnumStatusMasukanFilter<"MasukanWarga"> | $Enums.StatusMasukan
     alasanPenolakan?: StringNullableFilter<"MasukanWarga"> | string | null
     diverifikasiOlehId?: StringNullableFilter<"MasukanWarga"> | string | null
-    isRelevant?: BoolFilter<"MasukanWarga"> | boolean
-    expiresAt?: DateTimeNullableFilter<"MasukanWarga"> | Date | string | null
     createdAt?: DateTimeFilter<"MasukanWarga"> | Date | string
     updatedAt?: DateTimeFilter<"MasukanWarga"> | Date | string
     domainIsu?: XOR<DomainIsuScalarRelationFilter, DomainIsuWhereInput>
@@ -12971,14 +12903,10 @@ export namespace Prisma {
     deskripsi?: SortOrder
     lokasiRt?: SortOrder
     lokasiRw?: SortOrder
-    isLocked?: SortOrder
-    lockedAt?: SortOrderInput | SortOrder
     domainIsuId?: SortOrder
     status?: SortOrder
     alasanPenolakan?: SortOrderInput | SortOrder
     diverifikasiOlehId?: SortOrderInput | SortOrder
-    isRelevant?: SortOrder
-    expiresAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: MasukanWargaCountOrderByAggregateInput
@@ -12997,14 +12925,10 @@ export namespace Prisma {
     deskripsi?: StringWithAggregatesFilter<"MasukanWarga"> | string
     lokasiRt?: StringWithAggregatesFilter<"MasukanWarga"> | string
     lokasiRw?: StringWithAggregatesFilter<"MasukanWarga"> | string
-    isLocked?: BoolWithAggregatesFilter<"MasukanWarga"> | boolean
-    lockedAt?: DateTimeNullableWithAggregatesFilter<"MasukanWarga"> | Date | string | null
     domainIsuId?: StringWithAggregatesFilter<"MasukanWarga"> | string
     status?: EnumStatusMasukanWithAggregatesFilter<"MasukanWarga"> | $Enums.StatusMasukan
     alasanPenolakan?: StringNullableWithAggregatesFilter<"MasukanWarga"> | string | null
     diverifikasiOlehId?: StringNullableWithAggregatesFilter<"MasukanWarga"> | string | null
-    isRelevant?: BoolWithAggregatesFilter<"MasukanWarga"> | boolean
-    expiresAt?: DateTimeNullableWithAggregatesFilter<"MasukanWarga"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"MasukanWarga"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"MasukanWarga"> | Date | string
   }
@@ -13713,12 +13637,8 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
-    isLocked?: boolean
-    lockedAt?: Date | string | null
     status?: $Enums.StatusMasukan
     alasanPenolakan?: string | null
-    isRelevant?: boolean
-    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     domainIsu: DomainIsuCreateNestedOneWithoutMasukanInput
@@ -13734,14 +13654,10 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
-    isLocked?: boolean
-    lockedAt?: Date | string | null
     domainIsuId: string
     status?: $Enums.StatusMasukan
     alasanPenolakan?: string | null
     diverifikasiOlehId?: string | null
-    isRelevant?: boolean
-    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     relasiRapat?: KegiatanRapatMasukanUncheckedCreateNestedManyWithoutMasukanInput
@@ -13755,12 +13671,8 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
-    isLocked?: BoolFieldUpdateOperationsInput | boolean
-    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
-    isRelevant?: BoolFieldUpdateOperationsInput | boolean
-    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     domainIsu?: DomainIsuUpdateOneRequiredWithoutMasukanNestedInput
@@ -13776,14 +13688,10 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
-    isLocked?: BoolFieldUpdateOperationsInput | boolean
-    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     domainIsuId?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     diverifikasiOlehId?: NullableStringFieldUpdateOperationsInput | string | null
-    isRelevant?: BoolFieldUpdateOperationsInput | boolean
-    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     relasiRapat?: KegiatanRapatMasukanUncheckedUpdateManyWithoutMasukanNestedInput
@@ -13797,14 +13705,10 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
-    isLocked?: boolean
-    lockedAt?: Date | string | null
     domainIsuId: string
     status?: $Enums.StatusMasukan
     alasanPenolakan?: string | null
     diverifikasiOlehId?: string | null
-    isRelevant?: boolean
-    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -13817,12 +13721,8 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
-    isLocked?: BoolFieldUpdateOperationsInput | boolean
-    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
-    isRelevant?: BoolFieldUpdateOperationsInput | boolean
-    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -13835,14 +13735,10 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
-    isLocked?: BoolFieldUpdateOperationsInput | boolean
-    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     domainIsuId?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     diverifikasiOlehId?: NullableStringFieldUpdateOperationsInput | string | null
-    isRelevant?: BoolFieldUpdateOperationsInput | boolean
-    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -14644,17 +14540,6 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
-  export type DateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
   export type EnumStatusMasukanFilter<$PrismaModel = never> = {
     equals?: $Enums.StatusMasukan | EnumStatusMasukanFieldRefInput<$PrismaModel>
     in?: $Enums.StatusMasukan[] | ListEnumStatusMasukanFieldRefInput<$PrismaModel>
@@ -14690,14 +14575,10 @@ export namespace Prisma {
     deskripsi?: SortOrder
     lokasiRt?: SortOrder
     lokasiRw?: SortOrder
-    isLocked?: SortOrder
-    lockedAt?: SortOrder
     domainIsuId?: SortOrder
     status?: SortOrder
     alasanPenolakan?: SortOrder
     diverifikasiOlehId?: SortOrder
-    isRelevant?: SortOrder
-    expiresAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -14710,14 +14591,10 @@ export namespace Prisma {
     deskripsi?: SortOrder
     lokasiRt?: SortOrder
     lokasiRw?: SortOrder
-    isLocked?: SortOrder
-    lockedAt?: SortOrder
     domainIsuId?: SortOrder
     status?: SortOrder
     alasanPenolakan?: SortOrder
     diverifikasiOlehId?: SortOrder
-    isRelevant?: SortOrder
-    expiresAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -14730,30 +14607,12 @@ export namespace Prisma {
     deskripsi?: SortOrder
     lokasiRt?: SortOrder
     lokasiRw?: SortOrder
-    isLocked?: SortOrder
-    lockedAt?: SortOrder
     domainIsuId?: SortOrder
     status?: SortOrder
     alasanPenolakan?: SortOrder
     diverifikasiOlehId?: SortOrder
-    isRelevant?: SortOrder
-    expiresAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-  }
-
-  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type EnumStatusMasukanWithAggregatesFilter<$PrismaModel = never> = {
@@ -14901,6 +14760,17 @@ export namespace Prisma {
     not?: NestedEnumStatusRekomendasiFilter<$PrismaModel> | $Enums.StatusRekomendasi
   }
 
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type UserScalarRelationFilter = {
     is?: UserWhereInput
     isNot?: UserWhereInput
@@ -15008,6 +14878,20 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumStatusRekomendasiFilter<$PrismaModel>
     _max?: NestedEnumStatusRekomendasiFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type KegiatanRapatScalarRelationFilter = {
@@ -15603,10 +15487,6 @@ export namespace Prisma {
     connect?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
   }
 
-  export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null
-  }
-
   export type EnumStatusMasukanFieldUpdateOperationsInput = {
     set?: $Enums.StatusMasukan
   }
@@ -15737,6 +15617,10 @@ export namespace Prisma {
 
   export type EnumStatusRekomendasiFieldUpdateOperationsInput = {
     set?: $Enums.StatusRekomendasi
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
   }
 
   export type DomainIsuUpdateOneRequiredWithoutKegiatanRapatNestedInput = {
@@ -15992,36 +15876,11 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
-  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
   export type NestedEnumStatusMasukanFilter<$PrismaModel = never> = {
     equals?: $Enums.StatusMasukan | EnumStatusMasukanFieldRefInput<$PrismaModel>
     in?: $Enums.StatusMasukan[] | ListEnumStatusMasukanFieldRefInput<$PrismaModel>
     notIn?: $Enums.StatusMasukan[] | ListEnumStatusMasukanFieldRefInput<$PrismaModel>
     not?: NestedEnumStatusMasukanFilter<$PrismaModel> | $Enums.StatusMasukan
-  }
-
-  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumStatusMasukanWithAggregatesFilter<$PrismaModel = never> = {
@@ -16092,6 +15951,17 @@ export namespace Prisma {
     not?: NestedEnumStatusRekomendasiFilter<$PrismaModel> | $Enums.StatusRekomendasi
   }
 
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type NestedEnumModeRekomendasiWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.ModeRekomendasi | EnumModeRekomendasiFieldRefInput<$PrismaModel>
     in?: $Enums.ModeRekomendasi[] | ListEnumModeRekomendasiFieldRefInput<$PrismaModel>
@@ -16135,6 +16005,20 @@ export namespace Prisma {
     _max?: NestedEnumStatusRekomendasiFilter<$PrismaModel>
   }
 
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
   export type NestedBoolNullableFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
     not?: NestedBoolNullableFilter<$PrismaModel> | boolean | null
@@ -16156,12 +16040,8 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
-    isLocked?: boolean
-    lockedAt?: Date | string | null
     status?: $Enums.StatusMasukan
     alasanPenolakan?: string | null
-    isRelevant?: boolean
-    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     diverifikasiOleh?: UserCreateNestedOneWithoutMasukanVerifikasiInput
@@ -16176,13 +16056,9 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
-    isLocked?: boolean
-    lockedAt?: Date | string | null
     status?: $Enums.StatusMasukan
     alasanPenolakan?: string | null
     diverifikasiOlehId?: string | null
-    isRelevant?: boolean
-    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     relasiRapat?: KegiatanRapatMasukanUncheckedCreateNestedManyWithoutMasukanInput
@@ -16309,14 +16185,10 @@ export namespace Prisma {
     deskripsi?: StringFilter<"MasukanWarga"> | string
     lokasiRt?: StringFilter<"MasukanWarga"> | string
     lokasiRw?: StringFilter<"MasukanWarga"> | string
-    isLocked?: BoolFilter<"MasukanWarga"> | boolean
-    lockedAt?: DateTimeNullableFilter<"MasukanWarga"> | Date | string | null
     domainIsuId?: StringFilter<"MasukanWarga"> | string
     status?: EnumStatusMasukanFilter<"MasukanWarga"> | $Enums.StatusMasukan
     alasanPenolakan?: StringNullableFilter<"MasukanWarga"> | string | null
     diverifikasiOlehId?: StringNullableFilter<"MasukanWarga"> | string | null
-    isRelevant?: BoolFilter<"MasukanWarga"> | boolean
-    expiresAt?: DateTimeNullableFilter<"MasukanWarga"> | Date | string | null
     createdAt?: DateTimeFilter<"MasukanWarga"> | Date | string
     updatedAt?: DateTimeFilter<"MasukanWarga"> | Date | string
   }
@@ -16400,12 +16272,8 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
-    isLocked?: boolean
-    lockedAt?: Date | string | null
     status?: $Enums.StatusMasukan
     alasanPenolakan?: string | null
-    isRelevant?: boolean
-    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     domainIsu: DomainIsuCreateNestedOneWithoutMasukanInput
@@ -16420,13 +16288,9 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
-    isLocked?: boolean
-    lockedAt?: Date | string | null
     domainIsuId: string
     status?: $Enums.StatusMasukan
     alasanPenolakan?: string | null
-    isRelevant?: boolean
-    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     relasiRapat?: KegiatanRapatMasukanUncheckedCreateNestedManyWithoutMasukanInput
@@ -17458,12 +17322,8 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
-    isLocked?: boolean
-    lockedAt?: Date | string | null
     status?: $Enums.StatusMasukan
     alasanPenolakan?: string | null
-    isRelevant?: boolean
-    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     domainIsu: DomainIsuCreateNestedOneWithoutMasukanInput
@@ -17478,14 +17338,10 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
-    isLocked?: boolean
-    lockedAt?: Date | string | null
     domainIsuId: string
     status?: $Enums.StatusMasukan
     alasanPenolakan?: string | null
     diverifikasiOlehId?: string | null
-    isRelevant?: boolean
-    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -17565,12 +17421,8 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
-    isLocked?: BoolFieldUpdateOperationsInput | boolean
-    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
-    isRelevant?: BoolFieldUpdateOperationsInput | boolean
-    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     domainIsu?: DomainIsuUpdateOneRequiredWithoutMasukanNestedInput
@@ -17585,14 +17437,10 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
-    isLocked?: BoolFieldUpdateOperationsInput | boolean
-    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     domainIsuId?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     diverifikasiOlehId?: NullableStringFieldUpdateOperationsInput | string | null
-    isRelevant?: BoolFieldUpdateOperationsInput | boolean
-    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -17781,13 +17629,9 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
-    isLocked?: boolean
-    lockedAt?: Date | string | null
     status?: $Enums.StatusMasukan
     alasanPenolakan?: string | null
     diverifikasiOlehId?: string | null
-    isRelevant?: boolean
-    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -17831,12 +17675,8 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
-    isLocked?: BoolFieldUpdateOperationsInput | boolean
-    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
-    isRelevant?: BoolFieldUpdateOperationsInput | boolean
-    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     diverifikasiOleh?: UserUpdateOneWithoutMasukanVerifikasiNestedInput
@@ -17851,13 +17691,9 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
-    isLocked?: BoolFieldUpdateOperationsInput | boolean
-    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     diverifikasiOlehId?: NullableStringFieldUpdateOperationsInput | string | null
-    isRelevant?: BoolFieldUpdateOperationsInput | boolean
-    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     relasiRapat?: KegiatanRapatMasukanUncheckedUpdateManyWithoutMasukanNestedInput
@@ -17871,13 +17707,9 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
-    isLocked?: BoolFieldUpdateOperationsInput | boolean
-    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     diverifikasiOlehId?: NullableStringFieldUpdateOperationsInput | string | null
-    isRelevant?: BoolFieldUpdateOperationsInput | boolean
-    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -17985,13 +17817,9 @@ export namespace Prisma {
     deskripsi: string
     lokasiRt: string
     lokasiRw: string
-    isLocked?: boolean
-    lockedAt?: Date | string | null
     domainIsuId: string
     status?: $Enums.StatusMasukan
     alasanPenolakan?: string | null
-    isRelevant?: boolean
-    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -18083,12 +17911,8 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
-    isLocked?: BoolFieldUpdateOperationsInput | boolean
-    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
-    isRelevant?: BoolFieldUpdateOperationsInput | boolean
-    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     domainIsu?: DomainIsuUpdateOneRequiredWithoutMasukanNestedInput
@@ -18103,13 +17927,9 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
-    isLocked?: BoolFieldUpdateOperationsInput | boolean
-    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     domainIsuId?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
-    isRelevant?: BoolFieldUpdateOperationsInput | boolean
-    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     relasiRapat?: KegiatanRapatMasukanUncheckedUpdateManyWithoutMasukanNestedInput
@@ -18123,13 +17943,9 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     lokasiRt?: StringFieldUpdateOperationsInput | string
     lokasiRw?: StringFieldUpdateOperationsInput | string
-    isLocked?: BoolFieldUpdateOperationsInput | boolean
-    lockedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     domainIsuId?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
-    isRelevant?: BoolFieldUpdateOperationsInput | boolean
-    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

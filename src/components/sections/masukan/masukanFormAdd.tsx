@@ -70,6 +70,7 @@ export default function MasukanWargaFormAdd() {
 
     if (error) {
       notifier.error(error);
+      console.error("CREATE MASUKAN ERROR:", error);
       return;
     }
 
@@ -83,7 +84,7 @@ export default function MasukanWargaFormAdd() {
   return (
     <form
       onSubmit={form.handleSubmit(onSubmit)}
-      className="space-y-6 bg-white p-6 rounded-2xl shadow-md border border-gray-100"
+      className="space-y-6 bg-white p-6 rounded-2xl"
     >
       <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
         <MessageSquare className="w-5 h-5 text-blue-500" />

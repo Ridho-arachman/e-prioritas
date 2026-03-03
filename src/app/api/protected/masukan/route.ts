@@ -96,6 +96,8 @@ export const POST = async (req: NextRequest) => {
 
     const masukan = await masukanWargaService.create(body);
 
+    console.error("CREATE MASUKAN ERROR:", masukan);
+
     return handleResponse({
       success: true,
       message: "Masukan berhasil dibuat",
@@ -103,6 +105,7 @@ export const POST = async (req: NextRequest) => {
       status: 201,
     });
   } catch (error) {
+    console.log("CREATE MASUKAN ERROR:", error);
     const prismaResponse = handlePrismaError(error);
 
     if (prismaResponse) {

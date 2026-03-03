@@ -26,6 +26,7 @@ const POST = async (req: NextRequest) => {
       status: 201,
     });
   } catch (err) {
+    console.error("CREATE MASUKAN ERROR:", err);
     const prismaResponse = handlePrismaError(err);
     if (prismaResponse) {
       return handleResponse({

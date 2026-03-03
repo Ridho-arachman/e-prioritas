@@ -107,9 +107,6 @@ model MasukanWarga {
   lokasiRt     String  @db.VarChar(3)
   lokasiRw     String  @db.VarChar(3)
 
-  isLocked Boolean   @default(false)
-  lockedAt DateTime?
-
   domainIsuId String
   domainIsu   DomainIsu @relation(fields: [domainIsuId], references: [id])
 
@@ -119,10 +116,6 @@ model MasukanWarga {
   diverifikasiOlehId String?
   diverifikasiOleh   User?   @relation("VerifikatorMasukan", fields: [diverifikasiOlehId], references: [id])
 
-  // Relevance tracking
-  isRelevant Boolean   @default(true)
-  expiresAt  DateTime?
-
   // Relasi ke junction table (MENGGABUNGKAN RekomendasiMasukan dan ItemPrioritasMasukan)
   relasiRapat KegiatanRapatMasukan[]
 
@@ -130,7 +123,6 @@ model MasukanWarga {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@index([status])
-  @@index([isRelevant])
   @@index([domainIsuId])
   @@map("masukan_warga")
 }

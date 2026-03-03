@@ -150,14 +150,10 @@ exports.Prisma.MasukanWargaScalarFieldEnum = {
   deskripsi: 'deskripsi',
   lokasiRt: 'lokasiRt',
   lokasiRw: 'lokasiRw',
-  isLocked: 'isLocked',
-  lockedAt: 'lockedAt',
   domainIsuId: 'domainIsuId',
   status: 'status',
   alasanPenolakan: 'alasanPenolakan',
   diverifikasiOlehId: 'diverifikasiOlehId',
-  isRelevant: 'isRelevant',
-  expiresAt: 'expiresAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

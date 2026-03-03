@@ -53,7 +53,7 @@ export const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();
 
-    // ✅ Normalize tanggal ke Date object untuk Prisma
+    // Normalize tanggal ke Date object untuk Prisma
     const parsedTanggal = body.tanggal;
     let normalizedTanggal: Date | string = parsedTanggal;
 
@@ -79,7 +79,7 @@ export const POST = async (req: NextRequest) => {
 
     if (!parsed.success) return handleZodValidation(parsed);
 
-    // ✅ 1. Create kegiatan rapat dulu
+    // 1. Create kegiatan rapat dulu
     const data = {
       ...parsed.data,
       dibuatOlehId: session.user.id,
@@ -105,7 +105,9 @@ export const POST = async (req: NextRequest) => {
 
     const kegiatanRapat = await kegiatanRapatService.create(data);
 
-    // ✅ 2. Auto generate rekomendasi setelah create berhasil
+    let finalData = kegiatanRapat; // default jika AI gagal
+
+    // 2. Auto generate rekomendasi setelah create berhasil
     try {
       // Fetch domainIsu code untuk generateRekomendasi
       const domainIsu = await prisma.domainIsu.findUnique({
@@ -115,7 +117,7 @@ export const POST = async (req: NextRequest) => {
 
       if (domainIsu?.code) {
         // Trigger AI recommendation generation
-        await kegiatanRapatService.generateRekomendasi({
+        const result = await kegiatanRapatService.generateRekomendasi({
           kegiatanRapatId: kegiatanRapat.id,
           domainIsuId: parsed.data.domainIsuId,
           domainIsuCode: domainIsu.code,
@@ -123,27 +125,18 @@ export const POST = async (req: NextRequest) => {
           userId: session.user.id,
           judulLaporan: parsed.data.judulLaporan,
         });
+        finalData = result.updated; // gunakan data yang sudah diupdate dengan rekomendasi
       }
     } catch (aiError) {
       // ⚠️ Jangan gagalkan request jika AI generation error
-      // Log error dan lanjutkan response success
       console.error("AI Recommendation Generation Error:", aiError);
-      // Optional: Bisa kirim notifikasi ke admin/log system
+      // Tetap gunakan data awal (kegiatanRapat)
     }
-
-    // ✅ 3. Fetch updated data dengan rekomendasi yang sudah digenerate
-    const updatedKegiatan = await prisma.kegiatanRapat.findUnique({
-      where: { id: kegiatanRapat.id },
-      include: {
-        dibuatOleh: { select: { name: true, jabatan: true } },
-        domainIsu: { select: { nama: true, code: true } },
-      },
-    });
 
     return handleResponse({
       success: true,
-      message: "Kegiatan Berhasil Ditambahkan & Rekomendasi AI Sedang Diproses",
-      data: updatedKegiatan,
+      message: "Kegiatan Berhasil Ditambahkan",
+      data: finalData,
       status: 201,
     });
   } catch (err) {
@@ -165,7 +158,7 @@ export const POST = async (req: NextRequest) => {
 };
 
 // ========================
-// GET - List Kegiatan Rapat
+// GET - List Kegiatan Rapat (tidak berubah)
 // ========================
 
 export const GET = async (req: NextRequest) => {
@@ -207,7 +200,6 @@ export const GET = async (req: NextRequest) => {
     if (!parsed.success) return handleZodValidation(parsed);
     const data = parsed.data;
 
-    // ✅ Date filters helper dengan type annotation eksplisit
     const buildDateRange = (dateStr?: string): { from?: Date; to?: Date } => {
       if (!dateStr || !dayjs(dateStr, "YYYY-MM-DD", true).isValid()) {
         return { from: undefined, to: undefined };

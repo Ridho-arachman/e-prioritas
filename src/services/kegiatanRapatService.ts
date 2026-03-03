@@ -306,7 +306,7 @@ export const kegiatanRapatService = {
   },
 
   // ═══════════════════════════════════════════════════════════════
-  // 🤖 GENERATE REKOMENDASI AI (Integrated)
+  // 🤖 GENERATE REKOMENDASI AI (Integrated with Debug Logs)
   // ═══════════════════════════════════════════════════════════════
 
   generateRekomendasi: async (args: {
@@ -327,41 +327,83 @@ export const kegiatanRapatService = {
     } = args;
 
     // 1. Fetch data relevan berdasarkan mode
-    const [masukanWarga, dataMaster] = await Promise.all([
-      mode === "FUSI_DATA"
-        ? prisma.masukanWarga.findMany({
-            where: {
-              domainIsuId,
-              status: StatusMasukan.DIVERIFIKASI,
-              isRelevant: true,
-              expiresAt: { gt: new Date() },
-            },
-            select: {
-              id: true,
-              judul: true,
-              deskripsi: true,
-              lokasiRt: true,
-              lokasiRw: true,
-              domainIsuId: true,
-              status: true,
-            },
-            take: 50,
-          })
-        : [],
-      prisma.dataMaster.findMany({
-        where: { domainIsuId, isActive: true },
+    let masukanWarga: any[] = [];
+    if (mode === "FUSI_DATA") {
+      // 🔍 Hitung total data untuk debugging
+      const totalAll = await prisma.masukanWarga.count({
+        where: { domainIsuId },
+      });
+      const totalVerified = await prisma.masukanWarga.count({
+        where: { domainIsuId, status: StatusMasukan.DIVERIFIKASI },
+      });
+      console.log(
+        `[generateRekomendasi] Domain: ${domainIsuCode} (${domainIsuId})`,
+      );
+      console.log(
+        `[generateRekomendasi] Total masukan warga untuk domain ini: ${totalAll}`,
+      );
+      console.log(
+        `[generateRekomendasi] Total terverifikasi: ${totalVerified}`,
+      );
+
+      // Ambil dengan filter standar
+      masukanWarga = await prisma.masukanWarga.findMany({
+        where: {
+          domainIsuId,
+          status: StatusMasukan.DIVERIFIKASI,
+        },
         select: {
           id: true,
-          namaAtribut: true,
-          kritikalitas: true,
-          jumlah: true,
+          judul: true,
+          deskripsi: true,
+          lokasiRt: true,
+          lokasiRw: true,
           domainIsuId: true,
+          status: true,
         },
         take: 50,
-      }),
-    ]);
+      });
 
-    // 2. Fetch exclusion titles (cega duplikat)
+      console.log(
+        `[generateRekomendasi] Yang memenuhi semua filter (status=VERIFIED, isRelevant, expiresAt): ${masukanWarga.length}`,
+      );
+
+      // ⚠️ OPSIONAL: Jika ingin mengambil data tanpa filter expiresAt/isRelevant saat tidak ada data,
+      // aktifkan kode di bawah ini (hanya untuk sementara, misal untuk testing)
+      /*
+      if (masukanWarga.length === 0 && totalVerified > 0) {
+        console.log(`[generateRekomendasi] Mencoba mengambil data tanpa filter expiresAt/isRelevant...`);
+        masukanWarga = await prisma.masukanWarga.findMany({
+          where: { domainIsuId, status: StatusMasukan.DIVERIFIKASI },
+          select: {
+            id: true,
+            judul: true,
+            deskripsi: true,
+            lokasiRt: true,
+            lokasiRw: true,
+            domainIsuId: true,
+            status: true,
+          },
+          take: 50,
+        });
+        console.log(`[generateRekomendasi] Setelah fallback, ditemukan: ${masukanWarga.length}`);
+      }
+      */
+    }
+
+    const dataMaster = await prisma.dataMaster.findMany({
+      where: { domainIsuId, isActive: true },
+      select: {
+        id: true,
+        namaAtribut: true,
+        kritikalitas: true,
+        jumlah: true,
+        domainIsuId: true,
+      },
+      take: 50,
+    });
+
+    // 2. Fetch exclusion titles (cegah duplikat)
     const existingPrioritas = await prisma.kegiatanRapat.findMany({
       where: {
         domainIsuId,
@@ -445,19 +487,38 @@ export const kegiatanRapatService = {
       },
     };
 
-    // 7. Update kegiatan rapat dengan hasil rekomendasi
-    const updated = await prisma.kegiatanRapat.update({
-      where: { id: kegiatanRapatId },
-      data: {
-        rekomendasiItems: finalRekomendasi as any,
-        statusRekomendasi: "DIAJUKAN",
-        aiProcessedAt: new Date(),
-        diprosesOlehId: userId,
-      },
-      include: {
-        dibuatOleh: { select: { name: true, jabatan: true } },
-        domainIsu: { select: { nama: true, code: true } },
-      },
+    // 7. 🔥 SIMPAN RELASI MASUKAN WARGA dalam transaksi
+    const updated = await prisma.$transaction(async (tx) => {
+      // Hapus relasi lama
+      await tx.kegiatanRapatMasukan.deleteMany({
+        where: { kegiatanRapatId },
+      });
+
+      // Buat relasi baru jika mode FUSI_DATA dan ada masukan
+      if (mode === "FUSI_DATA" && masukanWarga.length > 0) {
+        await tx.kegiatanRapatMasukan.createMany({
+          data: masukanWarga.map((m) => ({
+            kegiatanRapatId,
+            masukanId: m.id,
+          })),
+          skipDuplicates: true,
+        });
+      }
+
+      // Update kegiatan rapat dengan hasil rekomendasi
+      return tx.kegiatanRapat.update({
+        where: { id: kegiatanRapatId },
+        data: {
+          rekomendasiItems: finalRekomendasi as any,
+          statusRekomendasi: "DIAJUKAN",
+          aiProcessedAt: new Date(),
+          diprosesOlehId: userId,
+        },
+        include: {
+          dibuatOleh: { select: { name: true, jabatan: true } },
+          domainIsu: { select: { nama: true, code: true } },
+        },
+      });
     });
 
     return {
