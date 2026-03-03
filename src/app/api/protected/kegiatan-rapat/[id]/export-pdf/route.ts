@@ -23,6 +23,8 @@ interface RekomendasiItem {
     dataMasterCount?: number;
     kritikalitas?: string;
   };
+  usedMasukanIds?: string[];
+  usedDataMasterIds?: string[];
 }
 
 interface RekomendasiMetadata {
@@ -34,16 +36,37 @@ interface RekomendasiMetadata {
   totalDataMasterDianalisis: number;
 }
 
+interface InputDataItem {
+  id: string;
+  judul: string;
+  deskripsi: string;
+  lokasiRt: string;
+  lokasiRw: string;
+}
+
+interface InputDataMaster {
+  id: string;
+  namaAtribut: string;
+  kritikalitas: string;
+  jumlah: number | null;
+}
+
+interface InputData {
+  masukan: InputDataItem[];
+  dataMaster: InputDataMaster[];
+}
+
 interface RekomendasiSnapshot {
   metadata: RekomendasiMetadata;
   prioritas: RekomendasiItem[];
+  inputData?: InputData;
 }
 
 // ==================== Konstanta ====================
 const MARGIN = 50;
 const PAGE_WIDTH = 595.28;
 const PAGE_HEIGHT = 841.89;
-const FOOTER_HEIGHT = 40;
+const FOOTER_HEIGHT = 50; // Sedikit ditambah untuk copyright
 const HEADER_HEIGHT = 60;
 const CONTENT_TOP = PAGE_HEIGHT - MARGIN - HEADER_HEIGHT;
 const CONTENT_BOTTOM = MARGIN + FOOTER_HEIGHT;
@@ -116,12 +139,15 @@ const drawFooter = (
   totalPages: number,
 ) => {
   const footerY = MARGIN - 10;
+  // Garis pemisah footer
   page.drawLine({
     start: { x: MARGIN, y: footerY },
     end: { x: PAGE_WIDTH - MARGIN, y: footerY },
     thickness: 0.5,
     color: COLORS.border,
   });
+
+  // Tanggal cetak
   const now = formatTanggalIndonesia(new Date());
   page.drawText(`Dicetak pada: ${now}`, {
     x: MARGIN,
@@ -130,10 +156,22 @@ const drawFooter = (
     font: helvetica,
     color: COLORS.textSecondary,
   });
+
+  // Nomor halaman
   page.drawText(`Halaman ${pageNumber} dari ${totalPages}`, {
     x: PAGE_WIDTH - MARGIN - 80,
     y: footerY - 10,
     size: 7,
+    font: helvetica,
+    color: COLORS.textSecondary,
+  });
+
+  // Hak cipta dan keterangan formal
+  const currentYear = new Date().getFullYear();
+  page.drawText(`© ${currentYear} Kelurahan Panggungjati - Dokumen Resmi`, {
+    x: MARGIN,
+    y: footerY - 20,
+    size: 6,
     font: helvetica,
     color: COLORS.textSecondary,
   });
@@ -424,7 +462,7 @@ export async function GET(
         y = result.newY - 10;
       }
 
-      // Loop setiap prioritas dengan pengukuran dinamis
+      // Loop setiap prioritas
       for (const item of rekomendasi.prioritas) {
         // Hitung tinggi yang dibutuhkan
         const descHeight = measureTextHeight(
@@ -441,9 +479,27 @@ export async function GET(
         );
 
         let requiredHeight = 25 + descHeight + 14 + 12 + alasanHeight + 8; // badge + deskripsi + skor + label alasan + alasan + margin
+
         if (item.evidence) {
           requiredHeight += 12 + 18 + 18 + 8; // label + header + data + margin
         }
+
+        // Tambahan untuk data input (masukan dan data master)
+        const usedMasukan =
+          rekomendasi.inputData?.masukan.filter((m) =>
+            item.usedMasukanIds?.includes(m.id),
+          ) || [];
+        const usedDataMaster =
+          rekomendasi.inputData?.dataMaster.filter((d) =>
+            item.usedDataMasterIds?.includes(d.id),
+          ) || [];
+        const totalInputItems = usedMasukan.length + usedDataMaster.length;
+        if (totalInputItems > 0) {
+          requiredHeight += 15; // label "Data Input Terkait"
+          const itemHeight = 12; // perkiraan tinggi per item (dengan wrap)
+          requiredHeight += totalInputItems * itemHeight;
+        }
+
         if (item.lokasiRt || item.lokasiRw) {
           requiredHeight += 15;
         }
@@ -611,6 +667,41 @@ export async function GET(
           y -= rowH + 8;
         }
 
+        // === Data Input Terkait dengan Label Jelas ===
+        if (usedMasukan.length > 0 || usedDataMaster.length > 0) {
+          currentPage.drawText("Data Input Terkait:", {
+            x: MARGIN + 35,
+            y,
+            size: 9,
+            font: helveticaBold,
+          });
+          y -= 12;
+
+          // Masukan Warga
+          for (const m of usedMasukan) {
+            const text = `[Masukan] ${sanitizeText(m.judul)} (RT ${m.lokasiRt}/RW ${m.lokasiRw})`;
+            const result = drawWrappedText(currentPage, text, MARGIN + 45, y, {
+              size: 8,
+              font: helvetica,
+              maxWidth: MAX_CONTENT_WIDTH - 45,
+            });
+            y = result.newY - 8;
+          }
+
+          // Data Master
+          for (const d of usedDataMaster) {
+            const text = `[Data Master] ${sanitizeText(d.namaAtribut)} (${d.kritikalitas})${d.jumlah ? ` - Jml: ${d.jumlah}` : ""}`;
+            const result = drawWrappedText(currentPage, text, MARGIN + 45, y, {
+              size: 8,
+              font: helvetica,
+              maxWidth: MAX_CONTENT_WIDTH - 45,
+            });
+            y = result.newY - 8;
+          }
+
+          y -= 4; // spasi setelah data input
+        }
+
         // Lokasi
         if (item.lokasiRt || item.lokasiRw) {
           currentPage.drawText(
@@ -652,9 +743,8 @@ export async function GET(
     }
 
     // ========== BAGIAN PENGESAHAN ==========
-    const pengesahanHeight = 120; // perkiraan tinggi total bagian pengesahan
+    const pengesahanHeight = 120;
 
-    // Cek apakah perlu halaman baru untuk pengesahan
     if (y - pengesahanHeight < CONTENT_BOTTOM) {
       drawFooter(
         currentPage,
@@ -667,7 +757,6 @@ export async function GET(
       y = CONTENT_TOP;
     }
 
-    // Garis pemisah sebelum pengesahan
     currentPage.drawLine({
       start: { x: MARGIN, y: y + 5 },
       end: { x: PAGE_WIDTH - MARGIN, y: y + 5 },
@@ -676,7 +765,6 @@ export async function GET(
     });
     y -= 15;
 
-    // Judul pengesahan
     currentPage.drawText("PENGESAHAN", {
       x: MARGIN,
       y,
@@ -686,12 +774,11 @@ export async function GET(
     });
     y -= 25;
 
-    // Simpan posisi awal pengesahan
     const pengesahanYStart = y;
 
     // Kolom kiri (Mengetahui)
     const leftX = MARGIN;
-    const rightX = MARGIN + (MAX_CONTENT_WIDTH - 50) / 2 + 50; // perkiraan
+    const rightX = MARGIN + (MAX_CONTENT_WIDTH - 50) / 2 + 50;
 
     // Kolom kiri
     currentPage.drawText("Mengetahui,", {
@@ -769,10 +856,7 @@ export async function GET(
       font: helvetica,
     });
 
-    // Update y setelah pengesahan
     y = pengesahanYStart - 120;
-
-    // ========== AKHIR PENGESAHAN ==========
 
     // === DRAW FOOTERS PADA SEMUA HALAMAN ===
     const totalPages = pdfDoc.getPageCount();
@@ -781,7 +865,6 @@ export async function GET(
       drawFooter(page, helvetica, i + 1, totalPages);
     }
 
-    // Simpan dan kembalikan PDF
     const pdfBytes = await pdfDoc.save();
     const pdfBuffer = Buffer.from(pdfBytes);
     const filename = `kegiatan-${kegiatan.judul?.replace(/[^a-zA-Z0-9_-]/g, "_") || id}.pdf`;
