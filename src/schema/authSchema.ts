@@ -2,6 +2,7 @@ import z from "zod";
 
 export const EmailSchema = z.object({
   email: z.string().email(),
+  turnstileToken: z.string().min(1, "Captcha wajib diisi"),
 });
 
 export const PasswordResetSchema = z
@@ -25,6 +26,8 @@ export const PasswordResetSchema = z
       .regex(/[A-Z]/, "Password harus mengandung huruf besar")
       .regex(/[0-9]/, "Password harus mengandung angka")
       .regex(/[^a-zA-Z0-9]/, "Password harus mengandung simbol"),
+
+    turnstileToken: z.string().min(1, "Captcha wajib diisi"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],

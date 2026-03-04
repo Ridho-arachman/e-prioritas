@@ -7,12 +7,24 @@ import { NextRequest } from "next/server";
 
 export const POST = async (req: NextRequest) => {
   try {
-    const { email } = await req.json();
+    const turnstileToken = await req.headers.get("x-captcha-response");
+    const body = await req.json();
 
-    const parsed = EmailSchema.safeParse({ email });
+    const parsed = EmailSchema.safeParse(body);
     if (!parsed.success) return handleZodValidation(parsed);
 
+    if (!turnstileToken) {
+      return handleResponse({
+        success: false,
+        message: "Captcha belum diverifikasi",
+        status: 400,
+      });
+    }
+
     const res = await auth.api.requestPasswordReset({
+      headers: {
+        "x-captcha-response": turnstileToken,
+      },
       body: {
         email: parsed.data.email,
         redirectTo:

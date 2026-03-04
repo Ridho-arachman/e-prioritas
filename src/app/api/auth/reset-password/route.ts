@@ -8,6 +8,15 @@ import { NextRequest } from "next/server";
 export const POST = async (req: NextRequest) => {
   try {
     const token = req.nextUrl.searchParams.get("token");
+    const turnstileToken = await req.headers.get("x-captcha-response");
+
+    if (!turnstileToken) {
+      return handleResponse({
+        success: false,
+        message: "Captcha belum diverifikasi",
+        status: 400,
+      });
+    }
 
     if (!token) {
       return handleResponse({
@@ -25,6 +34,9 @@ export const POST = async (req: NextRequest) => {
     const newPassword = parsed.data.password;
 
     const res = await auth.api.resetPassword({
+      headers: {
+        "x-captcha-response": turnstileToken,
+      },
       body: {
         token,
         newPassword,

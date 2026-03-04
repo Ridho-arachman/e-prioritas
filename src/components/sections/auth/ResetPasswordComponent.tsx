@@ -6,13 +6,6 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useSearchParams, useRouter } from "next/navigation";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
@@ -23,6 +16,7 @@ import { notifier } from "@/lib/ToastNotifier";
 import { AxiosError } from "axios";
 import { ApiError } from "@/types/ApiError";
 import { PasswordResetSchema } from "@/schema/authSchema";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 type ResetPasswordForm = z.infer<typeof PasswordResetSchema>;
 
@@ -41,10 +35,16 @@ export default function ResetPasswordComponent() {
     defaultValues: {
       password: "",
       confirmPassword: "",
+      turnstileToken: "",
     },
   });
 
   const onSubmit = async (values: ResetPasswordForm) => {
+    if (!values.turnstileToken) {
+      notifier.error("Login Gagal", "Captcha belum diverifikasi");
+      return;
+    }
+
     if (!token) {
       notifier.error(
         "Token tidak valid",
@@ -52,8 +52,13 @@ export default function ResetPasswordComponent() {
       );
       return;
     }
+
     try {
-      await post(values);
+      await post(values, {
+        headers: {
+          "x-captcha-response": values.turnstileToken,
+        },
+      });
       notifier.success("Berhasil", "Password berhasil direset");
       router.replace("/login");
     } catch (error) {
@@ -67,105 +72,121 @@ export default function ResetPasswordComponent() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <Card className="w-full sm:max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Buat Password Baru</CardTitle>
-          <CardDescription>
+    <div className="flex items-center justify-center">
+      <div className="w-full">
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold">Buat Password Baru</h1>
+          <p className="text-muted-foreground text-sm">
             Masukkan password baru untuk akun Anda
-          </CardDescription>
-        </CardHeader>
+          </p>
+        </div>
 
-        <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* PASSWORD BARU */}
-            <Controller
-              name="password"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>Password Baru</FieldLabel>
-                  <div className="flex items-center gap-3">
-                    <Input
-                      {...field}
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Password baru"
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="p-0 w-10 h-10"
-                    >
-                      {showPassword ? (
-                        <EyeOff className="w-5 h-5" />
-                      ) : (
-                        <Eye className="w-5 h-5" />
-                      )}
-                    </Button>
-                  </div>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {/* PASSWORD BARU */}
+          <Controller
+            name="password"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Password Baru</FieldLabel>
+                <div className="flex items-center gap-3">
+                  <Input
+                    {...field}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password baru"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="p-0 w-10 h-10 shrink-0"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </Button>
+                </div>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
 
-            {/* KONFIRMASI PASSWORD */}
-            <Controller
-              name="confirmPassword"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>Konfirmasi Password</FieldLabel>
-                  <div className="flex items-center gap-3">
-                    <Input
-                      {...field}
-                      type={showConfirm ? "text" : "password"}
-                      placeholder="Ulangi password"
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowConfirm(!showConfirm)}
-                      className="p-0 w-10 h-10"
-                    >
-                      {showConfirm ? (
-                        <EyeOff className="w-5 h-5" />
-                      ) : (
-                        <Eye className="w-5 h-5" />
-                      )}
-                    </Button>
-                  </div>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
+          {/* KONFIRMASI PASSWORD */}
+          <Controller
+            name="confirmPassword"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Konfirmasi Password</FieldLabel>
+                <div className="flex items-center gap-3">
+                  <Input
+                    {...field}
+                    type={showConfirm ? "text" : "password"}
+                    placeholder="Ulangi password"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowConfirm(!showConfirm)}
+                    className="p-0 w-10 h-10 shrink-0"
+                  >
+                    {showConfirm ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </Button>
+                </div>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
 
-            <Button
-              type="submit"
-              className="w-full cursor-pointer"
-              disabled={loading}
-            >
-              {loading ? "Menyimpan..." : "Reset Password"}
-            </Button>
+          <Controller
+            control={form.control}
+            name="turnstileToken"
+            render={({ field, fieldState }) => (
+              <Field>
+                <FieldLabel>Captcha</FieldLabel>
+                <Turnstile
+                  siteKey={`${process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}`}
+                  onSuccess={(token) => field.onChange(token)}
+                  onExpire={() => field.onChange("")}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
 
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full flex items-center gap-2"
-              onClick={() => router.push("/login")}
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Kembali ke Login
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+          <Button
+            type="submit"
+            className="w-full cursor-pointer"
+            disabled={loading}
+          >
+            {loading ? "Menyimpan..." : "Reset Password"}
+          </Button>
+
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full flex items-center gap-2 cursor-pointer"
+            onClick={() => router.push("/login")}
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Kembali ke Login
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }
