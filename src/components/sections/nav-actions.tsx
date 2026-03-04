@@ -26,7 +26,7 @@ import { notifier } from "../../lib/ToastNotifier";
 import { useState } from "react";
 import { AxiosError } from "axios";
 import { ApiError } from "@/types/ApiError";
-import { usePost } from "@/hooks/useApi";
+import { useGet, usePost } from "@/hooks/useApi";
 
 export function NavActions() {
   const router = useRouter();
@@ -41,14 +41,16 @@ export function NavActions() {
     year: "numeric",
   });
 
+  const { data: user } = useGet("/protected/user/getuser");
+
   // Ambil inisial user
-  // const initials = user?.name
-  //   ? user.name
-  //       .split(" ")
-  //       .map((n: string) => n[0])
-  //       .join("")
-  //       .toUpperCase()
-  //   : "USR";
+  const initials = user?.name
+    ? user.name
+        .split(" ")
+        .map((n: string) => n[0])
+        .join("")
+        .toUpperCase()
+    : "USR";
 
   const data = [
     [
@@ -87,9 +89,9 @@ export function NavActions() {
             size="icon"
             className="data-[state=open]:bg-accent h-8 w-8 rounded-full justify-center"
           >
-            {/* <Avatar className="h-8 w-8">
-              {user?.avatar ? (
-                <AvatarImage src={user.nama} alt={user.name} />
+            <Avatar className="h-8 w-8">
+              {user?.image ? (
+                <AvatarImage src={user.image} alt={user.name} />
               ) : (
                 <AvatarImage src="/avatar.png" alt="User default" />
               )}
@@ -97,7 +99,7 @@ export function NavActions() {
               <AvatarFallback className="bg-amber-300 text-amber-900">
                 {initials}
               </AvatarFallback>
-            </Avatar> */}
+            </Avatar>
           </Button>
         </PopoverTrigger>
 

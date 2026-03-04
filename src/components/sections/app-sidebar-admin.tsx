@@ -59,7 +59,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       },
       {
         title: "Setting Profile Admin",
-        url: `/admin/setting/user}`,
+        url: `/admin/setting`,
         icon: Settings2,
       },
       {

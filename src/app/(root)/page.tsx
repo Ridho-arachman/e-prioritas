@@ -1,4 +1,6 @@
-// app/page.tsx
+"use client";
+
+import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,204 +16,552 @@ import {
   BarChart3,
   Bot,
   Users,
-  LucideIcon,
+  Sparkles,
+  TrendingUp,
+  MessageSquare,
+  Star,
+  ChevronRight,
 } from "lucide-react";
 import Image from "next/image";
 import InfiniteLogoSlider from "@/components/blocks/logo-slider";
 import { cn } from "@/lib/utils";
-import type { Metadata } from "next";
+import { useRef, useState, useEffect } from "react";
+import { useGet } from "@/hooks/useApi";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export const metadata: Metadata = {
-  title: "Home",
-  description:
-    "Sistem rekomendasi pembangunan fasilitas desa Panggungjati untuk membantu perangkat desa agar bisa mendaptkan output prioritas pembangunan fasilitas desa.",
-  openGraph: {
-    title: "Masukan Warga Desa Panggungjati",
-    description:
-      "Berikan saran atau masukan Anda kepada Desa Panggungjati. Setiap suara warga berharga untuk kemajuan bersama.",
-    url: "https://desapanggungjati.id/masukan-warga",
-    images: [
-      {
-        url: "https://desapanggungjati.id/og-masukan.jpg",
-        width: 1200,
-        height: 630,
+// Komponen Counter (sama seperti di halaman tentang)
+const Counter = ({
+  value,
+  duration = 2,
+}: {
+  value: number;
+  duration?: number;
+}) => {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const [isInView, setIsInView] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+        }
       },
-    ],
-  },
-  twitter: {
-    title: "Masukan Warga | Desa Panggungjati",
-    description:
-      "Formulir online untuk menyampaikan saran dan masukan kepada Desa Panggungjati.",
-    images: ["https://desapanggungjati.id/og-masukan.jpg"],
-  },
+      { threshold: 0.1 },
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isInView) return;
+    let start = 0;
+    const increment = value / (duration * 60);
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= value) {
+        setCount(value);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, 16);
+    return () => clearInterval(timer);
+  }, [isInView, value, duration]);
+
+  return <span ref={ref}>{count.toLocaleString()}</span>;
 };
 
-// Definisikan tipe data untuk setiap kartu utama (MainCard)
-interface MainCard {
-  title: string;
-  description: string;
-  imageSrc: string;
-  imageAlt: string;
-  linkHref: string;
-  buttonText: string;
-  variant?: "default" | "outline";
-  hoverBorderColor: string;
-  hoverBorderColorDark: string;
-  textColor: string;
-}
+// Komponen partikel sederhana (hanya di-render di client)
+const Particles = () => {
+  const [isMounted, setIsMounted] = useState(false);
+  const [particles, setParticles] = useState<
+    Array<{ id: number; x: number; y: number; size: number; duration: number }>
+  >([]);
 
-// Definisikan tipe data untuk setiap fitur (FeatureCard)
-interface Feature {
-  title: string;
-  description: string;
-  icon: LucideIcon;
-  color: string;
-  colorDark: string;
-}
+  useEffect(() => {
+    setIsMounted(true);
+    setParticles(
+      Array.from({ length: 50 }).map((_, i) => ({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: Math.random() * 3 + 1,
+        duration: Math.random() * 20 + 10,
+      })),
+    );
+  }, []);
+
+  if (!isMounted) return null;
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {particles.map((p) => (
+        <motion.div
+          key={p.id}
+          className="absolute bg-blue-500/20 dark:bg-blue-400/20 rounded-full"
+          style={{
+            left: `${p.x}%`,
+            top: `${p.y}%`,
+            width: p.size,
+            height: p.size,
+          }}
+          animate={{
+            y: [0, -30, 0],
+            x: [0, Math.random() * 20 - 10, 0],
+          }}
+          transition={{
+            duration: p.duration,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+// Komponen kartu dengan efek tilt (3D)
+const TiltCard = ({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [rotate, setRotate] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = (y - centerY) / 20;
+    const rotateY = (centerX - x) / 20;
+    setRotate({ x: rotateX, y: rotateY });
+  };
+
+  const handleMouseLeave = () => {
+    setRotate({ x: 0, y: 0 });
+  };
+
+  return (
+    <motion.div
+      ref={cardRef}
+      className={className}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      animate={{ rotateX: rotate.x, rotateY: rotate.y }}
+      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+      style={{ transformStyle: "preserve-3d" }}
+    >
+      {children}
+    </motion.div>
+  );
+};
 
 export default function LandingPage() {
-  // Data array untuk kartu utama
-  const mainCards: MainCard[] = [
+  const { scrollYProgress } = useScroll();
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, -200]);
+
+  const { data: statsData, isLoading } = useGet("/public/stats");
+
+  const mainCards = [
     {
-      title: "Masuk sebagai Perangkat Desa",
+      title: "Untuk Perangkat Desa",
       description:
         "Kelola data, proses masukan warga, dan hasilkan rekomendasi dengan kecerdasan buatan.",
       imageSrc: "/home/1.png",
       imageAlt: "Dashboard Admin",
       linkHref: "/login",
       buttonText: "Masuk Sekarang",
-      hoverBorderColor: "hover:border-blue-500",
-      hoverBorderColorDark: "dark:hover:border-blue-500",
-      textColor: "blue",
+      gradientFrom: "from-blue-500",
+      gradientTo: "to-cyan-500",
+      icon: Users,
     },
     {
-      title: "Sampaikan Masukan Anda",
+      title: "Untuk Warga",
       description:
         "Berpartisipasi aktif dalam proses pembangunan dengan memberikan saran atau keluhan.",
       imageSrc: "/home/2.png",
       imageAlt: "Formulir Masukan Warga",
       linkHref: "/masukan",
       buttonText: "Sampaikan Masukan",
-      variant: "outline",
-      hoverBorderColor: "hover:border-green-500",
-      hoverBorderColorDark: "dark:hover:border-green-500",
-      textColor: "green",
+      gradientFrom: "from-green-500",
+      gradientTo: "to-emerald-500",
+      icon: MessageSquare,
     },
   ];
 
-  // Data array untuk fitur
-  const features: Feature[] = [
+  const features = [
     {
       title: "Partisipasi Aktif Warga",
       description:
         "Sistem memungkinkan warga untuk menyampaikan aspirasi dan masukan secara langsung, memastikan setiap suara didengar.",
       icon: Users,
-      color: "text-blue-600",
-      colorDark: "dark:text-blue-400",
+      gradient: "from-blue-500 to-cyan-500",
     },
     {
       title: "Rekomendasi Berbasis AI",
       description:
-        "Memanfaatkan kecerdasan buatan dari OpenAI untuk menganalisis data dan memberikan rekomendasi yang objektif.",
+        "Memanfaatkan kecerdasan buatan dari Google Gemini AI untuk menganalisis data dan memberikan rekomendasi yang objektif.",
       icon: Bot,
-      color: "text-green-600",
-      colorDark: "dark:text-green-400",
+      gradient: "from-purple-500 to-pink-500",
     },
     {
-      title: "Pengambilan Keputusan Cerdas",
+      title: "Keputusan Cerdas",
       description:
         "Membantu perangkat desa dalam memprioritaskan pembangunan berdasarkan data dan kebutuhan riil masyarakat.",
+      icon: TrendingUp,
+      gradient: "from-amber-500 to-orange-500",
+    },
+  ];
+
+  const testimonials = [
+    {
+      name: "Bapak RT 03",
+      role: "Ketua RW 05",
+      content:
+        "Sistem ini sangat membantu dalam menjaring aspirasi warga. Sekarang pembangunan lebih terarah.",
+      avatar: "👨‍🌾",
+    },
+    {
+      name: "Ibu Lurah",
+      role: "Lurah Panggungjati",
+      content:
+        "Dengan AI, kami bisa memprioritaskan program yang benar-benar dibutuhkan masyarakat.",
+      avatar: "👩‍💼",
+    },
+    {
+      name: "Warga RT 02",
+      role: "Warga",
+      content:
+        "Saya merasa didengar. Masukan saya tentang perbaikan jalan langsung masuk prioritas.",
+      avatar: "👴",
+    },
+  ];
+
+  const totalMasukan = statsData?.totalMasukan ?? 0;
+  const totalKegiatan = statsData?.totalKegiatan ?? 0;
+
+  const stats = [
+    {
+      value: isLoading ? (
+        <Skeleton className="h-8 w-16 mx-auto" />
+      ) : (
+        <Counter value={totalMasukan} />
+      ),
+      label: "Masukan Warga",
+      icon: Star,
+    },
+    {
+      value: isLoading ? (
+        <Skeleton className="h-8 w-16 mx-auto" />
+      ) : (
+        <Counter value={totalKegiatan} />
+      ),
+      label: "Kegiatan Rapat",
       icon: BarChart3,
-      color: "text-purple-600",
-      colorDark: "dark:text-purple-400",
+    },
+    {
+      value: <Counter value={5} />,
+      label: "Prioritas per Rapat",
+      icon: Sparkles,
+    },
+    {
+      value: "24/7",
+      label: "AI Siap Membantu",
+      icon: Bot,
     },
   ];
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center p-6 sm:p-24 overflow-hidden">
-      {/* Latar Belakang Gradien Animasi */}
-      <div className="absolute inset-0 z-0 bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-950 dark:to-blue-950 animate-pulse-slow opacity-50"></div>
+    <div className="relative min-h-screen overflow-hidden bg-linear-to-br from-slate-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-blue-950">
+      <Particles />
 
-      <div className="relative z-10 w-full max-w-7xl flex flex-col items-center">
-        {/* Header Utama */}
-        <div className="text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 text-gray-900 dark:text-gray-50">
+      {/* Animated background blobs */}
+      <motion.div
+        className="absolute -top-40 -right-40 w-80 h-80 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
+        animate={{ x: [0, 100, 0], y: [0, -50, 0] }}
+        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+      />
+      <motion.div
+        className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
+        animate={{ x: [0, -100, 0], y: [0, 50, 0] }}
+        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+      />
+
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-24">
+        {/* Header dengan parallax */}
+        <motion.div className="text-center space-y-4" style={{ y: y1 }}>
+          <motion.h1
+            className="text-4xl md:text-5xl lg:text-7xl font-bold bg-clip-text text-transparent bg-linear-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
             Sistem Cerdas untuk Pembangunan Kelurahan
-          </h1>
-          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Platform berbasis Next.js dan OpenAI untuk memprioritaskan
+          </motion.h1>
+          <motion.p
+            className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            Platform berbasis Next.js dan Google Gemini AI untuk memprioritaskan
             pembangunan fasilitas umum secara akurat dan transparan di Kelurahan
             Panggungjati.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
-        <div className="w-full max-w-5xl my-24">
+        {/* Stats dengan animasi */}
+        <motion.div
+          className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ staggerChildren: 0.1 }}
+        >
+          {stats.map((stat, idx) => (
+            <motion.div
+              key={idx}
+              className="text-center p-6 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all"
+              whileHover={{ scale: 1.05 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.1 }}
+            >
+              <stat.icon className="w-8 h-8 mx-auto mb-2 text-blue-600 dark:text-blue-400" />
+              <div className="text-3xl font-bold text-gray-900 dark:text-white">
+                {stat.value}
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {stat.label}
+              </p>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Logo Slider */}
+        <motion.div
+          className="mt-24"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+        >
           <InfiniteLogoSlider />
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 w-full mb-24">
-          {mainCards.map((card) => (
-            <Link key={card.title} href={card.linkHref}>
-              <Card
-                className={`flex flex-col h-full hover:shadow-2xl hover:scale-105 transition-all duration-500 cursor-pointer border-2 border-transparent ${card.hoverBorderColor} ${card.hoverBorderColorDark}`}
-              >
-                <CardHeader>
-                  <CardTitle
-                    className={`text-2xl font-semibold text-${card.textColor}-600 dark:text-${card.textColor}-400`}
-                  >
-                    {card.title}
-                  </CardTitle>
-                  <CardDescription>{card.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="grow flex items-center justify-center">
-                  <Image
-                    src={card.imageSrc}
-                    alt={card.imageAlt}
-                    width={250}
-                    height={250}
-                    className="rounded-lg object-cover"
+        {/* Main Cards dengan efek tilt */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-24">
+          {mainCards.map((card, idx) => (
+            <motion.div
+              key={card.title}
+              initial={{ opacity: 0, x: idx === 0 ? -50 : 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: idx * 0.2 }}
+            >
+              <Link href={card.linkHref}>
+                <TiltCard className="relative overflow-hidden h-full border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-white dark:bg-gray-800 rounded-2xl">
+                  <div
+                    className={cn(
+                      "absolute inset-0 opacity-0 hover:opacity-10 transition-opacity duration-500 bg-linear-to-r",
+                      card.gradientFrom,
+                      card.gradientTo,
+                    )}
                   />
-                </CardContent>
-                <CardFooter className="flex justify-end">
-                  <Button
-                    variant={card.variant}
-                    className="flex items-center gap-2 cursor-pointer"
-                  >
-                    {card.buttonText}{" "}
-                    <ArrowRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                  </Button>
-                </CardFooter>
-              </Card>
-            </Link>
+                  <CardHeader>
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={cn(
+                          "p-2 rounded-lg bg-linear-to-r text-white",
+                          card.gradientFrom,
+                          card.gradientTo,
+                        )}
+                      >
+                        <card.icon className="w-5 h-5" />
+                      </div>
+                      <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                        {card.title}
+                      </CardTitle>
+                    </div>
+                    <CardDescription className="text-gray-600 dark:text-gray-400 mt-2">
+                      {card.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex justify-center p-6">
+                    <Image
+                      src={card.imageSrc}
+                      alt={card.imageAlt}
+                      width={200}
+                      height={200}
+                      className="rounded-lg object-cover shadow-md group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </CardContent>
+                  <CardFooter className="flex justify-end p-6">
+                    <Button
+                      className={cn(
+                        "group/btn relative overflow-hidden transition-all duration-300",
+                        `bg-linear-to-r ${card.gradientFrom} ${card.gradientTo} text-white border-0`,
+                      )}
+                    >
+                      <span className="relative z-10 flex items-center gap-2">
+                        {card.buttonText}
+                        <ArrowRightIcon className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
+                      </span>
+                    </Button>
+                  </CardFooter>
+                </TiltCard>
+              </Link>
+            </motion.div>
           ))}
         </div>
 
-        <div className="w-full max-w-5xl text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-8 text-gray-900 dark:text-gray-50">
+        {/* Features Section */}
+        <motion.div
+          className="mt-32 text-center"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
             Mengapa Sistem Ini Penting?
           </h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-12">
+            Dibangun untuk menjembatani aspirasi warga dan pengambilan keputusan
+            yang lebih baik.
+          </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {features.map((feature) => (
-              <Card key={feature.title} className="p-6 text-left">
-                <CardContent className="flex flex-col items-center p-0">
-                  <feature.icon
-                    className={cn(
-                      "w-12 h-12 mb-4",
-                      feature.color,
-                      feature.colorDark,
-                    )}
-                  />
-                  <CardTitle className="mb-2 text-xl font-semibold">
-                    {feature.title}
-                  </CardTitle>
-                  <CardDescription className="text-center">
-                    {feature.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
+            {features.map((feature, idx) => (
+              <motion.div
+                key={feature.title}
+                whileHover={{ scale: 1.05, y: -5 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.1 }}
+              >
+                <Card className="p-8 text-left border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm h-full">
+                  <CardContent className="p-0 space-y-4">
+                    <div
+                      className={cn(
+                        "w-14 h-14 rounded-xl bg-linear-to-r flex items-center justify-center",
+                        feature.gradient,
+                      )}
+                    >
+                      <feature.icon className="w-7 h-7 text-white" />
+                    </div>
+                    <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                      {feature.title}
+                    </CardTitle>
+                    <CardDescription className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                      {feature.description}
+                    </CardDescription>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
+
+        {/* Testimonials Section */}
+        <motion.div
+          className="mt-32"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 dark:text-white mb-4">
+            Apa Kata Mereka?
+          </h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400 text-center max-w-2xl mx-auto mb-12">
+            Testimoni dari warga dan perangkat desa yang telah menggunakan
+            sistem ini.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {testimonials.map((testimonial, idx) => (
+              <motion.div
+                key={idx}
+                whileHover={{ scale: 1.05 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.1 }}
+              >
+                <Card className="p-6 border-0 shadow-md hover:shadow-xl transition-all bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm">
+                  <CardContent className="p-0 space-y-4">
+                    <div className="flex items-center gap-2">
+                      <div className="text-3xl">{testimonial.avatar}</div>
+                      <div>
+                        <p className="font-semibold text-gray-900 dark:text-white">
+                          {testimonial.name}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {testimonial.role}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-300 italic">
+                      "{testimonial.content}"
+                    </p>
+                    <div className="flex text-yellow-400">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-4 h-4 fill-current" />
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Call to Action */}
+        <motion.div
+          className="mt-32 text-center bg-linear-to-r from-blue-600 to-cyan-600 rounded-3xl p-12 shadow-2xl"
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          whileHover={{ scale: 1.02 }}
+        >
+          <h3 className="text-3xl font-bold text-white mb-4">
+            Siap Membangun Bersama?
+          </h3>
+          <p className="text-lg text-blue-100 mb-8 max-w-2xl mx-auto">
+            Bergabunglah dengan platform kami untuk mewujudkan pembangunan yang
+            lebih terarah dan partisipatif.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              size="lg"
+              variant="secondary"
+              className="bg-white text-blue-600 hover:bg-blue-50 group"
+              asChild
+            >
+              <Link href="/masukan">
+                Sampaikan Masukan
+                <ChevronRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-white hover:text-white hover:bg-white/10 group"
+              asChild
+            >
+              <Link href="/login">
+                Login Perangkat Desa
+                <ChevronRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </Button>
+          </div>
+        </motion.div>
       </div>
     </div>
   );
