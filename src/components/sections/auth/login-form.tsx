@@ -26,6 +26,7 @@ import { AxiosError } from "axios";
 import { ApiError } from "@/types/ApiError";
 import { Checkbox } from "../../ui/checkbox";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
@@ -79,7 +80,12 @@ export function LoginForm({
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className={cn("flex flex-col gap-6", className)}
+    >
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">Login Ke Akun Anda</h1>
         <p className="text-muted-foreground text-sm text-balance">
@@ -184,17 +190,19 @@ export function LoginForm({
 
             <Link
               href="/forgot-password"
-              className="text-sm font-medium  hover:underline"
+              className="text-sm font-medium hover:underline"
             >
               Forgot Password?
             </Link>
           </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            Login
-          </Button>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Button type="submit" className="w-full" disabled={loading}>
+              Login
+            </Button>
+          </motion.div>
         </form>
       </Form>
-    </div>
+    </motion.div>
   );
 }
