@@ -1,7 +1,7 @@
-// app/kebijakan-privasi/page.tsx
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -12,68 +12,68 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
+  FileText,
   Shield,
   Lock,
   Eye,
-  Database,
-  UserCheck,
-  FileText,
-  Mail,
-  Cookie,
-  Clock,
   Scale,
-  Server,
+  Clock,
   Globe,
+  Mail,
+  Phone,
+  MapPin,
+  Sparkles,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-const privacySections = [
+const termsSections = [
   {
-    title: "Pengumpulan Data",
-    icon: Database,
+    title: "Penerimaan Ketentuan",
+    icon: FileText,
     content:
-      "Kami mengumpulkan data pribadi yang Anda berikan secara sukarela saat menggunakan layanan kami, seperti nama, alamat email, nomor telepon, dan aspirasi pembangunan. Data ini digunakan untuk memproses masukan Anda dan menghasilkan rekomendasi prioritas pembangunan.",
+      "Dengan mengakses dan menggunakan Sistem Prioritas Pembangunan Kelurahan Panggungjati, Anda menyetujui untuk terikat oleh Syarat dan Ketentuan ini. Jika Anda tidak menyetujui sebagian atau seluruh ketentuan, mohon untuk tidak menggunakan layanan ini.",
   },
   {
-    title: "Penggunaan Data",
-    icon: Eye,
+    title: "Penggunaan Layanan",
+    icon: Globe,
     content:
-      "Data yang dikumpulkan digunakan untuk: (1) Memverifikasi dan memproses masukan warga, (2) Menganalisis kebutuhan pembangunan, (3) Menghasilkan rekomendasi prioritas melalui AI, (4) Menyusun laporan untuk perangkat desa, dan (5) Meningkatkan kualitas layanan kami.",
+      "Layanan ini disediakan untuk warga dan perangkat desa dalam rangka perencanaan pembangunan. Anda setuju untuk menggunakan layanan ini hanya untuk tujuan yang sah dan sesuai dengan peraturan perundang-undangan yang berlaku.",
   },
   {
-    title: "Perlindungan Data",
+    title: "Akun Pengguna",
+    icon: Shield,
+    content:
+      "Perangkat desa yang memiliki akun bertanggung jawab penuh atas keamanan kredensialnya. Setiap aktivitas yang terjadi dalam akun menjadi tanggung jawab pemilik akun. Segera laporkan jika terjadi penyalahgunaan.",
+  },
+  {
+    title: "Data Pribadi",
     icon: Lock,
     content:
-      "Kami menerapkan langkah-langkah keamanan teknis dan organisasi untuk melindungi data pribadi Anda dari akses tidak sah, perubahan, pengungkapan, atau penghancuran. Data disimpan di server aman dengan enkripsi dan akses terbatas.",
+      "Pengumpulan dan penggunaan data pribadi Anda diatur dalam Kebijakan Privasi terpisah. Dengan menggunakan layanan ini, Anda menyetujui pemrosesan data sesuai kebijakan tersebut.",
   },
   {
-    title: "Hak Pengguna",
-    icon: UserCheck,
+    title: "Hak Kekayaan Intelektual",
+    icon: Eye,
     content:
-      "Anda memiliki hak untuk mengakses, memperbaiki, atau menghapus data pribadi Anda. Jika ingin menggunakan hak ini, silakan hubungi perangkat desa melalui kontak yang tersedia. Kami akan merespons permintaan Anda sesuai dengan peraturan yang berlaku.",
+      "Seluruh konten, fitur, dan fungsionalitas sistem dilindungi oleh hak cipta dan hak kekayaan intelektual lainnya. Dilarang menyalin, memodifikasi, atau mendistribusikan tanpa izin tertulis.",
   },
   {
-    title: "Penggunaan Cookie",
-    icon: Cookie,
-    content:
-      "Kami menggunakan cookie untuk meningkatkan pengalaman pengguna, menyimpan preferensi, dan menganalisis lalu lintas situs. Anda dapat mengatur preferensi cookie melalui pengaturan browser Anda.",
-  },
-  {
-    title: "Pembagian Data",
-    icon: Server,
-    content:
-      "Data pribadi Anda tidak akan dijual, disewakan, atau dibagikan kepada pihak ketiga tanpa persetujuan Anda, kecuali diwajibkan oleh hukum atau untuk kepentingan publik dalam rangka pembangunan kelurahan.",
-  },
-  {
-    title: "Retensi Data",
-    icon: Clock,
-    content:
-      "Kami menyimpan data Anda selama diperlukan untuk memenuhi tujuan pengumpulan data atau sesuai dengan ketentuan peraturan perundang-undangan. Data yang tidak lagi diperlukan akan dihapus atau dianonimkan.",
-  },
-  {
-    title: "Kepatuhan Hukum",
+    title: "Pembatasan Tanggung Jawab",
     icon: Scale,
     content:
-      "Kami mematuhi Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi dan peraturan terkait lainnya. Kebijakan ini dapat diperbarui secara berkala untuk mencerminkan perubahan praktik atau regulasi.",
+      "Sistem disediakan 'sebagaimana adanya'. Kelurahan tidak bertanggung jawab atas kerugian tidak langsung yang timbul dari penggunaan layanan ini, termasuk namun tidak terbatas pada keakuratan rekomendasi AI.",
+  },
+  {
+    title: "Perubahan Ketentuan",
+    icon: Clock,
+    content:
+      "Kami dapat memperbarui Syarat dan Ketentuan ini sewaktu-waktu. Perubahan akan diumumkan melalui situs ini. Penggunaan berkelanjutan setelah perubahan berarti menyetujui ketentuan baru.",
+  },
+  {
+    title: "Hukum yang Berlaku",
+    icon: Scale,
+    content:
+      "Syarat dan Ketentuan ini tunduk pada hukum Republik Indonesia. Setiap sengketa akan diselesaikan di Pengadilan Negeri Serang.",
   },
 ];
 
@@ -92,7 +92,7 @@ const staggerContainer = {
   },
 };
 
-export default function KebijakanClient() {
+export default function SyaratKetentuanClient() {
   return (
     <div className="min-h-screen bg-linear-to-b from-slate-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-blue-950">
       {/* Hero Section */}
@@ -109,7 +109,7 @@ export default function KebijakanClient() {
             transition={{ duration: 0.5 }}
             className="inline-flex p-3 rounded-full bg-linear-to-r from-blue-600 to-cyan-600 text-white shadow-lg mb-6"
           >
-            <Shield className="h-8 w-8" />
+            <FileText className="h-8 w-8" />
           </motion.div>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -117,7 +117,7 @@ export default function KebijakanClient() {
             transition={{ duration: 0.6 }}
             className="text-4xl md:text-5xl lg:text-6xl font-extrabold bg-clip-text text-transparent bg-linear-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400"
           >
-            Kebijakan Privasi
+            Syarat dan Ketentuan
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -125,7 +125,8 @@ export default function KebijakanClient() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mt-4 text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto"
           >
-            Komitmen kami dalam melindungi data pribadi Anda
+            Ketentuan penggunaan Sistem Prioritas Pembangunan Kelurahan
+            Panggungjati
           </motion.p>
         </div>
       </section>
@@ -140,19 +141,17 @@ export default function KebijakanClient() {
           className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-gray-200 dark:border-gray-700"
         >
           <div className="flex items-center gap-3 mb-4">
-            <Globe className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
               Pendahuluan
             </h2>
           </div>
           <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-            Kebijakan Privasi ini menjelaskan bagaimana Kelurahan Panggungjati
-            ("kami", "kita", atau "kelurahan") mengumpulkan, menggunakan, dan
-            melindungi informasi pribadi Anda saat menggunakan Sistem Prioritas
-            Pembangunan. Kami berkomitmen untuk menjaga kerahasiaan dan keamanan
-            data pribadi Anda sesuai dengan peraturan perundang-undangan yang
-            berlaku, termasuk Undang-Undang Nomor 27 Tahun 2022 tentang
-            Pelindungan Data Pribadi.
+            Selamat datang di Sistem Prioritas Pembangunan Kelurahan
+            Panggungjati. Dengan mengakses dan menggunakan layanan ini, Anda
+            dianggap telah membaca, memahami, dan menyetujui seluruh Syarat dan
+            Ketentuan yang berlaku. Mohon baca dengan seksama sebelum
+            menggunakan layanan kami.
           </p>
           <div className="mt-4 flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
             <Badge
@@ -171,7 +170,7 @@ export default function KebijakanClient() {
         </motion.div>
       </section>
 
-      {/* Grid Kebijakan */}
+      {/* Grid Pasal */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <motion.div
           variants={staggerContainer}
@@ -180,7 +179,7 @@ export default function KebijakanClient() {
           viewport={{ once: true }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {privacySections.map((section, idx) => {
+          {termsSections.map((section, idx) => {
             const Icon = section.icon;
             return (
               <motion.div

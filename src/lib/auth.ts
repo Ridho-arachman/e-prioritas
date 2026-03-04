@@ -6,6 +6,13 @@ import { nextCookies } from "better-auth/next-js";
 import { sendEmail } from "./sendEmail";
 
 export const auth = betterAuth({
+  rateLimit: {
+    enabled: true,
+    window: 10, // time window in seconds
+    max: 100, // max requests in the window
+    storage: "database",
+    modelName: "rateLimit",
+  },
   plugins: [
     nextCookies(),
     captcha({

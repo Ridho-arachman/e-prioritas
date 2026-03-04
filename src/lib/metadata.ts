@@ -34,4 +34,7 @@ export const defaultMetadata: Metadata = {
   icons: {
     icon: "/favicon.ico",
   },
+  other: {
+    "theme-color": "#317EFB",
+  },
 };
