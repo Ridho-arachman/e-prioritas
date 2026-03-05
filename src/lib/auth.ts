@@ -26,12 +26,13 @@ export const auth = betterAuth({
       secretKey: process.env.TURNSTILE_SECRET_KEY!,
     }),
   ],
+  baseURL: process.env.BETTER_AUTH_URL,
   socialProviders: {
     google: {
-      disableSignUp: false,
+      disableSignUp: true,
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      scope: ["https://www.googleapis.com/auth/userinfo.email"],
+      // disableImplicitSignUp: false,
     },
   },
   database: prismaAdapter(prisma, {
