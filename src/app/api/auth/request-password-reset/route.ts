@@ -2,10 +2,26 @@ import { auth } from "@/lib/auth";
 import { handleBetterAuthError } from "@/lib/handleBetterAuthError";
 import { handleResponse } from "@/lib/handleResponse";
 import { handleZodValidation } from "@/lib/handleZodValidation";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { EmailSchema } from "@/schema/authSchema";
 import { NextRequest } from "next/server";
 
 export const POST = async (req: NextRequest) => {
+  const ip = req.headers.get("x-forwarded-for") ?? "anonymous";
+  const key = `api:ip:${ip}`;
+
+  const limit = await checkRateLimit(key, 10, 60 * 1000); // 30 request per menit
+  if (!limit.success) {
+    return handleResponse({
+      success: false,
+      message: "Terlalu banyak percobaan, coba lagi nanti",
+      status: 429,
+      headers: {
+        "Retry-After": String(limit.retryAfter),
+      },
+    });
+  }
+
   try {
     const turnstileToken = await req.headers.get("x-captcha-response");
     const body = await req.json();

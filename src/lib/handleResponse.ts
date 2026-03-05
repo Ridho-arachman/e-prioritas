@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 interface ResponseProps<T = unknown, E = unknown, M = unknown> {
@@ -7,6 +8,7 @@ interface ResponseProps<T = unknown, E = unknown, M = unknown> {
   errors?: E;
   status?: number;
   meta?: M;
+  headers?: HeadersInit;
 }
 
 export function handleResponse<T = unknown, E = unknown, M = unknown>({
@@ -16,6 +18,7 @@ export function handleResponse<T = unknown, E = unknown, M = unknown>({
   errors,
   status = 200,
   meta,
+  headers,
 }: ResponseProps<T, E, M>) {
   // Body bertipe generic
   const body: {
@@ -32,5 +35,5 @@ export function handleResponse<T = unknown, E = unknown, M = unknown>({
   if (errors !== undefined) body.errors = errors;
   if (meta !== undefined) body.meta = meta;
 
-  return NextResponse.json(body, { status });
+  return NextResponse.json(body, { status, headers });
 }

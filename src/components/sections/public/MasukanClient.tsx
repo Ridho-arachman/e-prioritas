@@ -42,7 +42,7 @@ export default function MasukanClient() {
           className="flex-1"
         >
           <Card className="h-full border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-3xl overflow-hidden group">
-            <div className="absolute inset-0 bg-linear-to-r from-blue-600 to-cyan-600 opacity-0 group-hover:opacity-10 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-linear-to-r from-blue-600 to-cyan-600 opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none" />
             <CardHeader className="text-center relative">
               <div className="relative inline-block mx-auto">
                 <div className="absolute inset-0 bg-linear-to-r from-blue-600 to-cyan-600 rounded-full blur-xl opacity-70 group-hover:opacity-100 transition-opacity" />

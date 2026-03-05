@@ -8,10 +8,16 @@ import { sendEmail } from "./sendEmail";
 export const auth = betterAuth({
   rateLimit: {
     enabled: true,
-    window: 10, // time window in seconds
-    max: 100, // max requests in the window
+    window: 1, // time window in seconds
+    max: 1, // max requests in the window
     storage: "database",
     modelName: "rateLimit",
+    customRules: {
+      "/login": {
+        window: 1, // 1 minute
+        max: 1, // max 1 login attempt per minute
+      },
+    },
   },
   plugins: [
     nextCookies(),

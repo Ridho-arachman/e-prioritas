@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client-js"
   output   = "../src/app/generated/prisma"
@@ -80,16 +81,16 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relasi
-  masukanVerifikasi    MasukanWarga[]   @relation("VerifikatorMasukan")
-  kegiatanRapatDiproses KegiatanRapat[]  @relation("PemrosesRekomendasi")
-  kegiatanRapatDibuat   KegiatanRapat[]  @relation("PembuatKegiatan")
-  dataMasterDibuat      DataMaster[]     @relation("PembuatDataMaster")
+  masukanVerifikasi     MasukanWarga[]  @relation("VerifikatorMasukan")
+  kegiatanRapatDiproses KegiatanRapat[] @relation("PemrosesRekomendasi")
+  kegiatanRapatDibuat   KegiatanRapat[] @relation("PembuatKegiatan")
+  dataMasterDibuat      DataMaster[]    @relation("PembuatDataMaster")
 
   // BetterAuth fields
-  emailVerified       Boolean        @default(false)
-  image               String?
-  sessions            Session[]
-  accounts            Account[]
+  emailVerified Boolean   @default(false)
+  image         String?
+  sessions      Session[]
+  accounts      Account[]
 
   @@map("user")
 }
@@ -99,19 +100,19 @@ model User {
 //////////////////////////
 
 model MasukanWarga {
-  id        String  @id @default(cuid())
+  id           String  @id @default(cuid())
   namaPengirim String? @db.VarChar(255)
-  nomorHp   String? @db.VarChar(15)
-  judul     String  @db.VarChar(255)
-  deskripsi String  @db.Text
-  lokasiRt  String  @db.VarChar(3)
-  lokasiRw  String  @db.VarChar(3)
+  nomorHp      String? @db.VarChar(15)
+  judul        String  @db.VarChar(255)
+  deskripsi    String  @db.Text
+  lokasiRt     String  @db.VarChar(3)
+  lokasiRw     String  @db.VarChar(3)
 
   domainIsuId String
   domainIsu   DomainIsu @relation(fields: [domainIsuId], references: [id])
 
-  status        StatusMasukan @default(MENUNGGU)
-  alasanPenolakan String? @db.Text
+  status          StatusMasukan @default(MENUNGGU)
+  alasanPenolakan String?       @db.Text
 
   diverifikasiOlehId String?
   diverifikasiOleh   User?   @relation("VerifikatorMasukan", fields: [diverifikasiOlehId], references: [id])
@@ -137,12 +138,12 @@ model DataMaster {
   domainIsuId String
   domainIsu   DomainIsu @relation(fields: [domainIsuId], references: [id])
 
-  namaAtribut   String           @db.VarChar(100)
-  kritikalitas  NilaiKritikalitas
-  jumlah        Int?
+  namaAtribut  String            @db.VarChar(100)
+  kritikalitas NilaiKritikalitas
+  jumlah       Int?
 
-  isActive    Boolean  @default(true)
-  tahunData   Int?
+  isActive  Boolean @default(true)
+  tahunData Int?
 
   diprosesOlehId String?
   diprosesOleh   User?   @relation("PembuatDataMaster", fields: [diprosesOlehId], references: [id])
@@ -165,34 +166,33 @@ model KegiatanRapat {
   id String @id @default(cuid())
 
   // Info rapat
-  judul     String  @db.VarChar(255)
-  deskripsi String  @db.Text
+  judul     String   @db.VarChar(255)
+  deskripsi String   @db.Text
   tanggal   DateTime
-  lokasi    String? @db.VarChar(100)
+  lokasi    String?  @db.VarChar(100)
 
   domainIsuId String
   domainIsu   DomainIsu @relation(fields: [domainIsuId], references: [id])
 
   dibuatOlehId String
-  dibuatOleh   User @relation("PembuatKegiatan", fields: [dibuatOlehId], references: [id])
+  dibuatOleh   User   @relation("PembuatKegiatan", fields: [dibuatOlehId], references: [id])
 
   // REKOMENDASI
-  mode           ModeRekomendasi
-  judulLaporan   String               @db.VarChar(255)
-  rekomendasiItems Json
-  fingerprint    String               @unique
+  mode              ModeRekomendasi
+  judulLaporan      String            @db.VarChar(255)
+  rekomendasiItems  Json
+  fingerprint       String            @unique
   statusRekomendasi StatusRekomendasi @default(DRAFT)
-  
   // AI Metadata
-  aiModel        String?
-  aiProcessedAt  DateTime?
+  aiModel           String?
+  aiProcessedAt     DateTime?
 
   // Relasi - untuk yang diproses (approval)
   diprosesOlehId String?
   diprosesOleh   User?   @relation("PemrosesRekomendasi", fields: [diprosesOlehId], references: [id])
 
   // Relasi ke junction table (MENGGABUNGKAN)
-  masukanRelasi  KegiatanRapatMasukan[]
+  masukanRelasi    KegiatanRapatMasukan[]
   dataMasterRelasi KegiatanRapatDataMaster[]
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -204,21 +204,18 @@ model KegiatanRapat {
   @@map("kegiatan_rapat")
 }
 
-
 //////////////////////////
 // JUNCTION TABLE GABUNGAN (MENGGANTIKAN 2 JUNCTION SEBELUMNYA)
 //////////////////////////
 
 model KegiatanRapatMasukan {
   id              String @id @default(cuid())
-  
   kegiatanRapatId String
   masukanId       String
 
-  
   // Relasi
-  kegiatanRapat   KegiatanRapat @relation(fields: [kegiatanRapatId], references: [id], onDelete: Cascade)
-  masukan         MasukanWarga  @relation(fields: [masukanId], references: [id])
+  kegiatanRapat KegiatanRapat @relation(fields: [kegiatanRapatId], references: [id], onDelete: Cascade)
+  masukan       MasukanWarga  @relation(fields: [masukanId], references: [id])
 
   createdAt DateTime @default(now())
 
@@ -230,13 +227,12 @@ model KegiatanRapatMasukan {
 
 model KegiatanRapatDataMaster {
   id              String @id @default(cuid())
-  
   kegiatanRapatId String
   dataMasterId    String
 
   // Relasi
-  kegiatanRapat   KegiatanRapat @relation(fields: [kegiatanRapatId], references: [id], onDelete: Cascade)
-  dataMaster      DataMaster    @relation(fields: [dataMasterId], references: [id])
+  kegiatanRapat KegiatanRapat @relation(fields: [kegiatanRapatId], references: [id], onDelete: Cascade)
+  dataMaster    DataMaster    @relation(fields: [dataMasterId], references: [id])
 
   createdAt DateTime @default(now())
 
@@ -300,4 +296,14 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model RateLimit {
+  id          String @id
+  key         String
+  count       Int
+  lastRequest BigInt
+
+  @@unique([key])
+  @@map("rateLimit")
 }

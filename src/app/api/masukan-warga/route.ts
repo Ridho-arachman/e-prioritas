@@ -4,8 +4,23 @@ import { handleResponse } from "@/lib/handleResponse";
 import { handlePrismaError } from "@/lib/handlePrismaError";
 import { handleZodValidation } from "@/lib/handleZodValidation";
 import { masukanWargaService } from "@/services/masukanWargaService";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const POST = async (req: NextRequest) => {
+  const ip = req.headers.get("x-forwarded-for") ?? "anonymous";
+  const key = `api:ip:${ip}`;
+
+  const limit = await checkRateLimit(key, 60, 60 * 1000); // 60 request per menit
+  if (!limit.success) {
+    return handleResponse({
+      success: false,
+      message: "Terlalu banyak percobaan, coba lagi nanti",
+      status: 429,
+      headers: {
+        "Retry-After": String(limit.retryAfter),
+      },
+    });
+  }
   try {
     const body = await req.json();
 

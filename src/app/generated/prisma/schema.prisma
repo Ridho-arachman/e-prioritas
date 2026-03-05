@@ -182,10 +182,9 @@ model KegiatanRapat {
   rekomendasiItems  Json
   fingerprint       String            @unique
   statusRekomendasi StatusRekomendasi @default(DRAFT)
-
   // AI Metadata
-  aiModel       String?
-  aiProcessedAt DateTime?
+  aiModel           String?
+  aiProcessedAt     DateTime?
 
   // Relasi - untuk yang diproses (approval)
   diprosesOlehId String?
@@ -209,8 +208,7 @@ model KegiatanRapat {
 //////////////////////////
 
 model KegiatanRapatMasukan {
-  id String @id @default(cuid())
-
+  id              String @id @default(cuid())
   kegiatanRapatId String
   masukanId       String
 
@@ -227,8 +225,7 @@ model KegiatanRapatMasukan {
 }
 
 model KegiatanRapatDataMaster {
-  id String @id @default(cuid())
-
+  id              String @id @default(cuid())
   kegiatanRapatId String
   dataMasterId    String
 
@@ -298,4 +295,14 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model RateLimit {
+  id          String @id
+  key         String
+  count       Int
+  lastRequest BigInt
+
+  @@unique([key])
+  @@map("rateLimit")
 }
