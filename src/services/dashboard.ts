@@ -7,8 +7,10 @@ export const dashboardService = {
       masukanWaiting,
       masukanAccepted,
       masukanRejected,
+      masukanOnProcess,
+      masukanCompleted,
       dataMasterCount,
-      rekomendasiCount,
+      kegiatanCount,
     ] = await Promise.all([
       prisma.user.count({
         where: { role: { not: "ADMIN" } },
@@ -26,6 +28,14 @@ export const dashboardService = {
         where: { status: "DITOLAK" },
       }),
 
+      prisma.masukanWarga.count({
+        where: { status: "DIPROSES" },
+      }),
+
+      prisma.masukanWarga.count({
+        where: { status: "DISELESAIKAN" },
+      }),
+
       prisma.dataMaster.count(),
 
       prisma.kegiatanRapat.count(),
@@ -36,8 +46,10 @@ export const dashboardService = {
       masukanWaiting,
       masukanAccepted,
       masukanRejected,
+      masukanOnProcess,
+      masukanCompleted,
       dataMasterCount,
-      rekomendasiCount,
+      kegiatanCount,
     };
   },
 
@@ -80,8 +92,6 @@ export const dashboardService = {
         }),
       ]);
 
-    console.log(dataMaster);
-
     const activities = [
       ...verifikasi.map((v) => ({
         title: `Verifikasi masukan warga oleh ${v.diverifikasiOleh?.name || "Anonim"}`,
@@ -108,17 +118,26 @@ export const dashboardService = {
   },
 
   getActivityStats: async () => {
-    const [masukanAccepted, masukanRejected, masukanWaiting] =
-      await Promise.all([
-        prisma.masukanWarga.count({ where: { status: "DIVERIFIKASI" } }),
-        prisma.masukanWarga.count({ where: { status: "DITOLAK" } }),
-        prisma.masukanWarga.count({ where: { status: "MENUNGGU" } }),
-      ]);
+    const [
+      masukanAccepted,
+      masukanRejected,
+      masukanWaiting,
+      masukanDiproses,
+      masukanDiselesaikan,
+    ] = await Promise.all([
+      prisma.masukanWarga.count({ where: { status: "DIVERIFIKASI" } }),
+      prisma.masukanWarga.count({ where: { status: "DITOLAK" } }),
+      prisma.masukanWarga.count({ where: { status: "MENUNGGU" } }),
+      prisma.masukanWarga.count({ where: { status: "DIPROSES" } }),
+      prisma.masukanWarga.count({ where: { status: "DISELESAIKAN" } }),
+    ]);
 
     return {
       masukanAccepted,
       masukanRejected,
       masukanWaiting,
+      masukanDiproses,
+      masukanDiselesaikan,
     };
   },
 
@@ -142,6 +161,8 @@ export const dashboardService = {
         waiting: 0,
         accepted: 0,
         rejected: 0,
+        onProcess: 0,
+        completed: 0,
       };
     });
 
@@ -153,6 +174,8 @@ export const dashboardService = {
       if (m.status === "MENUNGGU") monthData.waiting++;
       if (m.status === "DIVERIFIKASI") monthData.accepted++;
       if (m.status === "DITOLAK") monthData.rejected++;
+      if (m.status === "DIPROSES") monthData.onProcess++;
+      if (m.status === "DISELESAIKAN") monthData.completed++;
     });
 
     return months;
@@ -178,6 +201,69 @@ export const dashboardService = {
     // 4. Gabungkan hasilnya
     return stats.map((s) => ({
       name: domainMap[s.domainIsuId] || s.domainIsuId, // fallback ke ID jika nama tidak ditemukan (seharusnya tidak terjadi)
+      value: s._count.id,
+    }));
+  },
+
+  getMasukanPerDomain: async () => {
+    // Hitung jumlah masukan per domain isu
+    const stats = await prisma.masukanWarga.groupBy({
+      by: ["domainIsuId"],
+      _count: { id: true },
+    });
+
+    // Ambil semua domain yang muncul
+    const domainIds = stats.map((s) => s.domainIsuId);
+    const domains = await prisma.domainIsu.findMany({
+      where: { id: { in: domainIds } },
+      select: { id: true, nama: true },
+    });
+
+    const domainMap = Object.fromEntries(domains.map((d) => [d.id, d.nama]));
+
+    return stats.map((s) => ({
+      name: domainMap[s.domainIsuId] || "Domain Tidak Diketahui",
+      value: s._count.id,
+    }));
+  },
+
+  getDataMasterKritikalitas: async () => {
+    // Hitung jumlah data master per kritikalitas
+    const stats = await prisma.dataMaster.groupBy({
+      by: ["kritikalitas"],
+      _count: { id: true },
+    });
+
+    // Mapping enum ke label yang lebih ramah
+    const labelMap: Record<string, string> = {
+      KRITIS: "Kritis",
+      TINGGI: "Tinggi",
+      SEDANG: "Sedang",
+      RENDAH: "Rendah",
+    };
+
+    return stats.map((s) => ({
+      name: labelMap[s.kritikalitas] || s.kritikalitas,
+      value: s._count.id,
+    }));
+  },
+
+  getRekomendasiStatus: async () => {
+    // Hitung jumlah rekomendasi (kegiatan rapat) per status
+    const stats = await prisma.kegiatanRapat.groupBy({
+      by: ["statusRekomendasi"],
+      _count: { id: true },
+    });
+
+    const labelMap: Record<string, string> = {
+      DRAFT: "Draft",
+      DIAJUKAN: "Diajukan",
+      DISETUJUI: "Disetujui",
+      DITOLAK: "Ditolak",
+    };
+
+    return stats.map((s) => ({
+      name: labelMap[s.statusRekomendasi] || s.statusRekomendasi,
       value: s._count.id,
     }));
   },
