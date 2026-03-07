@@ -85,7 +85,7 @@ const StatusBadge = ({ status }: { status: string }) => {
   const label = statusLabelMap[status] || status;
 
   return (
-    <Badge variant="default" className={cn(color, "text-white")}>
+    <Badge variant="default" className={cn(color, "text-white shadow-sm")}>
       {label}
     </Badge>
   );
@@ -207,12 +207,12 @@ export default function MasukanListTable() {
   };
 
   const getDomainIsuLabel = (id: string) => {
-    const domain = domainIsuData.find((d: any) => d.id === id);
+    const domain = domainIsuData?.find((d: any) => d.id === id);
     return domain?.nama || id;
   };
 
   const getUserLabel = (id: string) => {
-    const user = userData.find((u: any) => u.id === id);
+    const user = userData?.find((u: any) => u.id === id);
     return user?.name || id;
   };
 
@@ -245,11 +245,15 @@ export default function MasukanListTable() {
   // ============================================================
   return (
     <>
-      <CardHeader className="space-y-4">
-        <div className="mb-4 flex flex-col lg:flex-row justify-between gap-4">
+      <CardHeader className="space-y-4 p-4 md:p-6 border-b bg-linear-to-r from-primary/5 to-transparent">
+        <div className="flex flex-col lg:flex-row justify-between gap-4">
           {/* FILTER BUTTON */}
           <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-            <Button variant="outline" onClick={() => setIsFilterOpen(true)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsFilterOpen(true)}
+              className="shadow-sm hover:shadow-md transition-all"
+            >
               <Filter className="mr-2 h-4 w-4" />
               Filter & Sort
               {hasActiveFilters && (
@@ -282,7 +286,6 @@ export default function MasukanListTable() {
                     value={status || "ALL"}
                     onValueChange={(v) => {
                       setStatus(v === "ALL" ? "" : v);
-                      // page akan direset oleh useEffect
                     }}
                   >
                     <SelectTrigger>
@@ -307,7 +310,6 @@ export default function MasukanListTable() {
                     value={domainIsuId || "ALL"}
                     onValueChange={(v) => {
                       setDomainIsuId(v === "ALL" ? "" : v);
-                      // page akan direset oleh useEffect
                     }}
                   >
                     <SelectTrigger>
@@ -331,7 +333,6 @@ export default function MasukanListTable() {
                     value={diprosesOlehId || "ALL"}
                     onValueChange={(v) => {
                       setDiprosesOlehId(v === "ALL" ? "" : v);
-                      // page akan direset oleh useEffect
                     }}
                   >
                     <SelectTrigger>
@@ -339,7 +340,7 @@ export default function MasukanListTable() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="ALL">Semua</SelectItem>
-                      {userData?.data?.map((user: any) => (
+                      {userData?.map((user: any) => (
                         <SelectItem key={user.id} value={user.id}>
                           {user.name}
                         </SelectItem>
@@ -356,7 +357,6 @@ export default function MasukanListTable() {
                     value={createdAt}
                     onChange={(e) => {
                       setCreatedAt(e.target.value);
-                      // page akan direset oleh useEffect
                     }}
                   />
                 </div>
@@ -373,6 +373,7 @@ export default function MasukanListTable() {
                       variant={sortBy === "createdAt" ? "default" : "outline"}
                       size="sm"
                       onClick={() => handleSortChange("createdAt")}
+                      className="shadow-sm hover:shadow-md transition-all"
                     >
                       Tanggal
                       {sortBy === "createdAt" &&
@@ -388,6 +389,7 @@ export default function MasukanListTable() {
                       }
                       size="sm"
                       onClick={() => handleSortChange("namaPengirim")}
+                      className="shadow-sm hover:shadow-md transition-all"
                     >
                       Nama
                       {sortBy === "namaPengirim" &&
@@ -401,6 +403,7 @@ export default function MasukanListTable() {
                       variant={sortBy === "status" ? "default" : "outline"}
                       size="sm"
                       onClick={() => handleSortChange("status")}
+                      className="shadow-sm hover:shadow-md transition-all"
                     >
                       Status
                       {sortBy === "status" &&
@@ -414,6 +417,7 @@ export default function MasukanListTable() {
                       variant={sortBy === "lokasiRt" ? "default" : "outline"}
                       size="sm"
                       onClick={() => handleSortChange("lokasiRt")}
+                      className="shadow-sm hover:shadow-md transition-all"
                     >
                       RT
                       {sortBy === "lokasiRt" &&
@@ -427,6 +431,7 @@ export default function MasukanListTable() {
                       variant={sortBy === "lokasiRw" ? "default" : "outline"}
                       size="sm"
                       onClick={() => handleSortChange("lokasiRw")}
+                      className="shadow-sm hover:shadow-md transition-all"
                     >
                       RW
                       {sortBy === "lokasiRw" &&
@@ -455,15 +460,15 @@ export default function MasukanListTable() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Cari masukan..."
-              className="min-w-62.5"
+              className="min-w-62.5 transition-shadow focus:ring-2 focus:ring-primary/50"
             />
             {q && (
               <Button
                 variant="outline"
                 onClick={() => {
                   setQ("");
-                  // page akan direset oleh useEffect
                 }}
+                className="shadow-sm hover:shadow-md transition-all"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -528,17 +533,17 @@ export default function MasukanListTable() {
         )}
       </CardHeader>
 
-      <CardContent className="max-w-full overflow-hidden">
+      <CardContent className="max-w-full overflow-hidden p-4 md:p-6">
         {/* Area tabel dengan scroll horizontal */}
         <div className="overflow-x-auto border rounded-lg">
           <Table className="w-full">
             <TableHeader>
-              <TableRow>
+              <TableRow className="bg-muted/50 hover:bg-muted/50">
                 <TableHead
-                  className="text-center cursor-pointer hover:bg-muted/50"
+                  className="text-center cursor-pointer hover:bg-muted/70"
                   onClick={() => handleSortChange("namaPengirim")}
                 >
-                  <div className="flex justify-center items-center gap-1">
+                  <div className="flex justify-center items-center gap-1 font-semibold">
                     Nama Pengirim
                     {sortBy === "namaPengirim" &&
                       (sortOrder === "asc" ? (
@@ -549,10 +554,10 @@ export default function MasukanListTable() {
                   </div>
                 </TableHead>
                 <TableHead
-                  className="text-center cursor-pointer hover:bg-muted/50"
+                  className="text-center cursor-pointer hover:bg-muted/70"
                   onClick={() => handleSortChange("status")}
                 >
-                  <div className="flex justify-center items-center gap-1">
+                  <div className="flex justify-center items-center gap-1 font-semibold">
                     Status
                     {sortBy === "status" &&
                       (sortOrder === "asc" ? (
@@ -563,10 +568,10 @@ export default function MasukanListTable() {
                   </div>
                 </TableHead>
                 <TableHead
-                  className="text-center cursor-pointer hover:bg-muted/50"
+                  className="text-center cursor-pointer hover:bg-muted/70"
                   onClick={() => handleSortChange("lokasiRt")}
                 >
-                  <div className="flex justify-center items-center gap-1">
+                  <div className="flex justify-center items-center gap-1 font-semibold">
                     RT
                     {sortBy === "lokasiRt" &&
                       (sortOrder === "asc" ? (
@@ -577,10 +582,10 @@ export default function MasukanListTable() {
                   </div>
                 </TableHead>
                 <TableHead
-                  className="text-center cursor-pointer hover:bg-muted/50"
+                  className="text-center cursor-pointer hover:bg-muted/70"
                   onClick={() => handleSortChange("lokasiRw")}
                 >
-                  <div className="flex justify-center items-center gap-1">
+                  <div className="flex justify-center items-center gap-1 font-semibold">
                     RW
                     {sortBy === "lokasiRw" &&
                       (sortOrder === "asc" ? (
@@ -591,10 +596,10 @@ export default function MasukanListTable() {
                   </div>
                 </TableHead>
                 <TableHead
-                  className="text-center cursor-pointer hover:bg-muted/50"
+                  className="text-center cursor-pointer hover:bg-muted/70"
                   onClick={() => handleSortChange("createdAt")}
                 >
-                  <div className="flex justify-center items-center gap-1">
+                  <div className="flex justify-center items-center gap-1 font-semibold">
                     Tanggal
                     {sortBy === "createdAt" &&
                       (sortOrder === "asc" ? (
@@ -604,15 +609,19 @@ export default function MasukanListTable() {
                       ))}
                   </div>
                 </TableHead>
-                <TableHead className="text-center">Domain Isu</TableHead>
-                <TableHead className="text-center">Diverifikasi Oleh</TableHead>
+                <TableHead className="text-center font-semibold">
+                  Domain Isu
+                </TableHead>
+                <TableHead className="text-center font-semibold">
+                  Diverifikasi Oleh
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading && <TableSkeleton rows={5} />}
               {error && (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center">
+                  <TableCell colSpan={7} className="text-center py-10">
                     <DataError message={error.message} />
                   </TableCell>
                 </TableRow>
@@ -621,7 +630,7 @@ export default function MasukanListTable() {
                 !hasSignificantFilter &&
                 !isLoading && (
                   <TableRow>
-                    <TableCell colSpan={7}>
+                    <TableCell colSpan={7} className="text-center py-10">
                       <DataKosong />
                     </TableCell>
                   </TableRow>
@@ -630,7 +639,7 @@ export default function MasukanListTable() {
                 hasSignificantFilter &&
                 !isLoading && (
                   <TableRow>
-                    <TableCell colSpan={7}>
+                    <TableCell colSpan={7} className="text-center py-10">
                       <DataTidakDitemukan />
                     </TableCell>
                   </TableRow>
@@ -692,6 +701,7 @@ export default function MasukanListTable() {
               variant="outline"
               onClick={() => setPage(String(pageNumber - 1))}
               disabled={pageNumber === 1}
+              className="shadow-sm hover:shadow-md transition-all"
             >
               <ChevronLeft className="h-4 w-4" /> Prev
             </Button>
@@ -703,6 +713,7 @@ export default function MasukanListTable() {
               variant="outline"
               onClick={() => setPage(String(pageNumber + 1))}
               disabled={pageNumber >= (paginationMeta?.totalPages || 1)}
+              className="shadow-sm hover:shadow-md transition-all"
             >
               Next <ChevronRight className="h-4 w-4" />
             </Button>
