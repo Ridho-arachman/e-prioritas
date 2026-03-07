@@ -18,6 +18,7 @@ import { ApiError } from "@/types/ApiError";
 import { useKategoriDraftStore } from "@/stores/kategoriFormAddDraft";
 import { useFormPersist } from "@/hooks/useFormPersist";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Tag, FileText, Hash, Save, RotateCcw, ArrowLeft } from "lucide-react";
 
 // Skeleton untuk loading state
 const FormSkeleton = () => (
@@ -174,21 +175,25 @@ export function KategoriFormAdd() {
 
   // Show skeleton while hydrating on client
   if (isClient && !isHydrated) {
-    return <FormSkeleton />;
+    return (
+      <div className="bg-card border rounded-xl shadow-sm p-6">
+        <FormSkeleton />
+      </div>
+    );
   }
 
   return (
-    <>
+    <div className="bg-card border rounded-xl shadow-lg shadow-primary/5 p-4 md:p-6">
       {/* Draft Indicator */}
       {hasDraft && isHydrated && (
-        <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-              <p className="text-sm text-blue-700 dark:text-blue-300 font-medium">
-                ⚡ Draft otomatis tersimpan
-              </p>
+        <div className="mb-6 p-4 bg-blue-50/80 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg backdrop-blur-sm">
+          <div className="flex items-center gap-3">
+            <div className="flex-shrink-0">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
             </div>
+            <p className="text-sm text-blue-700 dark:text-blue-300 font-medium flex items-center gap-2">
+              <span>⚡</span> Draft otomatis tersimpan
+            </p>
           </div>
         </div>
       )}
@@ -201,10 +206,14 @@ export function KategoriFormAdd() {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field>
-                <Label htmlFor="code" className="flex items-center gap-2">
+                <Label
+                  htmlFor="code"
+                  className="flex items-center gap-2 text-sm font-medium"
+                >
+                  <Hash className="h-4 w-4 text-muted-foreground" />
                   Code Kategori
                   {draft?.code && isHydrated && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
                       Draft
                     </span>
                   )}
@@ -215,10 +224,10 @@ export function KategoriFormAdd() {
                   aria-invalid={fieldState.invalid}
                   placeholder="Contoh: KAT001, INFRA001..."
                   disabled={loading}
-                  className="w-full"
+                  className="w-full transition-shadow focus:ring-2 focus:ring-primary/50"
                 />
-                <div className="text-xs text-muted-foreground mt-1">
-                  Gunakan format unik untuk kode kategori
+                <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                  <span>🔤</span> Gunakan format unik untuk kode kategori
                 </div>
                 {fieldState.invalid && (
                   <FieldError>
@@ -235,10 +244,14 @@ export function KategoriFormAdd() {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field>
-                <Label htmlFor="nama" className="flex items-center gap-2">
+                <Label
+                  htmlFor="nama"
+                  className="flex items-center gap-2 text-sm font-medium"
+                >
+                  <Tag className="h-4 w-4 text-muted-foreground" />
                   Nama Kategori
                   {draft?.nama && isHydrated && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
                       Draft
                     </span>
                   )}
@@ -249,10 +262,10 @@ export function KategoriFormAdd() {
                   aria-invalid={fieldState.invalid}
                   placeholder="Contoh: Infrastruktur, Kesehatan..."
                   disabled={loading}
-                  className="w-full"
+                  className="w-full transition-shadow focus:ring-2 focus:ring-primary/50"
                 />
-                <div className="text-xs text-muted-foreground mt-1">
-                  Nama kategori yang akan ditampilkan
+                <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                  <span>🏷️</span> Nama kategori yang akan ditampilkan
                 </div>
                 {fieldState.invalid && (
                   <FieldError>
@@ -275,11 +288,12 @@ export function KategoriFormAdd() {
                 <Field>
                   <Label
                     htmlFor="deskripsi"
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 text-sm font-medium"
                   >
+                    <FileText className="h-4 w-4 text-muted-foreground" />
                     Deskripsi
                     {draft?.deskripsi && isHydrated && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
                         Draft
                       </span>
                     )}
@@ -291,17 +305,19 @@ export function KategoriFormAdd() {
                     aria-invalid={fieldState.invalid || isOverLimit}
                     rows={4}
                     disabled={loading}
-                    className={`w-full max-w-150 resize-y min-h-30 ${
-                      isOverLimit ? "border-red-500" : ""
+                    className={`w-full max-w-150 resize-y min-h-30 transition-shadow focus:ring-2 focus:ring-primary/50 ${
+                      isOverLimit ? "border-red-500 focus:ring-red-500" : ""
                     }`}
                     maxLength={500}
                   />
                   <div className="flex justify-between text-xs mt-1">
-                    <span className="text-muted-foreground">Opsional</span>
+                    <span className="text-muted-foreground flex items-center gap-1">
+                      <span>📝</span> Opsional
+                    </span>
                     <span
                       className={
                         isOverLimit
-                          ? "text-red-600 font-medium"
+                          ? "text-red-600 font-medium flex items-center gap-1"
                           : "text-muted-foreground"
                       }
                     >
@@ -325,15 +341,16 @@ export function KategoriFormAdd() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-border">
-          <div className="flex items-center gap-2 order-2 sm:order-1">
+        <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-4 pt-6 border-t border-border">
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
             <Button
               variant="ghost"
               type="button"
               onClick={handleBack}
               disabled={loading}
-              className="cursor-pointer"
+              className="cursor-pointer flex-1 sm:flex-none"
             >
+              <ArrowLeft className="mr-2 h-4 w-4" />
               Kembali
             </Button>
 
@@ -342,8 +359,9 @@ export function KategoriFormAdd() {
               type="button"
               onClick={handleReset}
               disabled={loading}
-              className="cursor-pointer"
+              className="cursor-pointer flex-1 sm:flex-none"
             >
+              <RotateCcw className="mr-2 h-4 w-4" />
               Reset
             </Button>
           </div>
@@ -351,7 +369,7 @@ export function KategoriFormAdd() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full sm:w-auto order-1 sm:order-2 bg-primary hover:bg-primary/90 cursor-pointer"
+            className="w-full sm:w-auto bg-primary hover:bg-primary/90 cursor-pointer shadow-sm hover:shadow-md transition-all"
           >
             {loading ? (
               <div className="flex items-center justify-center">
@@ -359,11 +377,25 @@ export function KategoriFormAdd() {
                 Menyimpan...
               </div>
             ) : (
-              "Simpan Kategori"
+              <>
+                <Save className="mr-2 h-4 w-4" />
+                Simpan Kategori
+              </>
             )}
           </Button>
         </div>
       </form>
-    </>
+
+      {/* Footer note */}
+      <div className="mt-4 text-xs text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border/50 pt-4">
+        <span className="flex items-center gap-1">
+          ⚡ Draft otomatis tersimpan
+        </span>
+        <span className="flex items-center gap-1">🔤 Kode unik diperlukan</span>
+        <span className="flex items-center gap-1">
+          📝 Deskripsi maksimal 500 karakter
+        </span>
+      </div>
+    </div>
   );
 }

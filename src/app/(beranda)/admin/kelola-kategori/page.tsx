@@ -5,21 +5,27 @@ import ListTableKategori from "@/components/sections/kategori/listTableKategori"
 
 const page = () => {
   return (
-    <>
-      <h1 className="text-xl md:text-3xl font-bold font-sans flex items-center gap-2 mb-6">
-        🏷️ Kelola Kategori Masukan Warga
-      </h1>
-      {/* <Card className="hidden md:block min-w-0 overflow-hidden">
-        <ListTablePerangkat />
-      </Card>
-      <Card className="md:hidden">
-        <ListPerangkatMobile />
-      </Card> */}
+    <div className="container mx-auto px-4 py-6 md:py-8 max-w-7xl">
+      {/* Header dengan ikon dan gradien */}
+      <div className="mb-6 md:mb-8">
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-primary/10 rounded-xl shadow-sm">
+            <span className="text-2xl md:text-3xl">🏷️</span>
+          </div>
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold bg-linear-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            Kelola Kategori Masukan Warga
+          </h1>
+        </div>
+        <p className="text-muted-foreground mt-2 ml-1 text-sm md:text-base">
+          Kelola data kategori, tambah, edit, atau hapus kategori masukan warga.
+        </p>
+      </div>
 
-      <Card>
+      {/* Konten utama - ListTableKategori sudah memiliki card sendiri */}
+      <div className="bg-card rounded-xl shadow-lg shadow-primary/5 overflow-hidden border border-border/50">
         <ListTableKategori />
-      </Card>
-    </>
+      </div>
+    </div>
   );
 };
 

@@ -13,6 +13,7 @@ import {
   Trash2,
   Search,
   Plus,
+  Tag,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -104,7 +105,7 @@ export default function ListTableKategori() {
 
   return (
     <>
-      {/* Single Delete Confirmation Dialog */}
+      {/* Delete Confirmation Dialog */}
       <AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -136,13 +137,18 @@ export default function ListTableKategori() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <CardHeader className="space-y-4 p-4 md:p-6">
+      <CardHeader className="space-y-4 p-4 md:p-6 border-b bg-linear-to-r from-primary/5 to-transparent">
         <div className="flex flex-col gap-4 md:gap-0 md:flex-row md:items-center md:justify-between">
           {/* Title and Add Button */}
-          <div className="flex items-center justify-between md:justify-start gap-2">
-            <h2 className="text-lg md:text-xl font-semibold">Kategori</h2>
+          <div className="flex items-center justify-between md:justify-start gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg shadow-sm">
+              <Tag className="h-5 w-5 text-primary" />
+            </div>
+            <h2 className="text-lg md:text-2xl font-semibold bg-linear-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              Kategori
+            </h2>
             <Link href="/admin/kelola-kategori/add" className="md:hidden">
-              <Button size="sm" className="h-8">
+              <Button size="sm" className="h-8 shadow-sm">
                 <Plus className="h-4 w-4" />
               </Button>
             </Link>
@@ -151,27 +157,27 @@ export default function ListTableKategori() {
           {/* Search and Add Button */}
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             {/* Search Input */}
-            <div className="relative flex-1">
+            <div className="relative flex-1 min-w-62.5">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Cari kategori..."
-                className="pl-10 pr-10 w-full"
+                className="pl-10 pr-10 w-full transition-shadow focus:ring-2 focus:ring-primary/50"
               />
               {q && (
                 <button
                   onClick={() => setQ("")}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
-                  <XIcon className="h-4 w-4 text-muted-foreground" />
+                  <XIcon className="h-4 w-4" />
                 </button>
               )}
             </div>
 
             {/* Add Button - Desktop */}
             <Link href="/admin/kelola-kategori/add" className="hidden md:block">
-              <Button className="cursor-pointer whitespace-nowrap">
+              <Button className="cursor-pointer whitespace-nowrap shadow-sm hover:shadow-md transition-all">
                 <Plus className="mr-2 h-4 w-4" />
                 Tambah Kategori
               </Button>
@@ -185,12 +191,22 @@ export default function ListTableKategori() {
         <div className="hidden md:block overflow-x-auto">
           <Table className="min-w-full">
             <TableHeader>
-              <TableRow>
-                <TableHead className="w-16 text-center">No</TableHead>
-                <TableHead className="text-center">Code</TableHead>
-                <TableHead className="text-center">Nama Kategori</TableHead>
-                <TableHead className="text-center">Deskripsi</TableHead>
-                <TableHead className="w-32 text-center">Aksi</TableHead>
+              <TableRow className="bg-muted/50 hover:bg-muted/50">
+                <TableHead className="w-16 text-center font-semibold">
+                  No
+                </TableHead>
+                <TableHead className="text-center font-semibold">
+                  Code
+                </TableHead>
+                <TableHead className="text-center font-semibold">
+                  Nama Kategori
+                </TableHead>
+                <TableHead className="text-center font-semibold">
+                  Deskripsi
+                </TableHead>
+                <TableHead className="w-32 text-center font-semibold">
+                  Aksi
+                </TableHead>
               </TableRow>
             </TableHeader>
 
@@ -201,7 +217,7 @@ export default function ListTableKategori() {
               {/* Error */}
               {error && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center">
+                  <TableCell colSpan={5} className="text-center py-10">
                     <DataError message={error?.message} />
                   </TableCell>
                 </TableRow>
@@ -210,7 +226,7 @@ export default function ListTableKategori() {
               {/* Data tidak ditemukan */}
               {data?.length === 0 && queryString && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center">
+                  <TableCell colSpan={5} className="text-center py-10">
                     <DataTidakDitemukan />
                   </TableCell>
                 </TableRow>
@@ -219,7 +235,7 @@ export default function ListTableKategori() {
               {/* Data kosong */}
               {data?.length === 0 && !queryString && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center">
+                  <TableCell colSpan={5} className="text-center py-10">
                     <DataKosong />
                   </TableCell>
                 </TableRow>
@@ -228,14 +244,20 @@ export default function ListTableKategori() {
               {/* Data */}
               {data?.length > 0 &&
                 data.map((item: any, index: number) => (
-                  <TableRow key={item.id}>
+                  <TableRow
+                    key={item.id}
+                    className="hover:bg-muted/50 transition-colors"
+                  >
                     <TableCell className="text-center">
                       {(pageNumber - 1) * perPageNumber + index + 1}
                     </TableCell>
                     <TableCell className="text-center font-medium">
-                      <span className="px-2 py-1 bg-muted rounded-md text-xs">
+                      <Badge
+                        variant="secondary"
+                        className="px-2 py-1 font-mono text-xs shadow-sm"
+                      >
                         {item.code}
-                      </span>
+                      </Badge>
                     </TableCell>
                     <TableCell className="text-center font-medium">
                       {item.nama}
@@ -253,7 +275,7 @@ export default function ListTableKategori() {
                             size="sm"
                             variant="outline"
                             disabled={deleteLoading}
-                            className="h-8 px-3"
+                            className="h-8 px-3 shadow-sm hover:shadow-md transition-all"
                           >
                             <Pencil className="h-3 w-3 mr-1" />
                             Edit
@@ -264,7 +286,7 @@ export default function ListTableKategori() {
                           size="sm"
                           variant="destructive"
                           disabled={deleteLoading}
-                          className="h-8 px-3"
+                          className="h-8 px-3 shadow-sm hover:shadow-md transition-all"
                           onClick={() => confirmDelete(item.id, item.nama)}
                         >
                           <Trash2 className="h-3 w-3 mr-1" />
@@ -318,16 +340,19 @@ export default function ListTableKategori() {
             data.map((item: any, index: number) => (
               <div
                 key={item.id}
-                className="bg-card border rounded-lg p-4 space-y-3"
+                className="bg-card border rounded-lg p-4 space-y-3 shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="flex justify-between items-start">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge
+                        variant="secondary"
+                        className="px-2 py-1 font-mono text-xs shadow-sm"
+                      >
                         #{item.code}
                       </Badge>
-                      <span className="text-sm font-medium">
-                        {(pageNumber - 1) * perPageNumber + index + 1}
+                      <span className="text-sm font-medium text-muted-foreground">
+                        #{(pageNumber - 1) * perPageNumber + index + 1}
                       </span>
                     </div>
                     <h3 className="font-semibold text-base">{item.nama}</h3>
@@ -371,10 +396,11 @@ export default function ListTableKategori() {
                   </DropdownMenu>
                 </div>
 
+                {/* Deskripsi dengan scroll untuk mobile */}
                 {item.deskripsi && (
-                  <p className="text-sm text-muted-foreground line-clamp-2">
+                  <div className="text-sm text-muted-foreground max-h-20 overflow-y-auto p-2 bg-muted/30 rounded">
                     {item.deskripsi}
-                  </p>
+                  </div>
                 )}
 
                 {/* Action Buttons - Alternative for Mobile */}
@@ -386,7 +412,7 @@ export default function ListTableKategori() {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="w-full justify-center"
+                      className="w-full justify-center shadow-sm"
                       disabled={deleteLoading}
                     >
                       <Pencil className="h-3 w-3 mr-1" />
@@ -396,7 +422,7 @@ export default function ListTableKategori() {
                   <Button
                     size="sm"
                     variant="destructive"
-                    className="flex-1 justify-center"
+                    className="flex-1 justify-center shadow-sm"
                     disabled={deleteLoading}
                     onClick={() => confirmDelete(item.id, item.nama)}
                   >
@@ -434,7 +460,7 @@ export default function ListTableKategori() {
                 variant="outline"
                 onClick={() => setPage(String(Math.max(1, pageNumber - 1)))}
                 disabled={pageNumber === 1 || isLoading}
-                className="h-8 px-3"
+                className="h-8 px-3 shadow-sm hover:shadow-md transition-all"
               >
                 <ChevronLeft className="h-4 w-4" />
                 <span className="sr-only sm:not-sr-only sm:ml-1">
@@ -442,7 +468,7 @@ export default function ListTableKategori() {
                 </span>
               </Button>
 
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 bg-muted/50 px-3 py-1 rounded-lg">
                 <span className="text-sm font-medium">{pageNumber}</span>
                 <span className="text-sm text-muted-foreground">/</span>
                 <span className="text-sm text-muted-foreground">
@@ -459,7 +485,7 @@ export default function ListTableKategori() {
                   isLoading ||
                   !meta?.totalPages
                 }
-                className="h-8 px-3"
+                className="h-8 px-3 shadow-sm hover:shadow-md transition-all"
               >
                 <span className="sr-only sm:not-sr-only sm:mr-1">
                   Berikutnya
