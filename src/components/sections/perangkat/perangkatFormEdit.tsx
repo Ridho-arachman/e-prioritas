@@ -30,6 +30,17 @@ import {
   SelectValue,
 } from "../../ui/select";
 import { Trash, Image as ImageIcon, FileImage } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export function PerangkatFormEdit() {
   const router = useRouter();
@@ -47,7 +58,8 @@ export function PerangkatFormEdit() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isRemovingImage, setIsRemovingImage] = useState(false);
   const [isImageRemoved, setIsImageRemoved] = useState(false);
-  const [isInitialLoad, setIsInitialLoad] = useState(true); // ✅ Tambahkan state ini
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [resetDialogOpen, setResetDialogOpen] = useState(false);
 
   const form = useForm<z.infer<typeof updateUserPerangkatSchema>>({
     resolver: zodResolver(updateUserPerangkatSchema),
@@ -61,39 +73,32 @@ export function PerangkatFormEdit() {
     },
   });
 
-  // ✅ PERBAIKAN 1: Hanya depend on [data], HAPUS form dari dependency
   useEffect(() => {
     if (!data) return;
 
-    // ✅ Set nilai form dengan benar
     form.setValue("name", data.name || "");
     form.setValue("email", data.email || "");
-    form.setValue("role", data.role || "PERANGKAT_DESA"); // ✅ Pastikan ada default value
+    form.setValue("role", data.role || "PERANGKAT_DESA");
     form.setValue("jabatan", data.jabatan || "");
     form.setValue("isActive", data.isActive ?? true);
 
     setImagePreview(data.image || null);
     setIsImageRemoved(false);
     setImageFile(null);
-    setIsInitialLoad(false); // ✅ Set initial load selesai
+    setIsInitialLoad(false);
 
     resetFileInput();
-  }, [data]); // ✅ HANYA [data]
+  }, [data]);
 
-  // ✅ PERBAIKAN 2: Gunakan form.watch() bukan useWatch untuk initial value
   const role = form.watch("role");
 
-  // ✅ PERBAIKAN 3: Hanya jalankan saat bukan initial load
   useEffect(() => {
-    if (isInitialLoad) return; // ✅ Skip saat initial load
+    if (isInitialLoad) return;
 
     if (role === "LURAH") {
       form.setValue("jabatan", "Lurah");
-    } else if (role === "PERANGKAT_DESA") {
-      // Biarkan jabatan tetap seperti yang ada di data
-      // Tidak perlu reset ke kosong
     }
-  }, [role, isInitialLoad]); // ✅ Tambahkan isInitialLoad ke dependency
+  }, [role, isInitialLoad]);
 
   const resetFileInput = () => {
     if (fileInputRef.current) {
@@ -132,7 +137,6 @@ export function PerangkatFormEdit() {
 
   const handleRemoveImage = () => {
     if (!data?.image && !imagePreview) return;
-    if (!confirm("Apakah Anda yakin ingin menghapus foto profil?")) return;
 
     setImagePreview(null);
     setImageFile(null);
@@ -141,9 +145,24 @@ export function PerangkatFormEdit() {
     resetFileInput();
   };
 
+  const handleResetConfirm = () => {
+    if (data) {
+      form.setValue("name", data.name);
+      form.setValue("email", data.email);
+      form.setValue("role", data.role);
+      form.setValue("jabatan", data.jabatan || "");
+      form.setValue("isActive", data.isActive);
+      setImagePreview(data.image || null);
+      setImageFile(null);
+      setIsImageRemoved(false);
+    }
+    resetFileInput();
+    setResetDialogOpen(false);
+  };
+
   if (isLoading && !data) {
     return (
-      <div className="space-y-4 animate-pulse">
+      <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-6">
         <div className="space-y-2">
           <Skeleton className="h-4 w-20" />
           <Skeleton className="h-10 w-full rounded-md" />
@@ -154,7 +173,7 @@ export function PerangkatFormEdit() {
         </div>
         <div className="space-y-2">
           <Skeleton className="h-4 w-24" />
-          <div className="flex gap-4">
+          <div className="flex flex-col md:flex-row gap-4">
             <Skeleton className="h-32 w-32 rounded-xl" />
             <div className="flex-1 space-y-2">
               <Skeleton className="h-10 w-full rounded-md" />
@@ -214,38 +233,51 @@ export function PerangkatFormEdit() {
   };
 
   return (
-    <div>
+    <div className="max-w-4xl mx-auto p-4 md:p-6 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Nama */}
-        <Controller
-          control={form.control}
-          name="name"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Nama</FieldLabel>
-              <Input {...field} readOnly={loading} placeholder="Nama lengkap" />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
+        {/* Grid untuk Nama dan Email */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Nama */}
+          <Controller
+            control={form.control}
+            name="name"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Nama</FieldLabel>
+                <Input
+                  {...field}
+                  readOnly={loading}
+                  placeholder="Nama lengkap"
+                  className="transition-shadow focus:ring-2 focus:ring-blue-500"
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
 
-        {/* Email */}
-        <Controller
-          control={form.control}
-          name="email"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Email</FieldLabel>
-              <Input
-                {...field}
-                readOnly={loading}
-                type="email"
-                placeholder="contoh@email.com"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
+          {/* Email */}
+          <Controller
+            control={form.control}
+            name="email"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Email</FieldLabel>
+                <Input
+                  {...field}
+                  readOnly={loading}
+                  type="email"
+                  placeholder="contoh@email.com"
+                  className="transition-shadow focus:ring-2 focus:ring-blue-500"
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+        </div>
 
         {/* Foto Profil */}
         <Controller
@@ -254,20 +286,21 @@ export function PerangkatFormEdit() {
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel>Foto Profil</FieldLabel>
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1">
+              <div className="flex flex-col md:flex-row gap-6">
+                {/* Preview Image */}
+                <div className="flex-1 max-w-xs mx-auto md:mx-0">
                   {imagePreview && !isImageRemoved ? (
-                    <div className="relative w-full aspect-square border-2 border-dashed rounded-xl overflow-hidden">
+                    <div className="relative w-full aspect-square border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl overflow-hidden shadow-md group">
                       <img
                         src={imagePreview}
                         alt="Preview"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover transition-transform group-hover:scale-105"
                       />
                       <Button
                         type="button"
                         variant="destructive"
                         size="sm"
-                        className="absolute top-2 right-2 z-50"
+                        className="absolute top-2 right-2 z-50 opacity-90 hover:opacity-100 shadow-lg"
                         onClick={handleRemoveImage}
                         disabled={loading}
                         style={{ zIndex: 100 }}
@@ -275,23 +308,23 @@ export function PerangkatFormEdit() {
                         <Trash className="h-4 w-4" />
                       </Button>
                       {!imageFile && data?.image && (
-                        <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded z-40">
-                          <FileImage className="h-3 w-3 inline mr-1" />
+                        <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full z-40 flex items-center gap-1">
+                          <FileImage className="h-3 w-3" />
                           Foto saat ini
                         </div>
                       )}
                       {imageFile && (
-                        <div className="absolute bottom-2 left-2 bg-green-700 text-white text-xs px-2 py-1 rounded z-40">
-                          <FileImage className="h-3 w-3 inline mr-1" />
+                        <div className="absolute bottom-2 left-2 bg-green-700 text-white text-xs px-2 py-1 rounded-full z-40 flex items-center gap-1">
+                          <FileImage className="h-3 w-3" />
                           Preview baru
                         </div>
                       )}
                     </div>
                   ) : (
-                    <div className="w-full aspect-square border-2 border-dashed rounded-xl flex items-center justify-center bg-muted/30">
+                    <div className="w-full aspect-square border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl flex items-center justify-center bg-gray-50 dark:bg-gray-800/50">
                       <div className="text-center">
-                        <ImageIcon className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
-                        <p className="text-sm text-muted-foreground">
+                        <ImageIcon className="h-12 w-12 text-gray-400 dark:text-gray-600 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
                           {isImageRemoved ? "Foto dihapus" : "Belum ada foto"}
                         </p>
                       </div>
@@ -299,36 +332,37 @@ export function PerangkatFormEdit() {
                   )}
                 </div>
 
-                <div className="flex-1 space-y-3">
+                {/* Upload Button & Info */}
+                <div className="flex-1 space-y-4">
                   <Input
                     ref={fileInputRef}
                     type="file"
                     accept="image/jpeg,image/png,image/jpg,image/webp"
                     onChange={handleImageChange}
                     disabled={loading}
-                    className="cursor-pointer"
+                    className="cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/30 dark:file:text-blue-300"
                   />
-                  <div className="space-y-1">
-                    <FieldDescription className="text-sm">
+                  <div className="bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg space-y-1">
+                    <FieldDescription className="text-sm flex items-center gap-1">
                       <span className="font-medium">Format:</span> JPG, PNG,
                       WEBP
                     </FieldDescription>
-                    <FieldDescription className="text-sm">
+                    <FieldDescription className="text-sm flex items-center gap-1">
                       <span className="font-medium">Ukuran maksimal:</span> 5MB
                     </FieldDescription>
-                    <FieldDescription className="text-sm">
+                    <FieldDescription className="text-sm flex items-center gap-1">
                       <span className="font-medium">Rasio:</span> 1:1 (Square)
                     </FieldDescription>
                   </div>
                   {!imagePreview && data?.image && !isImageRemoved && (
-                    <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
                       <div className="flex items-start gap-2">
-                        <FileImage className="h-4 w-4 text-blue-600 mt-0.5" />
+                        <FileImage className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
                         <div className="text-sm">
-                          <p className="font-medium text-blue-700">
+                          <p className="font-medium text-blue-700 dark:text-blue-300">
                             Foto profil saat ini tersimpan
                           </p>
-                          <p className="text-xs text-blue-600 mt-1">
+                          <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
                             Pilih file baru untuk mengganti foto
                           </p>
                         </div>
@@ -342,58 +376,68 @@ export function PerangkatFormEdit() {
           )}
         />
 
-        {/* Role - ✅ PERBAIKAN: Tambahkan key berdasarkan value */}
-        <Controller
-          control={form.control}
-          name="role"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Role</FieldLabel>
-              <Select
-                value={field.value}
-                onValueChange={field.onChange}
-                disabled={loading}
-                key={field.value || "default"} // ✅ Force re-render saat value berubah
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="PERANGKAT_DESA">Perangkat Desa</SelectItem>
-                  <SelectItem value="LURAH">Lurah</SelectItem>
-                </SelectContent>
-              </Select>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
+        {/* Grid untuk Role dan Jabatan */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Role */}
+          <Controller
+            control={form.control}
+            name="role"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Role</FieldLabel>
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  disabled={loading}
+                  key={field.value || "default"}
+                >
+                  <SelectTrigger className="w-full transition-shadow focus:ring-2 focus:ring-blue-500">
+                    <SelectValue placeholder="Pilih role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PERANGKAT_DESA">
+                      Perangkat Desa
+                    </SelectItem>
+                    <SelectItem value="LURAH">Lurah</SelectItem>
+                  </SelectContent>
+                </Select>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
 
-        {/* Jabatan - ✅ PERBAIKAN: Tampilkan untuk semua role, tapi disabled untuk LURAH */}
-        <Controller
-          control={form.control}
-          name="jabatan"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Jabatan</FieldLabel>
-              <Input
-                {...field}
-                readOnly={loading || role === "LURAH"} // ✅ Disabled saat LURAH
-                placeholder={role === "LURAH" ? "Lurah" : "Jabatan perangkat"}
-                value={role === "LURAH" ? "Lurah" : field.value} // ✅ Force value "Lurah" saat role LURAH
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
+          {/* Jabatan */}
+          <Controller
+            control={form.control}
+            name="jabatan"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Jabatan</FieldLabel>
+                <Input
+                  {...field}
+                  readOnly={loading || role === "LURAH"}
+                  placeholder={role === "LURAH" ? "Lurah" : "Jabatan perangkat"}
+                  value={role === "LURAH" ? "Lurah" : field.value}
+                  className="transition-shadow focus:ring-2 focus:ring-blue-500"
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+        </div>
 
         {/* Status */}
         <Controller
           control={form.control}
           name="isActive"
           render={({ field }) => (
-            <Field className="flex items-center justify-between border rounded-lg p-3">
+            <Field className="flex items-center justify-between border rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50">
               <div>
-                <FieldLabel>Status Aktif</FieldLabel>
+                <FieldLabel className="text-base">Status Aktif</FieldLabel>
                 <FieldDescription>Tentukan apakah user aktif</FieldDescription>
               </div>
               <FieldContent>
@@ -401,6 +445,7 @@ export function PerangkatFormEdit() {
                   checked={field.value}
                   onCheckedChange={field.onChange}
                   disabled={loading}
+                  className="data-[state=checked]:bg-blue-600"
                 />
               </FieldContent>
             </Field>
@@ -408,35 +453,43 @@ export function PerangkatFormEdit() {
         />
 
         {/* Action Buttons */}
-        <div className="flex justify-end gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
-              if (confirm("Batalkan perubahan?")) {
-                // ✅ Reset ke nilai awal dari data
-                if (data) {
-                  form.setValue("name", data.name);
-                  form.setValue("email", data.email);
-                  form.setValue("role", data.role);
-                  form.setValue("jabatan", data.jabatan || "");
-                  form.setValue("isActive", data.isActive);
-                  setImagePreview(data.image || null);
-                  setImageFile(null);
-                  setIsImageRemoved(false);
-                }
-                resetFileInput();
-              }
-            }}
-            disabled={loading}
-            className="cursor-pointer"
-          >
-            Reset
-          </Button>
+        <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-800">
+          {/* Tombol Reset dengan AlertDialog */}
+          <AlertDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
+            <AlertDialogTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={loading}
+                className="cursor-pointer w-full sm:w-auto"
+              >
+                Reset
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Batalkan perubahan?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Semua perubahan yang belum disimpan akan hilang. Data akan
+                  kembali ke keadaan awal.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Batal</AlertDialogCancel>
+                <AlertDialogAction onClick={handleResetConfirm}>
+                  Ya, Reset
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
-          <Button type="submit" disabled={loading} className="cursor-pointer">
+          <Button
+            type="submit"
+            disabled={loading}
+            className="cursor-pointer w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white"
+          >
             {loading ? (
-              <span className="flex items-center gap-2">
+              <span className="flex items-center justify-center gap-2">
                 <Spinner className="size-4" /> Menyimpan...
               </span>
             ) : (
@@ -446,16 +499,19 @@ export function PerangkatFormEdit() {
         </div>
       </form>
 
-      <div className="mt-4 space-y-2">
-        <p className="text-xs text-muted-foreground">
-          ⚡ Pastikan semua data terisi dengan benar sebelum disimpan.
+      {/* Footer Info */}
+      <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-800/30 rounded-lg border border-gray-200 dark:border-gray-800 space-y-1">
+        <p className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
+          <span>⚡</span> Pastikan semua data terisi dengan benar sebelum
+          disimpan.
         </p>
-        <p className="text-xs text-muted-foreground">
-          📸 Foto profil bersifat opsional. Biarkan kosong jika tidak ingin
-          mengubah.
+        <p className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
+          <span>📸</span> Foto profil bersifat opsional. Biarkan kosong jika
+          tidak ingin mengubah.
         </p>
-        <p className="text-xs text-muted-foreground">
-          🗑️ Klik tombol hapus pada foto untuk menghapus foto profil saat ini.
+        <p className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
+          <span>🗑️</span> Klik tombol hapus pada foto untuk menghapus foto
+          profil saat ini.
         </p>
       </div>
     </div>

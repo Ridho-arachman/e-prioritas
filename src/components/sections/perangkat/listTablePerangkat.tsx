@@ -286,7 +286,7 @@ export default function ListTablePerangkat() {
           {/* Left Section - Actions */}
           <div className="flex flex-col lg:flex-row gap-4">
             <Link href="/admin/kelola-perangkat/add">
-              <Button className="cursor-pointer">
+              <Button className="cursor-pointer w-full sm:w-auto">
                 <Plus className="mr-2 h-4 w-4" /> Tambah Perangkat
               </Button>
             </Link>
@@ -295,7 +295,7 @@ export default function ListTablePerangkat() {
             <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
               <Button
                 variant="outline"
-                className="cursor-pointer"
+                className="cursor-pointer w-full sm:w-auto"
                 onClick={() => setIsFilterOpen(true)}
               >
                 <Filter className="mr-2 h-4 w-4" />
@@ -325,7 +325,7 @@ export default function ListTablePerangkat() {
                   {/* Status Filter */}
                   <div className="grid gap-2">
                     <Label>Status Aktif</Label>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <Button
                         variant={active === "true" ? "default" : "outline"}
                         className="flex-1 cursor-pointer"
@@ -368,7 +368,7 @@ export default function ListTablePerangkat() {
                       </SelectContent>
                     </Select>
 
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <Button
                         variant={sortOrder === "asc" ? "default" : "outline"}
                         className="flex-1 cursor-pointer"
@@ -390,7 +390,7 @@ export default function ListTablePerangkat() {
                   </div>
                 </div>
 
-                <div className="flex justify-between gap-2">
+                <div className="flex flex-col-reverse sm:flex-row justify-between gap-2">
                   <Button
                     variant="outline"
                     onClick={clearFilters}
@@ -410,12 +410,12 @@ export default function ListTablePerangkat() {
           </div>
 
           {/* Right Section - Search */}
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Cari Nama / Jabatan / Email..."
-              className="cursor-pointer min-w-62.5"
+              className="cursor-pointer min-w-62.5 max-w-full flex-1"
             />
             {q && (
               <Button
@@ -623,7 +623,7 @@ export default function ListTablePerangkat() {
 
                     {/* 🔥 AKSI — EVENT DIPUTUS DI SINI */}
                     <TableCell onClick={(e) => e.stopPropagation()}>
-                      <div className="flex justify-center gap-2">
+                      <div className="flex justify-center gap-1 sm:gap-2">
                         <Button
                           size="sm"
                           onClick={(e) => {
@@ -669,12 +669,12 @@ export default function ListTablePerangkat() {
           </Table>
         </div>
 
-        <div className="flex justify-between items-center mt-4">
-          <div className="text-sm text-muted-foreground">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mt-4">
+          <div className="text-sm text-muted-foreground order-2 sm:order-1">
             Total: {meta?.total || 0} User
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 order-1 sm:order-2">
             <Button
               size="sm"
               variant="outline"
@@ -684,7 +684,7 @@ export default function ListTablePerangkat() {
             >
               <ChevronLeft className="h-4 w-4" /> Prev
             </Button>
-            <span className="px-4 py-2 bg-muted rounded-md">
+            <span className="px-4 py-2 bg-muted rounded-md whitespace-nowrap">
               Halaman {pageNumber} dari {meta?.totalPages || 1}
             </span>
             <Button

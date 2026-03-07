@@ -277,7 +277,7 @@ export default function PerangkatFormAdd() {
 
   if (!isMounted) {
     return (
-      <div className="space-y-6">
+      <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-6">
         {/* Header */}
         <div className="mb-4">
           <Skeleton className="h-8 w-48 mb-2" />
@@ -313,7 +313,7 @@ export default function PerangkatFormAdd() {
           {/* Image Upload */}
           <div className="space-y-2">
             <Skeleton className="h-5 w-24" />
-            <div className="flex gap-4">
+            <div className="flex flex-col md:flex-row gap-4">
               <Skeleton className="h-32 w-32 rounded-lg" />
               <div className="flex-1 space-y-2">
                 <Skeleton className="h-10 w-full" />
@@ -352,32 +352,34 @@ export default function PerangkatFormAdd() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-end gap-2 pt-4">
-          <Skeleton className="h-10 w-36 rounded-md" />
-          <Skeleton className="h-10 w-44 rounded-md" />
+        <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4">
+          <Skeleton className="h-10 w-full sm:w-36 rounded-md" />
+          <Skeleton className="h-10 w-full sm:w-44 rounded-md" />
         </div>
       </div>
     );
   }
 
   return (
-    <>
+    <div className="max-w-4xl mx-auto p-4 md:p-6 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
       {/* Loading State untuk Hydration */}
       {!isHydrated && (
-        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-950/30 border border-yellow-200 dark:border-yellow-800 rounded-lg">
           <div className="flex items-center gap-2">
-            <Spinner className="size-4" />
-            <p className="text-sm text-yellow-700">Memuat draft tersimpan...</p>
+            <Spinner className="size-4 text-yellow-600" />
+            <p className="text-sm text-yellow-700 dark:text-yellow-400">
+              Memuat draft tersimpan...
+            </p>
           </div>
         </div>
       )}
 
       {/* Draft Status Indicator - hanya tampil jika ada draft */}
       {hasDraft && isHydrated && (
-        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-            <p className="text-sm text-blue-700">
+            <p className="text-sm text-blue-700 dark:text-blue-400">
               ⚡ Draft otomatis disimpan. Data tidak akan hilang saat halaman
               direfresh.
             </p>
@@ -386,91 +388,18 @@ export default function PerangkatFormAdd() {
       )}
 
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Nama */}
-        <Controller
-          control={form.control}
-          name="name"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>
-                Nama{" "}
-                {draft?.name && isHydrated && (
-                  <span className="text-green-600 text-xs">
-                    • Draft tersimpan
-                  </span>
-                )}
-              </FieldLabel>
-              <Input
-                {...field}
-                readOnly={isLoading}
-                placeholder="Nama lengkap"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-
-        {/* Email */}
-        <Controller
-          control={form.control}
-          name="email"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>
-                Email{" "}
-                {draft?.email && isHydrated && (
-                  <span className="text-green-600 text-xs">
-                    • Draft tersimpan
-                  </span>
-                )}
-              </FieldLabel>
-              <Input
-                {...field}
-                readOnly={isLoading}
-                type="email"
-                placeholder="contoh@email.com"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-
-        {/* Role */}
-        <Controller
-          control={form.control}
-          name="role"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Role</FieldLabel>
-              <Select
-                value={field.value}
-                onValueChange={field.onChange}
-                disabled={isLoading}
-              >
-                <SelectTrigger suppressHydrationWarning>
-                  <SelectValue placeholder="Pilih role" />
-                </SelectTrigger>
-                <SelectContent suppressHydrationWarning>
-                  <SelectItem value="PERANGKAT_DESA">Perangkat Desa</SelectItem>
-                  <SelectItem value="LURAH">Lurah</SelectItem>
-                </SelectContent>
-              </Select>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-
-        {/* Jabatan - hanya tampil untuk PERANGKAT_DESA */}
-        {role === "PERANGKAT_DESA" && (
+        {/* Grid untuk field nama dan email agar lebih rapi di layar besar */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Nama */}
           <Controller
             control={form.control}
-            name="jabatan"
+            name="name"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel>
-                  Jabatan{" "}
-                  {draft?.jabatan && isHydrated && (
-                    <span className="text-green-600 text-xs">
+                  Nama{" "}
+                  {draft?.name && isHydrated && (
+                    <span className="text-green-600 dark:text-green-400 text-xs font-normal">
                       • Draft tersimpan
                     </span>
                   )}
@@ -478,7 +407,8 @@ export default function PerangkatFormAdd() {
                 <Input
                   {...field}
                   readOnly={isLoading}
-                  placeholder="Jabatan perangkat"
+                  placeholder="Nama lengkap"
+                  className="transition-shadow focus:ring-2 focus:ring-blue-500"
                 />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
@@ -486,7 +416,99 @@ export default function PerangkatFormAdd() {
               </Field>
             )}
           />
-        )}
+
+          {/* Email */}
+          <Controller
+            control={form.control}
+            name="email"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>
+                  Email{" "}
+                  {draft?.email && isHydrated && (
+                    <span className="text-green-600 dark:text-green-400 text-xs font-normal">
+                      • Draft tersimpan
+                    </span>
+                  )}
+                </FieldLabel>
+                <Input
+                  {...field}
+                  readOnly={isLoading}
+                  type="email"
+                  placeholder="contoh@email.com"
+                  className="transition-shadow focus:ring-2 focus:ring-blue-500"
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+        </div>
+
+        {/* Role dan Jabatan - bisa digrid juga jika diperlukan, tapi jabatan dinamis */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Role */}
+          <Controller
+            control={form.control}
+            name="role"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Role</FieldLabel>
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  disabled={isLoading}
+                >
+                  <SelectTrigger
+                    suppressHydrationWarning
+                    className="w-full transition-shadow focus:ring-2 focus:ring-blue-500"
+                  >
+                    <SelectValue placeholder="Pilih role" />
+                  </SelectTrigger>
+                  <SelectContent suppressHydrationWarning>
+                    <SelectItem value="PERANGKAT_DESA">
+                      Perangkat Desa
+                    </SelectItem>
+                    <SelectItem value="LURAH">Lurah</SelectItem>
+                  </SelectContent>
+                </Select>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+
+          {/* Jabatan - hanya tampil untuk PERANGKAT_DESA */}
+          {role === "PERANGKAT_DESA" && (
+            <Controller
+              control={form.control}
+              name="jabatan"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>
+                    Jabatan{" "}
+                    {draft?.jabatan && isHydrated && (
+                      <span className="text-green-600 dark:text-green-400 text-xs font-normal">
+                        • Draft tersimpan
+                      </span>
+                    )}
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    readOnly={isLoading}
+                    placeholder="Jabatan perangkat"
+                    className="transition-shadow focus:ring-2 focus:ring-blue-500"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          )}
+        </div>
 
         {/* Upload Gambar */}
         <Controller
@@ -494,46 +516,46 @@ export default function PerangkatFormAdd() {
           name="image"
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>
-                Foto Profil{" "}
+              <FieldLabel className="flex items-center gap-2">
+                Foto Profil
                 {hasImageDraft && isHydrated && (
-                  <span className="text-green-600 text-xs">
+                  <span className="text-green-600 dark:text-green-400 text-xs font-normal">
                     • Draft tersimpan
                   </span>
                 )}
               </FieldLabel>
-              <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex flex-col md:flex-row gap-6">
                 {/* Preview Image */}
-                <div className="flex-1">
+                <div className="flex-1 max-w-xs mx-auto md:mx-0">
                   {imagePreview ? (
-                    <div className="relative w-full aspect-square border-2 border-dashed rounded-lg overflow-hidden">
+                    <div className="relative w-full aspect-square border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl overflow-hidden shadow-md group">
                       <img
                         src={imagePreview}
                         alt="Preview"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover transition-transform group-hover:scale-105"
                       />
                       <Button
                         type="button"
                         variant="destructive"
                         size="sm"
-                        className="absolute top-2 right-2 cursor-pointer"
+                        className="absolute top-2 right-2 cursor-pointer opacity-90 hover:opacity-100 shadow-lg"
                         onClick={handleRemoveImage}
                         disabled={isLoading}
                       >
                         <Trash className="h-4 w-4" />
                       </Button>
                       {hasImageDraft && isHydrated && (
-                        <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                          <FileImage className="h-3 w-3 inline mr-1" />
-                          Draft tersimpan
+                        <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                          <FileImage className="h-3 w-3" />
+                          Draft
                         </div>
                       )}
                     </div>
                   ) : (
-                    <div className="w-full aspect-square border-2 border-dashed rounded-lg flex items-center justify-center bg-muted/30">
+                    <div className="w-full aspect-square border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl flex items-center justify-center bg-gray-50 dark:bg-gray-800/50">
                       <div className="text-center">
-                        <ImageIcon className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
-                        <p className="text-sm text-muted-foreground">
+                        <ImageIcon className="h-12 w-12 text-gray-400 dark:text-gray-600 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
                           Belum ada foto
                         </p>
                       </div>
@@ -542,7 +564,7 @@ export default function PerangkatFormAdd() {
                 </div>
 
                 {/* Upload Button & Info */}
-                <div className="flex-1 space-y-3">
+                <div className="flex-1 space-y-4">
                   <Input
                     type="file"
                     accept="image/jpeg,image/png,image/jpg,image/webp"
@@ -551,43 +573,43 @@ export default function PerangkatFormAdd() {
                       field.onChange(e.target.files?.[0]);
                     }}
                     disabled={isLoading}
-                    className="cursor-pointer"
+                    className="cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/30 dark:file:text-blue-300"
                   />
-                  <div className="space-y-1">
-                    <FieldDescription className="text-sm">
+                  <div className="bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg space-y-1">
+                    <FieldDescription className="text-sm flex items-center gap-1">
                       <span className="font-medium">Format:</span> JPG, PNG,
                       WEBP
                     </FieldDescription>
-                    <FieldDescription className="text-sm">
+                    <FieldDescription className="text-sm flex items-center gap-1">
                       <span className="font-medium">Ukuran maksimal:</span> 5MB
                     </FieldDescription>
-                    <FieldDescription className="text-sm">
+                    <FieldDescription className="text-sm flex items-center gap-1">
                       <span className="font-medium">Rasio:</span> 1:1 (Square)
                     </FieldDescription>
                   </div>
 
                   {/* Info Draft Image */}
                   {hasImageDraft && isHydrated && draft?.imageFileName && (
-                    <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
                       <div className="flex items-start gap-2">
-                        <FileImage className="h-4 w-4 text-blue-600 mt-0.5" />
+                        <FileImage className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
                         <div className="text-sm">
-                          <p className="font-medium text-blue-700">
+                          <p className="font-medium text-blue-700 dark:text-blue-300">
                             {draft.imageFileName}
                           </p>
-                          <p className="text-xs text-blue-600">
+                          <p className="text-xs text-blue-600 dark:text-blue-400">
                             {draft.imageSize
                               ? (draft.imageSize / 1024).toFixed(1)
                               : 0}{" "}
                             KB
                             {draft.imageSize &&
                               draft.imageSize > 1024 * 1024 && (
-                                <span className="text-red-600 ml-1">
+                                <span className="text-red-600 dark:text-red-400 ml-1">
                                   (Melebihi batas, pilih ulang)
                                 </span>
                               )}
                           </p>
-                          <p className="text-xs text-blue-500 mt-1">
+                          <p className="text-xs text-blue-500 dark:text-blue-500 mt-1">
                             ⚠️ Gambar draft akan hilang jika halaman direfresh.
                             Pilih ulang file untuk memastikan upload.
                           </p>
@@ -602,75 +624,92 @@ export default function PerangkatFormAdd() {
           )}
         />
 
-        {/* Password */}
-        <Controller
-          control={form.control}
-          name="password"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Password</FieldLabel>
-              <div className="flex gap-2">
-                <Input
-                  {...field}
-                  type={showPassword ? "text" : "password"}
-                  readOnly={isLoading}
-                  placeholder="Masukkan password"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="cursor-pointer"
-                  disabled={isLoading}
-                >
-                  {showPassword ? <Eye /> : <EyeClosed />}
-                </Button>
-              </div>
-              <FieldDescription>
-                Minimal 8 karakter, huruf besar, kecil, angka & simbol
-              </FieldDescription>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
+        {/* Password dan Confirm Password dalam grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Password */}
+          <Controller
+            control={form.control}
+            name="password"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Password</FieldLabel>
+                <div className="flex gap-2">
+                  <Input
+                    {...field}
+                    type={showPassword ? "text" : "password"}
+                    readOnly={isLoading}
+                    placeholder="Masukkan password"
+                    className="transition-shadow focus:ring-2 focus:ring-blue-500"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="cursor-pointer px-3"
+                    disabled={isLoading}
+                  >
+                    {showPassword ? (
+                      <Eye className="h-4 w-4" />
+                    ) : (
+                      <EyeClosed className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+                <FieldDescription>
+                  Minimal 8 karakter, huruf besar, kecil, angka & simbol
+                </FieldDescription>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
 
-        {/* Confirm Password */}
-        <Controller
-          control={form.control}
-          name="confirmPassword"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Konfirmasi Password</FieldLabel>
-              <div className="flex gap-2">
-                <Input
-                  {...field}
-                  type={showConfirmPassword ? "text" : "password"}
-                  readOnly={isLoading}
-                  placeholder="Konfirmasi password"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="cursor-pointer"
-                  disabled={isLoading}
-                >
-                  {showConfirmPassword ? <Eye /> : <EyeClosed />}
-                </Button>
-              </div>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
+          {/* Confirm Password */}
+          <Controller
+            control={form.control}
+            name="confirmPassword"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Konfirmasi Password</FieldLabel>
+                <div className="flex gap-2">
+                  <Input
+                    {...field}
+                    type={showConfirmPassword ? "text" : "password"}
+                    readOnly={isLoading}
+                    placeholder="Konfirmasi password"
+                    className="transition-shadow focus:ring-2 focus:ring-blue-500"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="cursor-pointer px-3"
+                    disabled={isLoading}
+                  >
+                    {showConfirmPassword ? (
+                      <Eye className="h-4 w-4" />
+                    ) : (
+                      <EyeClosed className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+        </div>
 
         {/* Status */}
         <Controller
           control={form.control}
           name="isActive"
           render={({ field }) => (
-            <Field className="flex items-center justify-between border rounded-lg p-3">
+            <Field className="flex items-center justify-between border rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50">
               <div>
-                <FieldLabel>Status Aktif</FieldLabel>
+                <FieldLabel className="text-base">Status Aktif</FieldLabel>
                 <FieldDescription>Tentukan apakah user aktif</FieldDescription>
               </div>
               <FieldContent>
@@ -679,6 +718,7 @@ export default function PerangkatFormAdd() {
                   onCheckedChange={field.onChange}
                   disabled={isLoading}
                   suppressHydrationWarning
+                  className="data-[state=checked]:bg-blue-600"
                 />
               </FieldContent>
             </Field>
@@ -686,20 +726,24 @@ export default function PerangkatFormAdd() {
         />
 
         {/* Action Buttons */}
-        <div className="flex justify-end gap-2">
+        <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-800">
           <Button
             type="button"
             variant="outline"
             onClick={handleReset}
-            className="cursor-pointer"
+            className="cursor-pointer w-full sm:w-auto"
             disabled={isLoading}
           >
             Reset & Hapus Draft
           </Button>
 
-          <Button type="submit" disabled={isLoading} className="cursor-pointer">
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="cursor-pointer w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white"
+          >
             {isLoading ? (
-              <span className="flex items-center gap-2">
+              <span className="flex items-center justify-center gap-2">
                 <Spinner className="size-4" /> Menyimpan...
               </span>
             ) : (
@@ -710,21 +754,22 @@ export default function PerangkatFormAdd() {
       </form>
 
       {/* Footer Info */}
-      <div className="mt-6 space-y-2">
-        <p className="text-xs text-muted-foreground">
-          ⚡ Data otomatis disimpan sebagai draft saat Anda berhenti mengetik.
+      <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-800/30 rounded-lg border border-gray-200 dark:border-gray-800 space-y-1">
+        <p className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
+          <span>⚡</span> Data otomatis disimpan sebagai draft saat Anda
+          berhenti mengetik.
         </p>
-        <p className="text-xs text-muted-foreground">
-          🔒 Password tidak disimpan di draft untuk keamanan.
+        <p className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
+          <span>🔒</span> Password tidak disimpan di draft untuk keamanan.
         </p>
-        <p className="text-xs text-muted-foreground">
-          💾 Draft tetap tersimpan meskipun halaman direfresh.
+        <p className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
+          <span>💾</span> Draft tetap tersimpan meskipun halaman direfresh.
         </p>
-        <p className="text-xs text-muted-foreground">
-          📸 Gambar disimpan sebagai preview (base64). Pilih ulang file gambar
-          sebelum submit untuk memastikan upload berhasil.
+        <p className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
+          <span>📸</span> Gambar disimpan sebagai preview (base64). Pilih ulang
+          file gambar sebelum submit untuk memastikan upload berhasil.
         </p>
       </div>
-    </>
+    </div>
   );
 }
