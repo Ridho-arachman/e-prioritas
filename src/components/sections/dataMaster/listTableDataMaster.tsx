@@ -437,7 +437,7 @@ export default function ListTableDataMaster() {
 
       {/* Dialog Import Excel */}
       <Dialog open={isImportOpen} onOpenChange={setIsImportOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md w-[95vw] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Import Data Master dari Excel</DialogTitle>
             <DialogDescription>
@@ -454,8 +454,9 @@ export default function ListTableDataMaster() {
               href="/Template_Import_DataMaster_FINAL.xlsm"
               target="_blank"
               download
+              className="inline-flex items-center gap-2 text-sm hover:underline"
             >
-              <Download className="mr-2 h-4 w-4" /> Download Template Excel
+              <Download className="h-4 w-4" /> Download Template Excel
             </Link>
             <Input
               type="file"
@@ -468,7 +469,7 @@ export default function ListTableDataMaster() {
               </p>
             )}
           </div>
-          <div className="flex justify-end gap-2">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2">
             <Button
               variant="outline"
               onClick={() => {
@@ -476,12 +477,14 @@ export default function ListTableDataMaster() {
                 setImportFile(null);
               }}
               disabled={importLoading}
+              className="w-full sm:w-auto"
             >
               Batal
             </Button>
             <Button
               onClick={handleImport}
               disabled={!importFile || importLoading}
+              className="w-full sm:w-auto"
             >
               {importLoading && (
                 <Spinner className="mr-2 h-4 w-4 animate-spin" />
@@ -492,18 +495,20 @@ export default function ListTableDataMaster() {
         </DialogContent>
       </Dialog>
 
-      <CardHeader className="space-y-4">
-        <div className="mb-4 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
-          <div className="flex flex-col lg:flex-row gap-4">
-            <Link href="/admin/kelola-data/add">
-              <Button className="cursor-pointer">
-                <Plus className="mr-2 h-4 w-4" /> Tambah Data Master
+      <CardHeader className="space-y-4 p-4 md:p-6 border-b bg-linear-to-r from-primary/5 to-transparent">
+        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
+          {/* Bagian kiri: tombol aksi */}
+          <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+            <Link href="/admin/kelola-data/add" className="w-full sm:w-auto">
+              <Button className="cursor-pointer shadow-sm hover:shadow-md transition-all w-full sm:w-auto">
+                <Plus className="mr-2 h-4 w-4" /> Tambah Data
               </Button>
             </Link>
+
             <Button
               variant="outline"
               onClick={() => setIsImportOpen(true)}
-              className="cursor-pointer"
+              className="cursor-pointer shadow-sm hover:shadow-md transition-all w-full sm:w-auto"
             >
               <Upload className="mr-2 h-4 w-4" /> Import Excel
             </Button>
@@ -512,7 +517,7 @@ export default function ListTableDataMaster() {
             <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
               <Button
                 variant="outline"
-                className="cursor-pointer"
+                className="cursor-pointer shadow-sm hover:shadow-md transition-all w-full sm:w-auto"
                 onClick={() => setIsFilterOpen(true)}
               >
                 <Filter className="mr-2 h-4 w-4" />
@@ -524,7 +529,7 @@ export default function ListTableDataMaster() {
                   </Badge>
                 )}
               </Button>
-              <DialogContent className="sm:max-w-lg">
+              <DialogContent className="sm:max-w-lg w-[95vw] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>
                     <div className="flex items-center gap-2">
@@ -602,7 +607,7 @@ export default function ListTableDataMaster() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <Button
                         variant={sortOrder === "asc" ? "default" : "outline"}
                         className="flex-1 cursor-pointer"
@@ -624,7 +629,7 @@ export default function ListTableDataMaster() {
                     </div>
                   </div>
                 </div>
-                <div className="flex justify-between gap-2">
+                <div className="flex flex-col-reverse sm:flex-row justify-between gap-2">
                   <Button
                     variant="outline"
                     onClick={clearFilters}
@@ -645,31 +650,33 @@ export default function ListTableDataMaster() {
             </Dialog>
           </div>
 
-          {/* Search Box */}
-          <div className="flex gap-2">
-            <Input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Cari nama atribut..."
-              className="min-w-62.5"
-            />
-            {q && (
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setQ("")}
-                className="cursor-pointer shrink-0"
-              >
-                <XIcon className="h-4 w-4" />
-              </Button>
-            )}
+          {/* Bagian kanan: Search Box */}
+          <div className="flex gap-2 w-full lg:w-auto">
+            <div className="relative flex-1 w-full">
+              <Input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Cari nama atribut..."
+                className="pl-8 pr-10 w-full transition-shadow focus:ring-2 focus:ring-primary/50"
+              />
+              {q && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setQ("")}
+                  className="absolute right-0 top-0 h-full px-3 cursor-pointer"
+                >
+                  <XIcon className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </CardHeader>
 
       <CardContent className="max-w-full p-4 md:p-6">
         <div className="overflow-x-auto">
-          <Table className="table-fixed w-full">
+          <Table className="min-w-250 lg:min-w-full table-auto">
             <TableHeader>
               <TableRow>
                 <TableHead className="text-center w-12 whitespace-nowrap px-2">
@@ -873,12 +880,12 @@ export default function ListTableDataMaster() {
         {/* Pagination */}
         {data?.length > 0 && (
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-4 pt-4 border-t">
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground order-2 sm:order-1">
               Menampilkan {(pageNumber - 1) * limitNumber + 1} -{" "}
               {Math.min(pageNumber * limitNumber, meta?.total || 0)} dari{" "}
               {meta?.total || 0} data
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 order-1 sm:order-2">
               <Button
                 size="sm"
                 variant="outline"
@@ -888,7 +895,7 @@ export default function ListTableDataMaster() {
               >
                 <ChevronLeft className="h-4 w-4" /> Prev
               </Button>
-              <span className="px-4 py-2 bg-muted rounded-md text-sm">
+              <span className="px-4 py-2 bg-muted rounded-md text-sm whitespace-nowrap">
                 Halaman {pageNumber} dari {meta?.totalPages || 1}
               </span>
               <Button
