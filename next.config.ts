@@ -11,6 +11,15 @@ const nextConfig: NextConfig = {
   //   return config;
   // },
   // output: "standalone",
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/**",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

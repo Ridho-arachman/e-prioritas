@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Mail, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Mail, AlertTriangle, Send } from "lucide-react";
 
 import {
   Card,
@@ -41,13 +41,14 @@ import { useGet, usePatch } from "@/hooks/useApi";
 import { AxiosError } from "axios";
 import { ApiError } from "@/types/ApiError";
 import { Spinner } from "@/components/ui/spinner";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { notifier } from "@/lib/ToastNotifier";
 
 export default function ChangeEmailPage() {
   const router = useRouter();
   const { loading, patch } = usePatch("/auth/change-email");
   const { data } = useGet("/protected/user/getuser");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const form = useForm<z.infer<typeof UserUpdateEmailSchema>>({
     resolver: zodResolver(UserUpdateEmailSchema),
@@ -78,46 +79,49 @@ export default function ChangeEmailPage() {
         "Gagal",
         err.response?.data.message || "Terjadi kesalahan",
       );
+    } finally {
+      setIsDialogOpen(false);
     }
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      className="min-h-screen px-6 py-10"
-    >
-      {/* BACK */}
+    <div className="container mx-auto px-4 py-6 md:py-8 max-w-2xl">
+      {/* Tombol Kembali */}
       <motion.div
         initial={{ opacity: 0, x: -10 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.1 }}
-        className="mb-6"
+        className="mb-4"
       >
         <Button
           variant="ghost"
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-sm cursor-pointer"
+          className="flex items-center gap-2 text-sm cursor-pointer hover:pl-2 transition-all"
         >
           <ArrowLeft className="w-4 h-4" />
           Kembali
         </Button>
       </motion.div>
 
-      <Card className="rounded-xl shadow-sm">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Mail className="w-5 h-5 text-orange-600" />
-            <CardTitle className="text-xl">Ganti Email</CardTitle>
+      {/* Header */}
+      <div className="mb-6 space-y-2">
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-orange-500/10 rounded-xl shadow-sm">
+            <Mail className="h-6 w-6 text-orange-600" />
           </div>
-          <CardDescription>
-            Mengubah email akan memerlukan verifikasi ulang.
-          </CardDescription>
-        </CardHeader>
+          <h1 className="text-2xl md:text-3xl font-bold bg-linear-to-r from-orange-600 to-orange-700/70 bg-clip-text text-transparent">
+            Ganti Email
+          </h1>
+        </div>
+        <p className="text-muted-foreground ml-1 text-sm md:text-base">
+          Mengubah email akan memerlukan verifikasi ulang.
+        </p>
+      </div>
 
-        <CardContent className="space-y-6">
-          {/* WARNING */}
+      {/* Card Form */}
+      <Card className="border shadow-lg shadow-orange-500/5 overflow-hidden">
+        <CardContent className="p-4 md:p-6 space-y-6">
+          {/* Warning */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -131,7 +135,7 @@ export default function ChangeEmailPage() {
             </p>
           </motion.div>
 
-          {/* FORM */}
+          {/* Form */}
           <motion.form
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -144,8 +148,13 @@ export default function ChangeEmailPage() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Email Baru</FieldLabel>
-
+                  <FieldLabel
+                    htmlFor={field.name}
+                    className="flex items-center gap-2 text-sm font-medium"
+                  >
+                    <Mail className="h-4 w-4 text-muted-foreground" />
+                    Email Baru
+                  </FieldLabel>
                   <Input
                     {...field}
                     id={field.name}
@@ -154,12 +163,11 @@ export default function ChangeEmailPage() {
                     aria-invalid={fieldState.invalid}
                     placeholder="email@kominfo.go.id"
                     autoComplete="off"
+                    className="w-full transition-shadow focus:ring-2 focus:ring-orange-500/50"
                   />
-
-                  <FieldDescription>
+                  <FieldDescription className="text-xs text-muted-foreground">
                     Email ini akan digunakan sebagai akun login baru.
                   </FieldDescription>
-
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -167,28 +175,37 @@ export default function ChangeEmailPage() {
               )}
             />
 
-            {/* ALERT DIALOG */}
-            <div className="flex justify-end">
-              <AlertDialog>
+            {/* Action Buttons */}
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-border">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.back()}
+                disabled={loading}
+                className="cursor-pointer w-full sm:w-auto"
+              >
+                Batal
+              </Button>
+
+              <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <AlertDialogTrigger asChild>
-                  <motion.div
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
+                  <Button
+                    variant="default"
+                    disabled={loading}
+                    className="cursor-pointer w-full sm:w-auto bg-orange-600 hover:bg-orange-700 shadow-sm hover:shadow-md transition-all"
                   >
-                    <Button
-                      type="button"
-                      className="bg-orange-600 hover:bg-orange-700 cursor-pointer"
-                    >
-                      {loading ? (
-                        <>
-                          <Spinner />
-                          Loading ...
-                        </>
-                      ) : (
-                        "Kirim Verifikasi"
-                      )}
-                    </Button>
-                  </motion.div>
+                    {loading ? (
+                      <div className="flex items-center">
+                        <Spinner className="mr-2 size-4" />
+                        Memproses...
+                      </div>
+                    ) : (
+                      <>
+                        <Send className="mr-2 h-4 w-4" />
+                        Kirim Verifikasi
+                      </>
+                    )}
+                  </Button>
                 </AlertDialogTrigger>
 
                 <AlertDialogContent>
@@ -199,14 +216,23 @@ export default function ChangeEmailPage() {
                       ulang. Pastikan email sudah benar.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
-
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Batal</AlertDialogCancel>
+                    <AlertDialogCancel disabled={loading}>
+                      Batal
+                    </AlertDialogCancel>
                     <AlertDialogAction
                       onClick={() => form.handleSubmit(onSubmit)()}
                       className="bg-orange-600 hover:bg-orange-700"
+                      disabled={loading}
                     >
-                      Ya, Kirim Verifikasi
+                      {loading ? (
+                        <div className="flex items-center">
+                          <Spinner className="mr-2 size-4" />
+                          Memproses...
+                        </div>
+                      ) : (
+                        "Ya, Kirim Verifikasi"
+                      )}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -215,6 +241,6 @@ export default function ChangeEmailPage() {
           </motion.form>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 }

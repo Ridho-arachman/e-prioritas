@@ -15,7 +15,7 @@ const POST = async (
   req: NextRequest,
   ctx: RouteContext<"/api/protected/masukan/[id]">,
 ) => {
-  const allowedRoles: Role[] = ["ADMIN"];
+  const allowedRoles: Role[] = ["ADMIN", "PERANGKAT_DESA"];
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session) {

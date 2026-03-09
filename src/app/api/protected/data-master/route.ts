@@ -18,7 +18,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 export const POST = async (req: NextRequest) => {
-  const allowedRoles: Role[] = ["ADMIN"];
+  const allowedRoles: Role[] = ["ADMIN", "PERANGKAT_DESA"];
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session) {
@@ -75,7 +75,7 @@ export const POST = async (req: NextRequest) => {
 };
 
 export const GET = async (req: NextRequest) => {
-  const allowedRoles: Role[] = ["ADMIN"];
+  const allowedRoles: Role[] = ["ADMIN", "PERANGKAT_DESA"];
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session) {

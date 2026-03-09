@@ -14,7 +14,7 @@ import { headers } from "next/headers";
 type Params = { id: string };
 type RouteContext = { params: Promise<Params> };
 
-const allowedRoles: Role[] = ["ADMIN"];
+const allowedRoles: Role[] = ["ADMIN", "PERANGKAT_DESA"];
 
 // Helper cek auth (bisa dipisah ke file utils jika ingin)
 const checkAuth = async () => {

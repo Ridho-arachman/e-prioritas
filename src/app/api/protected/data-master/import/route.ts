@@ -9,8 +9,9 @@ import { Role } from "@/app/generated/prisma";
 import { headers } from "next/headers";
 
 export const POST = async (req: NextRequest) => {
-  // Cek autentikasi dan otorisasi
+  const allowedRoles: Role[] = ["ADMIN", "PERANGKAT_DESA"];
   const session = await auth.api.getSession({ headers: await headers() });
+
   if (!session) {
     return handleResponse({
       success: false,
@@ -19,7 +20,6 @@ export const POST = async (req: NextRequest) => {
     });
   }
 
-  const allowedRoles: Role[] = ["ADMIN"];
   if (!allowedRoles.includes(session.user.role as Role)) {
     return handleResponse({
       success: false,

@@ -7,28 +7,29 @@ import { handlePrismaError } from "@/lib/handlePrismaError";
 import { handleResponse } from "@/lib/handleResponse";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { StatusMasukan } from "@/app/generated/prisma";
+import { Role, StatusMasukan } from "@/app/generated/prisma";
 
 export const GET = async (req: NextRequest) => {
+  const allowedRoles: Role[] = ["ADMIN", "PERANGKAT_DESA"];
+  const session = await auth.api.getSession({ headers: await headers() });
+
+  if (!session) {
+    return handleResponse({
+      success: false,
+      message: "User belum login",
+      status: 401,
+    });
+  }
+
+  if (!allowedRoles.includes(session.user.role as Role)) {
+    return handleResponse({
+      success: false,
+      message: "Akses ditolak",
+      status: 403,
+    });
+  }
+
   try {
-    const session = await auth.api.getSession({ headers: await headers() });
-
-    if (!session) {
-      return handleResponse({
-        success: false,
-        message: "User belum login",
-        status: 401,
-      });
-    }
-
-    if (session.user.role !== "ADMIN") {
-      return handleResponse({
-        success: false,
-        message: "Akses ditolak",
-        status: 403,
-      });
-    }
-
     const searchParams = req.nextUrl.searchParams;
 
     const params = {

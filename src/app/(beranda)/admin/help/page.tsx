@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -30,6 +30,18 @@ import {
   Sparkles,
   Layers,
 } from "lucide-react";
+
+// Komponen untuk mencegah hidrasi error pada komponen yang menggunakan ID dinamis
+const ClientOnly = ({ children }: { children: React.ReactNode }) => {
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  if (!hasMounted) return null;
+  return <>{children}</>;
+};
 
 const AdminHelpPage = () => {
   return (
@@ -285,262 +297,268 @@ const AdminHelpPage = () => {
           Panduan Fungsional
         </h2>
 
-        <Accordion type="single" collapsible className="space-y-3 mb-10">
-          {/* 1. Data Master */}
-          <AccordionItem
-            value="master-data"
-            className="border rounded-lg overflow-hidden shadow-sm"
-          >
-            <AccordionTrigger className="px-6 py-4 hover:bg-slate-50 hover:no-underline">
-              <span className="flex items-center gap-3 text-lg font-medium">
-                <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                  <Settings className="h-4 w-4 text-blue-600" />
+        {/* ClientOnly wrapper untuk mencegah error hidrasi pada Accordion */}
+        <ClientOnly>
+          <Accordion type="single" collapsible className="space-y-3 mb-10">
+            {/* 1. Data Master */}
+            <AccordionItem
+              value="master-data"
+              className="border rounded-lg overflow-hidden shadow-sm"
+            >
+              <AccordionTrigger className="px-6 py-4 hover:bg-slate-50 hover:no-underline">
+                <span className="flex items-center gap-3 text-lg font-medium">
+                  <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <Settings className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <span>1. Pengelolaan Data Master</span>
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
+                <p className="text-slate-700">
+                  Data master berisi <strong>aturan penilaian AI</strong>{" "}
+                  seperti kritikalitas (KRITIS, TINGGI, SEDANG, RENDAH). Data
+                  ini menjadi bobot dalam perhitungan skor prioritas.
+                </p>
+                <div className="bg-slate-50 p-4 rounded-lg">
+                  <h4 className="font-semibold mb-2">Struktur Data Master:</h4>
+                  <ul className="list-disc list-inside space-y-1 text-sm">
+                    <li>
+                      <code>namaAtribut</code> : Nama indikator (misal: "Jumlah
+                      Rumah Tidak Layak Huni")
+                    </li>
+                    <li>
+                      <code>kritikalitas</code> : Nilai bobot (KRITIS=1.0,
+                      TINGGI=0.75, SEDANG=0.5, RENDAH=0.25)
+                    </li>
+                    <li>
+                      <code>jumlah</code> : Data statistik pendukung (opsional)
+                    </li>
+                    <li>
+                      <code>isActive</code> : Status aktif
+                    </li>
+                  </ul>
                 </div>
-                <span>1. Pengelolaan Data Master</span>
-              </span>
-            </AccordionTrigger>
-            <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
-              <p className="text-slate-700">
-                Data master berisi <strong>aturan penilaian AI</strong> seperti
-                kritikalitas (KRITIS, TINGGI, SEDANG, RENDAH). Data ini menjadi
-                bobot dalam perhitungan skor prioritas.
-              </p>
-              <div className="bg-slate-50 p-4 rounded-lg">
-                <h4 className="font-semibold mb-2">Struktur Data Master:</h4>
-                <ul className="list-disc list-inside space-y-1 text-sm">
+                <p>
+                  Data master digunakan oleh AI untuk menyesuaikan rekomendasi
+                  dengan kondisi aktual kelurahan.
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* 2. Masukan Warga */}
+            <AccordionItem
+              value="masukan"
+              className="border rounded-lg overflow-hidden shadow-sm"
+            >
+              <AccordionTrigger className="px-6 py-4 hover:bg-slate-50 hover:no-underline">
+                <span className="flex items-center gap-3 text-lg font-medium">
+                  <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
+                    <Users className="h-4 w-4 text-amber-600" />
+                  </div>
+                  <span>2. Verifikasi Masukan Warga</span>
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
+                <p className="text-slate-700">
+                  Admin bertugas memverifikasi setiap masukan warga. Status yang
+                  tersedia:
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                    <Badge className="bg-yellow-500">MENUNGGU</Badge>
+                    <p className="text-sm mt-1">
+                      Masukan baru, belum diproses.
+                    </p>
+                  </div>
+                  <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                    <Badge className="bg-green-600">DIVERIFIKASI</Badge>
+                    <p className="text-sm mt-1">Layak, siap dianalisis AI.</p>
+                  </div>
+                  <div className="bg-red-50 p-3 rounded-lg border border-red-200">
+                    <Badge className="bg-red-600">DITOLAK</Badge>
+                    <p className="text-sm mt-1">
+                      Tidak layak, wajib memberi alasan.
+                    </p>
+                  </div>
+                  <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                    <Badge className="bg-blue-500">DIPROSES</Badge>
+                    <p className="text-sm mt-1">
+                      Sedang digunakan dalam rekomendasi.
+                    </p>
+                  </div>
+                  <div className="bg-purple-50 p-3 rounded-lg border border-purple-200 sm:col-span-2">
+                    <Badge className="bg-purple-600">DISELESAIKAN</Badge>
+                    <p className="text-sm mt-1">
+                      Rekomendasi terkait telah disetujui.
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm text-slate-500 italic">
+                  ⚠️ Status DIPROSES dan DISELESAIKAN diatur otomatis oleh
+                  sistem.
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* 3. Kegiatan Rapat & Generate Rekomendasi */}
+            <AccordionItem
+              value="kegiatan"
+              className="border rounded-lg overflow-hidden shadow-sm"
+            >
+              <AccordionTrigger className="px-6 py-4 hover:bg-slate-50 hover:no-underline">
+                <span className="flex items-center gap-3 text-lg font-medium">
+                  <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
+                    <Calendar className="h-4 w-4 text-purple-600" />
+                  </div>
+                  <span>3. Kegiatan Rapat & Generate Rekomendasi</span>
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
+                <p className="text-slate-700">
+                  Buat kegiatan rapat, pilih domain isu, dan jalankan AI untuk
+                  mendapatkan 5 rekomendasi prioritas.
+                </p>
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h4 className="font-semibold mb-2 flex items-center gap-1">
+                    <Sparkles className="h-4 w-4" /> Mode Rekomendasi:
+                  </h4>
+                  <ul className="list-disc list-inside space-y-1">
+                    <li>
+                      <strong>FUSI_DATA</strong> : Menggabungkan masukan warga
+                      dan data master.
+                    </li>
+                    <li>
+                      <strong>DATA_MASTER_SAJA</strong> : Hanya berdasarkan data
+                      master (jika masukan tidak tersedia).
+                    </li>
+                  </ul>
+                </div>
+                <p>Setelah generate, setiap prioritas akan memiliki:</p>
+                <ul className="list-disc list-inside text-sm">
                   <li>
-                    <code>namaAtribut</code> : Nama indikator (misal: "Jumlah
-                    Rumah Tidak Layak Huni")
+                    <code>deskripsi</code> : Rencana aksi konkret
                   </li>
                   <li>
-                    <code>kritikalitas</code> : Nilai bobot (KRITIS=1.0,
-                    TINGGI=0.75, SEDANG=0.5, RENDAH=0.25)
+                    <code>skorPrioritas</code> : Nilai 0.00 - 1.00
                   </li>
                   <li>
-                    <code>jumlah</code> : Data statistik pendukung (opsional)
+                    <code>alasanAnalisis</code> : Penjelasan AI
                   </li>
                   <li>
-                    <code>isActive</code> : Status aktif
+                    <code>evidence</code> : Jumlah data pendukung
+                  </li>
+                  <li>
+                    <code>usedMasukanIds / usedDataMasterIds</code> : ID data
+                    yang digunakan
                   </li>
                 </ul>
-              </div>
-              <p>
-                Data master digunakan oleh AI untuk menyesuaikan rekomendasi
-                dengan kondisi aktual kelurahan.
-              </p>
-            </AccordionContent>
-          </AccordionItem>
+              </AccordionContent>
+            </AccordionItem>
 
-          {/* 2. Masukan Warga */}
-          <AccordionItem
-            value="masukan"
-            className="border rounded-lg overflow-hidden shadow-sm"
-          >
-            <AccordionTrigger className="px-6 py-4 hover:bg-slate-50 hover:no-underline">
-              <span className="flex items-center gap-3 text-lg font-medium">
-                <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
-                  <Users className="h-4 w-4 text-amber-600" />
-                </div>
-                <span>2. Verifikasi Masukan Warga</span>
-              </span>
-            </AccordionTrigger>
-            <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
-              <p className="text-slate-700">
-                Admin bertugas memverifikasi setiap masukan warga. Status yang
-                tersedia:
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
-                  <Badge className="bg-yellow-500">MENUNGGU</Badge>
-                  <p className="text-sm mt-1">Masukan baru, belum diproses.</p>
-                </div>
-                <div className="bg-green-50 p-3 rounded-lg border border-green-200">
-                  <Badge className="bg-green-600">DIVERIFIKASI</Badge>
-                  <p className="text-sm mt-1">Layak, siap dianalisis AI.</p>
-                </div>
-                <div className="bg-red-50 p-3 rounded-lg border border-red-200">
-                  <Badge className="bg-red-600">DITOLAK</Badge>
-                  <p className="text-sm mt-1">
-                    Tidak layak, wajib memberi alasan.
+            {/* 4. Preview Data Input */}
+            <AccordionItem
+              value="preview"
+              className="border rounded-lg overflow-hidden shadow-sm"
+            >
+              <AccordionTrigger className="px-6 py-4 hover:bg-slate-50 hover:no-underline">
+                <span className="flex items-center gap-3 text-lg font-medium">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+                    <Eye className="h-4 w-4 text-emerald-600" />
+                  </div>
+                  <span>4. Preview Data Input (Snapshot)</span>
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
+                <p className="text-slate-700">
+                  Saat generate, sistem menyimpan snapshot 10 data pertama dari
+                  masukan warga dan data master yang dianalisis. Ini berguna
+                  untuk melihat contoh data yang mendasari rekomendasi.
+                </p>
+                <div className="bg-slate-50 p-4 rounded-lg">
+                  <p className="font-mono text-sm">
+                    <code>rekomendasiItems.inputData</code> berisi array{" "}
+                    <code>masukan</code> dan <code>dataMaster</code>.
                   </p>
                 </div>
-                <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-                  <Badge className="bg-blue-500">DIPROSES</Badge>
-                  <p className="text-sm mt-1">
-                    Sedang digunakan dalam rekomendasi.
-                  </p>
-                </div>
-                <div className="bg-purple-50 p-3 rounded-lg border border-purple-200 sm:col-span-2">
-                  <Badge className="bg-purple-600">DISELESAIKAN</Badge>
-                  <p className="text-sm mt-1">
-                    Rekomendasi terkait telah disetujui.
-                  </p>
-                </div>
-              </div>
-              <p className="text-sm text-slate-500 italic">
-                ⚠️ Status DIPROSES dan DISELESAIKAN diatur otomatis oleh sistem.
-              </p>
-            </AccordionContent>
-          </AccordionItem>
+                <p>
+                  Di halaman detail kegiatan, Anda dapat mengklik "Lihat Data
+                  Input" pada setiap prioritas untuk menampilkan data spesifik
+                  yang terkait (berdasarkan <code>usedMasukanIds</code>).
+                </p>
+              </AccordionContent>
+            </AccordionItem>
 
-          {/* 3. Kegiatan Rapat & Generate Rekomendasi */}
-          <AccordionItem
-            value="kegiatan"
-            className="border rounded-lg overflow-hidden shadow-sm"
-          >
-            <AccordionTrigger className="px-6 py-4 hover:bg-slate-50 hover:no-underline">
-              <span className="flex items-center gap-3 text-lg font-medium">
-                <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
-                  <Calendar className="h-4 w-4 text-purple-600" />
-                </div>
-                <span>3. Kegiatan Rapat & Generate Rekomendasi</span>
-              </span>
-            </AccordionTrigger>
-            <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
-              <p className="text-slate-700">
-                Buat kegiatan rapat, pilih domain isu, dan jalankan AI untuk
-                mendapatkan 5 rekomendasi prioritas.
-              </p>
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-semibold mb-2 flex items-center gap-1">
-                  <Sparkles className="h-4 w-4" /> Mode Rekomendasi:
-                </h4>
+            {/* 5. Persetujuan & Status */}
+            <AccordionItem
+              value="approval"
+              className="border rounded-lg overflow-hidden shadow-sm"
+            >
+              <AccordionTrigger className="px-6 py-4 hover:bg-slate-50 hover:no-underline">
+                <span className="flex items-center gap-3 text-lg font-medium">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
+                    <Target className="h-4 w-4 text-indigo-600" />
+                  </div>
+                  <span>5. Persetujuan Rekomendasi</span>
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
+                <p className="text-slate-700">
+                  Setelah rekomendasi dihasilkan, admin (atau lurah) dapat
+                  menyetujui atau menolaknya. Tindakan ini akan mengubah status
+                  masukan terkait:
+                </p>
                 <ul className="list-disc list-inside space-y-1">
                   <li>
-                    <strong>FUSI_DATA</strong> : Menggabungkan masukan warga dan
-                    data master.
+                    <strong>Setujui</strong> → status rekomendasi menjadi{" "}
+                    <code>DISETUJUI</code>, masukan terkait berubah dari{" "}
+                    <code>DIPROSES</code> menjadi <code>DISELESAIKAN</code>.
                   </li>
                   <li>
-                    <strong>DATA_MASTER_SAJA</strong> : Hanya berdasarkan data
-                    master (jika masukan tidak tersedia).
+                    <strong>Tolak</strong> → status rekomendasi menjadi{" "}
+                    <code>DITOLAK</code>, masukan terkait kembali ke{" "}
+                    <code>DIVERIFIKASI</code> (siap dipakai lagi).
                   </li>
                 </ul>
-              </div>
-              <p>Setelah generate, setiap prioritas akan memiliki:</p>
-              <ul className="list-disc list-inside text-sm">
-                <li>
-                  <code>deskripsi</code> : Rencana aksi konkret
-                </li>
-                <li>
-                  <code>skorPrioritas</code> : Nilai 0.00 - 1.00
-                </li>
-                <li>
-                  <code>alasanAnalisis</code> : Penjelasan AI
-                </li>
-                <li>
-                  <code>evidence</code> : Jumlah data pendukung
-                </li>
-                <li>
-                  <code>usedMasukanIds / usedDataMasterIds</code> : ID data yang
-                  digunakan
-                </li>
-              </ul>
-            </AccordionContent>
-          </AccordionItem>
-
-          {/* 4. Preview Data Input */}
-          <AccordionItem
-            value="preview"
-            className="border rounded-lg overflow-hidden shadow-sm"
-          >
-            <AccordionTrigger className="px-6 py-4 hover:bg-slate-50 hover:no-underline">
-              <span className="flex items-center gap-3 text-lg font-medium">
-                <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
-                  <Eye className="h-4 w-4 text-emerald-600" />
-                </div>
-                <span>4. Preview Data Input (Snapshot)</span>
-              </span>
-            </AccordionTrigger>
-            <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
-              <p className="text-slate-700">
-                Saat generate, sistem menyimpan snapshot 10 data pertama dari
-                masukan warga dan data master yang dianalisis. Ini berguna untuk
-                melihat contoh data yang mendasari rekomendasi.
-              </p>
-              <div className="bg-slate-50 p-4 rounded-lg">
-                <p className="font-mono text-sm">
-                  <code>rekomendasiItems.inputData</code> berisi array{" "}
-                  <code>masukan</code> dan <code>dataMaster</code>.
+                <p className="text-sm text-slate-500 italic">
+                  ⚠️ Keputusan akhir ada di tangan lurah, AI hanya memberikan
+                  rekomendasi.
                 </p>
-              </div>
-              <p>
-                Di halaman detail kegiatan, Anda dapat mengklik "Lihat Data
-                Input" pada setiap prioritas untuk menampilkan data spesifik
-                yang terkait (berdasarkan <code>usedMasukanIds</code>).
-              </p>
-            </AccordionContent>
-          </AccordionItem>
+              </AccordionContent>
+            </AccordionItem>
 
-          {/* 5. Persetujuan & Status */}
-          <AccordionItem
-            value="approval"
-            className="border rounded-lg overflow-hidden shadow-sm"
-          >
-            <AccordionTrigger className="px-6 py-4 hover:bg-slate-50 hover:no-underline">
-              <span className="flex items-center gap-3 text-lg font-medium">
-                <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
-                  <Target className="h-4 w-4 text-indigo-600" />
-                </div>
-                <span>5. Persetujuan Rekomendasi</span>
-              </span>
-            </AccordionTrigger>
-            <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
-              <p className="text-slate-700">
-                Setelah rekomendasi dihasilkan, admin (atau lurah) dapat
-                menyetujui atau menolaknya. Tindakan ini akan mengubah status
-                masukan terkait:
-              </p>
-              <ul className="list-disc list-inside space-y-1">
-                <li>
-                  <strong>Setujui</strong> → status rekomendasi menjadi{" "}
-                  <code>DISETUJUI</code>, masukan terkait berubah dari{" "}
-                  <code>DIPROSES</code> menjadi <code>DISELESAIKAN</code>.
-                </li>
-                <li>
-                  <strong>Tolak</strong> → status rekomendasi menjadi{" "}
-                  <code>DITOLAK</code>, masukan terkait kembali ke{" "}
-                  <code>DIVERIFIKASI</code> (siap dipakai lagi).
-                </li>
-              </ul>
-              <p className="text-sm text-slate-500 italic">
-                ⚠️ Keputusan akhir ada di tangan lurah, AI hanya memberikan
-                rekomendasi.
-              </p>
-            </AccordionContent>
-          </AccordionItem>
-
-          {/* 6. Ekspor PDF */}
-          <AccordionItem
-            value="export"
-            className="border rounded-lg overflow-hidden shadow-sm"
-          >
-            <AccordionTrigger className="px-6 py-4 hover:bg-slate-50 hover:no-underline">
-              <span className="flex items-center gap-3 text-lg font-medium">
-                <div className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center">
-                  <Download className="h-4 w-4 text-rose-600" />
-                </div>
-                <span>6. Ekspor Laporan PDF</span>
-              </span>
-            </AccordionTrigger>
-            <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
-              <p className="text-slate-700">
-                Setiap kegiatan rapat dapat diekspor ke PDF. Dokumen mencakup:
-              </p>
-              <ul className="list-disc list-inside">
-                <li>Informasi kegiatan</li>
-                <li>
-                  5 rekomendasi prioritas dengan skor, analisis, dan evidence
-                </li>
-                <li>
-                  Preview data input terkait (dengan label [Masukan] / [Data
-                  Master])
-                </li>
-                <li>Bagian pengesahan formal</li>
-                <li>Footer dengan hak cipta</li>
-              </ul>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+            {/* 6. Ekspor PDF */}
+            <AccordionItem
+              value="export"
+              className="border rounded-lg overflow-hidden shadow-sm"
+            >
+              <AccordionTrigger className="px-6 py-4 hover:bg-slate-50 hover:no-underline">
+                <span className="flex items-center gap-3 text-lg font-medium">
+                  <div className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center">
+                    <Download className="h-4 w-4 text-rose-600" />
+                  </div>
+                  <span>6. Ekspor Laporan PDF</span>
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
+                <p className="text-slate-700">
+                  Setiap kegiatan rapat dapat diekspor ke PDF. Dokumen mencakup:
+                </p>
+                <ul className="list-disc list-inside">
+                  <li>Informasi kegiatan</li>
+                  <li>
+                    5 rekomendasi prioritas dengan skor, analisis, dan evidence
+                  </li>
+                  <li>
+                    Preview data input terkait (dengan label [Masukan] / [Data
+                    Master])
+                  </li>
+                  <li>Bagian pengesahan formal</li>
+                  <li>Footer dengan hak cipta</li>
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </ClientOnly>
 
         {/* FAQ */}
         <Card className="border-0 shadow-lg bg-white rounded-2xl overflow-hidden mb-8">
