@@ -1,4 +1,4 @@
-// src/app/admin/jadwal-program/page.tsx
+// src/app/perangkat/jadwal-program/page.tsx
 "use client";
 
 import {
@@ -312,7 +312,7 @@ export default function ListJadwalKegiatan() {
   });
 
   const { data, meta, error, isLoading, mutate } = useGet(
-    `/protected/kegiatan-rapat${queryString}`,
+    `/protected/kegiatan-rapat/perangkat${queryString}`,
   );
 
   const { del: deleteKegiatan, loading: deleteLoading } = useDelete();
@@ -446,7 +446,7 @@ export default function ListJadwalKegiatan() {
                 </div>
               </div>
               <Button
-                onClick={() => router.push("/admin/jadwal-program/add")}
+                onClick={() => router.push("/perangkat/jadwal-program/add")}
                 className="gap-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl px-6 py-3 transition-all duration-300 hover:shadow-blue-500/50 hover:scale-105 font-medium"
               >
                 <Plus className="h-5 w-5" />
@@ -949,7 +949,7 @@ export default function ListJadwalKegiatan() {
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         router.push(
-                                          `/admin/jadwal-program/${k.id}`,
+                                          `/perangkat/jadwal-program/${k.id}`,
                                         );
                                       }}
                                       className="cursor-pointer"
@@ -963,7 +963,7 @@ export default function ListJadwalKegiatan() {
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         router.push(
-                                          `/admin/jadwal-program/${k.id}/edit`,
+                                          `/perangkat/jadwal-program/${k.id}/edit`,
                                         );
                                       }}
                                       className="cursor-pointer"

@@ -1,4 +1,4 @@
-import KegiatanRapatDetail from "@/components/sections/jadwalKegiatan/DetailJadwalKegiatan";
+import KegiatanRapatDetail from "@/components/sections/jadwalKegiatan/perangkat/DetailJadwalKegiatan";
 
 const page = () => {
   return (

@@ -1,4 +1,4 @@
-import KegiatanRapatFormEdit from "@/components/sections/jadwalKegiatan/EditJadwalKegiatan";
+import KegiatanRapatFormEdit from "@/components/sections/jadwalKegiatan/perangkat/EditJadwalKegiatan";
 
 const page = () => {
   return (

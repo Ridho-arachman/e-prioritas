@@ -57,7 +57,6 @@ export async function GET() {
     // 4. Kegiatan rapat DRAFT milik user
     const totalKegiatanDraft = await prisma.kegiatanRapat.count({
       where: {
-        dibuatOlehId: userId,
         statusRekomendasi: "DRAFT",
       },
     });
@@ -65,7 +64,6 @@ export async function GET() {
     // 5. Kegiatan rapat DIAJUKAN milik user
     const totalKegiatanDiajukan = await prisma.kegiatanRapat.count({
       where: {
-        dibuatOlehId: userId,
         statusRekomendasi: "DIAJUKAN",
       },
     });

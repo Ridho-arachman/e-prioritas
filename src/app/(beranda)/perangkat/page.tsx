@@ -12,6 +12,8 @@ import {
   Legend,
   ResponsiveContainer,
   Cell,
+  PieChart,
+  Pie,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -41,6 +43,7 @@ import {
   Loader2,
   CheckCheck,
   BarChart as BarChartIcon,
+  PieChart as PieChartIcon,
 } from "lucide-react";
 
 interface KritikalitasCount {
@@ -156,18 +159,38 @@ export default function PerangkatDashboardPage() {
     count: statusMap.get(status) ?? 0,
   }));
 
-  // Konfigurasi warna dan ikon per kritikalitas
+  // Konfigurasi warna dan ikon per kritikalitas (dengan warna chart)
   const kritikalitasConfig: Record<
     string,
-    { bg: string; text: string; icon: any }
+    { bg: string; text: string; icon: any; color: string }
   > = {
-    KRITIS: { bg: "bg-red-100", text: "text-red-800", icon: AlertTriangle },
-    TINGGI: { bg: "bg-orange-100", text: "text-orange-800", icon: TrendingUp },
-    SEDANG: { bg: "bg-yellow-100", text: "text-yellow-800", icon: MinusCircle },
-    RENDAH: { bg: "bg-green-100", text: "text-green-800", icon: CheckCircle },
+    KRITIS: {
+      bg: "bg-red-100",
+      text: "text-red-800",
+      icon: AlertTriangle,
+      color: "#ef4444",
+    },
+    TINGGI: {
+      bg: "bg-orange-100",
+      text: "text-orange-800",
+      icon: TrendingUp,
+      color: "#f97316",
+    },
+    SEDANG: {
+      bg: "bg-yellow-100",
+      text: "text-yellow-800",
+      icon: MinusCircle,
+      color: "#eab308",
+    },
+    RENDAH: {
+      bg: "bg-green-100",
+      text: "text-green-800",
+      icon: CheckCircle,
+      color: "#22c55e",
+    },
   };
 
-  // Konfigurasi warna dan ikon per status masukan (dengan tambahan warna untuk chart)
+  // Konfigurasi warna dan ikon per status masukan (dengan warna chart)
   const statusConfig: Record<
     string,
     { bg: string; text: string; icon: any; color: string }
@@ -219,79 +242,71 @@ export default function PerangkatDashboardPage() {
       {/* Stat Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Card 1: Total Data Master */}
-        <Link href="/perangkat/data-master" className="block">
-          <Card className="group relative overflow-hidden border-2 border-blue-200 hover:border-blue-400 transition-all hover:shadow-lg hover:-translate-y-1">
-            <div className="absolute inset-0 bg-linear-to-br from-blue-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <CardHeader className="pb-2 flex flex-row items-center justify-between">
-              <CardTitle className="text-sm font-medium text-blue-700">
-                Total Data Master
-              </CardTitle>
-              <Database className="h-5 w-5 text-blue-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-blue-800">
-                {stats.totalDataMaster}
-              </div>
-              <p className="text-xs text-blue-600 mt-1">
-                {stats.activeDataMaster} aktif
-              </p>
-            </CardContent>
-          </Card>
-        </Link>
+        <Card className="group relative overflow-hidden border-2 border-blue-200 hover:border-blue-400 transition-all hover:shadow-lg hover:-translate-y-1">
+          <div className="absolute inset-0 bg-linear-to-br from-blue-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <CardHeader className="pb-2 flex flex-row items-center justify-between">
+            <CardTitle className="text-sm font-medium text-blue-700">
+              Total Data Master
+            </CardTitle>
+            <Database className="h-5 w-5 text-blue-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-blue-800">
+              {stats.totalDataMaster}
+            </div>
+            <p className="text-xs text-blue-600 mt-1">
+              {stats.activeDataMaster} aktif
+            </p>
+          </CardContent>
+        </Card>
 
         {/* Card 2: Kegiatan Draft */}
-        <Link href="/perangkat/kegiatan?status=DRAFT" className="block">
-          <Card className="group relative overflow-hidden border-2 border-amber-200 hover:border-amber-400 transition-all hover:shadow-lg hover:-translate-y-1">
-            <div className="absolute inset-0 bg-linear-to-br from-amber-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <CardHeader className="pb-2 flex flex-row items-center justify-between">
-              <CardTitle className="text-sm font-medium text-amber-700">
-                Kegiatan (Draft)
-              </CardTitle>
-              <PenTool className="h-5 w-5 text-amber-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-amber-800">
-                {stats.totalKegiatanDraft}
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
+        <Card className="group relative overflow-hidden border-2 border-amber-200 hover:border-amber-400 transition-all hover:shadow-lg hover:-translate-y-1">
+          <div className="absolute inset-0 bg-linear-to-br from-amber-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <CardHeader className="pb-2 flex flex-row items-center justify-between">
+            <CardTitle className="text-sm font-medium text-amber-700">
+              Kegiatan (Draft)
+            </CardTitle>
+            <PenTool className="h-5 w-5 text-amber-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-amber-800">
+              {stats.totalKegiatanDraft}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Card 3: Kegiatan Diajukan */}
-        <Link href="/perangkat/kegiatan?status=DIAJUKAN" className="block">
-          <Card className="group relative overflow-hidden border-2 border-yellow-200 hover:border-yellow-400 transition-all hover:shadow-lg hover:-translate-y-1">
-            <div className="absolute inset-0 bg-linear-to-br from-yellow-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <CardHeader className="pb-2 flex flex-row items-center justify-between">
-              <CardTitle className="text-sm font-medium text-yellow-700">
-                Kegiatan Diajukan
-              </CardTitle>
-              <Send className="h-5 w-5 text-yellow-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-yellow-800">
-                {stats.totalKegiatanDiajukan}
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
+        <Card className="group relative overflow-hidden border-2 border-yellow-200 hover:border-yellow-400 transition-all hover:shadow-lg hover:-translate-y-1">
+          <div className="absolute inset-0 bg-linear-to-br from-yellow-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <CardHeader className="pb-2 flex flex-row items-center justify-between">
+            <CardTitle className="text-sm font-medium text-yellow-700">
+              Kegiatan Diajukan
+            </CardTitle>
+            <Send className="h-5 w-5 text-yellow-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-yellow-800">
+              {stats.totalKegiatanDiajukan}
+            </div>
+          </CardContent>
+        </Card>
 
-        {/* Card 4: Masukan Diverifikasi */}
-        <Link href="/perangkat/masukan?status=DIVERIFIKASI" className="block">
-          <Card className="group relative overflow-hidden border-2 border-green-200 hover:border-green-400 transition-all hover:shadow-lg hover:-translate-y-1">
-            <div className="absolute inset-0 bg-linear-to-br from-green-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <CardHeader className="pb-2 flex flex-row items-center justify-between">
-              <CardTitle className="text-sm font-medium text-green-700">
-                Total Masukan Warga
-              </CardTitle>
-              <CheckCircle className="h-5 w-5 text-green-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-green-800">
-                {stats.totalMasukan}
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
+        {/* Card 4: Total Masukan */}
+        <Card className="group relative overflow-hidden border-2 border-green-200 hover:border-green-400 transition-all hover:shadow-lg hover:-translate-y-1">
+          <div className="absolute inset-0 bg-linear-to-br from-green-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <CardHeader className="pb-2 flex flex-row items-center justify-between">
+            <CardTitle className="text-sm font-medium text-green-700">
+              Total Masukan
+            </CardTitle>
+            <CheckCircle className="h-5 w-5 text-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-green-800">
+              {stats.totalMasukan}
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Tabel 5 Data Master Terbaru */}
@@ -435,36 +450,80 @@ export default function PerangkatDashboardPage() {
         </div>
       </div>
 
-      {/* Chart Distribusi Status Masukan */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <BarChartIcon className="h-5 w-5 text-primary" />
-            <CardTitle>Distribusi Status Masukan</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="h-75">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={statusData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="status" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="count" fill="#3b82f6">
-                  {statusData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={statusConfig[entry.status]?.color || "#3b82f6"}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Chart Distribusi Status Masukan */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <BarChartIcon className="h-5 w-5 text-primary" />
+              <CardTitle>Distribusi Status Masukan</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="h-75">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={statusData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="status" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="count" fill="#3b82f6">
+                    {statusData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={statusConfig[entry.status]?.color || "#3b82f6"}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Chart Distribusi Kritikalitas Data Master */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <PieChartIcon className="h-5 w-5 text-primary" />
+              <CardTitle>Distribusi Kritikalitas Data Master</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="h-75">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={kritikalitasData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, value }) => `${name}: ${value}`}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="count"
+                    nameKey="kritikalitas"
+                  >
+                    {kritikalitasData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={
+                          kritikalitasConfig[entry.kritikalitas]?.color ||
+                          "#8884d8"
+                        }
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import TambahKegiatanRapat from "@/components/sections/jadwalKegiatan/AddJadwalKegiatan";
+import TambahKegiatanRapat from "@/components/sections/jadwalKegiatan/perangkat/AddJadwalKegiatan";
 
 function page() {
   return (

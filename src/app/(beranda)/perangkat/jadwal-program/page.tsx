@@ -1,4 +1,4 @@
-import ListJadwalKegiatan from "@/components/sections/jadwalKegiatan/ListJadwalKegiatan";
+import ListJadwalKegiatan from "@/components/sections/jadwalKegiatan/perangkat/ListJadwalKegiatan";
 
 const page = () => {
   return (

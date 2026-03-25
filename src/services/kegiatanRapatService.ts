@@ -196,12 +196,13 @@ export const kegiatanRapatService = {
       limit = 10,
     } = params || {};
 
-    const where: Prisma.KegiatanRapatWhereInput = {};
+    const where: Prisma.KegiatanRapatWhereInput = {
+      dibuatOlehId,
+    };
 
     if (judul) where.judul = { contains: judul, mode: "insensitive" };
     if (lokasi) where.lokasi = { contains: lokasi, mode: "insensitive" };
     if (domainIsuId) where.domainIsuId = domainIsuId;
-    if (dibuatOlehId) where.dibuatOlehId = dibuatOlehId;
     if (aiModel) where.aiModel = { contains: aiModel, mode: "insensitive" };
     if (mode) where.mode = mode;
     if (statusRekomendasi) where.statusRekomendasi = statusRekomendasi;
@@ -566,7 +567,7 @@ export const kegiatanRapatService = {
         where: { id: kegiatanRapatId },
         data: {
           rekomendasiItems: finalRekomendasi as any,
-          statusRekomendasi: "DIAJUKAN",
+          statusRekomendasi: "DRAFT",
           aiProcessedAt: new Date(),
           diprosesOlehId: userId,
         },
