@@ -31,22 +31,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: LayoutDashboard,
       },
       {
-        title: "Kelola Masukan Warga",
-        url: "/lurah/kelola-masukan",
-        icon: MessageCircleMore,
-      },
-      {
-        title: "Kelola Data Master",
-        url: "/lurah/kelola-data",
-        icon: Database,
-      },
-    ],
-    navSecondary: [
-      {
-        title: "Atur Jadwal Program Mendatang",
+        title: "Persetujuan Jadwal Program Mendatang",
         url: "/lurah/jadwal-program",
         icon: Calendar,
       },
+    ],
+    navSecondary: [
       {
         title: "Setting Profile lurah",
         url: `/lurah/setting`,

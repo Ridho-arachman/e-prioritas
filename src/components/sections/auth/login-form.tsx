@@ -91,6 +91,10 @@ export function LoginForm({
           if (session?.user) {
             if (session.user.role === "ADMIN") {
               router.push("/admin");
+            } else if (session.user.role === "LURAH") {
+              router.push("/lurah");
+            } else if (session.user.role === "PERANGKAT_DESA") {
+              router.push("/perangkat");
             } else {
               router.push("/");
             }
@@ -125,6 +129,8 @@ export function LoginForm({
       );
 
       if (res.data.user.role === "ADMIN") router.push("/admin");
+      if (res.data.user.role === "PERANGKAT_DESA") router.push("/perangkat");
+      if (res.data.user.role === "LURAH") router.push("/lurah");
     } catch (error) {
       const err = error as AxiosError<ApiError>;
       console.log(err);

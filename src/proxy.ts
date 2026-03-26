@@ -27,9 +27,13 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
+  if (request.nextUrl.pathname.startsWith("/lurah") && role !== "LURAH") {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/perangkat/:path*"],
+  matcher: ["/admin/:path*", "/perangkat/:path*", "/lurah/:path*"],
 };

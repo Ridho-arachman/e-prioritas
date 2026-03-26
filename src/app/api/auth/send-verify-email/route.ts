@@ -10,10 +10,7 @@ export const POST = async (req: Request) => {
   try {
     const body = await req.json();
 
-    const parsed = EmailSchema.safeParse(body);
-    if (!parsed.success) return handleZodValidation(parsed);
-
-    const { email } = parsed.data;
+    const { email } = body;
 
     const response = await auth.api.sendVerificationEmail({
       body: { email, callbackURL: `http://localhost:3000/verify-success` },
