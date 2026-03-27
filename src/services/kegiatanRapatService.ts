@@ -196,9 +196,11 @@ export const kegiatanRapatService = {
       limit = 10,
     } = params || {};
 
-    const where: Prisma.KegiatanRapatWhereInput = {
-      dibuatOlehId,
-    };
+    const where: Prisma.KegiatanRapatWhereInput = {};
+
+    if (dibuatOlehId) {
+      where.dibuatOlehId = dibuatOlehId;
+    }
 
     if (judul) where.judul = { contains: judul, mode: "insensitive" };
     if (lokasi) where.lokasi = { contains: lokasi, mode: "insensitive" };

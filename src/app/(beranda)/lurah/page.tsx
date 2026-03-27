@@ -48,7 +48,7 @@ export default function LurahDashboardPage() {
 
   const handleExportLaporan = () => {
     window.open(
-      `/protected/dashboard/lurah/laporan-sistem?startDate=${startDate}&endDate=${endDate}`,
+      `/api/protected/dashboard/lurah/laporan-sistem?startDate=${startDate}&endDate=${endDate}`,
       "_blank",
     );
   };

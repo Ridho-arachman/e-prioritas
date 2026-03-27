@@ -1,5 +1,5 @@
 export function generateBreadcrumbSegments(pathname: string) {
-  const hiddenSegments = ["admin", "perangkat"];
+  const hiddenSegments = ["admin", "perangkat", "lurah"];
 
   const isId = (segment: string) => {
     return (

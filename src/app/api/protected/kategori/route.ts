@@ -9,7 +9,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
 const GET = async (req: NextRequest) => {
-  const allowedRoles: Role[] = ["ADMIN"];
+  const allowedRoles: Role[] = ["ADMIN", "LURAH", "PERANGKAT_DESA"];
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session) {

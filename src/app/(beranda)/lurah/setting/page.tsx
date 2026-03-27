@@ -84,7 +84,7 @@ export default function AdminSettingPage() {
               </div>
             </CardHeader>
             <CardContent className="flex justify-end relative">
-              <Link href="/perangkat/setting/edit-profile">
+              <Link href="/lurah/setting/edit-profile">
                 <Button
                   variant="outline"
                   className="cursor-pointer shadow-sm hover:shadow-md transition-all"
@@ -112,7 +112,7 @@ export default function AdminSettingPage() {
               </div>
             </CardHeader>
             <CardContent className="flex justify-end relative">
-              <Link href="/perangkat/setting/edit-password">
+              <Link href="/lurah/setting/edit-password">
                 <Button
                   variant="destructive"
                   className="cursor-pointer shadow-sm hover:shadow-md transition-all"
@@ -140,7 +140,7 @@ export default function AdminSettingPage() {
               </div>
             </CardHeader>
             <CardContent className="flex justify-end relative">
-              <Link href="/perangkat/setting/edit-email">
+              <Link href="/lurah/setting/edit-email">
                 <Button
                   variant="secondary"
                   className="cursor-pointer shadow-sm hover:shadow-md transition-all"

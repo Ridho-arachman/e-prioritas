@@ -119,9 +119,6 @@ export function NavActions() {
                 ) : user?.image ? (
                   <NextAvatarImage src={user.image} alt={user.name} />
                 ) : (
-                  <AvatarImage src="/avatar.png" alt="User default" />
-                )}
-                {!isLoading && (
                   <AvatarFallback className="bg-linear-to-br from-amber-400 to-amber-600 text-white">
                     {initials}
                   </AvatarFallback>
@@ -151,11 +148,10 @@ export function NavActions() {
                       {user?.image ? (
                         <NextAvatarImage src={user.image} alt={user.name} />
                       ) : (
-                        <AvatarImage src="/avatar.png" alt="User default" />
+                        <AvatarFallback className="bg-linear-to-br from-amber-400 to-amber-600 text-white">
+                          {initials}
+                        </AvatarFallback>
                       )}
-                      <AvatarFallback className="bg-linear-to-br from-amber-400 to-amber-600 text-white">
-                        {initials}
-                      </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col overflow-hidden">
                       <span className="font-semibold text-sm truncate">
