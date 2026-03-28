@@ -10,7 +10,7 @@ import { headers } from "next/headers";
 import { Role, StatusMasukan } from "@/app/generated/prisma";
 
 export const GET = async (req: NextRequest) => {
-  const allowedRoles: Role[] = ["ADMIN", "PERANGKAT_DESA"];
+  const allowedRoles: Role[] = ["ADMIN", "PERANGKAT_DESA", "LURAH"];
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session) {

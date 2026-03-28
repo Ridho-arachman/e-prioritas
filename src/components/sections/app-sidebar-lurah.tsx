@@ -31,6 +31,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: LayoutDashboard,
       },
       {
+        title: "Melihat Masukan Warga",
+        url: "/lurah/kelola-masukan",
+        icon: MessageCircleMore,
+      },
+      {
+        title: "Melihat Data Master",
+        url: "/lurah/kelola-data",
+        icon: Database,
+      },
+      {
         title: "Persetujuan Jadwal Program Mendatang",
         url: "/lurah/jadwal-program",
         icon: Calendar,

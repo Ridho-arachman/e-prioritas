@@ -315,10 +315,6 @@ export default function ListJadwalKegiatan() {
     `/protected/kegiatan-rapat/lurah${queryString}`,
   );
 
-  console.log(data);
-
-  const { del: deleteKegiatan, loading: deleteLoading } = useDelete();
-
   // Fetch domain isu options
   const { data: domainIsuOptions } = useGet("/protected/kategori");
 
@@ -337,22 +333,6 @@ export default function ListJadwalKegiatan() {
   useEffect(() => {
     setIsMounted(true);
   }, []);
-
-  const handleDelete = async () => {
-    if (!selectedDeleteId) return;
-    try {
-      const res = await deleteKegiatan(
-        `/protected/kegiatan-rapat/${selectedDeleteId}`,
-      );
-      notifier.success("Berhasil", res?.message);
-      mutate();
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      notifier.error("Gagal", err?.response?.data?.message);
-    } finally {
-      setSelectedDeleteId(null);
-    }
-  };
 
   const clearFilters = () => {
     setDomainIsuId("");
@@ -386,43 +366,6 @@ export default function ListJadwalKegiatan() {
 
   return (
     <>
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog
-        open={!!selectedDeleteId}
-        onOpenChange={(open) => {
-          if (!open) setSelectedDeleteId(null);
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Hapus kegiatan?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Data kegiatan akan dihapus permanen. Tindakan ini tidak dapat
-              dibatalkan.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="cursor-pointer">
-              Batal
-            </AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={deleteLoading}
-              className="cursor-pointer"
-            >
-              {deleteLoading ? (
-                <>
-                  <Spinner className="mr-2 h-4 w-4" /> Menghapus...
-                </>
-              ) : (
-                "Hapus"
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
       <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50 py-12 px-4 relative overflow-hidden">
         {/* Background Effects */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-blue-100/40 via-transparent to-transparent" />
@@ -447,13 +390,6 @@ export default function ListJadwalKegiatan() {
                   </p>
                 </div>
               </div>
-              <Button
-                onClick={() => router.push("/lurah/jadwal-program/add")}
-                className="gap-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl px-6 py-3 transition-all duration-300 hover:shadow-blue-500/50 hover:scale-105 font-medium"
-              >
-                <Plus className="h-5 w-5" />
-                Tambah Kegiatan
-              </Button>
             </div>
 
             {/* Stats Cards */}
@@ -958,31 +894,6 @@ export default function ListJadwalKegiatan() {
                                     >
                                       <Eye className="h-4 w-4 mr-1" />
                                       Detail
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        router.push(
-                                          `/lurah/jadwal-program/${k.id}/edit`,
-                                        );
-                                      }}
-                                      className="cursor-pointer"
-                                    >
-                                      <Edit className="h-4 w-4 mr-1" />
-                                      Edit
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="destructive"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setSelectedDeleteId(k.id);
-                                      }}
-                                      className="cursor-pointer"
-                                    >
-                                      <Trash className="h-4 w-4" />
                                     </Button>
                                   </div>
                                 </div>

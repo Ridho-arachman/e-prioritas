@@ -1,4 +1,4 @@
-// src/app/admin/jadwal-program/[id]/page.tsx
+// src/app/lurah/jadwal-program/[id]/page.tsx
 "use client";
 
 import { useRouter, useParams } from "next/navigation";
@@ -69,6 +69,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { useQueryState } from "nuqs";
 import { useDebounce } from "use-debounce";
+import { useUser } from "@/hooks/useUser";
 
 // ═══════════════════════════════════════════════════════════════
 // 📦 ENUMS (Sesuai Schema Prisma)
@@ -308,6 +309,8 @@ export default function KegiatanRapatDetail() {
   const params = useParams<{ id: string }>();
   const id = params?.id;
 
+  const { user, isLoading: userLoading } = useUser();
+
   const [selectedDeleteId, setSelectedDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -316,6 +319,12 @@ export default function KegiatanRapatDetail() {
   const [expandedPriorities, setExpandedPriorities] = useState<
     Record<string, boolean>
   >({});
+
+  // State untuk dialog konfirmasi Terima/Tolak
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+  const [pendingAction, setPendingAction] = useState<"terima" | "tolak" | null>(
+    null,
+  );
 
   const [q, setQ] = useQueryState("q", { defaultValue: "" });
   const [debouncedQ] = useDebounce(q, 500);
@@ -334,30 +343,17 @@ export default function KegiatanRapatDetail() {
   const { patch: patchKembaliKeDraft } = usePatch(
     `/protected/kegiatan-rapat/${id}/kembali-ke-draft`,
   );
+  const { patch: patchTerima } = usePatch(
+    `/protected/kegiatan-rapat/${id}/terima`,
+  );
+  const { patch: patchTolak } = usePatch(
+    `/protected/kegiatan-rapat/${id}/tolak`,
+  );
 
   const rekomendasiData = parseRekomendasiItems(kegiatan?.rekomendasiItems);
   const prioritasList = rekomendasiData?.prioritas || [];
 
-  const handleDelete = async () => {
-    if (!selectedDeleteId) return;
-    setIsDeleting(true);
-    try {
-      const res = await deleteKegiatan(
-        `/protected/kegiatan-rapat/${selectedDeleteId}`,
-      );
-      notifier.success("Berhasil", res?.message || "Kegiatan berhasil dihapus");
-      router.push("/admin/jadwal-program");
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      notifier.error(
-        "Gagal",
-        err?.response?.data?.message || "Gagal menghapus kegiatan",
-      );
-    } finally {
-      setIsDeleting(false);
-      setSelectedDeleteId(null);
-    }
-  };
+  // ==================== HANDLERS ====================
 
   const handleExportPDF = async () => {
     if (!id) return;
@@ -366,11 +362,7 @@ export default function KegiatanRapatDetail() {
       const response = await fetch(
         `/api/protected/kegiatan-rapat/${id}/export-pdf`,
       );
-
-      if (!response.ok) {
-        throw new Error("Gagal export PDF");
-      }
-
+      if (!response.ok) throw new Error("Gagal export PDF");
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -380,7 +372,6 @@ export default function KegiatanRapatDetail() {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-
       notifier.success("Berhasil", "PDF berhasil diunduh");
     } catch (error) {
       notifier.error("Gagal", "Gagal mengunduh PDF");
@@ -389,36 +380,33 @@ export default function KegiatanRapatDetail() {
     }
   };
 
-  const handleAjukanRekomendasi = async () => {
+  const handleTerima = async () => {
     try {
-      const res = await patchAjukan({});
+      const res = await patchTerima({});
       notifier.success(
         "Berhasil",
-        res?.message || "Kegiatan berhasil diajukan ke lurah",
+        res?.message || "Kegiatan berhasil diterima",
       );
       mutate();
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
       notifier.error(
         "Gagal",
-        err?.response?.data?.message || "Gagal mengajukan kegiatan",
+        err?.response?.data?.message || "Gagal menerima kegiatan",
       );
     }
   };
 
-  const handleKembaliKeDraft = async () => {
+  const handleTolak = async () => {
     try {
-      const res = await patchKembaliKeDraft({});
-      notifier.success(
-        "Berhasil",
-        res?.message || "Kegiatan dikembalikan ke draft",
-      );
+      const res = await patchTolak({});
+      notifier.success("Berhasil", res?.message || "Kegiatan berhasil ditolak");
       mutate();
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
       notifier.error(
         "Gagal",
-        err?.response?.data?.message || "Gagal mengembalikan ke draft",
+        err?.response?.data?.message || "Gagal menolak kegiatan",
       );
     }
   };
@@ -434,7 +422,8 @@ export default function KegiatanRapatDetail() {
     setIsMounted(true);
   }, []);
 
-  if (!isMounted || isLoading) {
+  // Loading State
+  if (!isMounted || isLoading || userLoading) {
     return (
       <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -447,6 +436,7 @@ export default function KegiatanRapatDetail() {
     );
   }
 
+  // Error State
   if (error || !kegiatan) {
     return (
       <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
@@ -462,7 +452,7 @@ export default function KegiatanRapatDetail() {
               Data kegiatan yang Anda cari tidak tersedia.
             </p>
             <Button
-              onClick={() => router.push("/admin/jadwal-program")}
+              onClick={() => router.push("/lurah/jadwal-program")}
               className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl"
             >
               Kembali ke Daftar
@@ -475,41 +465,45 @@ export default function KegiatanRapatDetail() {
 
   return (
     <>
-      <AlertDialog
-        open={!!selectedDeleteId}
-        onOpenChange={(open) => !open && setSelectedDeleteId(null)}
-      >
+      {/* Dialog Konfirmasi Terima/Tolak */}
+      <AlertDialog open={openConfirmDialog} onOpenChange={setOpenConfirmDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus kegiatan?</AlertDialogTitle>
+            <AlertDialogTitle>
+              {pendingAction === "terima"
+                ? "Terima Kegiatan?"
+                : "Tolak Kegiatan?"}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Data kegiatan akan dihapus permanen. Tindakan ini tidak dapat
-              dibatalkan.
+              {pendingAction === "terima"
+                ? "Apakah Anda yakin ingin menerima kegiatan ini? Kegiatan akan berstatus DISETUJUI."
+                : "Apakah Anda yakin ingin menolak kegiatan ini? Kegiatan akan berstatus DITOLAK."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="cursor-pointer">
+            <AlertDialogCancel onClick={() => setOpenConfirmDialog(false)}>
               Batal
             </AlertDialogCancel>
             <AlertDialogAction
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="cursor-pointer"
+              onClick={() => {
+                if (pendingAction === "terima") handleTerima();
+                else if (pendingAction === "tolak") handleTolak();
+                setOpenConfirmDialog(false);
+              }}
+              className={
+                pendingAction === "tolak"
+                  ? "bg-red-600 hover:bg-red-700"
+                  : "bg-emerald-600 hover:bg-emerald-700"
+              }
             >
-              {isDeleting ? (
-                <>
-                  <Spinner className="mr-2 h-4 w-4" /> Menghapus...
-                </>
-              ) : (
-                "Hapus"
-              )}
+              {pendingAction === "terima" ? "Terima" : "Tolak"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
       <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        {/* Background Effects */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-blue-100/40 via-transparent to-transparent" />
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-400/10 rounded-full blur-3xl" />
@@ -535,23 +529,6 @@ export default function KegiatanRapatDetail() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Button
-                onClick={() =>
-                  router.push(`/admin/jadwal-program/${kegiatan.id}/edit`)
-                }
-                className="gap-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl"
-              >
-                <EditIcon className="h-4 w-4" /> Edit Kegiatan
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => setSelectedDeleteId(kegiatan.id)}
-                className="gap-2 bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/30 rounded-xl"
-              >
-                <TrashIcon className="h-4 w-4" /> Hapus
-              </Button>
-            </div>
           </div>
 
           {/* Card Detail Kegiatan */}
@@ -560,6 +537,7 @@ export default function KegiatanRapatDetail() {
             <CardContent className="p-0">
               <div className="p-6 sm:p-8 border-b border-slate-100">
                 <div className="flex flex-col lg:flex-row lg:items-start gap-6">
+                  {/* Date Badge */}
                   <div className="shrink-0">
                     <div className="relative">
                       <div className="absolute inset-0 bg-linear-to-br from-blue-500 to-indigo-500 rounded-2xl blur-lg opacity-20" />
@@ -577,6 +555,8 @@ export default function KegiatanRapatDetail() {
                       </div>
                     </div>
                   </div>
+
+                  {/* Content */}
                   <div className="flex-1">
                     <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
                       <div>
@@ -741,6 +721,7 @@ export default function KegiatanRapatDetail() {
                     </button>
                   )}
                 </div>
+
                 <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
                   <Button
                     variant="outline"
@@ -1104,41 +1085,53 @@ export default function KegiatanRapatDetail() {
                 </span>
               </div>
               <div className="flex items-center gap-3">
-                <Button
-                  variant="outline"
-                  onClick={handleExportPDF}
-                  disabled={isExporting}
-                  className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl gap-2"
-                >
-                  {isExporting ? (
+                {/* Export PDF - hanya jika status DISETUJUI */}
+                {kegiatan.statusRekomendasi === StatusRekomendasi.DISETUJUI && (
+                  <Button
+                    variant="outline"
+                    onClick={handleExportPDF}
+                    disabled={isExporting}
+                    className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl gap-2"
+                  >
+                    {isExporting ? (
+                      <>
+                        <Loader2Icon className="h-4 w-4 animate-spin" />
+                        Exporting...
+                      </>
+                    ) : (
+                      <>
+                        <FileDownIcon className="h-4 w-4" />
+                        Export PDF
+                      </>
+                    )}
+                  </Button>
+                )}
+
+                {/* Lurah buttons */}
+                {user?.role === "LURAH" &&
+                  kegiatan.statusRekomendasi === StatusRekomendasi.DIAJUKAN && (
                     <>
-                      <Loader2Icon className="h-4 w-4 animate-spin" />
-                      Exporting...
-                    </>
-                  ) : (
-                    <>
-                      <FileDownIcon className="h-4 w-4" />
-                      Export PDF
+                      <Button
+                        onClick={() => {
+                          setPendingAction("terima");
+                          setOpenConfirmDialog(true);
+                        }}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/30 rounded-xl"
+                      >
+                        Terima
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setPendingAction("tolak");
+                          setOpenConfirmDialog(true);
+                        }}
+                        variant="destructive"
+                        className="bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-500/30 rounded-xl"
+                      >
+                        Tolak
+                      </Button>
                     </>
                   )}
-                </Button>
-                {kegiatan.statusRekomendasi === StatusRekomendasi.DRAFT && (
-                  <Button
-                    onClick={handleAjukanRekomendasi}
-                    className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl"
-                  >
-                    Ajukan Rekomendasi
-                  </Button>
-                )}
-                {kegiatan.statusRekomendasi === StatusRekomendasi.DIAJUKAN && (
-                  <Button
-                    onClick={handleKembaliKeDraft}
-                    variant="outline"
-                    className="border-amber-200 text-amber-700 hover:bg-amber-50 rounded-xl"
-                  >
-                    Kembalikan ke Draft
-                  </Button>
-                )}
               </div>
             </div>
           </div>

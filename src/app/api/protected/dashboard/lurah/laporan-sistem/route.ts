@@ -1,3 +1,4 @@
+// src/app/api/protected/lurah/laporan-sistem/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
@@ -26,7 +27,6 @@ const addHeader = (
   const { width, height } = page.getSize();
   const margin = 50;
 
-  // Garis atas
   page.drawLine({
     start: { x: margin, y: height - margin + 10 },
     end: { x: width - margin, y: height - margin + 10 },
@@ -34,7 +34,6 @@ const addHeader = (
     color: rgb(0.2, 0.4, 0.8),
   });
 
-  // Teks judul
   page.drawText("KELURAHAN PANGGUNGJATI", {
     x: margin,
     y: height - margin,
@@ -43,7 +42,6 @@ const addHeader = (
     color: rgb(0.2, 0.4, 0.8),
   });
 
-  // Nomor halaman (kanan atas)
   if (pageNumber && totalPages) {
     page.drawText(`Halaman ${pageNumber} dari ${totalPages}`, {
       x: width - margin - 80,
@@ -109,7 +107,7 @@ const wrapText = (
   return lines;
 };
 
-// Helper untuk menggambar tabel dengan pemotongan halaman aman
+// Helper untuk menggambar tabel dengan text wrapping
 const drawTable = (
   page: any,
   helvetica: any,
@@ -122,15 +120,28 @@ const drawTable = (
   startY: number,
 ) => {
   let currentY = y;
-  const rowHeight = 20;
   const headerHeight = 24;
+  const baseFontSize = 8;
+  const lineHeight = 1.4;
+  const rowHeightBase = baseFontSize * lineHeight; // ~11.2
 
-  // Periksa apakah cukup ruang untuk header
+  // Hitung tinggi baris berdasarkan jumlah baris teks terbanyak dalam sel
+  const getRowHeight = (row: any[]) => {
+    let maxLines = 1;
+    for (let i = 0; i < row.length; i++) {
+      const cellText = String(row[i] ?? "");
+      const maxWidth = colWidths[i] - 10;
+      const wrapped = wrapText(cellText, helvetica, baseFontSize, maxWidth);
+      maxLines = Math.max(maxLines, wrapped.length);
+    }
+    return maxLines * rowHeightBase;
+  };
+
+  // Header
   if (currentY - headerHeight < 60) {
     return { newY: currentY, pageBreak: true, drawnRows: 0 };
   }
 
-  // Header background
   page.drawRectangle({
     x,
     y: currentY - headerHeight,
@@ -139,7 +150,6 @@ const drawTable = (
     color: rgb(0.2, 0.4, 0.8),
   });
 
-  // Header text
   let headerX = x;
   headers.forEach((header, i) => {
     page.drawText(header, {
@@ -156,37 +166,55 @@ const drawTable = (
 
   let drawn = 0;
   for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const rowHeight = getRowHeight(row);
     if (currentY - rowHeight < 60) {
       return { newY: currentY, pageBreak: true, drawnRows: i };
     }
-    const row = rows[i];
-    let rowX = x;
-    for (let j = 0; j < row.length; j++) {
-      page.drawText(String(row[j]), {
-        x: rowX + 5,
-        y: currentY - rowHeight + 6,
-        size: 8,
-        font: helvetica,
-        color: rgb(0, 0, 0),
-      });
-      rowX += colWidths[j];
-    }
-    currentY -= rowHeight;
+
+    // Garis atas baris
     page.drawLine({
-      start: { x, y: currentY + rowHeight },
-      end: {
-        x: x + colWidths.reduce((a, b) => a + b, 0),
-        y: currentY + rowHeight,
-      },
+      start: { x, y: currentY },
+      end: { x: x + colWidths.reduce((a, b) => a + b, 0), y: currentY },
       thickness: 0.5,
       color: rgb(0.8, 0.8, 0.8),
     });
+
+    // Gambar sel
+    let rowX = x;
+    for (let j = 0; j < row.length; j++) {
+      const cellText = String(row[j] ?? "");
+      const maxWidth = colWidths[j] - 10;
+      const lines = wrapText(cellText, helvetica, baseFontSize, maxWidth);
+      let lineY = currentY - 6; // baseline
+      for (let k = lines.length - 1; k >= 0; k--) {
+        page.drawText(lines[k], {
+          x: rowX + 5,
+          y: lineY,
+          size: baseFontSize,
+          font: helvetica,
+          color: rgb(0, 0, 0),
+        });
+        lineY -= rowHeightBase;
+      }
+      rowX += colWidths[j];
+    }
+    currentY -= rowHeight;
     drawn++;
   }
+
+  // Garis bawah terakhir
+  page.drawLine({
+    start: { x, y: currentY },
+    end: { x: x + colWidths.reduce((a, b) => a + b, 0), y: currentY },
+    thickness: 0.5,
+    color: rgb(0.8, 0.8, 0.8),
+  });
+
   return { newY: currentY, pageBreak: false, drawnRows: drawn };
 };
 
-// Helper untuk mendapatkan rentang tahun dari startDate dan endDate
+// Helper untuk mendapatkan rentang tahun
 const getYearRange = (
   startDate?: string,
   endDate?: string,
@@ -220,7 +248,6 @@ export async function GET(req: NextRequest) {
   if (startDate) where.createdAt = { gte: new Date(startDate) };
   if (endDate) where.createdAt = { ...where.createdAt, lte: new Date(endDate) };
 
-  // Ambil rentang tahun untuk filter data master
   const { startYear, endYear } = getYearRange(
     startDate ?? undefined,
     endDate ?? undefined,
@@ -236,7 +263,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // Fetch data
+    // Fetch data (sama seperti sebelumnya)
     const [
       masukanStats,
       kegiatanStats,
@@ -366,7 +393,7 @@ export async function GET(req: NextRequest) {
     });
     y = coverY - 90;
 
-    // Helper untuk menambahkan section header dengan ruang lebih
+    // Helper untuk menambahkan section header
     const addSectionHeader = (title: string, startY: number) => {
       const headerHeight = 25;
       if (startY - headerHeight < 100) {

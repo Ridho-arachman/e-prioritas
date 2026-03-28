@@ -52,6 +52,7 @@ export type KegiatanRapatGetAllParams = {
   statusRekomendasi?: StatusRekomendasi;
   createdAtFrom?: Date;
   createdAtTo?: Date;
+  role?: string;
   updatedAtFrom?: Date;
   updatedAtTo?: Date;
   tanggalFrom?: Date;
@@ -182,6 +183,7 @@ export const kegiatanRapatService = {
       dibuatOlehId,
       aiModel,
       mode,
+      role,
       statusRekomendasi,
       createdAtFrom,
       createdAtTo,
@@ -200,6 +202,10 @@ export const kegiatanRapatService = {
 
     if (dibuatOlehId) {
       where.dibuatOlehId = dibuatOlehId;
+    }
+
+    if (role === "LURAH") {
+      where.statusRekomendasi = { not: StatusRekomendasi.DRAFT };
     }
 
     if (judul) where.judul = { contains: judul, mode: "insensitive" };

@@ -15,7 +15,6 @@ import {
   Role,
   StatusRekomendasi,
   ModeRekomendasi,
-  Prisma,
 } from "@/app/generated/prisma";
 import { headers } from "next/headers";
 import {
@@ -162,8 +161,6 @@ export const POST = async (req: NextRequest) => {
 // GET - List Kegiatan Rapat (tidak berubah)
 // ========================
 
-// src/app/api/protected/kegiatan-rapat/route.ts (bagian GET, menggunakan Prisma langsung)
-
 export const GET = async (req: NextRequest) => {
   const allowedRoles: Role[] = ["ADMIN", "LURAH", "PERANGKAT_DESA"];
   const session = await auth.api.getSession({ headers: await headers() });
@@ -187,39 +184,22 @@ export const GET = async (req: NextRequest) => {
   try {
     const searchParams = req.nextUrl.searchParams;
 
-    // Parse query parameters
-    const q = searchParams.get("q") || undefined;
-    const judul = searchParams.get("judul") || undefined;
-    const lokasi = searchParams.get("lokasi") || undefined;
-    const domainIsuId = searchParams.get("domainIsuId") || undefined;
-    const aiModel = searchParams.get("aiModel") || undefined;
-    const mode = searchParams.get("mode") as ModeRekomendasi | undefined;
-    const statusRekomendasiParam = searchParams.get("statusRekomendasi") as
-      | StatusRekomendasi
-      | undefined;
-    const createdAt = searchParams.get("createdAt") || undefined;
-    const updatedAt = searchParams.get("updatedAt") || undefined;
-    const tanggal = searchParams.get("tanggal") || undefined;
-    const dibuatOlehIdParam = searchParams.get("dibuatOlehId") || undefined;
-    const sortBy = (searchParams.get("sortBy") as string) || "updatedAt";
-    const sortOrder =
-      (searchParams.get("sortOrder") as "asc" | "desc") || "desc";
-    const page = Number(searchParams.get("page")) || 1;
-    const limit = Number(searchParams.get("limit")) || 10;
+    const parsed = kegiatanRapatQuerySchema.safeParse({
+      q: searchParams.get("q") || undefined,
+      judul: searchParams.get("judul") || undefined,
+      lokasi: searchParams.get("lokasi") || undefined,
+      domainIsuId: searchParams.get("domainIsuId") || undefined,
+      aiModel: searchParams.get("aiModel") || undefined,
+      mode: searchParams.get("mode") || undefined,
+      statusRekomendasi: searchParams.get("statusRekomendasi") || undefined,
+      createdAt: searchParams.get("createdAt") || undefined,
+      updatedAt: searchParams.get("updatedAt") || undefined,
+      tanggal: searchParams.get("tanggal") || undefined,
+    });
 
-    // 🔥 LOGIKA BERDASARKAN ROLE
-    const role = session.user.role;
-    let finalStatusRekomendasi = statusRekomendasiParam;
-    let finalDibuatOlehId = dibuatOlehIdParam;
+    if (!parsed.success) return handleZodValidation(parsed);
+    const data = parsed.data;
 
-    if (role === "LURAH" && !finalStatusRekomendasi) {
-      finalStatusRekomendasi = StatusRekomendasi.DIAJUKAN;
-    }
-    if (role === "PERANGKAT_DESA" && !finalDibuatOlehId) {
-      finalDibuatOlehId = session.user.id;
-    }
-
-    // Helper untuk date range
     const buildDateRange = (dateStr?: string): { from?: Date; to?: Date } => {
       if (!dateStr || !dayjs(dateStr, "YYYY-MM-DD", true).isValid()) {
         return { from: undefined, to: undefined };
@@ -230,85 +210,42 @@ export const GET = async (req: NextRequest) => {
       };
     };
 
-    const createdAtRange = buildDateRange(createdAt);
-    const updatedAtRange = buildDateRange(updatedAt);
-    const tanggalRange = buildDateRange(tanggal);
+    const createdAtRange = buildDateRange(data.createdAt);
+    const updatedAtRange = buildDateRange(data.updatedAt);
+    const tanggalRange = buildDateRange(data.tanggal);
 
-    // Build where clause
-    const where: Prisma.KegiatanRapatWhereInput = {};
+    const result = await kegiatanRapatService.getAll({
+      search: data.q,
+      judul: data.judul,
+      lokasi: data.lokasi,
+      domainIsuId: data.domainIsuId,
+      aiModel: data.aiModel,
+      mode: data.mode as ModeRekomendasi | undefined,
+      statusRekomendasi: data.statusRekomendasi as
+        | StatusRekomendasi
+        | undefined,
+      createdAtFrom: createdAtRange.from,
+      createdAtTo: createdAtRange.to,
+      updatedAtFrom: updatedAtRange.from,
+      updatedAtTo: updatedAtRange.to,
+      tanggalFrom: tanggalRange.from,
+      tanggalTo: tanggalRange.to,
+      role: session.user.role as Role,
+      sortBy: (searchParams.get("sortBy") as any) || "updatedAt",
+      sortOrder: (searchParams.get("sortOrder") as "asc" | "desc") || "desc",
+      page: Number(searchParams.get("page")) || 1,
+      limit: Number(searchParams.get("limit")) || 10,
+    });
 
-    if (finalDibuatOlehId) {
-      where.dibuatOlehId = finalDibuatOlehId;
-    }
-    if (judul) where.judul = { contains: judul, mode: "insensitive" };
-    if (lokasi) where.lokasi = { contains: lokasi, mode: "insensitive" };
-    if (domainIsuId) where.domainIsuId = domainIsuId;
-    if (aiModel) where.aiModel = { contains: aiModel, mode: "insensitive" };
-    if (mode) where.mode = mode;
-    if (finalStatusRekomendasi)
-      where.statusRekomendasi = finalStatusRekomendasi;
-
-    if (createdAtRange.from || createdAtRange.to) {
-      where.createdAt = {};
-      if (createdAtRange.from) where.createdAt.gte = createdAtRange.from;
-      if (createdAtRange.to) where.createdAt.lte = createdAtRange.to;
-    }
-    if (updatedAtRange.from || updatedAtRange.to) {
-      where.updatedAt = {};
-      if (updatedAtRange.from) where.updatedAt.gte = updatedAtRange.from;
-      if (updatedAtRange.to) where.updatedAt.lte = updatedAtRange.to;
-    }
-    if (tanggalRange.from || tanggalRange.to) {
-      where.tanggal = {};
-      if (tanggalRange.from) where.tanggal.gte = tanggalRange.from;
-      if (tanggalRange.to) where.tanggal.lte = tanggalRange.to;
-    }
-
-    if (q) {
-      where.OR = [
-        { judul: { contains: q, mode: "insensitive" } },
-        { deskripsi: { contains: q, mode: "insensitive" } },
-        { lokasi: { contains: q, mode: "insensitive" } },
-      ];
-    }
-
-    // Sorting validation
-    const validSortFields: Array<
-      keyof Prisma.KegiatanRapatOrderByWithRelationInput
-    > = ["judul", "tanggal", "createdAt", "updatedAt", "statusRekomendasi"];
-    const safeSortBy = validSortFields.includes(sortBy as any)
-      ? (sortBy as keyof Prisma.KegiatanRapatOrderByWithRelationInput)
-      : "updatedAt";
-    const orderBy: Prisma.KegiatanRapatOrderByWithRelationInput = {
-      [safeSortBy]: sortOrder,
-    };
-
-    const skip = (page - 1) * limit;
-
-    // Query langsung dengan Prisma
-    const [data, total] = await prisma.$transaction([
-      prisma.kegiatanRapat.findMany({
-        where,
-        orderBy,
-        skip,
-        take: limit,
-        include: {
-          dibuatOleh: { select: { name: true, jabatan: true } },
-          domainIsu: { select: { nama: true, code: true } },
-        },
-      }),
-      prisma.kegiatanRapat.count({ where }),
-    ]);
-
-    if (data.length === 0) {
+    if (result.data.length === 0) {
       return handleResponse({
         success: true,
         message: "Kegiatan Masih Kosong",
         data: [],
         meta: {
           total: 0,
-          page,
-          limit,
+          page: result.page,
+          limit: result.limit,
           totalPages: 0,
         },
         status: 200,
@@ -318,12 +255,12 @@ export const GET = async (req: NextRequest) => {
     return handleResponse({
       success: true,
       message: "Data Berhasil Ditemukan",
-      data,
+      data: result.data,
       meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
+        total: result.total,
+        page: result.page,
+        limit: result.limit,
+        totalPages: result.totalPages,
       },
       status: 200,
     });
