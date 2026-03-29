@@ -86,7 +86,10 @@ export function buildPrompt(args: PromptArgs): string {
   // 📋 SYSTEM PROMPT (Base Instruction)
   // ═══════════════════════════════════════════════════════════════
 
-  const baseInstruction = `Anda adalah asisten AI ahli untuk perencanaan pembangunan kelurahan. Tugas Anda adalah menganalisis data dan menghasilkan 5 rekomendasi prioritas yang dapat ditindaklanjuti.
+  const baseInstruction = `Anda adalah asisten AI ahli untuk menetukan prioritas pembantu pengambilan keputusan kegiatan kelurahan. Tugas Anda adalah menganalisis data dan menghasilkan 5 rekomendasi prioritas yang dapat ditindaklanjuti.
+
+  KONTEKS RAPAT:
+  ${judulLaporan}
 
 ATURAN WAJIB:
 1. Output HARUS berupa JSON valid sesuai skema yang ditentukan. Tanpa teks tambahan, tanpa markdown, tanpa penjelasan.
@@ -102,7 +105,12 @@ SKALA KRITIKALITAS:
 - KRITIS: bobot 1.00 (darurat, bahaya, dampak luas)
 - TINGGI: bobot 0.75 (penting, perlu segera)
 - SEDANG: bobot 0.50 (cukup, perlu perhatian)
-- RENDAH: bobot 0.25 (rutin, bisa dijadwalkan)`;
+- RENDAH: bobot 0.25 (rutin, bisa dijadwalkan)
+
+ANALISIS DATA:
+- Data master dan masukan warga di atas adalah satu-satunya sumber informasi yang valid.
+- Jumlah data yang digunakan dalam evidence HARUS sesuai dengan data yang tersedia. Misalnya, jika hanya ada 4 masukan warga, maka masukanWargaCount maksimal 4.
+- Jangan menciptakan data baru atau mengasumsikan jumlah yang tidak ada.`;
 
   // ═══════════════════════════════════════════════════════════════
   // 🔄 MODE-SPECIFIC INSTRUCTION
@@ -155,8 +163,8 @@ Strategi: Analisis murni berdasarkan data master karena masukan warga tidak ters
       "lokasiRw": "002",
       "fingerprint": "",
       "evidence": {
-        "masukanWargaCount": 5,
-        "dataMasterCount": 2,
+        "masukanWargaCount": 0,
+        "dataMasterCount": 0,
         "kritikalitas": "KRITIS"
       }
     },
@@ -229,6 +237,11 @@ INSTRUKSI FINAL:
 - Jangan tambahkan field baru atau hapus field wajib.
 - Jangan gunakan komentar atau teks di luar JSON.
 - Pastikan JSON dapat di-parse oleh JSON.parse().
+- Untuk setiap rekomendasi, hitung masukanWargaCount dan dataMasterCount berdasarkan data       masukan dan data master yang benar-benar relevan dengan rekomendasi tersebut. Jangan membuat angka fiktif.
+- Kritikalitas harus diambil dari data master yang paling dominan atau berdasarkan penilaian dari data yang ada.
+- evidence.masukanWargaCount harus diisi dengan jumlah masukan warga yang mendukung rekomendasi tersebut (dari data yang diberikan).
+- evidence.dataMasterCount harus diisi dengan jumlah data master yang mendukung rekomendasi tersebut (dari data yang diberikan).
+- evidence.kritikalitas harus diisi berdasarkan data master yang paling relevan.
 
 Sekarang, hasilkan rekomendasi berdasarkan data di atas. Output HANYA JSON.`;
 }

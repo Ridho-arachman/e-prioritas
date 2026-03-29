@@ -98,6 +98,7 @@ export const PUT = async (
     const { id } = await params;
 
     const parsed = kegiatanRapatSchema.partial().safeParse(body);
+    console.log(parsed);
     if (!parsed.success) {
       return handleResponse({
         success: false,
@@ -141,7 +142,7 @@ export const DELETE = async (
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) => {
-  const allowedRoles: Role[] = ["ADMIN", "LURAH"];
+  const allowedRoles: Role[] = ["ADMIN", "PERANGKAT_DESA"];
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session) {

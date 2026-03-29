@@ -226,7 +226,6 @@ export const GET = async (req: NextRequest) => {
         | undefined,
       createdAtFrom: createdAtRange.from,
       createdAtTo: createdAtRange.to,
-      dibuatOlehId: session.user.id,
       updatedAtFrom: updatedAtRange.from,
       updatedAtTo: updatedAtRange.to,
       tanggalFrom: tanggalRange.from,

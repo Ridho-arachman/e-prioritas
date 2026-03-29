@@ -55,7 +55,7 @@ export const kegiatanRapatSchema = z.object({
     .nativeEnum(StatusRekomendasi, { message: "Status tidak valid" })
     .optional()
     .default(StatusRekomendasi.DRAFT), // ✅ Gunakan enum value, bukan string
-  diprosesOlehId: z.string().cuid().nullable().optional(),
+  diprosesOlehId: z.string().nullable().optional(),
 });
 
 // ═══════════════════════════════════════════════════════════════
