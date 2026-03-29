@@ -1,3 +1,4 @@
+import { config } from "@/config";
 import { auth } from "@/lib/auth";
 import { handleBetterAuthError } from "@/lib/handleBetterAuthError";
 import { handleResponse } from "@/lib/handleResponse";
@@ -45,7 +46,7 @@ export const POST = async (req: NextRequest) => {
         email: parsed.data.email,
         redirectTo:
           `${process.env.NEXT_PUBLIC_APP_URL}/reset-password` ||
-          "http://localhost:3000/reset-password",
+          `${config.appUrl}/reset-password`,
       },
     });
 

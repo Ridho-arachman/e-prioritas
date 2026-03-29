@@ -140,30 +140,40 @@ export default function KegiatanRapatFormEdit() {
     },
   });
 
-  // Set form values and store original data
+  // Set form values and store original data, and check if editable
   useEffect(() => {
     if (kegiatan) {
+      // Jika status sudah DISETUJUI atau DITOLAK, redirect ke detail
+      if (
+        kegiatan.statusRekomendasi !== StatusRekomendasi.DRAFT &&
+        kegiatan.statusRekomendasi !== StatusRekomendasi.DIAJUKAN
+      ) {
+        notifier.error(
+          "Tidak dapat mengedit",
+          "Kegiatan yang sudah disetujui atau ditolak tidak dapat diedit.",
+        );
+        router.push(`/perangkat/jadwal-program/${kegiatan.id}`);
+        return;
+      }
+
       setKegiatanData(kegiatan);
-      // Convert tanggal to datetime-local format (YYYY-MM-DDTHH:mm)
       const tanggalDate = new Date(kegiatan.tanggal);
       const isoDate = tanggalDate.toISOString().slice(0, 16);
-
       form.reset({
         lokasi: kegiatan.lokasi ?? "",
         tanggal: isoDate,
       });
     }
-  }, [kegiatan, form]);
+  }, [kegiatan, form, router]);
 
   const onSubmit = async (data: KegiatanRapatEditForm) => {
     if (!kegiatanData) return;
     try {
-      // Convert datetime-local to ISO string with seconds
       const tanggalISO = new Date(data.tanggal).toISOString();
 
       // Kirim hanya field yang boleh diubah + data asli untuk field lainnya
       const payload = {
-        ...kegiatanData, // spread semua data asli
+        ...kegiatanData,
         lokasi: data.lokasi || null,
         tanggal: tanggalISO,
       };

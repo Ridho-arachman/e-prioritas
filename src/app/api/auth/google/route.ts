@@ -1,3 +1,4 @@
+import { config } from "@/config";
 import { auth } from "@/lib/auth";
 import { handleBetterAuthError } from "@/lib/handleBetterAuthError";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -23,7 +24,7 @@ export const GET = async (req: NextRequest) => {
 
   try {
     const callbackURL = new URL(
-      "/login?google=success",
+      `${config.appUrl}/login?google=success`,
       req.nextUrl.origin,
     ).toString();
     const result = await auth.api.signInSocial({
@@ -31,7 +32,7 @@ export const GET = async (req: NextRequest) => {
       body: {
         provider: "google",
         callbackURL: callbackURL,
-        errorCallbackURL: `${req.nextUrl.origin}/login?error=signup_disabled`,
+        errorCallbackURL: `${config.appUrl}/login?error=signup_disabled`,
       },
     });
 

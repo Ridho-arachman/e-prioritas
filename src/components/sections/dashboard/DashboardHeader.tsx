@@ -18,7 +18,10 @@ export default function DashboardHeader() {
         asChild
         className="gap-2 shadow-sm hover:shadow-md transition-all bg-linear-to-r from-blue-600 to-indigo-600 text-white border-0"
       >
-        <Link href="/admin/laporan">
+        <Link
+          href={`/api/protected/dashboard/lurah/laporan-sistem`}
+          target="_blank"
+        >
           <FileText className="w-4 h-4" />
           Lihat Laporan
         </Link>

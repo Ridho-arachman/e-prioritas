@@ -1,4 +1,4 @@
-// src/app/admin/jadwal-program/add/page.tsx
+// src/app/perangkat/jadwal-program/add/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -235,7 +235,7 @@ export default function TambahKegiatanRapat() {
         "Berhasil",
         res?.message || "Kegiatan berhasil ditambahkan",
       );
-      router.push("/admin/jadwal-program");
+      router.push("/perangkat/jadwal-program");
       router.refresh();
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
@@ -627,45 +627,38 @@ export default function TambahKegiatanRapat() {
                           </p>
                         </div>
                         <Switch
-                          checked={form.enableAI}
-                          onCheckedChange={handleSwitchChange}
-                          className="data-[state=checked]:bg-purple-600"
+                          checked={true} // Always enabled
+                          disabled={true} // Read-only, cannot be toggled
+                          className="data-[state=checked]:bg-purple-600 opacity-70"
                         />
                       </div>
 
-                      {form.enableAI && (
-                        <div className="space-y-2 pt-2 border-t border-purple-100">
-                          <Label className="text-xs text-slate-600 font-medium">
-                            AI Model
-                          </Label>
-                          <Select
-                            value={form.aiModel}
-                            onValueChange={handleAiModelChange}
-                          >
-                            <SelectTrigger className="bg-white border-purple-200 rounded-lg text-slate-700 h-10">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="bg-white border border-purple-200">
-                              <SelectItem
-                                value="gemini-2.5-flash"
-                                className="text-slate-700 focus:bg-purple-50"
-                              >
-                                Gemini 2.5 Flash (Rekomendasi)
-                              </SelectItem>
-                              <SelectItem
-                                value="gemini-2.5-pro"
-                                className="text-slate-700 focus:bg-purple-50"
-                              >
-                                Gemini 2.5 Pro
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <div className="flex items-center gap-1.5 text-xs text-purple-600">
-                            <SparklesIcon className="h-3 w-3" />
-                            <span>Rekomendasi akan digenerate otomatis</span>
-                          </div>
+                      <div className="space-y-2 pt-2 border-t border-purple-100">
+                        <Label className="text-xs text-slate-600 font-medium">
+                          AI Model
+                        </Label>
+                        <Select
+                          value="gemini-2.5-flash"
+                          onValueChange={() => {}} // No-op, disabled
+                          disabled={true}
+                        >
+                          <SelectTrigger className="bg-white border-purple-200 rounded-lg text-slate-700 h-10 opacity-70">
+                            <SelectValue placeholder="Gemini 2.5 Flash (Rekomendasi)" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white border border-purple-200">
+                            <SelectItem
+                              value="gemini-2.5-flash"
+                              className="text-slate-700"
+                            >
+                              Gemini 2.5 Flash (Rekomendasi)
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <div className="flex items-center gap-1.5 text-xs text-purple-600">
+                          <SparklesIcon className="h-3 w-3" />
+                          <span>Rekomendasi akan digenerate otomatis</span>
                         </div>
-                      )}
+                      </div>
                     </CardContent>
                   </Card>
 

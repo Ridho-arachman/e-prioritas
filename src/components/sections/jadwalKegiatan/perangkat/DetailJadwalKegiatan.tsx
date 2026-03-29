@@ -530,23 +530,27 @@ export default function KegiatanRapatDetail() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Button
-                onClick={() =>
-                  router.push(`/perangkat/jadwal-program/${kegiatan.id}/edit`)
-                }
-                className="gap-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl"
-              >
-                <EditIcon className="h-4 w-4" /> Edit Kegiatan
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => setSelectedDeleteId(kegiatan.id)}
-                className="gap-2 bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/30 rounded-xl"
-              >
-                <TrashIcon className="h-4 w-4" /> Hapus
-              </Button>
-            </div>
+            {/* Tombol Edit dan Hapus hanya untuk status DRAFT atau DIAJUKAN */}
+            {(kegiatan.statusRekomendasi === StatusRekomendasi.DRAFT ||
+              kegiatan.statusRekomendasi === StatusRekomendasi.DIAJUKAN) && (
+              <div className="flex items-center gap-3">
+                <Button
+                  onClick={() =>
+                    router.push(`/perangkat/jadwal-program/${kegiatan.id}/edit`)
+                  }
+                  className="gap-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl"
+                >
+                  <EditIcon className="h-4 w-4" /> Edit Kegiatan
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => setSelectedDeleteId(kegiatan.id)}
+                  className="gap-2 bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/30 rounded-xl"
+                >
+                  <TrashIcon className="h-4 w-4" /> Hapus
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Card Detail Kegiatan */}

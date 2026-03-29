@@ -1,4 +1,3 @@
-// src/app/admin/jadwal-program/[id]/page.tsx
 "use client";
 
 import { useRouter, useParams } from "next/navigation";
@@ -36,7 +35,7 @@ import {
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { useState, useEffect } from "react";
-import { useGet, useDelete } from "@/hooks/useApi";
+import { useGet, useDelete, usePatch } from "@/hooks/useApi";
 import { notifier } from "@/lib/ToastNotifier";
 import { AxiosError } from "axios";
 import { Spinner } from "@/components/ui/spinner";
@@ -161,8 +160,8 @@ export interface RekomendasiItem {
   lokasiRw?: string;
   fingerprint: string;
   evidence?: RekomendasiEvidence;
-  usedMasukanIds?: string[]; // ✅ field baru untuk ID masukan terkait
-  usedDataMasterIds?: string[]; // ✅ field baru untuk ID data master terkait
+  usedMasukanIds?: string[];
+  usedDataMasterIds?: string[];
 }
 
 export interface RekomendasiMetadata {
@@ -311,38 +310,28 @@ export default function KegiatanRapatDetail() {
   const [selectedDeleteId, setSelectedDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  // State untuk expand/collapse preview data per prioritas
   const [expandedPriorities, setExpandedPriorities] = useState<
     Record<string, boolean>
   >({});
-
-  const [q, setQ] = useQueryState("q", { defaultValue: "" });
-  const [debouncedQ] = useDebounce(q, 500);
 
   const {
     data: kegiatan,
     error,
     isLoading,
+    mutate,
   } = useGet(`/protected/kegiatan-rapat/${id}`);
 
   const { del: deleteKegiatan } = useDelete();
+  const { patch: patchAjukan } = usePatch(
+    `/protected/kegiatan-rapat/${id}/diajukan`,
+  );
+  const { patch: patchKembaliKeDraft } = usePatch(
+    `/protected/kegiatan-rapat/${id}/kembali-ke-draft`,
+  );
 
   const rekomendasiData = parseRekomendasiItems(kegiatan?.rekomendasiItems);
   const prioritasList = rekomendasiData?.prioritas || [];
-
-  console.log("=== RENDER DETAIL PAGE ===");
-  console.log("kegiatan:", kegiatan);
-  console.log("rekomendasiData:", rekomendasiData);
-  console.log("prioritasList:", prioritasList);
-
-  useEffect(() => {
-    console.log("=== DEBUG DETAIL PAGE ===");
-    console.log("kegiatan.rekomendasiItems:", kegiatan?.rekomendasiItems);
-    console.log("parsed:", parseRekomendasiItems(kegiatan?.rekomendasiItems));
-    console.log("prioritasList length:", prioritasList.length);
-  }, [kegiatan, prioritasList.length]);
 
   const handleDelete = async () => {
     if (!selectedDeleteId) return;
@@ -396,7 +385,37 @@ export default function KegiatanRapatDetail() {
   };
 
   const handleAjukanRekomendasi = async () => {
-    notifier.info("Info", "Fitur ajukan rekomendasi akan segera tersedia");
+    try {
+      const res = await patchAjukan({});
+      notifier.success(
+        "Berhasil",
+        res?.message || "Kegiatan berhasil diajukan ke lurah",
+      );
+      mutate();
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      notifier.error(
+        "Gagal",
+        err?.response?.data?.message || "Gagal mengajukan kegiatan",
+      );
+    }
+  };
+
+  const handleKembaliKeDraft = async () => {
+    try {
+      const res = await patchKembaliKeDraft({});
+      notifier.success(
+        "Berhasil",
+        res?.message || "Kegiatan dikembalikan ke draft",
+      );
+      mutate();
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      notifier.error(
+        "Gagal",
+        err?.response?.data?.message || "Gagal mengembalikan ke draft",
+      );
+    }
   };
 
   const toggleExpand = (fingerprint: string) => {
@@ -511,23 +530,27 @@ export default function KegiatanRapatDetail() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Button
-                onClick={() =>
-                  router.push(`/admin/jadwal-program/${kegiatan.id}/edit`)
-                }
-                className="gap-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl"
-              >
-                <EditIcon className="h-4 w-4" /> Edit Kegiatan
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => setSelectedDeleteId(kegiatan.id)}
-                className="gap-2 bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/30 rounded-xl"
-              >
-                <TrashIcon className="h-4 w-4" /> Hapus
-              </Button>
-            </div>
+            {/* Tombol Edit dan Hapus hanya untuk status DRAFT atau DIAJUKAN */}
+            {(kegiatan.statusRekomendasi === StatusRekomendasi.DRAFT ||
+              kegiatan.statusRekomendasi === StatusRekomendasi.DIAJUKAN) && (
+              <div className="flex items-center gap-3">
+                <Button
+                  onClick={() =>
+                    router.push(`/admin/jadwal-program/${kegiatan.id}/edit`)
+                  }
+                  className="gap-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl"
+                >
+                  <EditIcon className="h-4 w-4" /> Edit Kegiatan
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => setSelectedDeleteId(kegiatan.id)}
+                  className="gap-2 bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/30 rounded-xl"
+                >
+                  <TrashIcon className="h-4 w-4" /> Hapus
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Card Detail Kegiatan */}
@@ -694,363 +717,259 @@ export default function KegiatanRapatDetail() {
                 </div>
               </div>
 
-              {/* Search & Filter Toolbar */}
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="relative group">
-                  <div className="absolute inset-0 bg-linear-to-r from-blue-500/10 to-indigo-500/10 rounded-xl blur opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none" />
-                  <XIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
-                  <Input
-                    placeholder="Cari prioritas..."
-                    className="pl-12 pr-12 py-3 w-72 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-sm relative z-10"
-                    value={q}
-                    onChange={(e) => setQ(e.target.value)}
-                    onKeyDown={(e) => e.key === "Escape" && setQ("")}
-                  />
-                  {q && (
-                    <button
-                      onClick={() => setQ("")}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full p-1 transition-all z-20"
-                      type="button"
-                      aria-label="Clear search"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  )}
-                </div>
-                <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-                  <Button
-                    variant="outline"
-                    className="cursor-pointer border-slate-200"
-                    onClick={() => setIsFilterOpen(true)}
-                  >
-                    <Filter className="mr-2 h-4 w-4" /> Filter
-                  </Button>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>
-                        <div className="flex items-center gap-2">
-                          <SlidersHorizontal className="h-5 w-5" /> Filter
-                          Prioritas
-                        </div>
-                      </DialogTitle>
-                      <DialogDescription>
-                        Filter rekomendasi berdasarkan kritikalitas
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-6 py-4">
-                      <div className="grid gap-2">
-                        <Label>Kritikalitas</Label>
-                        <Select>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Semua" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">Semua</SelectItem>
-                            <SelectItem value="KRITIS">Kritis</SelectItem>
-                            <SelectItem value="TINGGI">Tinggi</SelectItem>
-                            <SelectItem value="SEDANG">Sedang</SelectItem>
-                            <SelectItem value="RENDAH">Rendah</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <div className="flex justify-end">
-                      <Button
-                        onClick={() => setIsFilterOpen(false)}
-                        className="cursor-pointer"
-                      >
-                        Terapkan
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
-
               {/* Prioritas List */}
               <div className="space-y-4">
-                {prioritasList
-                  .filter(
-                    (item) =>
-                      !debouncedQ ||
-                      item.deskripsi
-                        .toLowerCase()
-                        .includes(debouncedQ.toLowerCase()) ||
-                      item.alasanAnalisis
-                        .toLowerCase()
-                        .includes(debouncedQ.toLowerCase()),
-                  )
-                  .map((item, idx) => {
-                    const priorityBadge = getPriorityBadge(idx);
-                    const priorityColor = getPriorityColor(idx);
-                    const totalMasukan = item.evidence?.masukanWargaCount || 0;
-                    const isExpanded =
-                      expandedPriorities[item.fingerprint] || false;
+                {prioritasList.map((item, idx) => {
+                  const priorityBadge = getPriorityBadge(idx);
+                  const priorityColor = getPriorityColor(idx);
+                  const totalMasukan = item.evidence?.masukanWargaCount || 0;
+                  const isExpanded =
+                    expandedPriorities[item.fingerprint] || false;
 
-                    return (
-                      <Card
-                        key={item.fingerprint || idx}
-                        className="group border-0 shadow-lg shadow-slate-200/50 bg-white rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-500 hover:-translate-y-1"
-                      >
-                        <div
-                          className={`h-2 bg-linear-to-r ${priorityColor}`}
-                        />
-                        <CardContent className="p-6 sm:p-8">
-                          <div className="flex flex-col lg:flex-row gap-6">
-                            <div className="shrink-0">
-                              <div className="relative">
-                                <div
-                                  className={`absolute inset-0 bg-linear-to-br ${priorityColor} rounded-2xl blur-lg opacity-20 group-hover:opacity-40 transition-opacity`}
-                                />
-                                <div className="relative w-20 h-20 rounded-2xl bg-linear-to-br from-slate-50 to-white border border-slate-200 flex items-center justify-center shadow-sm">
-                                  <span className="text-4xl font-bold bg-linear-to-br from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                                    {item.prioritasKe}
-                                  </span>
-                                </div>
+                  return (
+                    <Card
+                      key={item.fingerprint || idx}
+                      className="group border-0 shadow-lg shadow-slate-200/50 bg-white rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-500 hover:-translate-y-1"
+                    >
+                      <div className={`h-2 bg-linear-to-r ${priorityColor}`} />
+                      <CardContent className="p-6 sm:p-8">
+                        <div className="flex flex-col lg:flex-row gap-6">
+                          <div className="shrink-0">
+                            <div className="relative">
+                              <div
+                                className={`absolute inset-0 bg-linear-to-br ${priorityColor} rounded-2xl blur-lg opacity-20 group-hover:opacity-40 transition-opacity`}
+                              />
+                              <div className="relative w-20 h-20 rounded-2xl bg-linear-to-br from-slate-50 to-white border border-slate-200 flex items-center justify-center shadow-sm">
+                                <span className="text-4xl font-bold bg-linear-to-br from-slate-800 to-slate-600 bg-clip-text text-transparent">
+                                  {item.prioritasKe}
+                                </span>
                               </div>
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
-                                <div className="space-y-2">
-                                  <div className="flex flex-wrap items-center gap-3">
-                                    <h3 className="text-xl font-bold text-slate-800">
-                                      {item.deskripsi}
-                                    </h3>
-                                  </div>
-                                  <div className="flex flex-wrap items-center gap-2">
-                                    <Badge
-                                      className={`${priorityBadge.color} text-white text-xs font-medium px-3 py-1`}
-                                    >
-                                      {priorityBadge.label}
-                                    </Badge>
-                                    <Badge
-                                      variant="outline"
-                                      className="flex items-center gap-1 bg-amber-50 text-amber-700 border-amber-200 font-medium"
-                                    >
-                                      <StarIcon className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
-                                      Skor: {item.skorPrioritas.toFixed(2)}
-                                    </Badge>
-                                    {item.evidence?.kritikalitas && (
-                                      <Badge
-                                        variant="secondary"
-                                        className="text-xs"
-                                      >
-                                        {item.evidence.kritikalitas}
-                                      </Badge>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="space-y-3 mb-4">
-                                <div className="flex items-start gap-2">
-                                  <CheckCircleIcon className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
-                                  <div>
-                                    <p className="text-sm font-medium text-slate-700">
-                                      Analisis
-                                    </p>
-                                    <p className="text-slate-600">
-                                      {item.alasanAnalisis}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                              {item.evidence && (
-                                <div className="mt-6 pt-6 border-t border-slate-100">
-                                  <div className="flex items-center justify-between mb-4">
-                                    <div className="flex items-center gap-2">
-                                      <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
-                                        <UsersIcon className="h-4 w-4 text-amber-600" />
-                                      </div>
-                                      <h4 className="text-sm font-semibold text-slate-700">
-                                        Evidence Data
-                                      </h4>
-                                    </div>
-                                  </div>
-                                  <div className="grid gap-3 sm:grid-cols-3">
-                                    <div className="bg-slate-50 rounded-lg p-3 text-center">
-                                      <p className="text-2xl font-bold text-slate-800">
-                                        {item.evidence.masukanWargaCount || 0}
-                                      </p>
-                                      <p className="text-xs text-slate-500">
-                                        Masukan Warga
-                                      </p>
-                                    </div>
-                                    <div className="bg-slate-50 rounded-lg p-3 text-center">
-                                      <p className="text-2xl font-bold text-slate-800">
-                                        {item.evidence.dataMasterCount || 0}
-                                      </p>
-                                      <p className="text-xs text-slate-500">
-                                        Data Master
-                                      </p>
-                                    </div>
-                                    <div className="bg-slate-50 rounded-lg p-3 text-center">
-                                      <p className="text-2xl font-bold text-slate-800">
-                                        {item.evidence.kritikalitas || "-"}
-                                      </p>
-                                      <p className="text-xs text-slate-500">
-                                        Kritikalitas
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Tombol Lihat Data Input */}
-                              <div className="mt-4 flex justify-end">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => toggleExpand(item.fingerprint)}
-                                  className="text-xs gap-1"
-                                >
-                                  <Eye className="h-3 w-3" />
-                                  {isExpanded
-                                    ? "Sembunyikan Data"
-                                    : "Lihat Data Input"}
-                                </Button>
-                              </div>
-
-                              {/* Panel Preview Data Input (berdasarkan usedMasukanIds / usedDataMasterIds) */}
-                              {isExpanded && rekomendasiData?.inputData && (
-                                <div className="mt-4 pt-4 border-t border-slate-100">
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {/* Masukan Warga */}
-                                    {item.usedMasukanIds &&
-                                      item.usedMasukanIds.length > 0 && (
-                                        <div>
-                                          <h5 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
-                                            <UsersIcon className="h-4 w-4" />{" "}
-                                            Masukan Warga Terkait
-                                          </h5>
-                                          <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
-                                            {rekomendasiData.inputData.masukan
-                                              .filter((m) =>
-                                                item.usedMasukanIds?.includes(
-                                                  m.id,
-                                                ),
-                                              )
-                                              .map((m, i) => (
-                                                <div
-                                                  key={i}
-                                                  className="text-xs bg-slate-50 p-2 rounded border border-slate-100"
-                                                >
-                                                  <p className="font-medium">
-                                                    {m.judul}
-                                                  </p>
-                                                  <p className="text-slate-600 line-clamp-2">
-                                                    {m.deskripsi}
-                                                  </p>
-                                                  <Badge
-                                                    variant="outline"
-                                                    className="mt-1"
-                                                  >
-                                                    RT {m.lokasiRt}/RW{" "}
-                                                    {m.lokasiRw}
-                                                  </Badge>
-                                                </div>
-                                              ))}
-                                            {item.usedMasukanIds.length >
-                                              rekomendasiData.inputData.masukan
-                                                .length && (
-                                              <p className="text-xs text-slate-400 italic">
-                                                *dan{" "}
-                                                {item.usedMasukanIds.length -
-                                                  rekomendasiData.inputData
-                                                    .masukan.length}{" "}
-                                                data lainnya (tidak ditampilkan)
-                                              </p>
-                                            )}
-                                          </div>
-                                        </div>
-                                      )}
-                                    {/* Data Master */}
-                                    {item.usedDataMasterIds &&
-                                      item.usedDataMasterIds.length > 0 && (
-                                        <div>
-                                          <h5 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
-                                            <TargetIcon className="h-4 w-4" />{" "}
-                                            Data Master Terkait
-                                          </h5>
-                                          <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
-                                            {rekomendasiData.inputData.dataMaster
-                                              .filter((d) =>
-                                                item.usedDataMasterIds?.includes(
-                                                  d.id,
-                                                ),
-                                              )
-                                              .map((d, i) => (
-                                                <div
-                                                  key={i}
-                                                  className="text-xs bg-slate-50 p-2 rounded border border-slate-100"
-                                                >
-                                                  <p className="font-medium">
-                                                    {d.namaAtribut}
-                                                  </p>
-                                                  <div className="flex items-center gap-2 mt-1">
-                                                    <Badge
-                                                      className={`text-xs ${
-                                                        d.kritikalitas ===
-                                                        "KRITIS"
-                                                          ? "bg-red-100 text-red-700"
-                                                          : d.kritikalitas ===
-                                                              "TINGGI"
-                                                            ? "bg-orange-100 text-orange-700"
-                                                            : d.kritikalitas ===
-                                                                "SEDANG"
-                                                              ? "bg-yellow-100 text-yellow-700"
-                                                              : "bg-green-100 text-green-700"
-                                                      }`}
-                                                    >
-                                                      {d.kritikalitas}
-                                                    </Badge>
-                                                    {d.jumlah !== null && (
-                                                      <span>
-                                                        Jml: {d.jumlah}
-                                                      </span>
-                                                    )}
-                                                  </div>
-                                                </div>
-                                              ))}
-                                            {item.usedDataMasterIds.length >
-                                              rekomendasiData.inputData
-                                                .dataMaster.length && (
-                                              <p className="text-xs text-slate-400 italic">
-                                                *dan{" "}
-                                                {item.usedDataMasterIds.length -
-                                                  rekomendasiData.inputData
-                                                    .dataMaster.length}{" "}
-                                                data lainnya (tidak ditampilkan)
-                                              </p>
-                                            )}
-                                          </div>
-                                        </div>
-                                      )}
-                                  </div>
-                                </div>
-                              )}
                             </div>
                           </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-              </div>
+                          <div className="flex-1">
+                            <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+                              <div className="space-y-2">
+                                <div className="flex flex-wrap items-center gap-3">
+                                  <h3 className="text-xl font-bold text-slate-800">
+                                    {item.deskripsi}
+                                  </h3>
+                                </div>
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <Badge
+                                    className={`${priorityBadge.color} text-white text-xs font-medium px-3 py-1`}
+                                  >
+                                    {priorityBadge.label}
+                                  </Badge>
+                                  <Badge
+                                    variant="outline"
+                                    className="flex items-center gap-1 bg-amber-50 text-amber-700 border-amber-200 font-medium"
+                                  >
+                                    <StarIcon className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+                                    Skor: {item.skorPrioritas.toFixed(2)}
+                                  </Badge>
+                                  {item.evidence?.kritikalitas && (
+                                    <Badge
+                                      variant="secondary"
+                                      className="text-xs"
+                                    >
+                                      {item.evidence.kritikalitas}
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="space-y-3 mb-4">
+                              <div className="flex items-start gap-2">
+                                <CheckCircleIcon className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
+                                <div>
+                                  <p className="text-sm font-medium text-slate-700">
+                                    Analisis
+                                  </p>
+                                  <p className="text-slate-600">
+                                    {item.alasanAnalisis}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                            {item.evidence && (
+                              <div className="mt-6 pt-6 border-t border-slate-100">
+                                <div className="flex items-center justify-between mb-4">
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
+                                      <UsersIcon className="h-4 w-4 text-amber-600" />
+                                    </div>
+                                    <h4 className="text-sm font-semibold text-slate-700">
+                                      Evidence Data
+                                    </h4>
+                                  </div>
+                                </div>
+                                <div className="grid gap-3 sm:grid-cols-3">
+                                  <div className="bg-slate-50 rounded-lg p-3 text-center">
+                                    <p className="text-2xl font-bold text-slate-800">
+                                      {item.evidence.masukanWargaCount || 0}
+                                    </p>
+                                    <p className="text-xs text-slate-500">
+                                      Masukan Warga
+                                    </p>
+                                  </div>
+                                  <div className="bg-slate-50 rounded-lg p-3 text-center">
+                                    <p className="text-2xl font-bold text-slate-800">
+                                      {item.evidence.dataMasterCount || 0}
+                                    </p>
+                                    <p className="text-xs text-slate-500">
+                                      Data Master
+                                    </p>
+                                  </div>
+                                  <div className="bg-slate-50 rounded-lg p-3 text-center">
+                                    <p className="text-2xl font-bold text-slate-800">
+                                      {item.evidence.kritikalitas || "-"}
+                                    </p>
+                                    <p className="text-xs text-slate-500">
+                                      Kritikalitas
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
 
-              {debouncedQ &&
-                prioritasList.filter(
-                  (item) =>
-                    item.deskripsi
-                      .toLowerCase()
-                      .includes(debouncedQ.toLowerCase()) ||
-                    item.alasanAnalisis
-                      .toLowerCase()
-                      .includes(debouncedQ.toLowerCase()),
-                ).length === 0 && (
-                  <Card className="border-0 bg-white rounded-2xl p-8 text-center">
-                    <p className="text-slate-500">
-                      Tidak ada prioritas yang cocok dengan "{debouncedQ}"
-                    </p>
-                  </Card>
-                )}
+                            {/* Tombol Lihat Data Input */}
+                            <div className="mt-4 flex justify-end">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => toggleExpand(item.fingerprint)}
+                                className="text-xs gap-1"
+                              >
+                                <Eye className="h-3 w-3" />
+                                {isExpanded
+                                  ? "Sembunyikan Data"
+                                  : "Lihat Data Input"}
+                              </Button>
+                            </div>
+
+                            {/* Panel Preview Data Input */}
+                            {isExpanded && rekomendasiData?.inputData && (
+                              <div className="mt-4 pt-4 border-t border-slate-100">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  {/* Masukan Warga */}
+                                  {item.usedMasukanIds &&
+                                    item.usedMasukanIds.length > 0 && (
+                                      <div>
+                                        <h5 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
+                                          <UsersIcon className="h-4 w-4" />{" "}
+                                          Masukan Warga Terkait
+                                        </h5>
+                                        <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
+                                          {rekomendasiData.inputData.masukan
+                                            .filter((m) =>
+                                              item.usedMasukanIds?.includes(
+                                                m.id,
+                                              ),
+                                            )
+                                            .map((m, i) => (
+                                              <div
+                                                key={i}
+                                                className="text-xs bg-slate-50 p-2 rounded border border-slate-100"
+                                              >
+                                                <p className="font-medium">
+                                                  {m.judul}
+                                                </p>
+                                                <p className="text-slate-600 line-clamp-2">
+                                                  {m.deskripsi}
+                                                </p>
+                                                <Badge
+                                                  variant="outline"
+                                                  className="mt-1"
+                                                >
+                                                  RT {m.lokasiRt}/RW{" "}
+                                                  {m.lokasiRw}
+                                                </Badge>
+                                              </div>
+                                            ))}
+                                          {item.usedMasukanIds.length >
+                                            rekomendasiData.inputData.masukan
+                                              .length && (
+                                            <p className="text-xs text-slate-400 italic">
+                                              *dan{" "}
+                                              {item.usedMasukanIds.length -
+                                                rekomendasiData.inputData
+                                                  .masukan.length}{" "}
+                                              data lainnya (tidak ditampilkan)
+                                            </p>
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+                                  {/* Data Master */}
+                                  {item.usedDataMasterIds &&
+                                    item.usedDataMasterIds.length > 0 && (
+                                      <div>
+                                        <h5 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
+                                          <TargetIcon className="h-4 w-4" />{" "}
+                                          Data Master Terkait
+                                        </h5>
+                                        <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
+                                          {rekomendasiData.inputData.dataMaster
+                                            .filter((d) =>
+                                              item.usedDataMasterIds?.includes(
+                                                d.id,
+                                              ),
+                                            )
+                                            .map((d, i) => (
+                                              <div
+                                                key={i}
+                                                className="text-xs bg-slate-50 p-2 rounded border border-slate-100"
+                                              >
+                                                <p className="font-medium">
+                                                  {d.namaAtribut}
+                                                </p>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                  <Badge
+                                                    className={`text-xs ${
+                                                      d.kritikalitas ===
+                                                      "KRITIS"
+                                                        ? "bg-red-100 text-red-700"
+                                                        : d.kritikalitas ===
+                                                            "TINGGI"
+                                                          ? "bg-orange-100 text-orange-700"
+                                                          : d.kritikalitas ===
+                                                              "SEDANG"
+                                                            ? "bg-yellow-100 text-yellow-700"
+                                                            : "bg-green-100 text-green-700"
+                                                    }`}
+                                                  >
+                                                    {d.kritikalitas}
+                                                  </Badge>
+                                                  {d.jumlah !== null && (
+                                                    <span>Jml: {d.jumlah}</span>
+                                                  )}
+                                                </div>
+                                              </div>
+                                            ))}
+                                          {item.usedDataMasterIds.length >
+                                            rekomendasiData.inputData.dataMaster
+                                              .length && (
+                                            <p className="text-xs text-slate-400 italic">
+                                              *dan{" "}
+                                              {item.usedDataMasterIds.length -
+                                                rekomendasiData.inputData
+                                                  .dataMaster.length}{" "}
+                                              data lainnya (tidak ditampilkan)
+                                            </p>
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
             </div>
           )}
 
@@ -1080,30 +999,44 @@ export default function KegiatanRapatDetail() {
                 </span>
               </div>
               <div className="flex items-center gap-3">
-                <Button
-                  variant="outline"
-                  onClick={handleExportPDF}
-                  disabled={isExporting}
-                  className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl gap-2"
-                >
-                  {isExporting ? (
-                    <>
-                      <Loader2Icon className="h-4 w-4 animate-spin" />
-                      Exporting...
-                    </>
-                  ) : (
-                    <>
-                      <FileDownIcon className="h-4 w-4" />
-                      Export PDF
-                    </>
-                  )}
-                </Button>
-                <Button
-                  onClick={handleAjukanRekomendasi}
-                  className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl"
-                >
-                  Ajukan Rekomendasi
-                </Button>
+                {/* Export PDF hanya muncul jika status DISETUJUI */}
+                {kegiatan.statusRekomendasi === StatusRekomendasi.DISETUJUI && (
+                  <Button
+                    variant="outline"
+                    onClick={handleExportPDF}
+                    disabled={isExporting}
+                    className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl gap-2"
+                  >
+                    {isExporting ? (
+                      <>
+                        <Loader2Icon className="h-4 w-4 animate-spin" />
+                        Exporting...
+                      </>
+                    ) : (
+                      <>
+                        <FileDownIcon className="h-4 w-4" />
+                        Export PDF
+                      </>
+                    )}
+                  </Button>
+                )}
+                {kegiatan.statusRekomendasi === StatusRekomendasi.DRAFT && (
+                  <Button
+                    onClick={handleAjukanRekomendasi}
+                    className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl"
+                  >
+                    Ajukan Rekomendasi
+                  </Button>
+                )}
+                {kegiatan.statusRekomendasi === StatusRekomendasi.DIAJUKAN && (
+                  <Button
+                    onClick={handleKembaliKeDraft}
+                    variant="outline"
+                    className="border-amber-200 text-amber-700 hover:bg-amber-50 rounded-xl"
+                  >
+                    Kembalikan ke Draft
+                  </Button>
+                )}
               </div>
             </div>
           </div>

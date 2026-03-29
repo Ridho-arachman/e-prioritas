@@ -13,7 +13,7 @@ export const POST = async (req: Request) => {
     const { email } = body;
 
     const response = await auth.api.sendVerificationEmail({
-      body: { email, callbackURL: `http://localhost:3000/verify-success` },
+      body: { email, callbackURL: `${config.appUrl}/verify-success` },
     });
 
     return handleResponse({

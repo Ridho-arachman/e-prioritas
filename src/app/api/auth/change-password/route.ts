@@ -1,3 +1,4 @@
+import { Role } from "@/app/generated/prisma";
 import { auth } from "@/lib/auth";
 import { handleBetterAuthError } from "@/lib/handleBetterAuthError";
 import { handleResponse } from "@/lib/handleResponse";
@@ -7,29 +8,25 @@ import { headers } from "next/headers";
 import { NextRequest } from "next/server";
 
 export const PATCH = async (req: NextRequest) => {
-  try {
-    const allowedRoles = ["ADMIN", "OPD"];
+  const allowedRoles: Role[] = ["ADMIN", "PERANGKAT_DESA", "LURAH"];
+  const session = await auth.api.getSession({ headers: await headers() });
 
-    const session = await auth.api.getSession({
-      headers: await headers(),
+  if (!session) {
+    return handleResponse({
+      success: false,
+      message: "User belum login",
+      status: 401,
     });
+  }
 
-    if (!session) {
-      return handleResponse({
-        success: false,
-        message: "User belum login",
-        status: 403,
-      });
-    }
-
-    if (!allowedRoles.includes(session.user.role as string)) {
-      return handleResponse({
-        success: false,
-        message: "Akses ditolak",
-        status: 403,
-      });
-    }
-
+  if (!allowedRoles.includes(session.user.role as Role)) {
+    return handleResponse({
+      success: false,
+      message: "Akses ditolak",
+      status: 403,
+    });
+  }
+  try {
     const body = await req.json();
 
     const parsed = userUpdatePasswordSchema.safeParse(body);

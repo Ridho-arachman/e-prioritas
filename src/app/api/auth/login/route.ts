@@ -46,7 +46,7 @@ export const POST = async (req: NextRequest) => {
       body: {
         email,
         password,
-        callbackURL: `http://localhost:3000/verify-success`,
+        callbackURL: `${config.appUrl}/verify-success`,
         rememberMe,
       },
     });

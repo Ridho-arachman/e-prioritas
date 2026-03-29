@@ -1,4 +1,3 @@
-// src/app/admin/jadwal-program/page.tsx
 "use client";
 
 import {
@@ -515,22 +514,17 @@ export default function ListJadwalKegiatan() {
           {/* Toolbar */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-10">
             <div className="flex flex-wrap items-center gap-3">
-              {/* ✅ Search Input - FIXED */}
+              {/* ✅ Search Input */}
               <div className="relative group">
-                {/* FIX: pointer-events-none agar tidak blokir input */}
                 <div className="absolute inset-0 bg-linear-to-r from-blue-500/10 to-indigo-500/10 rounded-xl blur opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none" />
-
-                {/* FIX: pointer-events-none pada icon dekoratif */}
                 <XIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
-
                 <Input
                   placeholder="Cari nama kegiatan..."
-                  // FIX: Tambah relative z-10 agar input di atas overlay
                   className="pl-12 pr-12 py-3 w-72 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-sm relative z-10"
                   value={q}
                   onChange={(e) => {
                     setQ(e.target.value);
-                    setPage("1"); // Reset ke halaman 1 saat search berubah
+                    setPage("1");
                   }}
                   onKeyDown={(e) => {
                     if (e.key === "Escape") {
@@ -539,8 +533,6 @@ export default function ListJadwalKegiatan() {
                     }
                   }}
                 />
-
-                {/* FIX: Clear Button - Tambah z-20 dan e.stopPropagation() */}
                 {q && (
                   <button
                     onClick={(e) => {
@@ -941,7 +933,7 @@ export default function ListJadwalKegiatan() {
                                     </div>
                                   )}
 
-                                  {/* Action Buttons */}
+                                  {/* Action Buttons - Hanya tampilkan Edit & Hapus jika status DRAFT atau DIAJUKAN */}
                                   <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-slate-100">
                                     <Button
                                       size="sm"
@@ -957,31 +949,38 @@ export default function ListJadwalKegiatan() {
                                       <Eye className="h-4 w-4 mr-1" />
                                       Detail
                                     </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        router.push(
-                                          `/admin/jadwal-program/${k.id}/edit`,
-                                        );
-                                      }}
-                                      className="cursor-pointer"
-                                    >
-                                      <Edit className="h-4 w-4 mr-1" />
-                                      Edit
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="destructive"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setSelectedDeleteId(k.id);
-                                      }}
-                                      className="cursor-pointer"
-                                    >
-                                      <Trash className="h-4 w-4" />
-                                    </Button>
+                                    {(k.statusRekomendasi ===
+                                      StatusRekomendasi.DRAFT ||
+                                      k.statusRekomendasi ===
+                                        StatusRekomendasi.DIAJUKAN) && (
+                                      <>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            router.push(
+                                              `/admin/jadwal-program/${k.id}/edit`,
+                                            );
+                                          }}
+                                          className="cursor-pointer"
+                                        >
+                                          <Edit className="h-4 w-4 mr-1" />
+                                          Edit
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="destructive"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSelectedDeleteId(k.id);
+                                          }}
+                                          className="cursor-pointer"
+                                        >
+                                          <Trash className="h-4 w-4" />
+                                        </Button>
+                                      </>
+                                    )}
                                   </div>
                                 </div>
                               </div>

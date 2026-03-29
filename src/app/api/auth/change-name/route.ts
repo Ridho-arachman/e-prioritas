@@ -9,8 +9,27 @@ import {
 } from "@/lib/cloudinaryCrudHelper";
 import { headers } from "next/headers";
 import { NextRequest } from "next/server";
+import { Role } from "@/app/generated/prisma";
 
 export const PATCH = async (req: NextRequest) => {
+  const allowedRoles: Role[] = ["ADMIN", "PERANGKAT_DESA", "LURAH"];
+  const session = await auth.api.getSession({ headers: await headers() });
+
+  if (!session) {
+    return handleResponse({
+      success: false,
+      message: "User belum login",
+      status: 401,
+    });
+  }
+
+  if (!allowedRoles.includes(session.user.role as Role)) {
+    return handleResponse({
+      success: false,
+      message: "Akses ditolak",
+      status: 403,
+    });
+  }
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
