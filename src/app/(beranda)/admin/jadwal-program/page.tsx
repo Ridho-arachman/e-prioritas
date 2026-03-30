@@ -1,6 +1,8 @@
 import ListJadwalKegiatan from "@/components/sections/jadwalKegiatan/ListJadwalKegiatan";
+import { connection } from "next/server";
 
-const page = () => {
+const page = async () => {
+  await connection();
   return (
     <>
       <ListJadwalKegiatan />

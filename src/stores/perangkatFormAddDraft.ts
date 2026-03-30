@@ -1,5 +1,8 @@
+// stores/perangkatFormAddDraft.ts
+"use client";
+
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 interface PerangkatDraft {
   name: string;
@@ -17,6 +20,7 @@ interface PerangkatDraftStore {
   isHydrated: boolean;
   updateDraft: (data: Partial<PerangkatDraft>) => void;
   clearDraft: () => void;
+  setHydrated: () => void;
 }
 
 export const usePerangkatDraftStore = create<PerangkatDraftStore>()(
@@ -24,6 +28,7 @@ export const usePerangkatDraftStore = create<PerangkatDraftStore>()(
     (set) => ({
       data: null,
       isHydrated: false,
+
       updateDraft: (partialData) =>
         set((state) => ({
           data: state.data
@@ -36,31 +41,42 @@ export const usePerangkatDraftStore = create<PerangkatDraftStore>()(
                 isActive: true,
                 ...partialData,
               },
-          isHydrated: true, // ✅ Set hydrated saat update
+          isHydrated: true,
         })),
+
       clearDraft: () => set({ data: null, isHydrated: true }),
+
+      setHydrated: () => set({ isHydrated: true }),
     }),
     {
       name: "perangkat-draft-storage",
-      // ✅ onRehydrateStorage untuk set flag setelah load
+
+      // ✅ onRehydrateStorage: set hydrated setelah rehydration selesai
       onRehydrateStorage: () => (state, error) => {
         if (error) {
           console.error("Rehydrate error:", error);
+          return;
+        }
+        if (state) {
+          state.setHydrated();
         }
       },
-      // ✅ Custom storage untuk handle hydration flag
-      storage: {
-        getItem: async (name) => {
-          const str = localStorage.getItem(name);
-          return str ? JSON.parse(str) : null;
-        },
-        setItem: async (name, value) => {
-          localStorage.setItem(name, JSON.stringify(value));
-        },
-        removeItem: async (name) => {
-          localStorage.removeItem(name);
-        },
-      },
+
+      // ✅ FIX UTAMA: Gunakan createJSONStorage dengan guard typeof window
+      storage: createJSONStorage(() => {
+        if (typeof window === "undefined") {
+          return {
+            getItem: () => null,
+            setItem: () => {},
+            removeItem: () => {},
+          };
+        }
+        return localStorage;
+      }),
+
+      partialize: (state) => ({
+        data: state.data,
+      }),
     },
   ),
 );

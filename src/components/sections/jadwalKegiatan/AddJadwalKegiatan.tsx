@@ -1,4 +1,4 @@
-// src/app/perangkat/jadwal-program/add/page.tsx
+// src/app/admin/jadwal-program/add/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -235,7 +235,7 @@ export default function TambahKegiatanRapat() {
         "Berhasil",
         res?.message || "Kegiatan berhasil ditambahkan",
       );
-      router.push("/perangkat/jadwal-program");
+      router.push("/admin/jadwal-program");
       router.refresh();
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;

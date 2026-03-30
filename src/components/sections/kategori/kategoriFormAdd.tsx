@@ -188,7 +188,7 @@ export function KategoriFormAdd() {
       {hasDraft && isHydrated && (
         <div className="mb-6 p-4 bg-blue-50/80 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg backdrop-blur-sm">
           <div className="flex items-center gap-3">
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
             </div>
             <p className="text-sm text-blue-700 dark:text-blue-300 font-medium flex items-center gap-2">

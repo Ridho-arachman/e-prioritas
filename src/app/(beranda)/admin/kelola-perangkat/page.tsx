@@ -1,8 +1,10 @@
 import { Card } from "@/components/ui/card";
 import ListTablePerangkat from "@/components/sections/perangkat/listTablePerangkat";
 import ListPerangkatMobile from "@/components/sections/perangkat/listPerangkatMobile";
+import { connection } from "next/server";
 
-export default function PerangkatListPage() {
+export default async function PerangkatListPage() {
+  await connection();
   return (
     <div className="container mx-auto px-4 py-6 md:py-8 max-w-7xl">
       {/* Header dengan ikon dan gradien */}

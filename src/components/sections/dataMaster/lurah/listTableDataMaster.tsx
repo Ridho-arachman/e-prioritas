@@ -504,7 +504,7 @@ export default function ListTableDataMaster() {
                 data.map((item, index) => (
                   <TableRow
                     key={item.id}
-                    className=" hover:bg-muted/50 transition-colors"
+                    className="hover:bg-muted/50 transition-colors"
                   >
                     <TableCell className={cellCenter}>
                       {(pageNumber - 1) * limitNumber + index + 1}

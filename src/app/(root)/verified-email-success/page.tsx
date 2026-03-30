@@ -4,8 +4,10 @@ import { CheckCircle2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { connection } from "next/server";
 
-export default function VerifiedEmailSuccess() {
+export default async function VerifiedEmailSuccess() {
+  await connection();
   const searchParams = useSearchParams();
   const success = searchParams.get("success");
 

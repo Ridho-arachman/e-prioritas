@@ -47,8 +47,6 @@ export async function masukanWargaFactory(
         domainIsuId,
         status,
         diverifikasiOlehId: shouldSetVerifier ? diverifikasiOlehId : undefined,
-        isRelevant: true,
-        isLocked: false,
       });
     }
   }
