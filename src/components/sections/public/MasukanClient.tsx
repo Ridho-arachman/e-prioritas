@@ -13,16 +13,174 @@ import {
   MapPinned,
   ArrowRight,
   Sparkles,
+  Search,
+  MapPin,
+  FileText,
+  User,
+  Loader2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import MasukanWargaFormAdd from "@/components/sections/masukan/masukanFormAdd";
 import { motion } from "framer-motion";
 import { useGet } from "@/hooks/useApi";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+
+// Mapping status masukan
+const statusConfig: Record<string, { color: string; label: string }> = {
+  MENUNGGU: {
+    color: "bg-yellow-100 text-yellow-800 border-yellow-200",
+    label: "Menunggu Verifikasi",
+  },
+  DIVERIFIKASI: {
+    color: "bg-green-100 text-green-800 border-green-200",
+    label: "Terverifikasi",
+  },
+  DITOLAK: {
+    color: "bg-red-100 text-red-800 border-red-200",
+    label: "Ditolak",
+  },
+  DIPROSES: {
+    color: "bg-blue-100 text-blue-800 border-blue-200",
+    label: "Sedang Diproses",
+  },
+  DISELESAIKAN: {
+    color: "bg-purple-100 text-purple-800 border-purple-200",
+    label: "Selesai",
+  },
+};
+
+// Mapping status rekomendasi
+const statusRekomendasiConfig: Record<
+  string,
+  { color: string; label: string }
+> = {
+  DRAFT: {
+    color: "bg-gray-100 text-gray-800 border-gray-200",
+    label: "Draft",
+  },
+  DIAJUKAN: {
+    color: "bg-blue-100 text-blue-800 border-blue-200",
+    label: "Diajukan",
+  },
+  DISETUJUI: {
+    color: "bg-green-100 text-green-800 border-green-200",
+    label: "Disetujui",
+  },
+  DITOLAK: {
+    color: "bg-red-100 text-red-800 border-red-200",
+    label: "Ditolak",
+  },
+};
+
+// Helper untuk parse rekomendasiItems
+const parseRekomendasiItems = (items: any): { prioritas: any[] } | null => {
+  try {
+    if (!items || typeof items !== "object") return null;
+    // Format snapshot dengan properti prioritas (array)
+    if (items.prioritas && Array.isArray(items.prioritas)) {
+      return { prioritas: items.prioritas };
+    }
+    // Jika langsung array (format lama)
+    if (Array.isArray(items)) {
+      return { prioritas: items };
+    }
+    return null;
+  } catch (e) {
+    console.error("Failed to parse rekomendasiItems:", e, items);
+    return null;
+  }
+};
 
 export default function MasukanClient() {
-  const { data: agendaData, isLoading } = useGet("/public/agenda");
+  const { data: agendaData, isLoading: agendaLoading } =
+    useGet("/public/agenda");
   const agendas = agendaData ?? [];
+
+  // State untuk dialog cek status
+  const [open, setOpen] = useState(false);
+  const [trackingId, setTrackingId] = useState("");
+  const [statusData, setStatusData] = useState<any>(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // State untuk dialog detail agenda
+  const [selectedAgenda, setSelectedAgenda] = useState<any>(null);
+  const [agendaDetailOpen, setAgendaDetailOpen] = useState(false);
+  const [agendaDetailLoading, setAgendaDetailLoading] = useState(false);
+  const [agendaDetailError, setAgendaDetailError] = useState("");
+
+  const handleCekStatus = async () => {
+    if (!trackingId.trim()) {
+      setError("Masukkan kode tracking");
+      setStatusData(null);
+      return;
+    }
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`/api/public/cek-status/${trackingId}`);
+      const result = await res.json();
+      if (res.ok) {
+        setStatusData(result.data);
+        setError("");
+      } else {
+        setStatusData(null);
+        setError(result.message || "Kode tracking tidak ditemukan.");
+      }
+    } catch (err) {
+      console.error(err);
+      setStatusData(null);
+      setError("Gagal menghubungi server. Coba lagi nanti.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClear = () => {
+    setTrackingId("");
+    setStatusData(null);
+    setError("");
+  };
+
+  const handleAgendaClick = async (agenda: any) => {
+    setAgendaDetailOpen(true);
+    setAgendaDetailLoading(true);
+    setAgendaDetailError("");
+    try {
+      const res = await fetch(`/api/public/agenda/${agenda.id}`);
+      const result = await res.json();
+      if (res.ok) {
+        setSelectedAgenda(result.data);
+      } else {
+        setAgendaDetailError(result.message || "Gagal mengambil detail agenda");
+        setSelectedAgenda(null);
+      }
+    } catch (err) {
+      console.error(err);
+      setAgendaDetailError("Gagal menghubungi server");
+      setSelectedAgenda(null);
+    } finally {
+      setAgendaDetailLoading(false);
+    }
+  };
+
+  // Parsing rekomendasi dari selectedAgenda
+  const rekomendasiData = selectedAgenda
+    ? parseRekomendasiItems(selectedAgenda.rekomendasiItems)
+    : null;
+  const prioritasList = rekomendasiData?.prioritas || [];
 
   return (
     <div className="relative min-h-screen bg-linear-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 overflow-hidden">
@@ -69,9 +227,9 @@ export default function MasukanClient() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="w-full md:w-1/3 space-y-6"
         >
-          {/* Card Informasi Desa (tetap hardcode karena statis) */}
-          <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl overflow-hidden group">
-            <div className="absolute inset-0 bg-linear-to-r from-green-600 to-emerald-600 opacity-0 group-hover:opacity-10 transition-opacity" />
+          {/* Card Informasi Desa */}
+          <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl overflow-hidden group relative">
+            <div className="absolute inset-0 bg-linear-to-r from-green-600 to-emerald-600 opacity-0 group-hover:opacity-10 transition-opacity pointer-events-none" />
             <CardHeader className="flex items-center gap-3 pb-2">
               <div className="p-2 rounded-xl bg-linear-to-r from-green-600 to-emerald-600 text-white shadow-lg">
                 <Building2 className="w-5 h-5" />
@@ -115,9 +273,122 @@ export default function MasukanClient() {
             </CardContent>
           </Card>
 
-          {/* Card Agenda Desa (dinamis dari API) */}
-          <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl overflow-hidden group">
-            <div className="absolute inset-0 bg-linear-to-r from-purple-600 to-pink-600 opacity-0 group-hover:opacity-10 transition-opacity" />
+          {/* Card Cek Status Masukan */}
+          <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl overflow-hidden group relative">
+            <div className="absolute inset-0 bg-linear-to-r from-blue-600 to-cyan-600 opacity-0 group-hover:opacity-10 transition-opacity pointer-events-none" />
+            <CardHeader className="flex items-center gap-3 pb-2">
+              <div className="p-2 rounded-xl bg-linear-to-r from-blue-600 to-cyan-600 text-white shadow-lg">
+                <Search className="w-5 h-5" />
+              </div>
+              <CardTitle className="text-xl font-semibold">
+                Cek Status Masukan
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button
+                variant="outline"
+                className="w-full gap-2 relative z-20"
+                onClick={() => setOpen(true)}
+              >
+                <Search className="h-4 w-4" /> Cek Status
+              </Button>
+              <Dialog open={open} onOpenChange={setOpen}>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Cek Status Masukan</DialogTitle>
+                    <DialogDescription>
+                      Masukkan kode tracking yang Anda terima saat mengirim
+                      masukan.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="trackingId">Kode Tracking</Label>
+                      <Input
+                        id="trackingId"
+                        placeholder="Contoh: clx... (kode unik)"
+                        value={trackingId}
+                        onChange={(e) => setTrackingId(e.target.value)}
+                      />
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <Button
+                        onClick={handleCekStatus}
+                        disabled={loading}
+                        className="flex-1"
+                      >
+                        {loading ? "Memeriksa..." : "Cek Status"}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={handleClear}
+                        disabled={loading}
+                        className="flex-1"
+                      >
+                        Clear
+                      </Button>
+                    </div>
+                    {error && (
+                      <p className="text-sm text-red-500 text-center">
+                        {error}
+                      </p>
+                    )}
+                    {statusData && (
+                      <div className="mt-4 p-4 rounded-lg border bg-muted/30 space-y-3">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-semibold">{statusData.judul}</p>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {statusData.deskripsi}
+                            </p>
+                            {statusData.namaPengirim && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Pengirim: {statusData.namaPengirim}
+                              </p>
+                            )}
+                          </div>
+                          <Badge
+                            className={cn(
+                              "text-xs",
+                              statusConfig[statusData.status]?.color,
+                            )}
+                          >
+                            {statusConfig[statusData.status]?.label}
+                          </Badge>
+                        </div>
+
+                        {statusData.status === "DITOLAK" &&
+                          statusData.alasanPenolakan && (
+                            <p className="text-sm text-red-600 dark:text-red-400 mt-2">
+                              <span className="font-semibold">
+                                Alasan Penolakan:
+                              </span>{" "}
+                              {statusData.alasanPenolakan}
+                            </p>
+                          )}
+
+                        <p className="text-xs text-muted-foreground">
+                          Tanggal Kirim:{" "}
+                          {new Date(statusData.createdAt).toLocaleDateString(
+                            "id-ID",
+                          )}
+                        </p>
+                        {statusData.domainIsu?.nama && (
+                          <p className="text-xs text-muted-foreground">
+                            Kategori: {statusData.domainIsu.nama}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </CardContent>
+          </Card>
+
+          {/* Card Agenda Desa */}
+          <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl overflow-hidden group relative">
+            <div className="absolute inset-0 bg-linear-to-r from-purple-600 to-pink-600 opacity-0 group-hover:opacity-10 transition-opacity pointer-events-none" />
             <CardHeader className="flex items-center gap-3 pb-2">
               <div className="p-2 rounded-xl bg-linear-to-r from-purple-600 to-pink-600 text-white shadow-lg">
                 <CalendarDays className="w-5 h-5" />
@@ -127,7 +398,7 @@ export default function MasukanClient() {
               </CardTitle>
             </CardHeader>
             <CardContent className="text-sm space-y-3">
-              {isLoading ? (
+              {agendaLoading ? (
                 <div className="space-y-2">
                   <Skeleton className="h-10 w-full" />
                   <Skeleton className="h-10 w-full" />
@@ -135,31 +406,27 @@ export default function MasukanClient() {
                 </div>
               ) : agendas.length > 0 ? (
                 <ul className="space-y-2">
-                  {agendas.map(
-                    (
-                      agenda: { nama: string; tanggal: string },
-                      idx: number,
-                    ) => (
-                      <motion.li
-                        key={idx}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: idx * 0.1 }}
-                        className="flex items-center justify-between p-3 rounded-xl bg-linear-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 hover:shadow-md transition-all group/item"
+                  {agendas.map((agenda: any, idx: number) => (
+                    <motion.li
+                      key={idx}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      className="flex items-center justify-between p-3 rounded-xl bg-linear-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 hover:shadow-md transition-all group/item cursor-pointer"
+                      onClick={() => handleAgendaClick(agenda)}
+                    >
+                      <span className="flex items-center gap-2">
+                        <ArrowRight className="w-4 h-4 text-purple-600 dark:text-purple-400 transition-transform group-hover/item:translate-x-1" />
+                        <span className="font-medium">{agenda.nama}</span>
+                      </span>
+                      <Badge
+                        variant="outline"
+                        className="text-xs bg-white/50 dark:bg-gray-900/50 border-purple-200 dark:border-purple-800"
                       >
-                        <span className="flex items-center gap-2">
-                          <ArrowRight className="w-4 h-4 text-purple-600 dark:text-purple-400 transition-transform group-hover/item:translate-x-1" />
-                          <span className="font-medium">{agenda.nama}</span>
-                        </span>
-                        <Badge
-                          variant="outline"
-                          className="text-xs bg-white/50 dark:bg-gray-900/50 border-purple-200 dark:border-purple-800"
-                        >
-                          {agenda.tanggal}
-                        </Badge>
-                      </motion.li>
-                    ),
-                  )}
+                        {agenda.tanggal}
+                      </Badge>
+                    </motion.li>
+                  ))}
                 </ul>
               ) : (
                 <p className="text-gray-500 dark:text-gray-400 text-center py-4">
@@ -176,6 +443,215 @@ export default function MasukanClient() {
           </Card>
         </motion.aside>
       </div>
+
+      {/* Dialog Detail Agenda */}
+      <Dialog open={agendaDetailOpen} onOpenChange={setAgendaDetailOpen}>
+        <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl flex items-center gap-2">
+              <CalendarDays className="w-5 h-5 text-purple-600" />
+              Detail Agenda
+            </DialogTitle>
+            <DialogDescription>
+              Informasi lengkap kegiatan dan rekomendasi.
+            </DialogDescription>
+          </DialogHeader>
+
+          {agendaDetailLoading ? (
+            <div className="flex justify-center items-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+            </div>
+          ) : agendaDetailError ? (
+            <div className="text-center text-red-500 py-4">
+              {agendaDetailError}
+            </div>
+          ) : selectedAgenda ? (
+            <div className="space-y-6 py-2">
+              {/* Judul */}
+              <div>
+                <h3 className="text-lg font-semibold">
+                  {selectedAgenda.judul}
+                </h3>
+                {selectedAgenda.judulLaporan && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Laporan: {selectedAgenda.judulLaporan}
+                  </p>
+                )}
+              </div>
+
+              {/* Info Dasar */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex items-start gap-3">
+                  <CalendarDays className="w-5 h-5 text-gray-500 mt-0.5" />
+                  <div>
+                    <p className="font-medium">Tanggal</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedAgenda.tanggal}
+                    </p>
+                  </div>
+                </div>
+                {selectedAgenda.lokasi && (
+                  <div className="flex items-start gap-3">
+                    <MapPin className="w-5 h-5 text-gray-500 mt-0.5" />
+                    <div>
+                      <p className="font-medium">Lokasi</p>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedAgenda.lokasi}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {selectedAgenda.domainIsu && (
+                  <div className="flex items-start gap-3">
+                    <FileText className="w-5 h-5 text-gray-500 mt-0.5" />
+                    <div>
+                      <p className="font-medium">Domain Isu</p>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedAgenda.domainIsu.nama}
+                      </p>
+                      {selectedAgenda.domainIsu.deskripsi && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {selectedAgenda.domainIsu.deskripsi}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+                {selectedAgenda.dibuatOleh && (
+                  <div className="flex items-start gap-3">
+                    <User className="w-5 h-5 text-gray-500 mt-0.5" />
+                    <div>
+                      <p className="font-medium">Dibuat Oleh</p>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedAgenda.dibuatOleh}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                <div className="flex items-start gap-3">
+                  <Badge
+                    className={cn(
+                      "text-xs",
+                      statusRekomendasiConfig[selectedAgenda.statusRekomendasi]
+                        ?.color,
+                    )}
+                  >
+                    {
+                      statusRekomendasiConfig[selectedAgenda.statusRekomendasi]
+                        ?.label
+                    }
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Deskripsi */}
+              {selectedAgenda.deskripsi && (
+                <div className="flex items-start gap-3">
+                  <FileText className="w-5 h-5 text-gray-500 mt-0.5" />
+                  <div>
+                    <p className="font-medium">Deskripsi Kegiatan</p>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                      {selectedAgenda.deskripsi}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Rekomendasi Items */}
+              {prioritasList.length > 0 && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-yellow-500" />
+                    <h4 className="font-semibold">Rekomendasi Prioritas</h4>
+                  </div>
+                  <div className="space-y-3">
+                    {prioritasList.map((item: any, idx: number) => (
+                      <div
+                        key={item.fingerprint || idx}
+                        className="p-3 rounded-lg border bg-muted/20"
+                      >
+                        <p className="font-medium">
+                          {item.prioritasKe
+                            ? `Prioritas ${item.prioritasKe}`
+                            : `Rekomendasi ${idx + 1}`}
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {item.deskripsi}
+                        </p>
+                        {item.alasanAnalisis && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Analisis: {item.alasanAnalisis}
+                          </p>
+                        )}
+                        {item.skorPrioritas && (
+                          <Badge variant="outline" className="mt-2 text-xs">
+                            Skor: {item.skorPrioritas.toFixed(2)}
+                          </Badge>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Masukan Terkait */}
+              {selectedAgenda.masukan && selectedAgenda.masukan.length > 0 && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <MessageSquare className="w-5 h-5 text-blue-500" />
+                    <h4 className="font-semibold">Masukan Warga Terkait</h4>
+                  </div>
+                  <div className="space-y-2">
+                    {selectedAgenda.masukan.map((m: any, idx: number) => (
+                      <div
+                        key={idx}
+                        className="p-2 rounded-lg border bg-muted/10"
+                      >
+                        <p className="font-medium text-sm">{m.judul}</p>
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                          {m.deskripsi}
+                        </p>
+                        {m.namaPengirim && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Pengirim: {m.namaPengirim}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Data Master Terkait */}
+              {selectedAgenda.dataMaster &&
+                selectedAgenda.dataMaster.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Building2 className="w-5 h-5 text-green-500" />
+                      <h4 className="font-semibold">Data Master Terkait</h4>
+                    </div>
+                    <div className="space-y-2">
+                      {selectedAgenda.dataMaster.map((dm: any, idx: number) => (
+                        <div
+                          key={idx}
+                          className="p-2 rounded-lg border bg-muted/10"
+                        >
+                          <p className="font-medium text-sm">
+                            {dm.namaAtribut}
+                          </p>
+                          <div className="flex gap-2 text-xs text-muted-foreground mt-1">
+                            <span>Kritikalitas: {dm.kritikalitas}</span>
+                            {dm.jumlah && <span>Jumlah: {dm.jumlah}</span>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

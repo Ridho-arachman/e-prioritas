@@ -24,6 +24,7 @@ export async function GET() {
 
     // Format tanggal ke format Indonesia
     const formattedAgendas = agendas.map((a) => ({
+      id: a.id,
       nama: a.judul,
       tanggal: a.tanggal.toLocaleDateString("id-ID", {
         day: "numeric",
