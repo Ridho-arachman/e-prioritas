@@ -29,6 +29,11 @@ export type User = $Result.DefaultSelection<Prisma.$UserPayload>
  */
 export type MasukanWarga = $Result.DefaultSelection<Prisma.$MasukanWargaPayload>
 /**
+ * Model GambarMasukan
+ * 
+ */
+export type GambarMasukan = $Result.DefaultSelection<Prisma.$GambarMasukanPayload>
+/**
  * Model DataMaster
  * 
  */
@@ -288,6 +293,16 @@ export class PrismaClient<
     * ```
     */
   get masukanWarga(): Prisma.MasukanWargaDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.gambarMasukan`: Exposes CRUD operations for the **GambarMasukan** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more GambarMasukans
+    * const gambarMasukans = await prisma.gambarMasukan.findMany()
+    * ```
+    */
+  get gambarMasukan(): Prisma.GambarMasukanDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.dataMaster`: Exposes CRUD operations for the **DataMaster** model.
@@ -805,6 +820,7 @@ export namespace Prisma {
     DomainIsu: 'DomainIsu',
     User: 'User',
     MasukanWarga: 'MasukanWarga',
+    GambarMasukan: 'GambarMasukan',
     DataMaster: 'DataMaster',
     KegiatanRapat: 'KegiatanRapat',
     KegiatanRapatMasukan: 'KegiatanRapatMasukan',
@@ -828,7 +844,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "domainIsu" | "user" | "masukanWarga" | "dataMaster" | "kegiatanRapat" | "kegiatanRapatMasukan" | "kegiatanRapatDataMaster" | "session" | "account" | "verification" | "rateLimit"
+      modelProps: "domainIsu" | "user" | "masukanWarga" | "gambarMasukan" | "dataMaster" | "kegiatanRapat" | "kegiatanRapatMasukan" | "kegiatanRapatDataMaster" | "session" | "account" | "verification" | "rateLimit"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1051,6 +1067,80 @@ export namespace Prisma {
           count: {
             args: Prisma.MasukanWargaCountArgs<ExtArgs>
             result: $Utils.Optional<MasukanWargaCountAggregateOutputType> | number
+          }
+        }
+      }
+      GambarMasukan: {
+        payload: Prisma.$GambarMasukanPayload<ExtArgs>
+        fields: Prisma.GambarMasukanFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.GambarMasukanFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GambarMasukanPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.GambarMasukanFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GambarMasukanPayload>
+          }
+          findFirst: {
+            args: Prisma.GambarMasukanFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GambarMasukanPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.GambarMasukanFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GambarMasukanPayload>
+          }
+          findMany: {
+            args: Prisma.GambarMasukanFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GambarMasukanPayload>[]
+          }
+          create: {
+            args: Prisma.GambarMasukanCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GambarMasukanPayload>
+          }
+          createMany: {
+            args: Prisma.GambarMasukanCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.GambarMasukanCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GambarMasukanPayload>[]
+          }
+          delete: {
+            args: Prisma.GambarMasukanDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GambarMasukanPayload>
+          }
+          update: {
+            args: Prisma.GambarMasukanUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GambarMasukanPayload>
+          }
+          deleteMany: {
+            args: Prisma.GambarMasukanDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.GambarMasukanUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.GambarMasukanUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GambarMasukanPayload>[]
+          }
+          upsert: {
+            args: Prisma.GambarMasukanUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GambarMasukanPayload>
+          }
+          aggregate: {
+            args: Prisma.GambarMasukanAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateGambarMasukan>
+          }
+          groupBy: {
+            args: Prisma.GambarMasukanGroupByArgs<ExtArgs>
+            result: $Utils.Optional<GambarMasukanGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.GambarMasukanCountArgs<ExtArgs>
+            result: $Utils.Optional<GambarMasukanCountAggregateOutputType> | number
           }
         }
       }
@@ -1757,6 +1847,7 @@ export namespace Prisma {
     domainIsu?: DomainIsuOmit
     user?: UserOmit
     masukanWarga?: MasukanWargaOmit
+    gambarMasukan?: GambarMasukanOmit
     dataMaster?: DataMasterOmit
     kegiatanRapat?: KegiatanRapatOmit
     kegiatanRapatMasukan?: KegiatanRapatMasukanOmit
@@ -1971,10 +2062,12 @@ export namespace Prisma {
 
   export type MasukanWargaCountOutputType = {
     relasiRapat: number
+    gambarMasukan: number
   }
 
   export type MasukanWargaCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     relasiRapat?: boolean | MasukanWargaCountOutputTypeCountRelasiRapatArgs
+    gambarMasukan?: boolean | MasukanWargaCountOutputTypeCountGambarMasukanArgs
   }
 
   // Custom InputTypes
@@ -1993,6 +2086,13 @@ export namespace Prisma {
    */
   export type MasukanWargaCountOutputTypeCountRelasiRapatArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: KegiatanRapatMasukanWhereInput
+  }
+
+  /**
+   * MasukanWargaCountOutputType without action
+   */
+  export type MasukanWargaCountOutputTypeCountGambarMasukanArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: GambarMasukanWhereInput
   }
 
 
@@ -4716,6 +4816,7 @@ export namespace Prisma {
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
     diverifikasiOleh?: boolean | MasukanWarga$diverifikasiOlehArgs<ExtArgs>
     relasiRapat?: boolean | MasukanWarga$relasiRapatArgs<ExtArgs>
+    gambarMasukan?: boolean | MasukanWarga$gambarMasukanArgs<ExtArgs>
     _count?: boolean | MasukanWargaCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["masukanWarga"]>
 
@@ -4776,6 +4877,7 @@ export namespace Prisma {
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
     diverifikasiOleh?: boolean | MasukanWarga$diverifikasiOlehArgs<ExtArgs>
     relasiRapat?: boolean | MasukanWarga$relasiRapatArgs<ExtArgs>
+    gambarMasukan?: boolean | MasukanWarga$gambarMasukanArgs<ExtArgs>
     _count?: boolean | MasukanWargaCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type MasukanWargaIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4793,6 +4895,7 @@ export namespace Prisma {
       domainIsu: Prisma.$DomainIsuPayload<ExtArgs>
       diverifikasiOleh: Prisma.$UserPayload<ExtArgs> | null
       relasiRapat: Prisma.$KegiatanRapatMasukanPayload<ExtArgs>[]
+      gambarMasukan: Prisma.$GambarMasukanPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -5205,6 +5308,7 @@ export namespace Prisma {
     domainIsu<T extends DomainIsuDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DomainIsuDefaultArgs<ExtArgs>>): Prisma__DomainIsuClient<$Result.GetResult<Prisma.$DomainIsuPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     diverifikasiOleh<T extends MasukanWarga$diverifikasiOlehArgs<ExtArgs> = {}>(args?: Subset<T, MasukanWarga$diverifikasiOlehArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     relasiRapat<T extends MasukanWarga$relasiRapatArgs<ExtArgs> = {}>(args?: Subset<T, MasukanWarga$relasiRapatArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatMasukanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    gambarMasukan<T extends MasukanWarga$gambarMasukanArgs<ExtArgs> = {}>(args?: Subset<T, MasukanWarga$gambarMasukanArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GambarMasukanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5686,6 +5790,30 @@ export namespace Prisma {
   }
 
   /**
+   * MasukanWarga.gambarMasukan
+   */
+  export type MasukanWarga$gambarMasukanArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GambarMasukan
+     */
+    select?: GambarMasukanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GambarMasukan
+     */
+    omit?: GambarMasukanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GambarMasukanInclude<ExtArgs> | null
+    where?: GambarMasukanWhereInput
+    orderBy?: GambarMasukanOrderByWithRelationInput | GambarMasukanOrderByWithRelationInput[]
+    cursor?: GambarMasukanWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: GambarMasukanScalarFieldEnum | GambarMasukanScalarFieldEnum[]
+  }
+
+  /**
    * MasukanWarga without action
    */
   export type MasukanWargaDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5701,6 +5829,1077 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: MasukanWargaInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model GambarMasukan
+   */
+
+  export type AggregateGambarMasukan = {
+    _count: GambarMasukanCountAggregateOutputType | null
+    _min: GambarMasukanMinAggregateOutputType | null
+    _max: GambarMasukanMaxAggregateOutputType | null
+  }
+
+  export type GambarMasukanMinAggregateOutputType = {
+    id: string | null
+    url: string | null
+    publicId: string | null
+    masukanId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type GambarMasukanMaxAggregateOutputType = {
+    id: string | null
+    url: string | null
+    publicId: string | null
+    masukanId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type GambarMasukanCountAggregateOutputType = {
+    id: number
+    url: number
+    publicId: number
+    masukanId: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type GambarMasukanMinAggregateInputType = {
+    id?: true
+    url?: true
+    publicId?: true
+    masukanId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type GambarMasukanMaxAggregateInputType = {
+    id?: true
+    url?: true
+    publicId?: true
+    masukanId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type GambarMasukanCountAggregateInputType = {
+    id?: true
+    url?: true
+    publicId?: true
+    masukanId?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type GambarMasukanAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which GambarMasukan to aggregate.
+     */
+    where?: GambarMasukanWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GambarMasukans to fetch.
+     */
+    orderBy?: GambarMasukanOrderByWithRelationInput | GambarMasukanOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: GambarMasukanWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GambarMasukans from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GambarMasukans.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned GambarMasukans
+    **/
+    _count?: true | GambarMasukanCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: GambarMasukanMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: GambarMasukanMaxAggregateInputType
+  }
+
+  export type GetGambarMasukanAggregateType<T extends GambarMasukanAggregateArgs> = {
+        [P in keyof T & keyof AggregateGambarMasukan]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateGambarMasukan[P]>
+      : GetScalarType<T[P], AggregateGambarMasukan[P]>
+  }
+
+
+
+
+  export type GambarMasukanGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: GambarMasukanWhereInput
+    orderBy?: GambarMasukanOrderByWithAggregationInput | GambarMasukanOrderByWithAggregationInput[]
+    by: GambarMasukanScalarFieldEnum[] | GambarMasukanScalarFieldEnum
+    having?: GambarMasukanScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: GambarMasukanCountAggregateInputType | true
+    _min?: GambarMasukanMinAggregateInputType
+    _max?: GambarMasukanMaxAggregateInputType
+  }
+
+  export type GambarMasukanGroupByOutputType = {
+    id: string
+    url: string
+    publicId: string
+    masukanId: string
+    createdAt: Date
+    updatedAt: Date
+    _count: GambarMasukanCountAggregateOutputType | null
+    _min: GambarMasukanMinAggregateOutputType | null
+    _max: GambarMasukanMaxAggregateOutputType | null
+  }
+
+  type GetGambarMasukanGroupByPayload<T extends GambarMasukanGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<GambarMasukanGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof GambarMasukanGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], GambarMasukanGroupByOutputType[P]>
+            : GetScalarType<T[P], GambarMasukanGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type GambarMasukanSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    url?: boolean
+    publicId?: boolean
+    masukanId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    masukan?: boolean | MasukanWargaDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["gambarMasukan"]>
+
+  export type GambarMasukanSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    url?: boolean
+    publicId?: boolean
+    masukanId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    masukan?: boolean | MasukanWargaDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["gambarMasukan"]>
+
+  export type GambarMasukanSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    url?: boolean
+    publicId?: boolean
+    masukanId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    masukan?: boolean | MasukanWargaDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["gambarMasukan"]>
+
+  export type GambarMasukanSelectScalar = {
+    id?: boolean
+    url?: boolean
+    publicId?: boolean
+    masukanId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type GambarMasukanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "url" | "publicId" | "masukanId" | "createdAt" | "updatedAt", ExtArgs["result"]["gambarMasukan"]>
+  export type GambarMasukanInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    masukan?: boolean | MasukanWargaDefaultArgs<ExtArgs>
+  }
+  export type GambarMasukanIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    masukan?: boolean | MasukanWargaDefaultArgs<ExtArgs>
+  }
+  export type GambarMasukanIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    masukan?: boolean | MasukanWargaDefaultArgs<ExtArgs>
+  }
+
+  export type $GambarMasukanPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "GambarMasukan"
+    objects: {
+      masukan: Prisma.$MasukanWargaPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      url: string
+      publicId: string
+      masukanId: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["gambarMasukan"]>
+    composites: {}
+  }
+
+  type GambarMasukanGetPayload<S extends boolean | null | undefined | GambarMasukanDefaultArgs> = $Result.GetResult<Prisma.$GambarMasukanPayload, S>
+
+  type GambarMasukanCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<GambarMasukanFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: GambarMasukanCountAggregateInputType | true
+    }
+
+  export interface GambarMasukanDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['GambarMasukan'], meta: { name: 'GambarMasukan' } }
+    /**
+     * Find zero or one GambarMasukan that matches the filter.
+     * @param {GambarMasukanFindUniqueArgs} args - Arguments to find a GambarMasukan
+     * @example
+     * // Get one GambarMasukan
+     * const gambarMasukan = await prisma.gambarMasukan.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends GambarMasukanFindUniqueArgs>(args: SelectSubset<T, GambarMasukanFindUniqueArgs<ExtArgs>>): Prisma__GambarMasukanClient<$Result.GetResult<Prisma.$GambarMasukanPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one GambarMasukan that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {GambarMasukanFindUniqueOrThrowArgs} args - Arguments to find a GambarMasukan
+     * @example
+     * // Get one GambarMasukan
+     * const gambarMasukan = await prisma.gambarMasukan.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends GambarMasukanFindUniqueOrThrowArgs>(args: SelectSubset<T, GambarMasukanFindUniqueOrThrowArgs<ExtArgs>>): Prisma__GambarMasukanClient<$Result.GetResult<Prisma.$GambarMasukanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first GambarMasukan that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GambarMasukanFindFirstArgs} args - Arguments to find a GambarMasukan
+     * @example
+     * // Get one GambarMasukan
+     * const gambarMasukan = await prisma.gambarMasukan.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends GambarMasukanFindFirstArgs>(args?: SelectSubset<T, GambarMasukanFindFirstArgs<ExtArgs>>): Prisma__GambarMasukanClient<$Result.GetResult<Prisma.$GambarMasukanPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first GambarMasukan that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GambarMasukanFindFirstOrThrowArgs} args - Arguments to find a GambarMasukan
+     * @example
+     * // Get one GambarMasukan
+     * const gambarMasukan = await prisma.gambarMasukan.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends GambarMasukanFindFirstOrThrowArgs>(args?: SelectSubset<T, GambarMasukanFindFirstOrThrowArgs<ExtArgs>>): Prisma__GambarMasukanClient<$Result.GetResult<Prisma.$GambarMasukanPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more GambarMasukans that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GambarMasukanFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all GambarMasukans
+     * const gambarMasukans = await prisma.gambarMasukan.findMany()
+     * 
+     * // Get first 10 GambarMasukans
+     * const gambarMasukans = await prisma.gambarMasukan.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const gambarMasukanWithIdOnly = await prisma.gambarMasukan.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends GambarMasukanFindManyArgs>(args?: SelectSubset<T, GambarMasukanFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GambarMasukanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a GambarMasukan.
+     * @param {GambarMasukanCreateArgs} args - Arguments to create a GambarMasukan.
+     * @example
+     * // Create one GambarMasukan
+     * const GambarMasukan = await prisma.gambarMasukan.create({
+     *   data: {
+     *     // ... data to create a GambarMasukan
+     *   }
+     * })
+     * 
+     */
+    create<T extends GambarMasukanCreateArgs>(args: SelectSubset<T, GambarMasukanCreateArgs<ExtArgs>>): Prisma__GambarMasukanClient<$Result.GetResult<Prisma.$GambarMasukanPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many GambarMasukans.
+     * @param {GambarMasukanCreateManyArgs} args - Arguments to create many GambarMasukans.
+     * @example
+     * // Create many GambarMasukans
+     * const gambarMasukan = await prisma.gambarMasukan.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends GambarMasukanCreateManyArgs>(args?: SelectSubset<T, GambarMasukanCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many GambarMasukans and returns the data saved in the database.
+     * @param {GambarMasukanCreateManyAndReturnArgs} args - Arguments to create many GambarMasukans.
+     * @example
+     * // Create many GambarMasukans
+     * const gambarMasukan = await prisma.gambarMasukan.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many GambarMasukans and only return the `id`
+     * const gambarMasukanWithIdOnly = await prisma.gambarMasukan.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends GambarMasukanCreateManyAndReturnArgs>(args?: SelectSubset<T, GambarMasukanCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GambarMasukanPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a GambarMasukan.
+     * @param {GambarMasukanDeleteArgs} args - Arguments to delete one GambarMasukan.
+     * @example
+     * // Delete one GambarMasukan
+     * const GambarMasukan = await prisma.gambarMasukan.delete({
+     *   where: {
+     *     // ... filter to delete one GambarMasukan
+     *   }
+     * })
+     * 
+     */
+    delete<T extends GambarMasukanDeleteArgs>(args: SelectSubset<T, GambarMasukanDeleteArgs<ExtArgs>>): Prisma__GambarMasukanClient<$Result.GetResult<Prisma.$GambarMasukanPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one GambarMasukan.
+     * @param {GambarMasukanUpdateArgs} args - Arguments to update one GambarMasukan.
+     * @example
+     * // Update one GambarMasukan
+     * const gambarMasukan = await prisma.gambarMasukan.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends GambarMasukanUpdateArgs>(args: SelectSubset<T, GambarMasukanUpdateArgs<ExtArgs>>): Prisma__GambarMasukanClient<$Result.GetResult<Prisma.$GambarMasukanPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more GambarMasukans.
+     * @param {GambarMasukanDeleteManyArgs} args - Arguments to filter GambarMasukans to delete.
+     * @example
+     * // Delete a few GambarMasukans
+     * const { count } = await prisma.gambarMasukan.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends GambarMasukanDeleteManyArgs>(args?: SelectSubset<T, GambarMasukanDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more GambarMasukans.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GambarMasukanUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many GambarMasukans
+     * const gambarMasukan = await prisma.gambarMasukan.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends GambarMasukanUpdateManyArgs>(args: SelectSubset<T, GambarMasukanUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more GambarMasukans and returns the data updated in the database.
+     * @param {GambarMasukanUpdateManyAndReturnArgs} args - Arguments to update many GambarMasukans.
+     * @example
+     * // Update many GambarMasukans
+     * const gambarMasukan = await prisma.gambarMasukan.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more GambarMasukans and only return the `id`
+     * const gambarMasukanWithIdOnly = await prisma.gambarMasukan.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends GambarMasukanUpdateManyAndReturnArgs>(args: SelectSubset<T, GambarMasukanUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GambarMasukanPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one GambarMasukan.
+     * @param {GambarMasukanUpsertArgs} args - Arguments to update or create a GambarMasukan.
+     * @example
+     * // Update or create a GambarMasukan
+     * const gambarMasukan = await prisma.gambarMasukan.upsert({
+     *   create: {
+     *     // ... data to create a GambarMasukan
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the GambarMasukan we want to update
+     *   }
+     * })
+     */
+    upsert<T extends GambarMasukanUpsertArgs>(args: SelectSubset<T, GambarMasukanUpsertArgs<ExtArgs>>): Prisma__GambarMasukanClient<$Result.GetResult<Prisma.$GambarMasukanPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of GambarMasukans.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GambarMasukanCountArgs} args - Arguments to filter GambarMasukans to count.
+     * @example
+     * // Count the number of GambarMasukans
+     * const count = await prisma.gambarMasukan.count({
+     *   where: {
+     *     // ... the filter for the GambarMasukans we want to count
+     *   }
+     * })
+    **/
+    count<T extends GambarMasukanCountArgs>(
+      args?: Subset<T, GambarMasukanCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], GambarMasukanCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a GambarMasukan.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GambarMasukanAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends GambarMasukanAggregateArgs>(args: Subset<T, GambarMasukanAggregateArgs>): Prisma.PrismaPromise<GetGambarMasukanAggregateType<T>>
+
+    /**
+     * Group by GambarMasukan.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GambarMasukanGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends GambarMasukanGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: GambarMasukanGroupByArgs['orderBy'] }
+        : { orderBy?: GambarMasukanGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, GambarMasukanGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetGambarMasukanGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the GambarMasukan model
+   */
+  readonly fields: GambarMasukanFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for GambarMasukan.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__GambarMasukanClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    masukan<T extends MasukanWargaDefaultArgs<ExtArgs> = {}>(args?: Subset<T, MasukanWargaDefaultArgs<ExtArgs>>): Prisma__MasukanWargaClient<$Result.GetResult<Prisma.$MasukanWargaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the GambarMasukan model
+   */
+  interface GambarMasukanFieldRefs {
+    readonly id: FieldRef<"GambarMasukan", 'String'>
+    readonly url: FieldRef<"GambarMasukan", 'String'>
+    readonly publicId: FieldRef<"GambarMasukan", 'String'>
+    readonly masukanId: FieldRef<"GambarMasukan", 'String'>
+    readonly createdAt: FieldRef<"GambarMasukan", 'DateTime'>
+    readonly updatedAt: FieldRef<"GambarMasukan", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * GambarMasukan findUnique
+   */
+  export type GambarMasukanFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GambarMasukan
+     */
+    select?: GambarMasukanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GambarMasukan
+     */
+    omit?: GambarMasukanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GambarMasukanInclude<ExtArgs> | null
+    /**
+     * Filter, which GambarMasukan to fetch.
+     */
+    where: GambarMasukanWhereUniqueInput
+  }
+
+  /**
+   * GambarMasukan findUniqueOrThrow
+   */
+  export type GambarMasukanFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GambarMasukan
+     */
+    select?: GambarMasukanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GambarMasukan
+     */
+    omit?: GambarMasukanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GambarMasukanInclude<ExtArgs> | null
+    /**
+     * Filter, which GambarMasukan to fetch.
+     */
+    where: GambarMasukanWhereUniqueInput
+  }
+
+  /**
+   * GambarMasukan findFirst
+   */
+  export type GambarMasukanFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GambarMasukan
+     */
+    select?: GambarMasukanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GambarMasukan
+     */
+    omit?: GambarMasukanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GambarMasukanInclude<ExtArgs> | null
+    /**
+     * Filter, which GambarMasukan to fetch.
+     */
+    where?: GambarMasukanWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GambarMasukans to fetch.
+     */
+    orderBy?: GambarMasukanOrderByWithRelationInput | GambarMasukanOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for GambarMasukans.
+     */
+    cursor?: GambarMasukanWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GambarMasukans from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GambarMasukans.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of GambarMasukans.
+     */
+    distinct?: GambarMasukanScalarFieldEnum | GambarMasukanScalarFieldEnum[]
+  }
+
+  /**
+   * GambarMasukan findFirstOrThrow
+   */
+  export type GambarMasukanFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GambarMasukan
+     */
+    select?: GambarMasukanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GambarMasukan
+     */
+    omit?: GambarMasukanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GambarMasukanInclude<ExtArgs> | null
+    /**
+     * Filter, which GambarMasukan to fetch.
+     */
+    where?: GambarMasukanWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GambarMasukans to fetch.
+     */
+    orderBy?: GambarMasukanOrderByWithRelationInput | GambarMasukanOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for GambarMasukans.
+     */
+    cursor?: GambarMasukanWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GambarMasukans from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GambarMasukans.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of GambarMasukans.
+     */
+    distinct?: GambarMasukanScalarFieldEnum | GambarMasukanScalarFieldEnum[]
+  }
+
+  /**
+   * GambarMasukan findMany
+   */
+  export type GambarMasukanFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GambarMasukan
+     */
+    select?: GambarMasukanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GambarMasukan
+     */
+    omit?: GambarMasukanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GambarMasukanInclude<ExtArgs> | null
+    /**
+     * Filter, which GambarMasukans to fetch.
+     */
+    where?: GambarMasukanWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GambarMasukans to fetch.
+     */
+    orderBy?: GambarMasukanOrderByWithRelationInput | GambarMasukanOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing GambarMasukans.
+     */
+    cursor?: GambarMasukanWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GambarMasukans from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GambarMasukans.
+     */
+    skip?: number
+    distinct?: GambarMasukanScalarFieldEnum | GambarMasukanScalarFieldEnum[]
+  }
+
+  /**
+   * GambarMasukan create
+   */
+  export type GambarMasukanCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GambarMasukan
+     */
+    select?: GambarMasukanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GambarMasukan
+     */
+    omit?: GambarMasukanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GambarMasukanInclude<ExtArgs> | null
+    /**
+     * The data needed to create a GambarMasukan.
+     */
+    data: XOR<GambarMasukanCreateInput, GambarMasukanUncheckedCreateInput>
+  }
+
+  /**
+   * GambarMasukan createMany
+   */
+  export type GambarMasukanCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many GambarMasukans.
+     */
+    data: GambarMasukanCreateManyInput | GambarMasukanCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * GambarMasukan createManyAndReturn
+   */
+  export type GambarMasukanCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GambarMasukan
+     */
+    select?: GambarMasukanSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the GambarMasukan
+     */
+    omit?: GambarMasukanOmit<ExtArgs> | null
+    /**
+     * The data used to create many GambarMasukans.
+     */
+    data: GambarMasukanCreateManyInput | GambarMasukanCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GambarMasukanIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * GambarMasukan update
+   */
+  export type GambarMasukanUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GambarMasukan
+     */
+    select?: GambarMasukanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GambarMasukan
+     */
+    omit?: GambarMasukanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GambarMasukanInclude<ExtArgs> | null
+    /**
+     * The data needed to update a GambarMasukan.
+     */
+    data: XOR<GambarMasukanUpdateInput, GambarMasukanUncheckedUpdateInput>
+    /**
+     * Choose, which GambarMasukan to update.
+     */
+    where: GambarMasukanWhereUniqueInput
+  }
+
+  /**
+   * GambarMasukan updateMany
+   */
+  export type GambarMasukanUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update GambarMasukans.
+     */
+    data: XOR<GambarMasukanUpdateManyMutationInput, GambarMasukanUncheckedUpdateManyInput>
+    /**
+     * Filter which GambarMasukans to update
+     */
+    where?: GambarMasukanWhereInput
+    /**
+     * Limit how many GambarMasukans to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * GambarMasukan updateManyAndReturn
+   */
+  export type GambarMasukanUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GambarMasukan
+     */
+    select?: GambarMasukanSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the GambarMasukan
+     */
+    omit?: GambarMasukanOmit<ExtArgs> | null
+    /**
+     * The data used to update GambarMasukans.
+     */
+    data: XOR<GambarMasukanUpdateManyMutationInput, GambarMasukanUncheckedUpdateManyInput>
+    /**
+     * Filter which GambarMasukans to update
+     */
+    where?: GambarMasukanWhereInput
+    /**
+     * Limit how many GambarMasukans to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GambarMasukanIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * GambarMasukan upsert
+   */
+  export type GambarMasukanUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GambarMasukan
+     */
+    select?: GambarMasukanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GambarMasukan
+     */
+    omit?: GambarMasukanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GambarMasukanInclude<ExtArgs> | null
+    /**
+     * The filter to search for the GambarMasukan to update in case it exists.
+     */
+    where: GambarMasukanWhereUniqueInput
+    /**
+     * In case the GambarMasukan found by the `where` argument doesn't exist, create a new GambarMasukan with this data.
+     */
+    create: XOR<GambarMasukanCreateInput, GambarMasukanUncheckedCreateInput>
+    /**
+     * In case the GambarMasukan was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<GambarMasukanUpdateInput, GambarMasukanUncheckedUpdateInput>
+  }
+
+  /**
+   * GambarMasukan delete
+   */
+  export type GambarMasukanDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GambarMasukan
+     */
+    select?: GambarMasukanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GambarMasukan
+     */
+    omit?: GambarMasukanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GambarMasukanInclude<ExtArgs> | null
+    /**
+     * Filter which GambarMasukan to delete.
+     */
+    where: GambarMasukanWhereUniqueInput
+  }
+
+  /**
+   * GambarMasukan deleteMany
+   */
+  export type GambarMasukanDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which GambarMasukans to delete
+     */
+    where?: GambarMasukanWhereInput
+    /**
+     * Limit how many GambarMasukans to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * GambarMasukan without action
+   */
+  export type GambarMasukanDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GambarMasukan
+     */
+    select?: GambarMasukanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GambarMasukan
+     */
+    omit?: GambarMasukanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GambarMasukanInclude<ExtArgs> | null
   }
 
 
@@ -14731,6 +15930,18 @@ export namespace Prisma {
   export type MasukanWargaScalarFieldEnum = (typeof MasukanWargaScalarFieldEnum)[keyof typeof MasukanWargaScalarFieldEnum]
 
 
+  export const GambarMasukanScalarFieldEnum: {
+    id: 'id',
+    url: 'url',
+    publicId: 'publicId',
+    masukanId: 'masukanId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type GambarMasukanScalarFieldEnum = (typeof GambarMasukanScalarFieldEnum)[keyof typeof GambarMasukanScalarFieldEnum]
+
+
   export const DataMasterScalarFieldEnum: {
     id: 'id',
     domainIsuId: 'domainIsuId',
@@ -15239,6 +16450,7 @@ export namespace Prisma {
     domainIsu?: XOR<DomainIsuScalarRelationFilter, DomainIsuWhereInput>
     diverifikasiOleh?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     relasiRapat?: KegiatanRapatMasukanListRelationFilter
+    gambarMasukan?: GambarMasukanListRelationFilter
   }
 
   export type MasukanWargaOrderByWithRelationInput = {
@@ -15258,6 +16470,7 @@ export namespace Prisma {
     domainIsu?: DomainIsuOrderByWithRelationInput
     diverifikasiOleh?: UserOrderByWithRelationInput
     relasiRapat?: KegiatanRapatMasukanOrderByRelationAggregateInput
+    gambarMasukan?: GambarMasukanOrderByRelationAggregateInput
   }
 
   export type MasukanWargaWhereUniqueInput = Prisma.AtLeast<{
@@ -15280,6 +16493,7 @@ export namespace Prisma {
     domainIsu?: XOR<DomainIsuScalarRelationFilter, DomainIsuWhereInput>
     diverifikasiOleh?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     relasiRapat?: KegiatanRapatMasukanListRelationFilter
+    gambarMasukan?: GambarMasukanListRelationFilter
   }, "id">
 
   export type MasukanWargaOrderByWithAggregationInput = {
@@ -15318,6 +16532,66 @@ export namespace Prisma {
     diverifikasiOlehId?: StringNullableWithAggregatesFilter<"MasukanWarga"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"MasukanWarga"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"MasukanWarga"> | Date | string
+  }
+
+  export type GambarMasukanWhereInput = {
+    AND?: GambarMasukanWhereInput | GambarMasukanWhereInput[]
+    OR?: GambarMasukanWhereInput[]
+    NOT?: GambarMasukanWhereInput | GambarMasukanWhereInput[]
+    id?: StringFilter<"GambarMasukan"> | string
+    url?: StringFilter<"GambarMasukan"> | string
+    publicId?: StringFilter<"GambarMasukan"> | string
+    masukanId?: StringFilter<"GambarMasukan"> | string
+    createdAt?: DateTimeFilter<"GambarMasukan"> | Date | string
+    updatedAt?: DateTimeFilter<"GambarMasukan"> | Date | string
+    masukan?: XOR<MasukanWargaScalarRelationFilter, MasukanWargaWhereInput>
+  }
+
+  export type GambarMasukanOrderByWithRelationInput = {
+    id?: SortOrder
+    url?: SortOrder
+    publicId?: SortOrder
+    masukanId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    masukan?: MasukanWargaOrderByWithRelationInput
+  }
+
+  export type GambarMasukanWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: GambarMasukanWhereInput | GambarMasukanWhereInput[]
+    OR?: GambarMasukanWhereInput[]
+    NOT?: GambarMasukanWhereInput | GambarMasukanWhereInput[]
+    url?: StringFilter<"GambarMasukan"> | string
+    publicId?: StringFilter<"GambarMasukan"> | string
+    masukanId?: StringFilter<"GambarMasukan"> | string
+    createdAt?: DateTimeFilter<"GambarMasukan"> | Date | string
+    updatedAt?: DateTimeFilter<"GambarMasukan"> | Date | string
+    masukan?: XOR<MasukanWargaScalarRelationFilter, MasukanWargaWhereInput>
+  }, "id">
+
+  export type GambarMasukanOrderByWithAggregationInput = {
+    id?: SortOrder
+    url?: SortOrder
+    publicId?: SortOrder
+    masukanId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: GambarMasukanCountOrderByAggregateInput
+    _max?: GambarMasukanMaxOrderByAggregateInput
+    _min?: GambarMasukanMinOrderByAggregateInput
+  }
+
+  export type GambarMasukanScalarWhereWithAggregatesInput = {
+    AND?: GambarMasukanScalarWhereWithAggregatesInput | GambarMasukanScalarWhereWithAggregatesInput[]
+    OR?: GambarMasukanScalarWhereWithAggregatesInput[]
+    NOT?: GambarMasukanScalarWhereWithAggregatesInput | GambarMasukanScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"GambarMasukan"> | string
+    url?: StringWithAggregatesFilter<"GambarMasukan"> | string
+    publicId?: StringWithAggregatesFilter<"GambarMasukan"> | string
+    masukanId?: StringWithAggregatesFilter<"GambarMasukan"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"GambarMasukan"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"GambarMasukan"> | Date | string
   }
 
   export type DataMasterWhereInput = {
@@ -16140,6 +17414,7 @@ export namespace Prisma {
     domainIsu: DomainIsuCreateNestedOneWithoutMasukanInput
     diverifikasiOleh?: UserCreateNestedOneWithoutMasukanVerifikasiInput
     relasiRapat?: KegiatanRapatMasukanCreateNestedManyWithoutMasukanInput
+    gambarMasukan?: GambarMasukanCreateNestedManyWithoutMasukanInput
   }
 
   export type MasukanWargaUncheckedCreateInput = {
@@ -16157,6 +17432,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     relasiRapat?: KegiatanRapatMasukanUncheckedCreateNestedManyWithoutMasukanInput
+    gambarMasukan?: GambarMasukanUncheckedCreateNestedManyWithoutMasukanInput
   }
 
   export type MasukanWargaUpdateInput = {
@@ -16174,6 +17450,7 @@ export namespace Prisma {
     domainIsu?: DomainIsuUpdateOneRequiredWithoutMasukanNestedInput
     diverifikasiOleh?: UserUpdateOneWithoutMasukanVerifikasiNestedInput
     relasiRapat?: KegiatanRapatMasukanUpdateManyWithoutMasukanNestedInput
+    gambarMasukan?: GambarMasukanUpdateManyWithoutMasukanNestedInput
   }
 
   export type MasukanWargaUncheckedUpdateInput = {
@@ -16191,6 +17468,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     relasiRapat?: KegiatanRapatMasukanUncheckedUpdateManyWithoutMasukanNestedInput
+    gambarMasukan?: GambarMasukanUncheckedUpdateManyWithoutMasukanNestedInput
   }
 
   export type MasukanWargaCreateManyInput = {
@@ -16235,6 +17513,68 @@ export namespace Prisma {
     status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
     alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
     diverifikasiOlehId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GambarMasukanCreateInput = {
+    id?: string
+    url: string
+    publicId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    masukan: MasukanWargaCreateNestedOneWithoutGambarMasukanInput
+  }
+
+  export type GambarMasukanUncheckedCreateInput = {
+    id?: string
+    url: string
+    publicId: string
+    masukanId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GambarMasukanUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    publicId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    masukan?: MasukanWargaUpdateOneRequiredWithoutGambarMasukanNestedInput
+  }
+
+  export type GambarMasukanUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    publicId?: StringFieldUpdateOperationsInput | string
+    masukanId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GambarMasukanCreateManyInput = {
+    id?: string
+    url: string
+    publicId: string
+    masukanId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GambarMasukanUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    publicId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GambarMasukanUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    publicId?: StringFieldUpdateOperationsInput | string
+    masukanId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -17163,7 +18503,17 @@ export namespace Prisma {
     none?: KegiatanRapatMasukanWhereInput
   }
 
+  export type GambarMasukanListRelationFilter = {
+    every?: GambarMasukanWhereInput
+    some?: GambarMasukanWhereInput
+    none?: GambarMasukanWhereInput
+  }
+
   export type KegiatanRapatMasukanOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type GambarMasukanOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -17223,6 +18573,38 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumStatusMasukanFilter<$PrismaModel>
     _max?: NestedEnumStatusMasukanFilter<$PrismaModel>
+  }
+
+  export type MasukanWargaScalarRelationFilter = {
+    is?: MasukanWargaWhereInput
+    isNot?: MasukanWargaWhereInput
+  }
+
+  export type GambarMasukanCountOrderByAggregateInput = {
+    id?: SortOrder
+    url?: SortOrder
+    publicId?: SortOrder
+    masukanId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type GambarMasukanMaxOrderByAggregateInput = {
+    id?: SortOrder
+    url?: SortOrder
+    publicId?: SortOrder
+    masukanId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type GambarMasukanMinOrderByAggregateInput = {
+    id?: SortOrder
+    url?: SortOrder
+    publicId?: SortOrder
+    masukanId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type EnumNilaiKritikalitasFilter<$PrismaModel = never> = {
@@ -17507,11 +18889,6 @@ export namespace Prisma {
   export type KegiatanRapatScalarRelationFilter = {
     is?: KegiatanRapatWhereInput
     isNot?: KegiatanRapatWhereInput
-  }
-
-  export type MasukanWargaScalarRelationFilter = {
-    is?: MasukanWargaWhereInput
-    isNot?: MasukanWargaWhereInput
   }
 
   export type KegiatanRapatMasukanKegiatanRapatIdMasukanIdCompoundUniqueInput = {
@@ -18206,11 +19583,25 @@ export namespace Prisma {
     connect?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
   }
 
+  export type GambarMasukanCreateNestedManyWithoutMasukanInput = {
+    create?: XOR<GambarMasukanCreateWithoutMasukanInput, GambarMasukanUncheckedCreateWithoutMasukanInput> | GambarMasukanCreateWithoutMasukanInput[] | GambarMasukanUncheckedCreateWithoutMasukanInput[]
+    connectOrCreate?: GambarMasukanCreateOrConnectWithoutMasukanInput | GambarMasukanCreateOrConnectWithoutMasukanInput[]
+    createMany?: GambarMasukanCreateManyMasukanInputEnvelope
+    connect?: GambarMasukanWhereUniqueInput | GambarMasukanWhereUniqueInput[]
+  }
+
   export type KegiatanRapatMasukanUncheckedCreateNestedManyWithoutMasukanInput = {
     create?: XOR<KegiatanRapatMasukanCreateWithoutMasukanInput, KegiatanRapatMasukanUncheckedCreateWithoutMasukanInput> | KegiatanRapatMasukanCreateWithoutMasukanInput[] | KegiatanRapatMasukanUncheckedCreateWithoutMasukanInput[]
     connectOrCreate?: KegiatanRapatMasukanCreateOrConnectWithoutMasukanInput | KegiatanRapatMasukanCreateOrConnectWithoutMasukanInput[]
     createMany?: KegiatanRapatMasukanCreateManyMasukanInputEnvelope
     connect?: KegiatanRapatMasukanWhereUniqueInput | KegiatanRapatMasukanWhereUniqueInput[]
+  }
+
+  export type GambarMasukanUncheckedCreateNestedManyWithoutMasukanInput = {
+    create?: XOR<GambarMasukanCreateWithoutMasukanInput, GambarMasukanUncheckedCreateWithoutMasukanInput> | GambarMasukanCreateWithoutMasukanInput[] | GambarMasukanUncheckedCreateWithoutMasukanInput[]
+    connectOrCreate?: GambarMasukanCreateOrConnectWithoutMasukanInput | GambarMasukanCreateOrConnectWithoutMasukanInput[]
+    createMany?: GambarMasukanCreateManyMasukanInputEnvelope
+    connect?: GambarMasukanWhereUniqueInput | GambarMasukanWhereUniqueInput[]
   }
 
   export type EnumStatusMasukanFieldUpdateOperationsInput = {
@@ -18249,6 +19640,20 @@ export namespace Prisma {
     deleteMany?: KegiatanRapatMasukanScalarWhereInput | KegiatanRapatMasukanScalarWhereInput[]
   }
 
+  export type GambarMasukanUpdateManyWithoutMasukanNestedInput = {
+    create?: XOR<GambarMasukanCreateWithoutMasukanInput, GambarMasukanUncheckedCreateWithoutMasukanInput> | GambarMasukanCreateWithoutMasukanInput[] | GambarMasukanUncheckedCreateWithoutMasukanInput[]
+    connectOrCreate?: GambarMasukanCreateOrConnectWithoutMasukanInput | GambarMasukanCreateOrConnectWithoutMasukanInput[]
+    upsert?: GambarMasukanUpsertWithWhereUniqueWithoutMasukanInput | GambarMasukanUpsertWithWhereUniqueWithoutMasukanInput[]
+    createMany?: GambarMasukanCreateManyMasukanInputEnvelope
+    set?: GambarMasukanWhereUniqueInput | GambarMasukanWhereUniqueInput[]
+    disconnect?: GambarMasukanWhereUniqueInput | GambarMasukanWhereUniqueInput[]
+    delete?: GambarMasukanWhereUniqueInput | GambarMasukanWhereUniqueInput[]
+    connect?: GambarMasukanWhereUniqueInput | GambarMasukanWhereUniqueInput[]
+    update?: GambarMasukanUpdateWithWhereUniqueWithoutMasukanInput | GambarMasukanUpdateWithWhereUniqueWithoutMasukanInput[]
+    updateMany?: GambarMasukanUpdateManyWithWhereWithoutMasukanInput | GambarMasukanUpdateManyWithWhereWithoutMasukanInput[]
+    deleteMany?: GambarMasukanScalarWhereInput | GambarMasukanScalarWhereInput[]
+  }
+
   export type KegiatanRapatMasukanUncheckedUpdateManyWithoutMasukanNestedInput = {
     create?: XOR<KegiatanRapatMasukanCreateWithoutMasukanInput, KegiatanRapatMasukanUncheckedCreateWithoutMasukanInput> | KegiatanRapatMasukanCreateWithoutMasukanInput[] | KegiatanRapatMasukanUncheckedCreateWithoutMasukanInput[]
     connectOrCreate?: KegiatanRapatMasukanCreateOrConnectWithoutMasukanInput | KegiatanRapatMasukanCreateOrConnectWithoutMasukanInput[]
@@ -18261,6 +19666,34 @@ export namespace Prisma {
     update?: KegiatanRapatMasukanUpdateWithWhereUniqueWithoutMasukanInput | KegiatanRapatMasukanUpdateWithWhereUniqueWithoutMasukanInput[]
     updateMany?: KegiatanRapatMasukanUpdateManyWithWhereWithoutMasukanInput | KegiatanRapatMasukanUpdateManyWithWhereWithoutMasukanInput[]
     deleteMany?: KegiatanRapatMasukanScalarWhereInput | KegiatanRapatMasukanScalarWhereInput[]
+  }
+
+  export type GambarMasukanUncheckedUpdateManyWithoutMasukanNestedInput = {
+    create?: XOR<GambarMasukanCreateWithoutMasukanInput, GambarMasukanUncheckedCreateWithoutMasukanInput> | GambarMasukanCreateWithoutMasukanInput[] | GambarMasukanUncheckedCreateWithoutMasukanInput[]
+    connectOrCreate?: GambarMasukanCreateOrConnectWithoutMasukanInput | GambarMasukanCreateOrConnectWithoutMasukanInput[]
+    upsert?: GambarMasukanUpsertWithWhereUniqueWithoutMasukanInput | GambarMasukanUpsertWithWhereUniqueWithoutMasukanInput[]
+    createMany?: GambarMasukanCreateManyMasukanInputEnvelope
+    set?: GambarMasukanWhereUniqueInput | GambarMasukanWhereUniqueInput[]
+    disconnect?: GambarMasukanWhereUniqueInput | GambarMasukanWhereUniqueInput[]
+    delete?: GambarMasukanWhereUniqueInput | GambarMasukanWhereUniqueInput[]
+    connect?: GambarMasukanWhereUniqueInput | GambarMasukanWhereUniqueInput[]
+    update?: GambarMasukanUpdateWithWhereUniqueWithoutMasukanInput | GambarMasukanUpdateWithWhereUniqueWithoutMasukanInput[]
+    updateMany?: GambarMasukanUpdateManyWithWhereWithoutMasukanInput | GambarMasukanUpdateManyWithWhereWithoutMasukanInput[]
+    deleteMany?: GambarMasukanScalarWhereInput | GambarMasukanScalarWhereInput[]
+  }
+
+  export type MasukanWargaCreateNestedOneWithoutGambarMasukanInput = {
+    create?: XOR<MasukanWargaCreateWithoutGambarMasukanInput, MasukanWargaUncheckedCreateWithoutGambarMasukanInput>
+    connectOrCreate?: MasukanWargaCreateOrConnectWithoutGambarMasukanInput
+    connect?: MasukanWargaWhereUniqueInput
+  }
+
+  export type MasukanWargaUpdateOneRequiredWithoutGambarMasukanNestedInput = {
+    create?: XOR<MasukanWargaCreateWithoutGambarMasukanInput, MasukanWargaUncheckedCreateWithoutGambarMasukanInput>
+    connectOrCreate?: MasukanWargaCreateOrConnectWithoutGambarMasukanInput
+    upsert?: MasukanWargaUpsertWithoutGambarMasukanInput
+    connect?: MasukanWargaWhereUniqueInput
+    update?: XOR<XOR<MasukanWargaUpdateToOneWithWhereWithoutGambarMasukanInput, MasukanWargaUpdateWithoutGambarMasukanInput>, MasukanWargaUncheckedUpdateWithoutGambarMasukanInput>
   }
 
   export type DomainIsuCreateNestedOneWithoutDataMasterInput = {
@@ -18954,6 +20387,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     diverifikasiOleh?: UserCreateNestedOneWithoutMasukanVerifikasiInput
     relasiRapat?: KegiatanRapatMasukanCreateNestedManyWithoutMasukanInput
+    gambarMasukan?: GambarMasukanCreateNestedManyWithoutMasukanInput
   }
 
   export type MasukanWargaUncheckedCreateWithoutDomainIsuInput = {
@@ -18970,6 +20404,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     relasiRapat?: KegiatanRapatMasukanUncheckedCreateNestedManyWithoutMasukanInput
+    gambarMasukan?: GambarMasukanUncheckedCreateNestedManyWithoutMasukanInput
   }
 
   export type MasukanWargaCreateOrConnectWithoutDomainIsuInput = {
@@ -19190,6 +20625,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     domainIsu: DomainIsuCreateNestedOneWithoutMasukanInput
     relasiRapat?: KegiatanRapatMasukanCreateNestedManyWithoutMasukanInput
+    gambarMasukan?: GambarMasukanCreateNestedManyWithoutMasukanInput
   }
 
   export type MasukanWargaUncheckedCreateWithoutDiverifikasiOlehInput = {
@@ -19206,6 +20642,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     relasiRapat?: KegiatanRapatMasukanUncheckedCreateNestedManyWithoutMasukanInput
+    gambarMasukan?: GambarMasukanUncheckedCreateNestedManyWithoutMasukanInput
   }
 
   export type MasukanWargaCreateOrConnectWithoutDiverifikasiOlehInput = {
@@ -19659,6 +21096,32 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type GambarMasukanCreateWithoutMasukanInput = {
+    id?: string
+    url: string
+    publicId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GambarMasukanUncheckedCreateWithoutMasukanInput = {
+    id?: string
+    url: string
+    publicId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GambarMasukanCreateOrConnectWithoutMasukanInput = {
+    where: GambarMasukanWhereUniqueInput
+    create: XOR<GambarMasukanCreateWithoutMasukanInput, GambarMasukanUncheckedCreateWithoutMasukanInput>
+  }
+
+  export type GambarMasukanCreateManyMasukanInputEnvelope = {
+    data: GambarMasukanCreateManyMasukanInput | GambarMasukanCreateManyMasukanInput[]
+    skipDuplicates?: boolean
+  }
+
   export type DomainIsuUpsertWithoutMasukanInput = {
     update: XOR<DomainIsuUpdateWithoutMasukanInput, DomainIsuUncheckedUpdateWithoutMasukanInput>
     create: XOR<DomainIsuCreateWithoutMasukanInput, DomainIsuUncheckedCreateWithoutMasukanInput>
@@ -19763,6 +21226,118 @@ export namespace Prisma {
     kegiatanRapatId?: StringFilter<"KegiatanRapatMasukan"> | string
     masukanId?: StringFilter<"KegiatanRapatMasukan"> | string
     createdAt?: DateTimeFilter<"KegiatanRapatMasukan"> | Date | string
+  }
+
+  export type GambarMasukanUpsertWithWhereUniqueWithoutMasukanInput = {
+    where: GambarMasukanWhereUniqueInput
+    update: XOR<GambarMasukanUpdateWithoutMasukanInput, GambarMasukanUncheckedUpdateWithoutMasukanInput>
+    create: XOR<GambarMasukanCreateWithoutMasukanInput, GambarMasukanUncheckedCreateWithoutMasukanInput>
+  }
+
+  export type GambarMasukanUpdateWithWhereUniqueWithoutMasukanInput = {
+    where: GambarMasukanWhereUniqueInput
+    data: XOR<GambarMasukanUpdateWithoutMasukanInput, GambarMasukanUncheckedUpdateWithoutMasukanInput>
+  }
+
+  export type GambarMasukanUpdateManyWithWhereWithoutMasukanInput = {
+    where: GambarMasukanScalarWhereInput
+    data: XOR<GambarMasukanUpdateManyMutationInput, GambarMasukanUncheckedUpdateManyWithoutMasukanInput>
+  }
+
+  export type GambarMasukanScalarWhereInput = {
+    AND?: GambarMasukanScalarWhereInput | GambarMasukanScalarWhereInput[]
+    OR?: GambarMasukanScalarWhereInput[]
+    NOT?: GambarMasukanScalarWhereInput | GambarMasukanScalarWhereInput[]
+    id?: StringFilter<"GambarMasukan"> | string
+    url?: StringFilter<"GambarMasukan"> | string
+    publicId?: StringFilter<"GambarMasukan"> | string
+    masukanId?: StringFilter<"GambarMasukan"> | string
+    createdAt?: DateTimeFilter<"GambarMasukan"> | Date | string
+    updatedAt?: DateTimeFilter<"GambarMasukan"> | Date | string
+  }
+
+  export type MasukanWargaCreateWithoutGambarMasukanInput = {
+    id?: string
+    namaPengirim?: string | null
+    nomorHp?: string | null
+    judul: string
+    deskripsi: string
+    lokasiRt: string
+    lokasiRw: string
+    status?: $Enums.StatusMasukan
+    alasanPenolakan?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    domainIsu: DomainIsuCreateNestedOneWithoutMasukanInput
+    diverifikasiOleh?: UserCreateNestedOneWithoutMasukanVerifikasiInput
+    relasiRapat?: KegiatanRapatMasukanCreateNestedManyWithoutMasukanInput
+  }
+
+  export type MasukanWargaUncheckedCreateWithoutGambarMasukanInput = {
+    id?: string
+    namaPengirim?: string | null
+    nomorHp?: string | null
+    judul: string
+    deskripsi: string
+    lokasiRt: string
+    lokasiRw: string
+    domainIsuId: string
+    status?: $Enums.StatusMasukan
+    alasanPenolakan?: string | null
+    diverifikasiOlehId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    relasiRapat?: KegiatanRapatMasukanUncheckedCreateNestedManyWithoutMasukanInput
+  }
+
+  export type MasukanWargaCreateOrConnectWithoutGambarMasukanInput = {
+    where: MasukanWargaWhereUniqueInput
+    create: XOR<MasukanWargaCreateWithoutGambarMasukanInput, MasukanWargaUncheckedCreateWithoutGambarMasukanInput>
+  }
+
+  export type MasukanWargaUpsertWithoutGambarMasukanInput = {
+    update: XOR<MasukanWargaUpdateWithoutGambarMasukanInput, MasukanWargaUncheckedUpdateWithoutGambarMasukanInput>
+    create: XOR<MasukanWargaCreateWithoutGambarMasukanInput, MasukanWargaUncheckedCreateWithoutGambarMasukanInput>
+    where?: MasukanWargaWhereInput
+  }
+
+  export type MasukanWargaUpdateToOneWithWhereWithoutGambarMasukanInput = {
+    where?: MasukanWargaWhereInput
+    data: XOR<MasukanWargaUpdateWithoutGambarMasukanInput, MasukanWargaUncheckedUpdateWithoutGambarMasukanInput>
+  }
+
+  export type MasukanWargaUpdateWithoutGambarMasukanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    namaPengirim?: NullableStringFieldUpdateOperationsInput | string | null
+    nomorHp?: NullableStringFieldUpdateOperationsInput | string | null
+    judul?: StringFieldUpdateOperationsInput | string
+    deskripsi?: StringFieldUpdateOperationsInput | string
+    lokasiRt?: StringFieldUpdateOperationsInput | string
+    lokasiRw?: StringFieldUpdateOperationsInput | string
+    status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
+    alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    domainIsu?: DomainIsuUpdateOneRequiredWithoutMasukanNestedInput
+    diverifikasiOleh?: UserUpdateOneWithoutMasukanVerifikasiNestedInput
+    relasiRapat?: KegiatanRapatMasukanUpdateManyWithoutMasukanNestedInput
+  }
+
+  export type MasukanWargaUncheckedUpdateWithoutGambarMasukanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    namaPengirim?: NullableStringFieldUpdateOperationsInput | string | null
+    nomorHp?: NullableStringFieldUpdateOperationsInput | string | null
+    judul?: StringFieldUpdateOperationsInput | string
+    deskripsi?: StringFieldUpdateOperationsInput | string
+    lokasiRt?: StringFieldUpdateOperationsInput | string
+    lokasiRw?: StringFieldUpdateOperationsInput | string
+    domainIsuId?: StringFieldUpdateOperationsInput | string
+    status?: EnumStatusMasukanFieldUpdateOperationsInput | $Enums.StatusMasukan
+    alasanPenolakan?: NullableStringFieldUpdateOperationsInput | string | null
+    diverifikasiOlehId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    relasiRapat?: KegiatanRapatMasukanUncheckedUpdateManyWithoutMasukanNestedInput
   }
 
   export type DomainIsuCreateWithoutDataMasterInput = {
@@ -20334,6 +21909,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     domainIsu: DomainIsuCreateNestedOneWithoutMasukanInput
     diverifikasiOleh?: UserCreateNestedOneWithoutMasukanVerifikasiInput
+    gambarMasukan?: GambarMasukanCreateNestedManyWithoutMasukanInput
   }
 
   export type MasukanWargaUncheckedCreateWithoutRelasiRapatInput = {
@@ -20350,6 +21926,7 @@ export namespace Prisma {
     diverifikasiOlehId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    gambarMasukan?: GambarMasukanUncheckedCreateNestedManyWithoutMasukanInput
   }
 
   export type MasukanWargaCreateOrConnectWithoutRelasiRapatInput = {
@@ -20435,6 +22012,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     domainIsu?: DomainIsuUpdateOneRequiredWithoutMasukanNestedInput
     diverifikasiOleh?: UserUpdateOneWithoutMasukanVerifikasiNestedInput
+    gambarMasukan?: GambarMasukanUpdateManyWithoutMasukanNestedInput
   }
 
   export type MasukanWargaUncheckedUpdateWithoutRelasiRapatInput = {
@@ -20451,6 +22029,7 @@ export namespace Prisma {
     diverifikasiOlehId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    gambarMasukan?: GambarMasukanUncheckedUpdateManyWithoutMasukanNestedInput
   }
 
   export type KegiatanRapatCreateWithoutDataMasterRelasiInput = {
@@ -20857,6 +22436,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     diverifikasiOleh?: UserUpdateOneWithoutMasukanVerifikasiNestedInput
     relasiRapat?: KegiatanRapatMasukanUpdateManyWithoutMasukanNestedInput
+    gambarMasukan?: GambarMasukanUpdateManyWithoutMasukanNestedInput
   }
 
   export type MasukanWargaUncheckedUpdateWithoutDomainIsuInput = {
@@ -20873,6 +22453,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     relasiRapat?: KegiatanRapatMasukanUncheckedUpdateManyWithoutMasukanNestedInput
+    gambarMasukan?: GambarMasukanUncheckedUpdateManyWithoutMasukanNestedInput
   }
 
   export type MasukanWargaUncheckedUpdateManyWithoutDomainIsuInput = {
@@ -21097,6 +22678,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     domainIsu?: DomainIsuUpdateOneRequiredWithoutMasukanNestedInput
     relasiRapat?: KegiatanRapatMasukanUpdateManyWithoutMasukanNestedInput
+    gambarMasukan?: GambarMasukanUpdateManyWithoutMasukanNestedInput
   }
 
   export type MasukanWargaUncheckedUpdateWithoutDiverifikasiOlehInput = {
@@ -21113,6 +22695,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     relasiRapat?: KegiatanRapatMasukanUncheckedUpdateManyWithoutMasukanNestedInput
+    gambarMasukan?: GambarMasukanUncheckedUpdateManyWithoutMasukanNestedInput
   }
 
   export type MasukanWargaUncheckedUpdateManyWithoutDiverifikasiOlehInput = {
@@ -21383,6 +22966,14 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type GambarMasukanCreateManyMasukanInput = {
+    id?: string
+    url: string
+    publicId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type KegiatanRapatMasukanUpdateWithoutMasukanInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -21399,6 +22990,30 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     kegiatanRapatId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GambarMasukanUpdateWithoutMasukanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    publicId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GambarMasukanUncheckedUpdateWithoutMasukanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    publicId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GambarMasukanUncheckedUpdateManyWithoutMasukanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    publicId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type KegiatanRapatDataMasterCreateManyDataMasterInput = {

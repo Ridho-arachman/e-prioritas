@@ -158,6 +158,15 @@ exports.Prisma.MasukanWargaScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.GambarMasukanScalarFieldEnum = {
+  id: 'id',
+  url: 'url',
+  publicId: 'publicId',
+  masukanId: 'masukanId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.DataMasterScalarFieldEnum = {
   id: 'id',
   domainIsuId: 'domainIsuId',
@@ -313,6 +322,7 @@ exports.Prisma.ModelName = {
   DomainIsu: 'DomainIsu',
   User: 'User',
   MasukanWarga: 'MasukanWarga',
+  GambarMasukan: 'GambarMasukan',
   DataMaster: 'DataMaster',
   KegiatanRapat: 'KegiatanRapat',
   KegiatanRapatMasukan: 'KegiatanRapatMasukan',

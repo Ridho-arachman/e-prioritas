@@ -53,7 +53,7 @@ const socialMedia = [
   },
   {
     icon: Github,
-    href: "https://github.com/desapanggungjati",
+    href: "https://github.com/Ridho-arachman",
     label: "GitHub",
   },
 ];
@@ -88,7 +88,7 @@ export default function Footer() {
                 />
               </motion.div>
               <span className="text-2xl font-bold bg-linear-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                Sistem Prioritas
+                E - Prioritas
               </span>
             </Link>
             <p className="text-gray-400 max-w-md leading-relaxed">

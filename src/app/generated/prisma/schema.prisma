@@ -117,7 +117,8 @@ model MasukanWarga {
   diverifikasiOleh   User?   @relation("VerifikatorMasukan", fields: [diverifikasiOlehId], references: [id])
 
   // Relasi ke junction table (MENGGABUNGKAN RekomendasiMasukan dan ItemPrioritasMasukan)
-  relasiRapat KegiatanRapatMasukan[]
+  relasiRapat   KegiatanRapatMasukan[]
+  gambarMasukan GambarMasukan[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -125,6 +126,18 @@ model MasukanWarga {
   @@index([status])
   @@index([domainIsuId])
   @@map("masukan_warga")
+}
+
+model GambarMasukan {
+  id        String       @id @default(cuid())
+  url       String       @db.Text // URL Cloudinary
+  publicId  String       @db.Text // public_id untuk delete nanti
+  masukanId String
+  masukan   MasukanWarga @relation(fields: [masukanId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@map("gambar_masukan")
 }
 
 //////////////////////////
