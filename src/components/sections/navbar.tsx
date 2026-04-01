@@ -11,15 +11,30 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Menu, Home, Layers, MessageSquare, Settings, X } from "lucide-react";
+import {
+  Menu,
+  Home,
+  Layers,
+  MessageSquare,
+  Settings,
+  X,
+  GitBranch,
+  MailOpen,
+} from "lucide-react";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
   { href: "/", label: "Beranda", icon: Home },
   { href: "/tentang", label: "Tentang", icon: Layers },
+  {
+    href: "/struktur-organisasi",
+    label: "Struktur Organisasi",
+    icon: GitBranch,
+  },
   { href: "/masukan", label: "Masukan Warga", icon: MessageSquare },
+  { href: "/surat", label: "Surat Menyurat", icon: MailOpen },
   { href: "/login", label: "Perangkat Desa", icon: Settings },
 ];
 

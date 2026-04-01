@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
@@ -27,6 +27,9 @@ import {
   Calendar,
   User,
   FileText,
+  Image as ImageIcon,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 import { useParams } from "next/navigation";
@@ -49,6 +52,9 @@ export default function CardDetailMasukanWarga() {
     null,
   );
   const [alasan, setAlasan] = useState("");
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const {
     data: masukan,
@@ -180,6 +186,8 @@ export default function CardDetailMasukanWarga() {
     );
   }
 
+  const images = masukan.gambarMasukan || [];
+
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Back Button & Title */}
@@ -292,14 +300,117 @@ export default function CardDetailMasukanWarga() {
                 </div>
               </div>
             )}
+
+            {/* Gambar Masukan */}
+            {images.length > 0 && (
+              <div className="space-y-3">
+                <Label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <ImageIcon className="h-4 w-4" /> Lampiran Gambar (
+                  {images.length})
+                </Label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                  {images.map((img: any, idx: number) => (
+                    <div
+                      key={idx}
+                      className="relative group cursor-pointer aspect-square rounded-lg overflow-hidden border border-border bg-muted/20 hover:shadow-md transition-all"
+                      onClick={() => {
+                        setSelectedImage(img.url);
+                        setCurrentImageIndex(idx);
+                        setImageModalOpen(true);
+                      }}
+                    >
+                      <Image
+                        src={img.url}
+                        alt={`Gambar ${idx + 1}`}
+                        fill
+                        sizes="(max-width: 768px) 150px, 200px"
+                        className="object-cover hover:scale-105 transition-transform duration-300"
+                        unoptimized
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
+
+      {/* Modal untuk gambar besar dengan slider */}
+      <Dialog open={imageModalOpen} onOpenChange={setImageModalOpen}>
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] p-0 bg-transparent border-none shadow-none">
+          {/* Hidden title for accessibility */}
+          <div className="sr-only">
+            <DialogTitle>Gambar Masukan</DialogTitle>
+          </div>
+
+          <div className="relative w-full h-full min-h-75 max-h-[80vh] bg-black/90 rounded-lg overflow-hidden">
+            {selectedImage && (
+              <div className="relative w-full h-full">
+                <Image
+                  src={selectedImage}
+                  alt={`Gambar ${currentImageIndex + 1}`}
+                  fill
+                  className="object-contain"
+                  unoptimized
+                />
+              </div>
+            )}
+
+            {/* Tombol navigasi hanya jika lebih dari satu gambar */}
+            {images.length > 1 && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white hover:bg-black/70 rounded-full w-10 h-10"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const newIndex =
+                      (currentImageIndex - 1 + images.length) % images.length;
+                    setCurrentImageIndex(newIndex);
+                    setSelectedImage(images[newIndex].url);
+                  }}
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white hover:bg-black/70 rounded-full w-10 h-10"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const newIndex = (currentImageIndex + 1) % images.length;
+                    setCurrentImageIndex(newIndex);
+                    setSelectedImage(images[newIndex].url);
+                  }}
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </Button>
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                  {currentImageIndex + 1} / {images.length}
+                </div>
+              </>
+            )}
+
+            {/* Tombol tutup */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 bg-black/50 text-white hover:bg-black/70 rounded-full"
+              onClick={() => setImageModalOpen(false)}
+            >
+              <XCircle className="h-5 w-5" />
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
-// Improved InfoItem with icon
+// InfoItem with icon (tidak berubah)
 function InfoItemWithIcon({
   icon: Icon,
   label,

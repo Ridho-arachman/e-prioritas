@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image"; // ✅ ditambahkan
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,12 +23,16 @@ import {
   Clock,
   CheckCheck,
   Loader2,
+  ArrowLeft,
+  Image as ImageIcon, // ✅ ikon gambar
+  ChevronLeft, // ✅ navigasi slider
+  ChevronRight,
 } from "lucide-react";
 
 import { useParams } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
 import { useRouter } from "next/navigation";
-import { Skeleton } from "../../ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useGet, usePost } from "@/hooks/useApi";
 import { StatusMasukan } from "@/app/generated/prisma";
 import { cn } from "@/lib/utils";
@@ -44,6 +49,11 @@ export default function CardDetailMasukanWarga() {
     null,
   );
   const [alasan, setAlasan] = useState("");
+
+  // ✅ state untuk gambar
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const {
     data: masukan,
@@ -190,279 +200,374 @@ export default function CardDetailMasukanWarga() {
     );
   }
 
+  const images = masukan.gambarMasukan || [];
+
   return (
-    <Card className="border shadow-lg shadow-primary/5 overflow-hidden bg-card/50 backdrop-blur-sm">
-      <CardContent className="p-4 md:p-6 space-y-6">
-        {/* Header pengirim dengan status */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="w-full sm:w-auto">
-            <h3 className="text-xl font-semibold text-foreground flex flex-wrap items-center gap-2">
-              <span className="wrap-break-words">{masukan.namaPengirim}</span>
-              {masukan.nomorHp && (
-                <span className="text-sm font-normal text-muted-foreground break-all">
-                  ({masukan.nomorHp})
-                </span>
+    <div className="p-4 md:p-6 space-y-6">
+      {/* Back Button & Title */}
+      <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => router.back()}
+          className="cursor-pointer shrink-0"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <h1 className="text-2xl font-bold">Kembali</h1>
+      </div>
+      <Card className="border shadow-lg shadow-primary/5 overflow-hidden bg-card/50 backdrop-blur-sm">
+        <CardContent className="p-4 md:p-6 space-y-6">
+          {/* Header pengirim dengan status */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="w-full sm:w-auto">
+              <h2 className="text-2xl font-bold text-foreground mb-1">
+                {masukan.judul}
+              </h2>
+              <h3 className="text-xl font-semibold text-foreground flex flex-wrap items-center gap-2">
+                <span className="wrap-break-words">{masukan.namaPengirim}</span>
+                {masukan.nomorHp && (
+                  <span className="text-sm font-normal text-muted-foreground break-all">
+                    ({masukan.nomorHp})
+                  </span>
+                )}
+              </h3>
+            </div>
+            <Badge
+              className={cn(
+                currentStatus.color,
+                "px-3 py-1.5 text-sm font-medium border flex items-center shadow-sm shrink-0",
               )}
-            </h3>
+            >
+              {currentStatus.icon}
+              {currentStatus.label}
+            </Badge>
           </div>
-          <Badge
-            className={cn(
-              currentStatus.color,
-              "px-3 py-1.5 text-sm font-medium border flex items-center shadow-sm shrink-0",
+
+          <Separator className="bg-border/50" />
+
+          {/* Grid informasi dengan ikon */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <InfoItem label="Lokasi RT" value={masukan.lokasiRt} />
+            <InfoItem label="Lokasi RW" value={masukan.lokasiRw} />
+            <InfoItem
+              label="Kategori (Domain Isu)"
+              value={masukan.domainIsu?.nama ?? "-"}
+            />
+            <InfoItem
+              label="Diverifikasi Oleh"
+              value={masukan.diverifikasiOleh?.name ?? "-"}
+            />
+            <InfoItem
+              label="Dibuat Pada"
+              value={formatDate(masukan.createdAt)}
+            />
+            <InfoItem
+              label="Diperbarui Pada"
+              value={formatDate(masukan.updatedAt)}
+            />
+            {masukan.nomorHp && (
+              <InfoItem label="Nomor HP" value={masukan.nomorHp} />
             )}
-          >
-            {currentStatus.icon}
-            {currentStatus.label}
-          </Badge>
-        </div>
-
-        <Separator className="bg-border/50" />
-
-        {/* Grid informasi dengan ikon */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <InfoItem label="Lokasi RT" value={masukan.lokasiRt} />
-          <InfoItem label="Lokasi RW" value={masukan.lokasiRw} />
-          <InfoItem
-            label="Kategori (Domain Isu)"
-            value={masukan.domainIsu?.nama ?? "-"}
-          />
-          <InfoItem
-            label="Diverifikasi Oleh"
-            value={masukan.diverifikasiOleh?.name ?? "-"}
-          />
-          <InfoItem label="Dibuat Pada" value={formatDate(masukan.createdAt)} />
-          <InfoItem
-            label="Diperbarui Pada"
-            value={formatDate(masukan.updatedAt)}
-          />
-          {masukan.nomorHp && (
-            <InfoItem label="Nomor HP" value={masukan.nomorHp} />
-          )}
-        </div>
-
-        {/* Deskripsi */}
-        <div className="space-y-2">
-          <Label className="text-sm font-medium text-foreground">
-            Deskripsi Masukan
-          </Label>
-          <div className="bg-muted/30 p-4 rounded-lg border border-border/50 text-foreground whitespace-pre-wrap wrap-break-words">
-            {masukan.deskripsi}
           </div>
-        </div>
 
-        {/* Alasan penolakan jika ada */}
-        {masukan.alasanPenolakan && (
+          {/* Deskripsi */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-destructive">
-              Alasan Penolakan
-            </Label>
-            <div className="bg-destructive/10 p-4 rounded-lg border border-destructive/20 text-destructive whitespace-pre-wrap wrap-break-words">
-              {masukan.alasanPenolakan}
-            </div>
-          </div>
-        )}
-
-        {/* Rekomendasi terkait */}
-        {masukan.relasiRapat && masukan.relasiRapat.length > 0 && (
-          <div className="space-y-3">
             <Label className="text-sm font-medium text-foreground">
-              Rekomendasi Terkait
+              Deskripsi Masukan
             </Label>
-            <div className="bg-muted/30 p-4 rounded-lg border border-border/50 space-y-3">
-              {masukan.relasiRapat.map((relasi: any) => (
-                <div
-                  key={relasi.id}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-background rounded-md shadow-sm border border-border/50"
-                >
-                  <div className="min-w-0">
-                    <p className="font-medium text-foreground wrap-wrap-break-words">
-                      {relasi.kegiatanRapat.judul}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {formatDate(relasi.kegiatanRapat.tanggal)}
-                    </p>
-                  </div>
-                  <Badge variant="outline" className="shrink-0">
-                    {relasi.kegiatanRapat.statusRekomendasi}
-                  </Badge>
-                </div>
-              ))}
+            <div className="bg-muted/30 p-4 rounded-lg border border-border/50 text-foreground whitespace-pre-wrap wrap-break-words">
+              {masukan.deskripsi}
             </div>
           </div>
-        )}
 
-        {/* Tombol aksi */}
-        <div className="flex flex-wrap gap-3 pt-4 border-t border-border/50 justify-center sm:justify-start">
-          {masukan.status !== "MENUNGGU" && (
-            <Button
-              variant="outline"
-              onClick={() => handleChangeStatus("MENUNGGU")}
-              disabled={updating}
-              className="flex w-full md:w-fit items-center gap-2 shadow-sm hover:shadow-md transition-all"
-            >
-              {updating && pendingStatus === "MENUNGGU" ? (
-                <Spinner className="h-4 w-4" />
-              ) : (
-                <RotateCcw className="h-4 w-4" />
-              )}
-              <span className="whitespace-nowrap">Kembalikan ke Menunggu</span>
-            </Button>
-          )}
-
-          {masukan.status !== "DIVERIFIKASI" && (
-            <Button
-              variant="default"
-              onClick={() => handleChangeStatus("DIVERIFIKASI")}
-              disabled={updating}
-              className="flex w-full md:w-fit items-center gap-2 bg-emerald-600 hover:bg-emerald-700 shadow-sm hover:shadow-md transition-all"
-            >
-              {updating && pendingStatus === "DIVERIFIKASI" ? (
-                <Spinner className="h-4 w-4" />
-              ) : (
-                <CheckCircle className="h-4 w-4" />
-              )}
-              <span className="whitespace-nowrap">Verifikasi Diterima</span>
-            </Button>
-          )}
-
-          {masukan.status !== "DITOLAK" && (
-            <Button
-              variant="destructive"
-              onClick={() => handleChangeStatus("DITOLAK")}
-              disabled={updating}
-              className="flex w-full md:w-fit items-center gap-2 shadow-sm hover:shadow-md transition-all"
-            >
-              {updating && pendingStatus === "DITOLAK" ? (
-                <Spinner className="h-4 w-4" />
-              ) : (
-                <XCircle className="h-4 w-4" />
-              )}
-              <span className="whitespace-nowrap">Tolak Masukan</span>
-            </Button>
-          )}
-
-          {masukan.status !== "DIPROSES" && (
-            <Button
-              variant="secondary"
-              onClick={() => handleChangeStatus("DIPROSES")}
-              disabled={updating}
-              className="flex w-full md:w-fit items-center gap-2 bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow-md transition-all"
-            >
-              {updating && pendingStatus === "DIPROSES" ? (
-                <Spinner className="h-4 w-4" />
-              ) : (
-                <Loader2 className="h-4 w-4" />
-              )}
-              <span className="whitespace-nowrap">Tandai Diproses</span>
-            </Button>
-          )}
-
-          {masukan.status !== "DISELESAIKAN" && (
-            <Button
-              className="flex w-full md:w-fit items-center gap-2 bg-purple-600 text-white hover:bg-purple-700 shadow-sm hover:shadow-md transition-all"
-              onClick={() => handleChangeStatus("DISELESAIKAN")}
-              disabled={updating}
-            >
-              {updating && pendingStatus === "DISELESAIKAN" ? (
-                <Spinner className="h-4 w-4" />
-              ) : (
-                <CheckCheck className="h-4 w-4" />
-              )}
-              <span className="whitespace-nowrap">Tandai Selesai</span>
-            </Button>
-          )}
-        </div>
-      </CardContent>
-
-      {/* Modal Penolakan */}
-      <Dialog open={openRejectModal} onOpenChange={setOpenRejectModal}>
-        <DialogContent className="sm:max-w-lg w-[95vw] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl flex items-center gap-2">
-              <XCircle className="h-5 w-5 text-destructive" />
-              Alasan Penolakan
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
+          {/* Alasan penolakan jika ada */}
+          {masukan.alasanPenolakan && (
             <div className="space-y-2">
-              <Label htmlFor="alasan" className="text-base">
-                Tuliskan alasan penolakan
+              <Label className="text-sm font-medium text-destructive">
+                Alasan Penolakan
               </Label>
-              <Textarea
-                id="alasan"
-                placeholder="Alasan penolakan akan terlihat oleh pengirim..."
-                value={alasan}
-                onChange={(e) => setAlasan(e.target.value)}
-                rows={4}
-                className="resize-none focus:ring-2 focus:ring-primary/50 w-full"
-              />
-              <p className="text-xs text-muted-foreground">
-                Alasan wajib diisi jika status ditolak.
+              <div className="bg-destructive/10 p-4 rounded-lg border border-destructive/20 text-destructive whitespace-pre-wrap wrap-break-words">
+                {masukan.alasanPenolakan}
+              </div>
+            </div>
+          )}
+
+          {/* ✅ BAGIAN GAMBAR (ditambahkan) */}
+          {images.length > 0 && (
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-foreground flex items-center gap-2">
+                <ImageIcon className="h-4 w-4" /> Lampiran Gambar (
+                {images.length})
+              </Label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {images.map((img: any, idx: number) => (
+                  <div
+                    key={idx}
+                    className="relative group cursor-pointer aspect-square rounded-lg overflow-hidden border border-border bg-muted/20 hover:shadow-md transition-all"
+                    onClick={() => {
+                      setSelectedImage(img.url);
+                      setCurrentImageIndex(idx);
+                      setImageModalOpen(true);
+                    }}
+                  >
+                    <Image
+                      src={img.url}
+                      alt={`Gambar ${idx + 1}`}
+                      fill
+                      sizes="(max-width: 768px) 150px, 200px"
+                      className="object-cover hover:scale-105 transition-transform duration-300"
+                      unoptimized
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Tombol aksi (tidak diubah) */}
+          <div className="flex flex-wrap gap-3 pt-4 border-t border-border/50 justify-center sm:justify-start">
+            {masukan.status !== "MENUNGGU" && (
+              <Button
+                variant="outline"
+                onClick={() => handleChangeStatus("MENUNGGU")}
+                disabled={updating}
+                className="flex w-full md:w-fit items-center gap-2 shadow-sm hover:shadow-md transition-all"
+              >
+                {updating && pendingStatus === "MENUNGGU" ? (
+                  <Spinner className="h-4 w-4" />
+                ) : (
+                  <RotateCcw className="h-4 w-4" />
+                )}
+                <span className="whitespace-nowrap">
+                  Kembalikan ke Menunggu
+                </span>
+              </Button>
+            )}
+
+            {masukan.status !== "DIVERIFIKASI" && (
+              <Button
+                variant="default"
+                onClick={() => handleChangeStatus("DIVERIFIKASI")}
+                disabled={updating}
+                className="flex w-full md:w-fit items-center gap-2 bg-emerald-600 hover:bg-emerald-700 shadow-sm hover:shadow-md transition-all"
+              >
+                {updating && pendingStatus === "DIVERIFIKASI" ? (
+                  <Spinner className="h-4 w-4" />
+                ) : (
+                  <CheckCircle className="h-4 w-4" />
+                )}
+                <span className="whitespace-nowrap">Verifikasi Diterima</span>
+              </Button>
+            )}
+
+            {masukan.status !== "DITOLAK" && (
+              <Button
+                variant="destructive"
+                onClick={() => handleChangeStatus("DITOLAK")}
+                disabled={updating}
+                className="flex w-full md:w-fit items-center gap-2 shadow-sm hover:shadow-md transition-all"
+              >
+                {updating && pendingStatus === "DITOLAK" ? (
+                  <Spinner className="h-4 w-4" />
+                ) : (
+                  <XCircle className="h-4 w-4" />
+                )}
+                <span className="whitespace-nowrap">Tolak Masukan</span>
+              </Button>
+            )}
+
+            {masukan.status !== "DIPROSES" && (
+              <Button
+                variant="secondary"
+                onClick={() => handleChangeStatus("DIPROSES")}
+                disabled={updating}
+                className="flex w-full md:w-fit items-center gap-2 bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow-md transition-all"
+              >
+                {updating && pendingStatus === "DIPROSES" ? (
+                  <Spinner className="h-4 w-4" />
+                ) : (
+                  <Loader2 className="h-4 w-4" />
+                )}
+                <span className="whitespace-nowrap">Tandai Diproses</span>
+              </Button>
+            )}
+
+            {masukan.status !== "DISELESAIKAN" && (
+              <Button
+                className="flex w-full md:w-fit items-center gap-2 bg-purple-600 text-white hover:bg-purple-700 shadow-sm hover:shadow-md transition-all"
+                onClick={() => handleChangeStatus("DISELESAIKAN")}
+                disabled={updating}
+              >
+                {updating && pendingStatus === "DISELESAIKAN" ? (
+                  <Spinner className="h-4 w-4" />
+                ) : (
+                  <CheckCheck className="h-4 w-4" />
+                )}
+                <span className="whitespace-nowrap">Tandai Selesai</span>
+              </Button>
+            )}
+          </div>
+        </CardContent>
+
+        {/* Modal Penolakan (tidak diubah) */}
+        <Dialog open={openRejectModal} onOpenChange={setOpenRejectModal}>
+          <DialogContent className="sm:max-w-lg w-[95vw] max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-xl flex items-center gap-2">
+                <XCircle className="h-5 w-5 text-destructive" />
+                Alasan Penolakan
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="alasan" className="text-base">
+                  Tuliskan alasan penolakan
+                </Label>
+                <Textarea
+                  id="alasan"
+                  placeholder="Alasan penolakan akan terlihat oleh pengirim..."
+                  value={alasan}
+                  onChange={(e) => setAlasan(e.target.value)}
+                  rows={4}
+                  className="resize-none focus:ring-2 focus:ring-primary/50 w-full"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Alasan wajib diisi jika status ditolak.
+                </p>
+              </div>
+            </div>
+            <DialogFooter className="flex-col sm:flex-row gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setOpenRejectModal(false)}
+                disabled={updating}
+                className="w-full sm:w-auto"
+              >
+                Batal
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleConfirmChange}
+                disabled={updating}
+                className="w-full sm:w-auto"
+              >
+                {updating && <Spinner className="mr-2 h-4 w-4" />}
+                Kirim
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Modal Konfirmasi (tidak diubah) */}
+        <Dialog open={openConfirmModal} onOpenChange={setOpenConfirmModal}>
+          <DialogContent className="sm:max-w-md w-[95vw]">
+            <DialogHeader>
+              <DialogTitle className="text-xl">
+                Konfirmasi Perubahan
+              </DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <p className="text-center text-lg wrap-wrap-break-words">
+                Ubah status menjadi{" "}
+                <span className="font-semibold text-primary">
+                  {pendingStatus}
+                </span>
+                ?
               </p>
             </div>
-          </div>
-          <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setOpenRejectModal(false)}
-              disabled={updating}
-              className="w-full sm:w-auto"
-            >
-              Batal
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleConfirmChange}
-              disabled={updating}
-              className="w-full sm:w-auto"
-            >
-              {updating && <Spinner className="mr-2 h-4 w-4" />}
-              Kirim
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <DialogFooter className="flex-col sm:flex-row gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setOpenConfirmModal(false)}
+                disabled={updating}
+                className="w-full sm:w-auto"
+              >
+                Batal
+              </Button>
+              <Button
+                onClick={handleConfirmChange}
+                disabled={updating}
+                className="w-full sm:w-auto"
+              >
+                {updating && <Spinner className="mr-2 h-4 w-4" />}
+                Ya, Ubah
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </Card>
 
-      {/* Modal Konfirmasi */}
-      <Dialog open={openConfirmModal} onOpenChange={setOpenConfirmModal}>
-        <DialogContent className="sm:max-w-md w-[95vw]">
-          <DialogHeader>
-            <DialogTitle className="text-xl">Konfirmasi Perubahan</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            <p className="text-center text-lg wrap-wrap-break-words">
-              Ubah status menjadi{" "}
-              <span className="font-semibold text-primary">
-                {pendingStatus}
-              </span>
-              ?
-            </p>
+      {/* ✅ Modal untuk gambar besar dengan slider */}
+      <Dialog open={imageModalOpen} onOpenChange={setImageModalOpen}>
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] p-0 bg-transparent border-none shadow-none">
+          {/* Judul tersembunyi untuk aksesibilitas */}
+          <div className="sr-only">
+            <DialogTitle>Gambar Masukan</DialogTitle>
           </div>
-          <DialogFooter className="flex-col sm:flex-row gap-2">
+          <div className="relative w-full h-full min-h-75 max-h-[80vh] bg-black/90 rounded-lg overflow-hidden">
+            {selectedImage && (
+              <div className="relative w-full h-full">
+                <Image
+                  src={selectedImage}
+                  alt={`Gambar ${currentImageIndex + 1}`}
+                  fill
+                  className="object-contain"
+                  unoptimized
+                />
+              </div>
+            )}
+            {images.length > 1 && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white hover:bg-black/70 rounded-full w-10 h-10"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const newIndex =
+                      (currentImageIndex - 1 + images.length) % images.length;
+                    setCurrentImageIndex(newIndex);
+                    setSelectedImage(images[newIndex].url);
+                  }}
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white hover:bg-black/70 rounded-full w-10 h-10"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const newIndex = (currentImageIndex + 1) % images.length;
+                    setCurrentImageIndex(newIndex);
+                    setSelectedImage(images[newIndex].url);
+                  }}
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </Button>
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                  {currentImageIndex + 1} / {images.length}
+                </div>
+              </>
+            )}
             <Button
-              variant="outline"
-              onClick={() => setOpenConfirmModal(false)}
-              disabled={updating}
-              className="w-full sm:w-auto"
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 bg-black/50 text-white hover:bg-black/70 rounded-full"
+              onClick={() => setImageModalOpen(false)}
             >
-              Batal
+              <XCircle className="h-5 w-5" />
             </Button>
-            <Button
-              onClick={handleConfirmChange}
-              disabled={updating}
-              className="w-full sm:w-auto"
-            >
-              {updating && <Spinner className="mr-2 h-4 w-4" />}
-              Ya, Ubah
-            </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
-    </Card>
+    </div>
   );
 }
 
-// Komponen kecil untuk menampilkan item informasi
+// Komponen InfoItem (tidak diubah)
 function InfoItem({ label, value }: { label: string; value: string }) {
   return (
     <div className="space-y-1 min-w-0">

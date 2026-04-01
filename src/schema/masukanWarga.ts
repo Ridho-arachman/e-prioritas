@@ -109,7 +109,7 @@ export const editStatusMasukanWargaSchema = z
 //////////////////////////////////////////////////////////////
 
 export const masukanWargaByIdSchema = z.object({
-  id: z.string().trim().cuid("ID tidak valid"),
+  id: z.string().trim(),
 });
 
 //////////////////////////////////////////////////////////////
@@ -125,7 +125,7 @@ export const masukanWargaQuerySchema = z.object({
 
   domainIsuId: z.string().trim().cuid("Domain isu tidak valid").optional(),
 
-  diverifikasiOlehId: z.string().trim().cuid("ID user tidak valid").optional(),
+  diverifikasiOlehId: z.string().trim().optional(),
 
   lokasiRt: z
     .string()

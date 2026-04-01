@@ -122,6 +122,7 @@ export const masukanWargaService = {
         q
           ? {
               OR: [
+                { id: { contains: q, mode: "insensitive" } },
                 { namaPengirim: { contains: q, mode: "insensitive" } },
                 { nomorHp: { contains: q, mode: "insensitive" } },
                 { judul: { contains: q, mode: "insensitive" } },
@@ -195,6 +196,14 @@ export const masukanWargaService = {
       include: {
         domainIsu: {
           select: { id: true, nama: true },
+        },
+
+        gambarMasukan: {
+          select: {
+            id: true,
+            url: true,
+            publicId: true,
+          },
         },
 
         diverifikasiOleh: {

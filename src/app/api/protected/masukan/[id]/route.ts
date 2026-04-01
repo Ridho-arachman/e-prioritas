@@ -137,6 +137,7 @@ const GET = async (
       status: 200,
     });
   } catch (err) {
+    console.error("Error di GET /api/protected/masukan/[id]", err);
     //PRISMA ERROR
     const prismaResponse = handlePrismaError(err);
     if (prismaResponse) {

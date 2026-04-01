@@ -53,15 +53,10 @@ export async function GET() {
 
     // Data kelurahan statis (jika tidak ada di database, bisa hardcode)
     const dataKelurahan = {
-      totalPenduduk: 5500,
-      totalKepalaKeluarga: 1250,
-      sebaranPekerjaan: {
-        petani: 1500,
-        wirausaha: 900,
-        pegawaiSwasta: 1800,
-        lainnya: 1300,
-      },
-      jumlahFasilitasPublik: 12,
+      totalPenduduk: 10333,
+      totalKepalaKeluarga: 3011,
+      luasKelurahan: 272.45, // dalam Ha
+      jumlahLembagaPendidikan: 21,
     };
 
     return NextResponse.json({
