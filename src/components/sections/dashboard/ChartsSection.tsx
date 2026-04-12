@@ -3,25 +3,25 @@
 
 import {
   Card,
+  CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
 } from "@/components/ui/card";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-  BarChart,
-  Bar,
-} from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGet } from "@/hooks/useApi";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 export default function ChartsSection() {
   const { data, isLoading, error } = useGet(
@@ -139,10 +139,7 @@ export default function ChartsSection() {
                     borderRadius: "8px",
                     boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                   }}
-                  formatter={(
-                    value: number | string | undefined,
-                    name: string | undefined,
-                  ) => {
+                  formatter={(value: any, name: any) => {
                     const val = typeof value === "number" ? value : 0;
                     const label = name ?? "";
                     return [`${val} masukan`, label];
@@ -235,10 +232,7 @@ export default function ChartsSection() {
                     borderRadius: "8px",
                     boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                   }}
-                  formatter={(
-                    value: number | string | undefined,
-                    name: string | undefined,
-                  ) => {
+                  formatter={(value: any, name: any) => {
                     const val = typeof value === "number" ? value : 0;
                     const label = name ?? "";
                     return [`${val} data`, label];

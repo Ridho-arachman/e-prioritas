@@ -3,22 +3,22 @@
 
 import {
   Card,
+  CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
 } from "@/components/ui/card";
-import {
-  PieChart,
-  Pie,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-  Legend,
-} from "recharts";
-import { PieChart as PieChartIcon, AlertCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGet } from "@/hooks/useApi";
+import { AlertCircle, PieChart as PieChartIcon } from "lucide-react";
+import {
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
 
 // Warna untuk setiap tingkat kritikalitas
 const COLORS = {
@@ -135,7 +135,7 @@ export default function KritikalitasDistribution() {
                 })}
               </Pie>
               <Tooltip
-                formatter={(value: number | string | undefined) => {
+                formatter={(value: any) => {
                   const val = typeof value === "number" ? value : 0;
                   return [`${val} data`, "Jumlah"];
                 }}

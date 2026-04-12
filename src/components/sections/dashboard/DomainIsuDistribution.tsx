@@ -3,23 +3,23 @@
 
 import {
   Card,
+  CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
 } from "@/components/ui/card";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import { BarChart3, AlertCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGet } from "@/hooks/useApi";
+import { AlertCircle, BarChart3 } from "lucide-react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 export default function DomainIsuDistribution() {
   const { data, isLoading, error } = useGet(
@@ -94,7 +94,7 @@ export default function DomainIsuDistribution() {
                   borderRadius: "8px",
                   boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                 }}
-                formatter={(value: number | string | undefined) => {
+                formatter={(value: any) => {
                   const val = typeof value === "number" ? value : 0;
                   return [`${val} masukan`, "Jumlah"];
                 }}

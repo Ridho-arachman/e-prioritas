@@ -3,22 +3,22 @@
 
 import {
   Card,
+  CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
 } from "@/components/ui/card";
-import {
-  PieChart,
-  Pie,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-  Legend,
-} from "recharts";
-import { PieChart as PieChartIcon, AlertCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGet } from "@/hooks/useApi";
+import { AlertCircle, PieChart as PieChartIcon } from "lucide-react";
+import {
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
 
 // Tambahkan enum StatusMasukan (sesuai schema)
 export enum StatusMasukan {
@@ -128,16 +128,17 @@ export default function ActivityStats() {
                 ))}
               </Pie>
               <Tooltip
-                formatter={(
-                  value: number | string | undefined,
-                  name: string | undefined,
-                ) => {
-                  const val = typeof value === "number" ? value : 0;
+                formatter={(value: any, name: any) => {
+                  const numericValue = Array.isArray(value)
+                    ? value.reduce(
+                        (sum: number, v: any) => sum + (Number(v) || 0),
+                        0,
+                      )
+                    : Number(value) || 0;
                   const persen =
-                    total > 0 ? ((val / total) * 100).toFixed(1) : "0";
-                  // Pastikan name tidak undefined, fallback ke string kosong
+                    total > 0 ? ((numericValue / total) * 100).toFixed(1) : "0";
                   const label = name ?? "";
-                  return [`${val} (${persen}%)`, label];
+                  return [`${numericValue} (${persen}%)`, label];
                 }}
               />
               <Legend verticalAlign="bottom" height={36} />

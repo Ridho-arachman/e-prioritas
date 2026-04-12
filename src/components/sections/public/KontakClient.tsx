@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import {
   Card,
   CardContent,
@@ -8,18 +7,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Mail,
-  Phone,
-  MapPin,
-  Clock,
-  Facebook,
-  Instagram,
-  Twitter,
-  Youtube,
-  Globe,
-  Users,
-} from "lucide-react";
+import { motion } from "framer-motion";
+// Ikon umum dari Lucide
+import { Clock, Globe, Mail, MapPin, Phone, Users } from "lucide-react";
+// Ikon brand dari React Icons (Font Awesome)
+import { FaFacebook, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 
 export default function KontakPage() {
   const contactInfo = [
@@ -67,25 +59,25 @@ export default function KontakPage() {
 
   const socialMedia = [
     {
-      icon: Facebook,
+      icon: FaFacebook, // Ganti menjadi FaFacebook
       href: "https://facebook.com",
       label: "Facebook",
       color: "bg-blue-600",
     },
     {
-      icon: Instagram,
+      icon: FaInstagram, // Ganti menjadi FaInstagram
       href: "https://instagram.com",
       label: "Instagram",
       color: "bg-pink-600",
     },
     {
-      icon: Twitter,
+      icon: FaTwitter, // Ganti menjadi FaTwitter
       href: "https://twitter.com",
       label: "Twitter",
       color: "bg-sky-500",
     },
     {
-      icon: Youtube,
+      icon: FaYoutube, // Ganti menjadi FaYoutube
       href: "https://youtube.com",
       label: "YouTube",
       color: "bg-red-600",
