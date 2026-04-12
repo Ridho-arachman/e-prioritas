@@ -1,18 +1,12 @@
 // components/layout/footer.tsx
 "use client";
-import Link from "next/link";
 import Image from "next/image";
-import {
-  Mail,
-  Phone,
-  MapPin,
-  Facebook,
-  Instagram,
-  Twitter,
-  Github,
-  Heart,
-} from "lucide-react";
+import Link from "next/link";
+// Ikon umum tetap dari Lucide
+import { Heart, Mail, MapPin, Phone } from "lucide-react";
+// Ikon brand dari React Icons (Font Awesome)
 import { motion } from "framer-motion";
+import { FaFacebook, FaGithub, FaInstagram, FaTwitter } from "react-icons/fa";
 
 const footerLinks = [
   {
@@ -35,24 +29,25 @@ const footerLinks = [
   },
 ];
 
+// GANTI KOMPONEN DI SINI
 const socialMedia = [
   {
-    icon: Facebook,
+    icon: FaFacebook, // Ganti Facebook jadi FaFacebook
     href: "https://facebook.com/desapanggungjati",
     label: "Facebook",
   },
   {
-    icon: Instagram,
+    icon: FaInstagram, // Ganti Instagram jadi FaInstagram
     href: "https://instagram.com/desapanggungjati",
     label: "Instagram",
   },
   {
-    icon: Twitter,
+    icon: FaTwitter, // Ganti Twitter jadi FaTwitter
     href: "https://twitter.com/desapanggungjati",
     label: "Twitter",
   },
   {
-    icon: Github,
+    icon: FaGithub, // Ganti Github jadi FaGithub
     href: "https://github.com/Ridho-arachman",
     label: "GitHub",
   },

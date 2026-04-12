@@ -11,6 +11,8 @@ const nextConfig: NextConfig = {
   //   return config;
   // },
 
+  allowedDevOrigins: ["aromatically-dreamiest-delia.ngrok-free.dev"],
+
   images: {
     remotePatterns: [
       {

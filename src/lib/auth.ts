@@ -1,8 +1,8 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import prisma from "./prisma";
-import { captcha, phoneNumber } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
+import { captcha } from "better-auth/plugins";
+import prisma from "./prisma";
 import { sendEmail } from "./sendEmail";
 
 export const auth = betterAuth({
@@ -24,7 +24,7 @@ export const auth = betterAuth({
     captcha({
       provider: "cloudflare-turnstile",
       secretKey: process.env.TURNSTILE_SECRET_KEY!,
-    }),
+    }) as any,
   ],
   baseURL: process.env.BETTER_AUTH_URL,
   socialProviders: {

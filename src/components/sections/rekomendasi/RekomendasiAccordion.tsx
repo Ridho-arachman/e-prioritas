@@ -84,7 +84,7 @@ export function RekomendasiAccordion({
                   </h3>
                   <MasukanTerlibatTable
                     masukanWarga={masukanWarga.filter((m: any) =>
-                      item.masukan_terkait_ids.includes(m.masukan.id)
+                      item.masukan_terkait_ids.includes(m.masukan.id),
                     )}
                   />
                 </div>

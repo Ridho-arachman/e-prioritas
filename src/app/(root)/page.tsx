@@ -1,7 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
-import Link from "next/link";
+import InfiniteLogoSlider from "@/components/blocks/logo-slider";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,25 +10,26 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useGet } from "@/hooks/useApi";
+import { cn } from "@/lib/utils";
+import { motion, useScroll, useTransform } from "framer-motion";
 import {
   ArrowRightIcon,
   BarChart3,
   Bot,
-  Users,
-  Sparkles,
-  TrendingUp,
-  MessageSquare,
-  Star,
   ChevronRight,
+  MessageSquare,
+  Sparkles,
+  Star,
+  TrendingUp,
+  Users,
 } from "lucide-react";
 import Image from "next/image";
-import InfiniteLogoSlider from "@/components/blocks/logo-slider";
-import { cn } from "@/lib/utils";
-import { useRef, useState, useEffect } from "react";
-import { useGet } from "@/hooks/useApi";
-import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
-// Komponen Counter (sama seperti di halaman tentang)
+// Komponen Counter
 const Counter = ({
   value,
   duration = 2,
@@ -73,7 +73,7 @@ const Counter = ({
   return <span ref={ref}>{count.toLocaleString()}</span>;
 };
 
-// Komponen partikel sederhana (hanya di-render di client)
+// Komponen partikel
 const Particles = () => {
   const [isMounted, setIsMounted] = useState(false);
   const [particles, setParticles] = useState<
@@ -165,8 +165,14 @@ const TiltCard = ({
 };
 
 export default function LandingPage() {
-  const { scrollYProgress } = useScroll();
-  const y1 = useTransform(scrollYProgress, [0, 1], [0, -200]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"],
+  });
+
+  // Background parallax (bergerak lebih lambat)
+  const bgY = useTransform(scrollYProgress, [0, 1], [0, -200]);
 
   const { data: statsData, isLoading } = useGet("/public/stats");
 
@@ -280,24 +286,35 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-linear-to-br from-slate-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-blue-950">
+    <div
+      ref={containerRef}
+      className="relative min-h-screen overflow-hidden bg-linear-to-br from-slate-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-blue-950"
+    >
+      {/* LAYER BACKGROUND PARALLAX */}
+      <motion.div className="absolute inset-0 z-0" style={{ y: bgY }}>
+        <div className="absolute inset-0 bg-linear-to-br from-indigo-100/40 via-blue-50/30 to-cyan-100/40 dark:from-indigo-950/40 dark:via-blue-900/30 dark:to-cyan-950/40" />
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\' width=\'100\' height=\'100\'%3E%3Cpath fill=\'none\' stroke=\'rgba(0,0,0,0.05)\' stroke-width=\'1\' d=\'M10 0 L10 100 M20 0 L20 100 ...\'/%3E%3C/svg%3E')] bg-repeat opacity-30 dark:opacity-10" />
+      </motion.div>
+
+      {/* Animated background blobs (tetap, tanpa scroll effect) */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <motion.div
+          className="absolute -top-40 -right-40 w-80 h-80 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
+          animate={{ x: [0, 100, 0], y: [0, -50, 0] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+        />
+        <motion.div
+          className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
+          animate={{ x: [0, -100, 0], y: [0, 50, 0] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+        />
+      </div>
+
       <Particles />
 
-      {/* Animated background blobs */}
-      <motion.div
-        className="absolute -top-40 -right-40 w-80 h-80 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
-        animate={{ x: [0, 100, 0], y: [0, -50, 0] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-      />
-      <motion.div
-        className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
-        animate={{ x: [0, -100, 0], y: [0, 50, 0] }}
-        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-      />
-
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-24">
-        {/* Header dengan parallax */}
-        <motion.div className="text-center space-y-4" style={{ y: y1 }}>
+        {/* Hero section (tetap, tanpa animasi masuk/keluar karena di awal) */}
+        <div className="text-center space-y-4">
           <motion.h1
             className="text-4xl md:text-5xl lg:text-7xl font-bold bg-clip-text text-transparent bg-linear-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400"
             initial={{ opacity: 0, y: 20 }}
@@ -316,15 +333,15 @@ export default function LandingPage() {
             pembangunan fasilitas umum secara akurat dan transparan di Kelurahan
             Panggungjati.
           </motion.p>
-        </motion.div>
+        </div>
 
-        {/* Stats dengan animasi */}
+        {/* Stats dengan efek masuk/keluar saat scroll */}
         <motion.div
           className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16"
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ staggerChildren: 0.1 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.6, ease: "easeOut", staggerChildren: 0.1 }}
         >
           {stats.map((stat, idx) => (
             <motion.div
@@ -333,7 +350,7 @@ export default function LandingPage() {
               whileHover={{ scale: 1.05 }}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              viewport={{ once: false, amount: 0.2 }}
               transition={{ delay: idx * 0.1 }}
             >
               <stat.icon className="w-8 h-8 mx-auto mb-2 text-blue-600 dark:text-blue-400" />
@@ -347,25 +364,32 @@ export default function LandingPage() {
           ))}
         </motion.div>
 
-        {/* Logo Slider */}
+        {/* Logo Slider dengan efek masuk/keluar */}
         <motion.div
           className="mt-24"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.6 }}
         >
           <InfiniteLogoSlider />
         </motion.div>
 
-        {/* Main Cards dengan efek tilt */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-24">
+        {/* Main Cards dengan efek masuk/keluar */}
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-24"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.6, staggerChildren: 0.2 }}
+        >
           {mainCards.map((card, idx) => (
             <motion.div
               key={card.title}
-              initial={{ opacity: 0, x: idx === 0 ? -50 : 50 }}
+              initial={{ opacity: 0, x: idx === 0 ? -30 : 30 }}
               whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: idx * 0.2 }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 0.5, delay: idx * 0.1 }}
             >
               <Link href={card.linkHref}>
                 <TiltCard className="relative overflow-hidden h-full border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-white dark:bg-gray-800 rounded-2xl">
@@ -421,14 +445,15 @@ export default function LandingPage() {
               </Link>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-        {/* Features Section */}
+        {/* Features Section dengan efek masuk/keluar */}
         <motion.div
           className="mt-32 text-center"
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.6 }}
         >
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
             Mengapa Sistem Ini Penting?
@@ -444,7 +469,7 @@ export default function LandingPage() {
                 whileHover={{ scale: 1.05, y: -5 }}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                viewport={{ once: false, amount: 0.2 }}
                 transition={{ delay: idx * 0.1 }}
               >
                 <Card className="p-8 text-left border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm h-full">
@@ -470,12 +495,13 @@ export default function LandingPage() {
           </div>
         </motion.div>
 
-        {/* Testimonials Section */}
+        {/* Testimonials Section dengan efek masuk/keluar */}
         <motion.div
           className="mt-32"
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.6 }}
         >
           <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 dark:text-white mb-4">
             Apa Kata Mereka?
@@ -491,7 +517,7 @@ export default function LandingPage() {
                 whileHover={{ scale: 1.05 }}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                viewport={{ once: false, amount: 0.2 }}
                 transition={{ delay: idx * 0.1 }}
               >
                 <Card className="p-6 border-0 shadow-md hover:shadow-xl transition-all bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm">
@@ -522,12 +548,13 @@ export default function LandingPage() {
           </div>
         </motion.div>
 
-        {/* Call to Action */}
+        {/* Call to Action dengan efek masuk/keluar */}
         <motion.div
           className="mt-32 text-center bg-linear-to-r from-blue-600 to-cyan-600 rounded-3xl p-12 shadow-2xl"
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.5 }}
           whileHover={{ scale: 1.02 }}
         >
           <h3 className="text-3xl font-bold text-white mb-4">
