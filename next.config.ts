@@ -29,7 +29,7 @@ const nextConfig: NextConfig = {
   compress: true,
 
   // Output standalone untuk deployment dengan Docker (mengurangi ukuran image)
-  output: "standalone",
+  // output: "standalone",
 
   // Tambahkan header keamanan HTTP (CSP, HSTS, dll)
   async headers() {
