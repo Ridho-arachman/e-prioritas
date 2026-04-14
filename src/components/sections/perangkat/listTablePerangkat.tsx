@@ -1,45 +1,6 @@
 "use client";
 
 import {
-  Plus,
-  Send,
-  XIcon,
-  ChevronLeft,
-  ChevronRight,
-  Verified,
-  X,
-  Trash,
-  Filter,
-  ArrowUp,
-  ArrowDown,
-  SlidersHorizontal,
-} from "lucide-react";
-import { useDebounce } from "use-debounce";
-import { useState, useEffect } from "react";
-import { notifier } from "../../../lib/ToastNotifier";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { CardContent, CardHeader } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { useDelete, useGet, usePost } from "@/hooks/useApi";
-import DataKosong from "../../blocks/DataKosong";
-import DataTidakDitemukan from "../../blocks/DataTidakDitemukan";
-import DataError from "../../blocks/DataError";
-import TableSkeleton from "../../blocks/tableSkeleton";
-import Link from "next/link";
-import { useQueryState } from "nuqs";
-import { buildQuery } from "@/utils/query";
-import { useRouter } from "next/navigation";
-import { AxiosError } from "axios";
-import { Spinner } from "@/components/ui/spinner";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -49,6 +10,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { CardContent, CardHeader } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -56,7 +21,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -64,10 +30,44 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useDelete, useGet, usePost } from "@/hooks/useApi";
+import { cn } from "@/lib/utils";
+import { buildQuery } from "@/utils/query";
+import { AxiosError } from "axios";
+import {
+  ArrowDown,
+  ArrowUp,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+  Plus,
+  Send,
+  SlidersHorizontal,
+  Trash,
+  Verified,
+  X,
+  XIcon,
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
+import { useEffect, useState } from "react";
+import { useDebounce } from "use-debounce";
+import { notifier } from "../../../lib/ToastNotifier";
+import DataError from "../../blocks/DataError";
+import DataKosong from "../../blocks/DataKosong";
+import DataTidakDitemukan from "../../blocks/DataTidakDitemukan";
+import TableSkeleton from "../../blocks/tableSkeleton";
 
 // Helper function untuk mendapatkan inisial dari nama
 const getInitials = (name: string): string => {
@@ -85,6 +85,13 @@ const getInitials = (name: string): string => {
   );
 };
 
+// ✅ Opsi role yang tersedia untuk filter (tanpa string kosong)
+const roleOptions = [
+  { value: "all", label: "Semua Perangkat" },
+  { value: "LURAH", label: "Lurah" },
+  { value: "PERANGKAT_DESA", label: "Perangkat Desa" },
+];
+
 export default function ListTablePerangkat() {
   const router = useRouter();
   const [selectedDeleteId, setSelectedDeleteId] = useState<string | null>(null);
@@ -96,6 +103,7 @@ export default function ListTablePerangkat() {
   const [active, setActive] = useQueryState("isActive", { defaultValue: "" });
   const [page, setPage] = useQueryState("page", { defaultValue: "1" });
   const [perPage] = useQueryState("perPage", { defaultValue: "10" });
+  const [role, setRole] = useQueryState("role", { defaultValue: "all" }); // ✅ default "all"
 
   // Sorting states
   const [sortBy, setSortBy] = useQueryState("sortBy", { defaultValue: "name" });
@@ -115,6 +123,7 @@ export default function ListTablePerangkat() {
     perPage: perPageNumber,
     sortBy,
     sortOrder,
+    role: role !== "all" ? role : undefined, // ✅ hanya kirim jika bukan "all"
   });
 
   const { data, meta, error, isLoading, mutate } = useGet(
@@ -134,8 +143,15 @@ export default function ListTablePerangkat() {
     { value: "createdAt", label: "Tanggal Dibuat" },
   ];
 
+  // ✅ Filter signifikan jika role bukan "all"
   const hasSignificantFilter =
-    (debouncedQ?.trim() !== "" && debouncedQ !== undefined) || active !== "";
+    (debouncedQ?.trim() !== "" && debouncedQ !== undefined) ||
+    active !== "" ||
+    role !== "all";
+
+  useEffect(() => {
+    setPage("1");
+  }, [debouncedQ, setPage]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -172,10 +188,8 @@ export default function ListTablePerangkat() {
 
   const handleSortChange = (field: string) => {
     if (sortBy === field) {
-      // Toggle order if same field
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
-      // New field, default to ascending
       setSortBy(field);
       setSortOrder("asc");
     }
@@ -183,18 +197,19 @@ export default function ListTablePerangkat() {
 
   const clearFilters = () => {
     setActive("");
+    setRole("all"); // ✅ reset ke "all"
     setSortBy("name");
     setSortOrder("asc");
     setIsFilterOpen(false);
   };
 
   const hasActiveFilters =
-    active !== "" || sortBy !== "name" || sortOrder !== "asc";
+    active !== "" || role !== "all" || sortBy !== "name" || sortOrder !== "asc";
 
-  // Tampilkan loading atau versi sederhana saat belum mounted (SSR)
   if (!isMounted) {
     return (
       <div className="p-4 md:p-6">
+        {/* Skeleton loading */}
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-4">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="animate-pulse bg-muted h-10 w-40 rounded"></div>
@@ -205,8 +220,6 @@ export default function ListTablePerangkat() {
             <div className="animate-pulse bg-muted h-10 w-10 rounded"></div>
           </div>
         </div>
-
-        {/* Skeleton yang valid secara HTML */}
         <div className="hidden md:block">
           <div className="border rounded-lg overflow-hidden">
             <div className="grid grid-cols-9 gap-4 p-4 border-b bg-muted/50">
@@ -229,8 +242,6 @@ export default function ListTablePerangkat() {
             ))}
           </div>
         </div>
-
-        {/* Mobile Skeleton */}
         <div className="md:hidden space-y-4">
           {[...Array(3)].map((_, i) => (
             <div
@@ -245,7 +256,6 @@ export default function ListTablePerangkat() {
 
   return (
     <>
-      {/* Delete Confirmation Dialog */}
       <AlertDialog
         open={!!selectedDeleteId}
         onOpenChange={(open) => {
@@ -283,7 +293,6 @@ export default function ListTablePerangkat() {
 
       <CardHeader className="space-y-4">
         <div className="mb-4 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
-          {/* Left Section - Actions */}
           <div className="flex flex-col lg:flex-row gap-4">
             <Link href="/admin/kelola-perangkat/add">
               <Button className="cursor-pointer w-full sm:w-auto">
@@ -291,7 +300,6 @@ export default function ListTablePerangkat() {
               </Button>
             </Link>
 
-            {/* Filter Button */}
             <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
               <Button
                 variant="outline"
@@ -302,8 +310,11 @@ export default function ListTablePerangkat() {
                 Filter & Sort
                 {hasActiveFilters && (
                   <Badge variant="secondary" className="ml-2">
-                    {active !== "" ? 1 : 0} +{" "}
-                    {sortBy !== "name" || sortOrder !== "asc" ? 1 : 0}
+                    {[
+                      active !== "" ? 1 : 0,
+                      role !== "all" ? 1 : 0,
+                      sortBy !== "name" || sortOrder !== "asc" ? 1 : 0,
+                    ].reduce((a, b) => a + b, 0)}
                   </Badge>
                 )}
               </Button>
@@ -322,7 +333,28 @@ export default function ListTablePerangkat() {
                 </DialogHeader>
 
                 <div className="grid gap-6 py-4">
-                  {/* Status Filter */}
+                  <div className="grid gap-2">
+                    <Label>Role</Label>
+                    <Select value={role} onValueChange={setRole}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {roleOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">
+                      Pilih role untuk memfilter data. Default: Semua Perangkat
+                      (Lurah & Perangkat Desa).
+                    </p>
+                  </div>
+
+                  <Separator />
+
                   <div className="grid gap-2">
                     <Label>Status Aktif</Label>
                     <div className="flex flex-col sm:flex-row gap-2">
@@ -336,7 +368,6 @@ export default function ListTablePerangkat() {
                         <Verified className="mr-2 h-4 w-4" />
                         Aktif
                       </Button>
-
                       <Button
                         variant={active === "false" ? "default" : "outline"}
                         className="flex-1 cursor-pointer"
@@ -352,7 +383,6 @@ export default function ListTablePerangkat() {
 
                   <Separator />
 
-                  {/* Sorting Section */}
                   <div className="grid gap-2">
                     <Label>Urutkan Berdasarkan</Label>
                     <Select value={sortBy} onValueChange={setSortBy}>
@@ -377,7 +407,6 @@ export default function ListTablePerangkat() {
                         <ArrowUp className="mr-2 h-4 w-4" />
                         Ascending
                       </Button>
-
                       <Button
                         variant={sortOrder === "desc" ? "default" : "outline"}
                         className="flex-1 cursor-pointer"
@@ -409,7 +438,6 @@ export default function ListTablePerangkat() {
             </Dialog>
           </div>
 
-          {/* Right Section - Search */}
           <div className="flex flex-wrap gap-2">
             <Input
               value={q}
@@ -429,9 +457,19 @@ export default function ListTablePerangkat() {
           </div>
         </div>
 
-        {/* Active Filters Badge */}
         {hasActiveFilters && (
           <div className="flex flex-wrap gap-2">
+            {role !== "all" && (
+              <Badge variant="secondary" className="gap-2">
+                Role: {roleOptions.find((opt) => opt.value === role)?.label}
+                <button
+                  onClick={() => setRole("all")}
+                  className="hover:text-red-500"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
             {active !== "" && (
               <Badge variant="secondary" className="gap-2">
                 Status: {active === "true" ? "Aktif" : "Tidak Aktif"}
@@ -533,7 +571,6 @@ export default function ListTablePerangkat() {
 
             <TableBody>
               {isLoading && !data && <TableSkeleton rows={5} />}
-
               {error && (
                 <TableRow>
                   <TableCell colSpan={9} className="text-center">
@@ -541,7 +578,6 @@ export default function ListTablePerangkat() {
                   </TableCell>
                 </TableRow>
               )}
-
               {data?.length === 0 && !hasSignificantFilter && (
                 <TableRow>
                   <TableCell colSpan={9} className="text-center">
@@ -549,7 +585,6 @@ export default function ListTablePerangkat() {
                   </TableCell>
                 </TableRow>
               )}
-
               {data?.length === 0 && hasSignificantFilter && (
                 <TableRow>
                   <TableCell colSpan={9} className="text-center">
@@ -557,7 +592,6 @@ export default function ListTablePerangkat() {
                   </TableCell>
                 </TableRow>
               )}
-
               {data?.length > 0 &&
                 data?.map((item: any, index: number) => (
                   <TableRow
@@ -570,8 +604,6 @@ export default function ListTablePerangkat() {
                     <TableCell className={cellCenter}>
                       {(pageNumber - 1) * perPageNumber + index + 1}
                     </TableCell>
-
-                    {/* Kolom Foto dengan Avatar Fallback */}
                     <TableCell className="text-center align-middle">
                       <div className="flex justify-center">
                         <Avatar className="h-10 w-10 border-2 border-muted">
@@ -589,7 +621,6 @@ export default function ListTablePerangkat() {
                         </Avatar>
                       </div>
                     </TableCell>
-
                     <TableCell className={cellCenter}>{item.name}</TableCell>
                     <TableCell className={cellCenter}>{item.email}</TableCell>
                     <TableCell className={cellCenter}>{item.jabatan}</TableCell>
@@ -602,7 +633,6 @@ export default function ListTablePerangkat() {
                         )}
                       </div>
                     </TableCell>
-
                     <TableCell className="align-middle">
                       <div className="flex items-center justify-center">
                         {item.emailVerified ? (
@@ -612,7 +642,6 @@ export default function ListTablePerangkat() {
                         )}
                       </div>
                     </TableCell>
-
                     <TableCell className={cellCenter}>
                       {new Date(item.createdAt).toLocaleDateString("id-ID", {
                         day: "2-digit",
@@ -620,8 +649,6 @@ export default function ListTablePerangkat() {
                         year: "numeric",
                       })}
                     </TableCell>
-
-                    {/* 🔥 AKSI — EVENT DIPUTUS DI SINI */}
                     <TableCell onClick={(e) => e.stopPropagation()}>
                       <div className="flex justify-center gap-1 sm:gap-2">
                         <Button
@@ -636,7 +663,6 @@ export default function ListTablePerangkat() {
                         >
                           Edit
                         </Button>
-
                         <Button
                           size="sm"
                           variant="destructive"
@@ -648,7 +674,6 @@ export default function ListTablePerangkat() {
                         >
                           <Trash className="h-4 w-4" />
                         </Button>
-
                         <Button
                           size="sm"
                           variant="outline"
@@ -673,7 +698,6 @@ export default function ListTablePerangkat() {
           <div className="text-sm text-muted-foreground order-2 sm:order-1">
             Total: {meta?.total || 0} User
           </div>
-
           <div className="flex gap-2 order-1 sm:order-2">
             <Button
               size="sm"

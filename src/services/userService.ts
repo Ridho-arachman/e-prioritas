@@ -1,3 +1,4 @@
+import { Prisma, Role } from "@/app/generated/prisma";
 import { config } from "@/config";
 import { auth } from "@/lib/auth";
 import { deleteFromCloudinary } from "@/lib/cloudinary";
@@ -5,9 +6,10 @@ import prisma from "@/lib/prisma";
 
 interface GetAllPerangkatParams {
   q?: string;
+  role?: string; // atau Role.PERANGKAT_DESA | Role.LURAH
   isActive?: string;
-  page?: number; // halaman saat ini
-  perPage?: number; // jumlah item per halaman
+  page?: number;
+  perPage?: number;
 }
 
 export const userService = {
@@ -40,8 +42,9 @@ export const userService = {
     isActive,
     page = 1,
     perPage = 10,
-    sortBy = "name", // default sort by name
-    sortOrder = "asc", // default ascending order
+    sortBy = "name",
+    sortOrder = "asc",
+    role,
   }: GetAllPerangkatParams & {
     sortBy?: string;
     sortOrder?: "asc" | "desc";
@@ -49,7 +52,6 @@ export const userService = {
     const skip = (page - 1) * perPage;
     const take = perPage;
 
-    // Validasi dan mapping field sorting
     const validSortFields = [
       "id",
       "name",
@@ -61,47 +63,39 @@ export const userService = {
     const sortField = validSortFields.includes(sortBy) ? sortBy : "name";
     const order = sortOrder === "desc" ? "desc" : "asc";
 
-    // Hitung total data (optional, buat total halaman)
-    const total = await prisma.user.count({
-      where: {
-        AND: [
-          q
-            ? {
-                OR: [
-                  { id: { contains: q, mode: "insensitive" } },
-                  { name: { contains: q, mode: "insensitive" } },
-                  { email: { contains: q, mode: "insensitive" } },
-                  { jabatan: { contains: q, mode: "insensitive" } },
-                ],
-              }
-            : {},
-          {
-            OR: [{ role: "PERANGKAT_DESA" }, { role: "LURAH" }],
-          },
-          isActive !== undefined ? { isActive: isActive === "true" } : {},
-        ],
-      },
-    });
+    let rolesToFilter: Role[] = [];
+    if (role) {
+      // role di sini bisa string apa pun, tapi kita hanya mau proses jika valid
+      if (role === "PERANGKAT_DESA" || role === "LURAH") {
+        rolesToFilter = [role as Role];
+      } else {
+        // Jika role tidak valid, fallback ke default
+        rolesToFilter = [Role.PERANGKAT_DESA, Role.LURAH];
+      }
+    } else {
+      rolesToFilter = [Role.PERANGKAT_DESA, Role.LURAH];
+    }
 
+    const whereCondition: Prisma.UserWhereInput = {
+      AND: [
+        q
+          ? {
+              OR: [
+                { id: { contains: q, mode: "insensitive" } },
+                { name: { contains: q, mode: "insensitive" } },
+                { email: { contains: q, mode: "insensitive" } },
+                { jabatan: { contains: q, mode: "insensitive" } },
+              ],
+            }
+          : {},
+        { role: { in: rolesToFilter } },
+        isActive !== undefined ? { isActive: isActive === "true" } : {},
+      ],
+    };
+
+    const total = await prisma.user.count({ where: whereCondition });
     const data = await prisma.user.findMany({
-      where: {
-        AND: [
-          q
-            ? {
-                OR: [
-                  { id: { contains: q, mode: "insensitive" } },
-                  { name: { contains: q, mode: "insensitive" } },
-                  { email: { contains: q, mode: "insensitive" } },
-                  { jabatan: { contains: q, mode: "insensitive" } },
-                ],
-              }
-            : {},
-          {
-            OR: [{ role: "PERANGKAT_DESA" }, { role: "LURAH" }],
-          },
-          isActive !== undefined ? { isActive: isActive === "true" } : {},
-        ],
-      },
+      where: whereCondition,
       omit: { role: true },
       orderBy: { [sortField]: order },
       skip,
@@ -121,11 +115,47 @@ export const userService = {
     };
   },
 
-  getAll: async () => {
-    return prisma.user.findMany({
-      omit: { role: true },
-      orderBy: { name: "asc" },
-    });
+  getAll: async ({
+    q,
+    page = 1,
+    perPage = 20,
+  }: {
+    q?: string;
+    page?: number;
+    perPage?: number;
+  }) => {
+    const skip = (page - 1) * perPage;
+    const take = perPage;
+
+    const where = q
+      ? {
+          OR: [
+            { name: { contains: q, mode: "insensitive" as const } },
+            { email: { contains: q, mode: "insensitive" as const } },
+          ],
+        }
+      : {};
+
+    const [total, data] = await Promise.all([
+      prisma.user.count({ where }),
+      prisma.user.findMany({
+        where,
+        omit: { role: true },
+        orderBy: { name: "asc" },
+        skip,
+        take,
+      }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        perPage,
+        totalPages: Math.ceil(total / perPage),
+      },
+    };
   },
 
   getById: async (userId: string) => {

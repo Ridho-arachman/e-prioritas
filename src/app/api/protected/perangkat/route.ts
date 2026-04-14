@@ -1,17 +1,17 @@
+import { Role } from "@/app/generated/prisma";
+import { auth } from "@/lib/auth";
+import { deleteFromCloudinary, uploadToCloudinary } from "@/lib/cloudinary";
+import { handleBetterAuthError } from "@/lib/handleBetterAuthError";
 import { handlePrismaError } from "@/lib/handlePrismaError";
-import { handleZodValidation } from "@/lib/handleZodValidation";
 import { handleResponse } from "@/lib/handleResponse";
+import { handleZodValidation } from "@/lib/handleZodValidation";
 import {
   createUserPerangkatSchema,
   queryUserPerangkatSchema,
 } from "@/schema/userPerangkatSchema";
 import { userService } from "@/services/userService";
-import { NextRequest } from "next/server";
-import { Role } from "@/app/generated/prisma";
-import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { handleBetterAuthError } from "@/lib/handleBetterAuthError";
-import { deleteFromCloudinary, uploadToCloudinary } from "@/lib/cloudinary";
+import { NextRequest } from "next/server";
 
 const GET = async (req: NextRequest) => {
   const allowedRoles: Role[] = ["ADMIN"];
@@ -37,6 +37,14 @@ const GET = async (req: NextRequest) => {
     const searchParams = req.nextUrl.searchParams;
     const q = searchParams.get("q") || "";
     const isActive = searchParams.get("isActive") || undefined;
+
+    // ✅ Ambil parameter role dan pastikan hanya nilai yang valid yang diteruskan
+    const roleParam = searchParams.get("role");
+    const role =
+      roleParam === "PERANGKAT_DESA" || roleParam === "LURAH"
+        ? roleParam
+        : undefined;
+
     const sortBy = searchParams.get("sortBy") || undefined;
     const sortOrder = searchParams.get("sortOrder") as "asc" | "desc";
     const page = parseInt(searchParams.get("page") || "1");
@@ -55,6 +63,7 @@ const GET = async (req: NextRequest) => {
       sortOrder,
       page,
       perPage,
+      role, // ✅ Sekarang bertipe "PERANGKAT_DESA" | "LURAH" | undefined
     });
 
     if (data.length === 0) {

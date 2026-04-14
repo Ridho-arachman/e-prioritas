@@ -1,12 +1,13 @@
+import { Role } from "@/app/generated/prisma";
+import { auth } from "@/lib/auth";
 import { handlePrismaError } from "@/lib/handlePrismaError";
 import { handleResponse } from "@/lib/handleResponse";
 import { userService } from "@/services/userService";
-import { Role } from "@/app/generated/prisma";
-import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { NextRequest } from "next/server";
 
-const GET = async () => {
-  const allowedRoles: Role[] = ["ADMIN"];
+export const GET = async (req: NextRequest) => {
+  const allowedRoles: Role[] = ["ADMIN", "PERANGKAT_DESA", "LURAH"];
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session) {
@@ -26,27 +27,37 @@ const GET = async () => {
   }
 
   try {
-    //AMBIL DATA KATEGORI DARI DATABASE
-    const data = await userService.getAll();
+    const searchParams = req.nextUrl.searchParams;
+    const q = searchParams.get("q") || undefined;
+    const page = searchParams.get("page")
+      ? parseInt(searchParams.get("page")!)
+      : 1;
+    const perPage = searchParams.get("perPage")
+      ? parseInt(searchParams.get("perPage")!)
+      : 20;
 
-    //JIKA DATA KOSONG
-    if (data.length === 0) {
+    // Jika tidak ada parameter pencarian/pagination, gunakan getAll (all data)
+    // Tapi untuk keperluan combobox, kita akan selalu pakai getAllPaginated
+    const result = await userService.getAll({ q, page, perPage });
+
+    if (result.data.length === 0) {
       return handleResponse({
         success: true,
-        message: "Data perangkat desa masih kosong",
-        status: 404,
+        message: "Data user tidak ditemukan",
+        status: 200,
+        data: [],
+        meta: result.meta,
       });
     }
 
-    //JIKA DATA ADA
     return handleResponse({
       success: true,
-      message: "Data perangkat desa berhasil diambil",
-      data,
+      message: "Data user berhasil diambil",
+      data: result.data,
+      meta: result.meta,
       status: 200,
     });
   } catch (err) {
-    //PRISMA ERROR
     const prismaResponse = handlePrismaError(err);
     if (prismaResponse) {
       return handleResponse({
@@ -55,8 +66,6 @@ const GET = async () => {
         status: prismaResponse.status,
       });
     }
-
-    //SERVER ERROR
     return handleResponse({
       success: false,
       message: "Terjadi error pada server",
@@ -64,5 +73,3 @@ const GET = async () => {
     });
   }
 };
-
-export { GET };

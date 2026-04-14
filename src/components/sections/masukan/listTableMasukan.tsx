@@ -1,20 +1,22 @@
 "use client";
 
 import {
-  Filter,
-  X,
+  ArrowDown,
+  ArrowUp,
+  Check,
   ChevronLeft,
   ChevronRight,
+  ChevronsUpDown,
+  Filter,
   SlidersHorizontal,
-  ArrowUp,
-  ArrowDown,
+  X,
 } from "lucide-react";
 
-import { useDebounce } from "use-debounce";
-import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { useCallback, useEffect, useState } from "react";
+import { useDebounce } from "use-debounce";
 
 import {
   Table,
@@ -25,15 +27,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { useGet } from "@/hooks/useApi";
+import DataError from "@/components/blocks/DataError";
 import DataKosong from "@/components/blocks/DataKosong";
 import DataTidakDitemukan from "@/components/blocks/DataTidakDitemukan";
-import DataError from "@/components/blocks/DataError";
 import TableSkeleton from "@/components/blocks/tableSkeleton";
+import { useGet } from "@/hooks/useApi";
 
-import { useQueryState } from "nuqs";
 import { buildQuery } from "@/utils/query";
 import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
 
 import {
   Dialog,
@@ -51,13 +53,28 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 
+import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import { cn } from "@/lib/utils";
+
+// Command components untuk combobox
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 // ============================================================
 // STATUS BADGE
@@ -68,7 +85,6 @@ const statusColorMap: Record<string, string> = {
   DITOLAK: "bg-red-600 hover:bg-red-700",
   DIPROSES: "bg-blue-500 hover:bg-blue-600",
   DISELESAIKAN: "bg-purple-600 hover:bg-purple-700",
-  KADALUWARSA: "bg-gray-500 hover:bg-gray-600",
 };
 
 const statusLabelMap: Record<string, string> = {
@@ -77,7 +93,6 @@ const statusLabelMap: Record<string, string> = {
   DITOLAK: "Ditolak",
   DIPROSES: "Diproses",
   DISELESAIKAN: "Selesai",
-  KADALUWARSA: "Kadaluwarsa",
 };
 
 const StatusBadge = ({ status }: { status: string }) => {
@@ -91,14 +106,163 @@ const StatusBadge = ({ status }: { status: string }) => {
   );
 };
 
+// ============================================================
+// USER COMBOBOX DENGAN SEARCH & PAGINATION
+// ============================================================
+interface UserComboboxProps {
+  value: string;
+  onChange: (
+    value: string,
+    user?: { id: string; name: string; email: string },
+  ) => void;
+  placeholder?: string;
+}
+
+const UserCombobox = ({ value, onChange, placeholder }: UserComboboxProps) => {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebounce(search, 300);
+  const [page, setPage] = useState(1);
+  const [users, setUsers] = useState<any[]>([]);
+  const [meta, setMeta] = useState<{ totalPages: number } | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+
+  // Fetch user detail jika value ada (untuk menampilkan label)
+  const { data: userDetail } = useGet(value ? `/protected/user/${value}` : "");
+
+  useEffect(() => {
+    if (userDetail) setSelectedUser(userDetail);
+  }, [userDetail]);
+
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const query = buildQuery({
+        q: debouncedSearch || undefined,
+        page,
+        perPage: 10,
+      });
+      const res = await fetch(`/api/protected/user${query}`);
+      const json = await res.json();
+      if (json.success) {
+        if (page === 1) {
+          setUsers(json.data);
+        } else {
+          setUsers((prev) => [...prev, ...json.data]);
+        }
+        setMeta(json.meta);
+      }
+    } catch (error) {
+      console.error("Failed to fetch users", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [debouncedSearch, page]);
+
+  // Reset page dan users ketika search berubah
+  useEffect(() => {
+    setPage(1);
+    setUsers([]);
+  }, [debouncedSearch]);
+
+  // Fetch data ketika combobox dibuka atau page/search berubah
+  useEffect(() => {
+    if (open) {
+      fetchUsers();
+    }
+  }, [open, fetchUsers]);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const bottom =
+      e.currentTarget.scrollHeight - e.currentTarget.scrollTop ===
+      e.currentTarget.clientHeight;
+    if (bottom && !loading && meta && page < meta.totalPages) {
+      setPage((p) => p + 1);
+    }
+  };
+
+  const handleSelect = (userId: string) => {
+    const user = users.find((u) => u.id === userId);
+    if (user) {
+      setSelectedUser(user);
+      onChange(userId, user);
+    }
+    setOpen(false);
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between"
+        >
+          <span className="truncate">
+            {value && selectedUser
+              ? selectedUser.name
+              : placeholder || "Pilih verifikator"}
+          </span>
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[--radix-popover-trigger-width] max-w-75 p-0">
+        <Command shouldFilter={false}>
+          <CommandInput
+            placeholder="Cari user..."
+            value={search}
+            onValueChange={setSearch}
+          />
+          <CommandList onScroll={handleScroll}>
+            {loading && users.length === 0 && (
+              <CommandEmpty>Loading...</CommandEmpty>
+            )}
+            {!loading && users.length === 0 && (
+              <CommandEmpty>Tidak ada user ditemukan.</CommandEmpty>
+            )}
+            <CommandGroup>
+              {users.map((user) => (
+                <CommandItem
+                  key={user.id}
+                  value={user.id}
+                  onSelect={handleSelect}
+                  className="max-w-full"
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4 shrink-0",
+                      value === user.id ? "opacity-100" : "opacity-0",
+                    )}
+                  />
+                  <span className="truncate">
+                    {user.name} ({user.email})
+                  </span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+            {loading && users.length > 0 && (
+              <div className="py-2 text-center text-sm text-muted-foreground">
+                Loading...
+              </div>
+            )}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
+// ============================================================
+// MAIN COMPONENT
+// ============================================================
 export default function MasukanListTable() {
   const router = useRouter();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
-  // ============================================================
-  // QUERY STATE
-  // ============================================================
+  // Query states
   const [q, setQ] = useQueryState("q", { defaultValue: "" });
   const [status, setStatus] = useQueryState("status", { defaultValue: "" });
   const [domainIsuId, setDomainIsuId] = useQueryState("domainIsuId", {
@@ -116,18 +280,17 @@ export default function MasukanListTable() {
   const [sortBy, setSortBy] = useQueryState("sortBy", {
     defaultValue: "createdAt",
   });
-
   const [sortOrder, setSortOrder] = useQueryState("sortOrder", {
     defaultValue: "desc",
   });
 
-  // ============================================================
-  // DERIVED STATE
-  // ============================================================
   const [debouncedQ] = useDebounce(q, 500);
 
   const pageNumber = Number(page);
   const perPageNumber = Number(perPage);
+
+  // State untuk menyimpan nama verifikator yang dipilih (untuk badge)
+  const [selectedVerifikatorName, setSelectedVerifikatorName] = useState("");
 
   const queryString = buildQuery({
     q: debouncedQ || undefined,
@@ -141,22 +304,15 @@ export default function MasukanListTable() {
     sortOrder,
   });
 
-  // ============================================================
-  // API CALLS
-  // ============================================================
   const { data, error, isLoading, meta } = useGet(
     `/protected/masukan${queryString}`,
   );
 
   const { data: domainIsuData } = useGet("/protected/kategori");
-  const { data: userData } = useGet("/protected/users?role=ADMIN&perPage=100");
 
   const masukanList = data || [];
-  const paginationMeta = meta;
+  const paginationMeta = meta || { total: 0, totalPages: 1 };
 
-  // ============================================================
-  // FILTER STATE
-  // ============================================================
   const hasSignificantFilter =
     (debouncedQ?.trim() !== "" && debouncedQ !== undefined) ||
     status !== "" ||
@@ -172,14 +328,10 @@ export default function MasukanListTable() {
     sortBy !== "createdAt" ||
     sortOrder !== "desc";
 
-  // ============================================================
-  // EFFECTS
-  // ============================================================
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // Reset ke halaman 1 ketika filter berubah
   useEffect(() => {
     setPage("1");
   }, [debouncedQ, status, domainIsuId, diprosesOlehId, createdAt, setPage]);
@@ -199,6 +351,7 @@ export default function MasukanListTable() {
     setStatus("");
     setDomainIsuId("");
     setDiprosesOlehId("");
+    setSelectedVerifikatorName("");
     setCreatedAt("");
     setSortBy("createdAt");
     setSortOrder("desc");
@@ -211,14 +364,6 @@ export default function MasukanListTable() {
     return domain?.nama || id;
   };
 
-  const getUserLabel = (id: string) => {
-    const user = userData?.find((u: any) => u.id === id);
-    return user?.name || id;
-  };
-
-  // ============================================================
-  // SSR SKELETON
-  // ============================================================
   if (!isMounted) {
     return (
       <div className="p-4 md:p-6">
@@ -240,14 +385,10 @@ export default function MasukanListTable() {
     );
   }
 
-  // ============================================================
-  // RENDER
-  // ============================================================
   return (
     <>
       <CardHeader className="space-y-4 p-4 md:p-6 border-b bg-linear-to-r from-primary/5 to-transparent">
         <div className="flex flex-col lg:flex-row justify-between gap-4">
-          {/* FILTER BUTTON */}
           <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
             <Button
               variant="outline"
@@ -284,9 +425,7 @@ export default function MasukanListTable() {
                   <Label>Status</Label>
                   <Select
                     value={status || "ALL"}
-                    onValueChange={(v) => {
-                      setStatus(v === "ALL" ? "" : v);
-                    }}
+                    onValueChange={(v) => setStatus(v === "ALL" ? "" : v)}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -298,7 +437,6 @@ export default function MasukanListTable() {
                       <SelectItem value="DITOLAK">Ditolak</SelectItem>
                       <SelectItem value="DIPROSES">Diproses</SelectItem>
                       <SelectItem value="DISELESAIKAN">Selesai</SelectItem>
-                      <SelectItem value="KADALUWARSA">Kadaluwarsa</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -308,9 +446,7 @@ export default function MasukanListTable() {
                   <Label>Domain Isu</Label>
                   <Select
                     value={domainIsuId || "ALL"}
-                    onValueChange={(v) => {
-                      setDomainIsuId(v === "ALL" ? "" : v);
-                    }}
+                    onValueChange={(v) => setDomainIsuId(v === "ALL" ? "" : v)}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Pilih domain isu" />
@@ -326,38 +462,30 @@ export default function MasukanListTable() {
                   </Select>
                 </div>
 
-                {/* DIPROSES OLEH */}
+                {/* DIPROSES OLEH - DENGAN COMBOBOX */}
                 <div className="grid gap-2">
                   <Label>Diverifikasi Oleh</Label>
-                  <Select
-                    value={diprosesOlehId || "ALL"}
-                    onValueChange={(v) => {
-                      setDiprosesOlehId(v === "ALL" ? "" : v);
+                  <UserCombobox
+                    value={diprosesOlehId}
+                    onChange={(val, user) => {
+                      setDiprosesOlehId(val);
+                      if (user) {
+                        setSelectedVerifikatorName(user.name);
+                      } else {
+                        setSelectedVerifikatorName("");
+                      }
                     }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih verifikator" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ALL">Semua</SelectItem>
-                      {userData?.map((user: any) => (
-                        <SelectItem key={user.id} value={user.id}>
-                          {user.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    placeholder="Pilih verifikator"
+                  />
                 </div>
 
-                {/* TANGGAL DIBUAT */}
+                {/* TANGGAL */}
                 <div className="grid gap-2">
                   <Label>Tanggal Dibuat</Label>
                   <Input
                     type="date"
                     value={createdAt}
-                    onChange={(e) => {
-                      setCreatedAt(e.target.value);
-                    }}
+                    onChange={(e) => setCreatedAt(e.target.value)}
                   />
                 </div>
 
@@ -465,9 +593,7 @@ export default function MasukanListTable() {
             {q && (
               <Button
                 variant="outline"
-                onClick={() => {
-                  setQ("");
-                }}
+                onClick={() => setQ("")}
                 className="shadow-sm hover:shadow-md transition-all"
               >
                 <X className="h-4 w-4" />
@@ -497,8 +623,13 @@ export default function MasukanListTable() {
             )}
             {diprosesOlehId && (
               <Badge variant="secondary" className="gap-2">
-                Verifikator: {getUserLabel(diprosesOlehId)}
-                <button onClick={() => setDiprosesOlehId("")}>
+                Verifikator: {selectedVerifikatorName || diprosesOlehId}
+                <button
+                  onClick={() => {
+                    setDiprosesOlehId("");
+                    setSelectedVerifikatorName("");
+                  }}
+                >
                   <X className="h-3 w-3" />
                 </button>
               </Badge>
@@ -534,7 +665,6 @@ export default function MasukanListTable() {
       </CardHeader>
 
       <CardContent className="max-w-full overflow-hidden p-4 md:p-6">
-        {/* Area tabel dengan scroll horizontal */}
         <div className="overflow-x-auto border rounded-lg">
           <Table className="w-full">
             <TableHeader>
@@ -690,10 +820,9 @@ export default function MasukanListTable() {
           </Table>
         </div>
 
-        {/* PAGINATION */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 pt-4 border-t">
           <div className="text-sm text-muted-foreground">
-            Total: {paginationMeta?.total || 0}
+            Total: {paginationMeta.total}
           </div>
           <div className="flex gap-2">
             <Button
@@ -706,13 +835,13 @@ export default function MasukanListTable() {
               <ChevronLeft className="h-4 w-4" /> Prev
             </Button>
             <span className="px-4 py-2 bg-muted rounded-md">
-              Halaman {pageNumber} dari {paginationMeta?.totalPages || 1}
+              Halaman {pageNumber} dari {paginationMeta.totalPages}
             </span>
             <Button
               size="sm"
               variant="outline"
               onClick={() => setPage(String(pageNumber + 1))}
-              disabled={pageNumber >= (paginationMeta?.totalPages || 1)}
+              disabled={pageNumber >= paginationMeta.totalPages}
               className="shadow-sm hover:shadow-md transition-all"
             >
               Next <ChevronRight className="h-4 w-4" />
