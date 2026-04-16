@@ -1,44 +1,6 @@
 "use client";
 
 import {
-  Plus,
-  XIcon,
-  ChevronLeft,
-  ChevronRight,
-  Trash,
-  Filter,
-  ArrowUp,
-  ArrowDown,
-  SlidersHorizontal,
-  Upload,
-  Download,
-} from "lucide-react";
-import { useDebounce } from "use-debounce";
-import { useState, useEffect } from "react";
-import { notifier } from "../../../lib/ToastNotifier";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { useDelete, useGet } from "@/hooks/useApi";
-import DataKosong from "../../blocks/DataKosong";
-import DataTidakDitemukan from "../../blocks/DataTidakDitemukan";
-import DataError from "../../blocks/DataError";
-import TableSkeleton from "../../blocks/tableSkeleton";
-import Link from "next/link";
-import { useQueryState } from "nuqs";
-import { buildQuery } from "@/utils/query";
-import { useRouter } from "next/navigation";
-import { AxiosError } from "axios";
-import { Spinner } from "@/components/ui/spinner";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -48,6 +10,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -55,6 +20,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -62,10 +29,62 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useDelete, useGet } from "@/hooks/useApi";
+import { buildQuery } from "@/utils/query";
+import { AxiosError } from "axios";
+import {
+  ArrowDown,
+  ArrowUp,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsUpDown,
+  Download,
+  Filter,
+  Plus,
+  SlidersHorizontal,
+  Trash,
+  Upload,
+  XIcon,
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
+import { useCallback, useEffect, useState } from "react";
+import { useDebounce } from "use-debounce";
 import * as XLSX from "xlsx";
+import { notifier } from "../../../lib/ToastNotifier";
+import DataError from "../../blocks/DataError";
+import DataKosong from "../../blocks/DataKosong";
+import DataTidakDitemukan from "../../blocks/DataTidakDitemukan";
+import TableSkeleton from "../../blocks/tableSkeleton";
+
+// Command components untuk combobox
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 // Import schema dari file terpisah
 import {
@@ -82,7 +101,7 @@ type DataMasterWithRelations = DataMaster & {
   diprosesOleh: Pick<User, "id" | "name" | "email"> | null;
 };
 
-// Valid sort fields (harus sama dengan backend)
+// Valid sort fields
 const VALID_SORT_FIELDS = [
   "namaAtribut",
   "kritikalitas",
@@ -94,6 +113,156 @@ const VALID_SORT_FIELDS = [
 ] as const;
 type ValidSortField = (typeof VALID_SORT_FIELDS)[number];
 
+// ============================================================
+// USER COMBOBOX
+// ============================================================
+interface UserComboboxProps {
+  value: string;
+  onChange: (
+    value: string,
+    user?: { id: string; name: string; email: string },
+  ) => void;
+  placeholder?: string;
+}
+
+const UserCombobox = ({ value, onChange, placeholder }: UserComboboxProps) => {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebounce(search, 300);
+  const [page, setPage] = useState(1);
+  const [users, setUsers] = useState<any[]>([]);
+  const [meta, setMeta] = useState<{ totalPages: number } | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+
+  const { data: userDetail } = useGet(value ? `/protected/user/${value}` : "");
+
+  useEffect(() => {
+    if (userDetail) setSelectedUser(userDetail);
+  }, [userDetail]);
+
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const query = buildQuery({
+        q: debouncedSearch || undefined,
+        page,
+        perPage: 10,
+      });
+      const res = await fetch(`/api/protected/user${query}`);
+      const json = await res.json();
+      if (json.success) {
+        if (page === 1) {
+          setUsers(json.data);
+        } else {
+          setUsers((prev) => [...prev, ...json.data]);
+        }
+        setMeta(json.meta);
+      }
+    } catch (error) {
+      console.error("Failed to fetch users", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [debouncedSearch, page]);
+
+  useEffect(() => {
+    setPage(1);
+    setUsers([]);
+  }, [debouncedSearch]);
+
+  useEffect(() => {
+    if (open) {
+      fetchUsers();
+    }
+  }, [open, fetchUsers]);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const bottom =
+      e.currentTarget.scrollHeight - e.currentTarget.scrollTop ===
+      e.currentTarget.clientHeight;
+    if (bottom && !loading && meta && page < meta.totalPages) {
+      setPage((p) => p + 1);
+    }
+  };
+
+  const handleSelect = (userId: string) => {
+    const user = users.find((u) => u.id === userId);
+    if (user) {
+      setSelectedUser(user);
+      onChange(userId, user);
+    }
+    setOpen(false);
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between"
+        >
+          <span className="truncate">
+            {value && selectedUser
+              ? selectedUser.name
+              : placeholder || "Pilih user"}
+          </span>
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[--radix-popover-trigger-width] max-w-75 p-0">
+        <Command shouldFilter={false}>
+          <CommandInput
+            placeholder="Cari user..."
+            value={search}
+            onValueChange={setSearch}
+          />
+          <CommandList onScroll={handleScroll}>
+            {loading && users.length === 0 && (
+              <div className="py-6 text-center text-sm text-muted-foreground">
+                Loading...
+              </div>
+            )}
+            {!loading && users.length === 0 && (
+              <CommandEmpty>Tidak ada user ditemukan.</CommandEmpty>
+            )}
+            <CommandGroup>
+              {users.map((user) => (
+                <CommandItem
+                  key={user.id}
+                  value={user.id}
+                  onSelect={handleSelect}
+                  className="max-w-full"
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4 shrink-0",
+                      value === user.id ? "opacity-100" : "opacity-0",
+                    )}
+                  />
+                  <span className="truncate">
+                    {user.name} ({user.email})
+                  </span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+            {loading && users.length > 0 && (
+              <div className="py-2 text-center text-sm text-muted-foreground">
+                Memuat lebih banyak...
+              </div>
+            )}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
+// ============================================================
+// MAIN COMPONENT
+// ============================================================
 export default function ListTableDataMaster() {
   const router = useRouter();
   const [selectedDeleteId, setSelectedDeleteId] = useState<string | null>(null);
@@ -111,6 +280,18 @@ export default function ListTableDataMaster() {
   const [kritikalitas, setKritikalitas] = useQueryState("kritikalitas", {
     defaultValue: "",
   });
+  const [isActive, setIsActive] = useQueryState("isActive", {
+    defaultValue: "",
+  });
+  const [diprosesOlehId, setDiprosesOlehId] = useQueryState("diprosesOlehId", {
+    defaultValue: "",
+  });
+  const [tahunData, setTahunData] = useQueryState("tahunData", {
+    defaultValue: "",
+  });
+  const [createdAt, setCreatedAt] = useQueryState("createdAt", {
+    defaultValue: "",
+  });
 
   const [page, setPage] = useQueryState("page", { defaultValue: "1" });
   const [limit] = useQueryState("limit", { defaultValue: "10" });
@@ -122,6 +303,8 @@ export default function ListTableDataMaster() {
     defaultValue: "desc",
   });
 
+  const [selectedUserName, setSelectedUserName] = useState("");
+
   const [debouncedQ] = useDebounce(q, 500);
   const pageNumber = Number(page);
   const limitNumber = Number(limit);
@@ -131,6 +314,10 @@ export default function ListTableDataMaster() {
     q: debouncedQ || undefined,
     domainIsuId: domainIsuId || undefined,
     kritikalitas: kritikalitas || undefined,
+    isActive: isActive || undefined,
+    diprosesOlehId: diprosesOlehId || undefined,
+    tahunData: tahunData || undefined,
+    createdAt: createdAt || undefined,
     page: pageNumber,
     limit: limitNumber,
     sortBy: VALID_SORT_FIELDS.includes(sortBy as ValidSortField)
@@ -172,7 +359,11 @@ export default function ListTableDataMaster() {
   const hasSignificantFilter =
     (debouncedQ?.trim() !== "" && debouncedQ !== undefined) ||
     domainIsuId !== "" ||
-    kritikalitas !== "";
+    kritikalitas !== "" ||
+    isActive !== "" ||
+    diprosesOlehId !== "" ||
+    tahunData !== "" ||
+    createdAt !== "";
 
   useEffect(() => {
     setIsMounted(true);
@@ -209,6 +400,11 @@ export default function ListTableDataMaster() {
   const clearFilters = () => {
     setDomainIsuId("");
     setKritikalitas("");
+    setIsActive("");
+    setDiprosesOlehId("");
+    setSelectedUserName("");
+    setTahunData("");
+    setCreatedAt("");
     setSortBy("updatedAt");
     setSortOrder("desc");
     setIsFilterOpen(false);
@@ -216,19 +412,31 @@ export default function ListTableDataMaster() {
   };
 
   useEffect(() => {
-    if (pageNumber !== 1) {
-      setPage("1");
-    }
-  }, [debouncedQ, domainIsuId, kritikalitas, sortBy, sortOrder]);
+    setPage("1");
+  }, [
+    debouncedQ,
+    domainIsuId,
+    kritikalitas,
+    isActive,
+    diprosesOlehId,
+    tahunData,
+    createdAt,
+    sortBy,
+    sortOrder,
+  ]);
 
   const hasActiveFilters =
     domainIsuId !== "" ||
     kritikalitas !== "" ||
+    isActive !== "" ||
+    diprosesOlehId !== "" ||
+    tahunData !== "" ||
+    createdAt !== "" ||
     sortBy !== "updatedAt" ||
     sortOrder !== "desc";
 
   // ─────────────────────────────────────────────────────────────
-  // Import Excel
+  // Import Excel (tidak berubah)
   // ─────────────────────────────────────────────────────────────
   const readExcelFile = (
     file: File,
@@ -254,7 +462,6 @@ export default function ListTableDataMaster() {
             defval: "",
           }) as any[][];
 
-          // Lewati baris header (baris pertama)
           const dataRows = rows
             .slice(1)
             .filter((row) => row.some((cell) => cell !== null && cell !== ""));
@@ -263,38 +470,21 @@ export default function ListTableDataMaster() {
             val !== null && val !== undefined ? String(val).trim() : "";
 
           const mapped = dataRows.map((row) => {
-            // Mapping berdasarkan posisi kolom (0-based index):
-            // Kolom A (0): domainIsuId
-            // Kolom B (1): namaAtribut
-            // Kolom C (2): jumlah
-            // Kolom D (3): tahunData
-            // Kolom E (4): kritikalitas
-            // Kolom F (5): keterangan (diabaikan)
-            // Kolom G (6): isActive
-
             const domainIsuId = cleanString(row[0]);
             const namaAtribut = cleanString(row[1]);
-
-            // Jumlah
             const jumlahRaw = row[2];
             const jumlah =
               jumlahRaw !== "" && jumlahRaw !== null ? Number(jumlahRaw) : null;
-
-            // Tahun Data
             const tahunDataRaw = row[3];
             const tahunData =
               tahunDataRaw !== "" && tahunDataRaw !== null
                 ? Number(tahunDataRaw)
                 : null;
-
-            // Kritikalitas
             const kritikalitasRaw = cleanString(row[4]).toUpperCase();
             const validKritikalitas: "KRITIS" | "TINGGI" | "SEDANG" | "RENDAH" =
               ["KRITIS", "TINGGI", "SEDANG", "RENDAH"].includes(kritikalitasRaw)
                 ? (kritikalitasRaw as "KRITIS" | "TINGGI" | "SEDANG" | "RENDAH")
                 : "SEDANG";
-
-            // isActive
             const isActiveRaw = row[6];
             const isActive =
               isActiveRaw === true ||
@@ -312,7 +502,6 @@ export default function ListTableDataMaster() {
               jumlah,
               tahunData,
               isActive,
-              // diprosesOlehId akan diisi oleh backend
             };
           });
 
@@ -334,8 +523,6 @@ export default function ListTableDataMaster() {
     setImportLoading(true);
     try {
       const rawData = await readExcelFile(importFile);
-
-      // Validasi dengan schema dari import
       const parsed = dataMasterArraySchema.safeParse(rawData);
       if (!parsed.success) {
         const errors = parsed.error.issues
@@ -345,7 +532,6 @@ export default function ListTableDataMaster() {
         return;
       }
 
-      // Kirim ke endpoint import yang baru
       const res = await fetch("/api/protected/data-master/import", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -524,12 +710,19 @@ export default function ListTableDataMaster() {
                 Filter & Sort
                 {hasActiveFilters && (
                   <Badge variant="secondary" className="ml-2">
-                    {[domainIsuId, kritikalitas].filter(Boolean).length +
+                    {[
+                      domainIsuId,
+                      kritikalitas,
+                      isActive,
+                      diprosesOlehId,
+                      tahunData,
+                      createdAt,
+                    ].filter(Boolean).length +
                       (sortBy !== "updatedAt" || sortOrder !== "desc" ? 1 : 0)}
                   </Badge>
                 )}
               </Button>
-              <DialogContent className="sm:max-w-lg w-[95vw] max-h-[90vh] overflow-y-auto">
+              <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>
                     <div className="flex items-center gap-2">
@@ -541,8 +734,8 @@ export default function ListTableDataMaster() {
                     Atur filter dan urutan data master
                   </DialogDescription>
                 </DialogHeader>
-                <div className="grid gap-6 py-4">
-                  {/* Filter: Domain Isu */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
+                  {/* Domain Isu */}
                   <div className="grid gap-2">
                     <Label>Domain Isu</Label>
                     <Select
@@ -564,8 +757,7 @@ export default function ListTableDataMaster() {
                       </SelectContent>
                     </Select>
                   </div>
-
-                  {/* Filter: Kritikalitas */}
+                  {/* Kritikalitas */}
                   <div className="grid gap-2">
                     <Label>Kritikalitas</Label>
                     <Select
@@ -586,63 +778,102 @@ export default function ListTableDataMaster() {
                       </SelectContent>
                     </Select>
                   </div>
-
-                  <Separator />
-
-                  {/* Sorting */}
+                  {/* Status Aktif */}
                   <div className="grid gap-2">
-                    <Label>Urutkan Berdasarkan</Label>
+                    <Label>Status Aktif</Label>
                     <Select
-                      value={sortBy}
-                      onValueChange={(val: ValidSortField) => setSortBy(val)}
+                      value={isActive || "ALL"}
+                      onValueChange={(val) =>
+                        setIsActive(val === "ALL" ? "" : val)
+                      }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Pilih kolom" />
+                        <SelectValue placeholder="Pilih status" />
                       </SelectTrigger>
                       <SelectContent>
-                        {sortOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
+                        <SelectItem value="ALL">Semua</SelectItem>
+                        <SelectItem value="true">Aktif</SelectItem>
+                        <SelectItem value="false">Tidak Aktif</SelectItem>
                       </SelectContent>
                     </Select>
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <Button
-                        variant={sortOrder === "asc" ? "default" : "outline"}
-                        className="flex-1 cursor-pointer"
-                        onClick={() => setSortOrder("asc")}
-                        size="sm"
-                      >
-                        <ArrowUp className="mr-2 h-4 w-4" />
-                        Asc
-                      </Button>
-                      <Button
-                        variant={sortOrder === "desc" ? "default" : "outline"}
-                        className="flex-1 cursor-pointer"
-                        onClick={() => setSortOrder("desc")}
-                        size="sm"
-                      >
-                        <ArrowDown className="mr-2 h-4 w-4" />
-                        Desc
-                      </Button>
-                    </div>
+                  </div>
+                  {/* Diproses Oleh */}
+                  <div className="grid gap-2">
+                    <Label>Diproses Oleh</Label>
+                    <UserCombobox
+                      value={diprosesOlehId}
+                      onChange={(val, user) => {
+                        setDiprosesOlehId(val);
+                        setSelectedUserName(user?.name || "");
+                      }}
+                      placeholder="Pilih user"
+                    />
+                  </div>
+                  {/* Tahun Data */}
+                  <div className="grid gap-2">
+                    <Label>Tahun Data</Label>
+                    <Input
+                      type="number"
+                      placeholder="Contoh: 2024"
+                      value={tahunData}
+                      onChange={(e) => setTahunData(e.target.value)}
+                      min="1900"
+                      max="2100"
+                    />
+                  </div>
+                  {/* Tanggal Dibuat */}
+                  <div className="grid gap-2">
+                    <Label>Tanggal Dibuat</Label>
+                    <Input
+                      type="date"
+                      value={createdAt}
+                      onChange={(e) => setCreatedAt(e.target.value)}
+                    />
                   </div>
                 </div>
-                <div className="flex flex-col-reverse sm:flex-row justify-between gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={clearFilters}
-                    className="cursor-pointer"
-                    size="sm"
+                <Separator className="my-2" />
+                {/* Sorting */}
+                <div className="grid gap-2 mt-4">
+                  <Label>Urutkan Berdasarkan</Label>
+                  <Select
+                    value={sortBy}
+                    onValueChange={(val: ValidSortField) => setSortBy(val)}
                   >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih kolom" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {sortOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={sortOrder === "asc" ? "default" : "outline"}
+                      className="flex-1"
+                      onClick={() => setSortOrder("asc")}
+                      size="sm"
+                    >
+                      <ArrowUp className="mr-2 h-4 w-4" /> Asc
+                    </Button>
+                    <Button
+                      variant={sortOrder === "desc" ? "default" : "outline"}
+                      className="flex-1"
+                      onClick={() => setSortOrder("desc")}
+                      size="sm"
+                    >
+                      <ArrowDown className="mr-2 h-4 w-4" /> Desc
+                    </Button>
+                  </div>
+                </div>
+                <div className="flex flex-col-reverse sm:flex-row justify-between gap-2 mt-6">
+                  <Button variant="outline" onClick={clearFilters} size="sm">
                     Reset Filter
                   </Button>
-                  <Button
-                    onClick={() => setIsFilterOpen(false)}
-                    className="cursor-pointer"
-                    size="sm"
-                  >
+                  <Button onClick={() => setIsFilterOpen(false)} size="sm">
                     Terapkan
                   </Button>
                 </div>
@@ -672,6 +903,81 @@ export default function ListTableDataMaster() {
             </div>
           </div>
         </div>
+
+        {/* Active Filter Badges */}
+        {hasActiveFilters && (
+          <div className="flex flex-wrap gap-2">
+            {domainIsuId && (
+              <Badge variant="secondary" className="gap-2">
+                Domain:{" "}
+                {domainList.find((d) => d.id === domainIsuId)?.nama ||
+                  domainIsuId}
+                <button onClick={() => setDomainIsuId("")}>
+                  <XIcon className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+            {kritikalitas && (
+              <Badge variant="secondary" className="gap-2">
+                Kritikalitas: {kritikalitas}
+                <button onClick={() => setKritikalitas("")}>
+                  <XIcon className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+            {isActive !== "" && (
+              <Badge variant="secondary" className="gap-2">
+                Status: {isActive === "true" ? "Aktif" : "Tidak Aktif"}
+                <button onClick={() => setIsActive("")}>
+                  <XIcon className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+            {diprosesOlehId && (
+              <Badge variant="secondary" className="gap-2">
+                Diproses: {selectedUserName || diprosesOlehId}
+                <button
+                  onClick={() => {
+                    setDiprosesOlehId("");
+                    setSelectedUserName("");
+                  }}
+                >
+                  <XIcon className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+            {tahunData && (
+              <Badge variant="secondary" className="gap-2">
+                Tahun: {tahunData}
+                <button onClick={() => setTahunData("")}>
+                  <XIcon className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+            {createdAt && (
+              <Badge variant="secondary" className="gap-2">
+                Tanggal: {format(new Date(createdAt), "dd MMM yyyy")}
+                <button onClick={() => setCreatedAt("")}>
+                  <XIcon className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+            {(sortBy !== "updatedAt" || sortOrder !== "desc") && (
+              <Badge variant="secondary" className="gap-2">
+                Sort: {sortOptions.find((o) => o.value === sortBy)?.label}{" "}
+                {sortOrder === "asc" ? "↑" : "↓"}
+                <button
+                  onClick={() => {
+                    setSortBy("updatedAt");
+                    setSortOrder("desc");
+                  }}
+                >
+                  <XIcon className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+          </div>
+        )}
       </CardHeader>
 
       <CardContent className="max-w-full p-4 md:p-6">

@@ -46,12 +46,36 @@ export const dataMasterQuerySchema = z.object({
     if (trimmed === "" || trimmed.toLowerCase() === "all") return undefined;
     return trimmed.toUpperCase();
   }, z.nativeEnum(NilaiKritikalitas).optional()),
+
+  // ✅ Filter baru dengan penanganan null/undefined/empty string
+  isActive: z.preprocess(
+    (val) =>
+      val === null || val === undefined || val === "" ? undefined : val,
+    z.enum(["true", "false"]).optional(),
+  ),
+  diprosesOlehId: z.preprocess(
+    (val) =>
+      val === null || val === undefined || val === "" ? undefined : val,
+    z.string().optional(),
+  ),
+  tahunData: z.preprocess((val) => {
+    if (val === null || val === undefined || val === "") return undefined;
+    const num = Number(val);
+    return isNaN(num) ? undefined : num;
+  }, z.number().int().min(1900).max(2100).optional()),
+  createdAt: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, {
+      message: "Format tanggal harus YYYY-MM-DD",
+    })
+    .optional(),
   updatedAt: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, {
       message: "Format tanggal harus YYYY-MM-DD",
     })
     .optional(),
+
   page: z.coerce.number().int().min(1).optional().default(1),
   limit: z.coerce.number().int().min(1).max(100).optional().default(10),
   sortBy: z.string().optional(),

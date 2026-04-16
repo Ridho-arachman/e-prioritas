@@ -27,6 +27,11 @@ export type DataMasterUpdateInput = Partial<DataMasterCreateInput>;
 export type DataMasterGetAllParams = {
   domainIsuId?: string;
   kritikalitas?: NilaiKritikalitas;
+  isActive?: boolean;
+  diprosesOlehId?: string;
+  tahunData?: number;
+  createdAtFrom?: Date;
+  createdAtTo?: Date;
   updatedAtFrom?: Date;
   updatedAtTo?: Date;
   search?: string;
@@ -58,6 +63,11 @@ export const dataMasterService = {
     const {
       domainIsuId,
       kritikalitas,
+      isActive,
+      diprosesOlehId,
+      tahunData,
+      createdAtFrom,
+      createdAtTo,
       updatedAtFrom,
       updatedAtTo,
       search,
@@ -67,17 +77,28 @@ export const dataMasterService = {
       limit = 10,
     } = params || {};
 
-    const safeSortBy: ValidSortField = VALID_SORT_FIELDS.includes(
-      sortBy as ValidSortField,
-    )
+    const safeSortBy = VALID_SORT_FIELDS.includes(sortBy as ValidSortField)
       ? (sortBy as ValidSortField)
       : "updatedAt";
 
     const where: Prisma.DataMasterWhereInput = {};
 
+    // Filter eksak
     if (domainIsuId) where.domainIsuId = domainIsuId;
     if (kritikalitas) where.kritikalitas = kritikalitas;
+    if (isActive !== undefined) where.isActive = isActive;
+    if (diprosesOlehId) where.diprosesOlehId = diprosesOlehId;
+    if (tahunData !== undefined) where.tahunData = tahunData;
 
+    // Range tanggal dibuat
+    if (createdAtFrom || createdAtTo) {
+      where.createdAt = {
+        ...(createdAtFrom && { gte: createdAtFrom }),
+        ...(createdAtTo && { lte: createdAtTo }),
+      };
+    }
+
+    // Range tanggal diperbarui
     if (updatedAtFrom || updatedAtTo) {
       where.updatedAt = {
         ...(updatedAtFrom && { gte: updatedAtFrom }),
@@ -85,6 +106,7 @@ export const dataMasterService = {
       };
     }
 
+    // Pencarian
     if (search) {
       where.OR = [{ namaAtribut: { contains: search, mode: "insensitive" } }];
     }

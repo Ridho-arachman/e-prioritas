@@ -1,18 +1,18 @@
+import { NilaiKritikalitas, Role } from "@/app/generated/prisma"; // pastikan path sesuai
 import { auth } from "@/lib/auth";
 import { handlePrismaError } from "@/lib/handlePrismaError";
-import { handleZodValidation } from "@/lib/handleZodValidation";
 import { handleResponse } from "@/lib/handleResponse";
+import { handleZodValidation } from "@/lib/handleZodValidation";
 import {
   dataMasterCreateSchema,
   dataMasterQuerySchema,
 } from "@/schema/dataMasterSchema";
 import { dataMasterService } from "@/services/dataMasterService";
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import { NextRequest } from "next/server";
-import { NilaiKritikalitas, Prisma, Role } from "@/app/generated/prisma"; // pastikan path sesuai
+import utc from "dayjs/plugin/utc";
 import { headers } from "next/headers";
+import { NextRequest } from "next/server";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -102,7 +102,11 @@ export const GET = async (req: NextRequest) => {
     const kritikalitas = searchParams.get("kritikalitas") as
       | NilaiKritikalitas
       | undefined;
-    const updatedAt = searchParams.get("updatedAt") || undefined;
+    const isActiveParam = searchParams.get("isActive");
+    const diprosesOlehId = searchParams.get("diprosesOlehId") || undefined;
+    const tahunDataParam = searchParams.get("tahunData") || undefined;
+    const createdAtParam = searchParams.get("createdAt") || undefined;
+    const updatedAtParam = searchParams.get("updatedAt") || undefined;
 
     const sortBy = searchParams.get("sortBy") || "updatedAt";
     const sortOrder =
@@ -110,31 +114,56 @@ export const GET = async (req: NextRequest) => {
     const page = Number(searchParams.get("page")) || 1;
     const limit = Number(searchParams.get("limit")) || 10;
 
-    // ✅ Validasi hanya field yang ada di schema
     const parsed = dataMasterQuerySchema.safeParse({
       q,
       domainIsuId,
       kritikalitas,
-      updatedAt,
+      isActive: isActiveParam,
+      diprosesOlehId,
+      tahunData: tahunDataParam,
+      createdAt: createdAtParam,
+      updatedAt: updatedAtParam,
+      page,
+      limit,
+      sortBy,
+      sortOrder,
     });
 
-    console.log("Parsed Query Params:", parsed);
-
-    if (!parsed.success) return handleZodValidation(parsed);
+    if (!parsed.success) {
+      console.error(
+        "[DATA_MASTER_GET] Validation Error:",
+        parsed.error.format(),
+      );
+      return handleZodValidation(parsed);
+    }
 
     const data = parsed.data;
 
+    // Konversi isActive ke boolean
+    const isActive =
+      data.isActive === "true"
+        ? true
+        : data.isActive === "false"
+          ? false
+          : undefined;
+
+    // Konversi createdAt menjadi range satu hari
+    let createdAtFrom: Date | undefined;
+    let createdAtTo: Date | undefined;
+    if (data.createdAt) {
+      createdAtFrom = dayjs
+        .tz(`${data.createdAt} 00:00:00`, "Asia/Jakarta")
+        .utc()
+        .toDate();
+      createdAtTo = dayjs
+        .tz(`${data.createdAt} 23:59:59`, "Asia/Jakarta")
+        .utc()
+        .toDate();
+    }
+
     let updatedAtFrom: Date | undefined;
     let updatedAtTo: Date | undefined;
-
     if (data.updatedAt) {
-      if (!dayjs(data.updatedAt, "YYYY-MM-DD", true).isValid()) {
-        return handleResponse({
-          success: false,
-          message: "Format tanggal tidak valid (harus YYYY-MM-DD)",
-          status: 400,
-        });
-      }
       updatedAtFrom = dayjs
         .tz(`${data.updatedAt} 00:00:00`, "Asia/Jakarta")
         .utc()
@@ -149,28 +178,18 @@ export const GET = async (req: NextRequest) => {
       search: data.q,
       domainIsuId: data.domainIsuId,
       kritikalitas: data.kritikalitas,
+      isActive,
+      diprosesOlehId: data.diprosesOlehId,
+      tahunData: data.tahunData,
+      createdAtFrom,
+      createdAtTo,
       updatedAtFrom,
       updatedAtTo,
-      sortBy: sortBy as keyof Prisma.DataMasterOrderByWithRelationInput,
-      sortOrder,
-      page,
-      limit,
+      sortBy: data.sortBy,
+      sortOrder: data.sortOrder,
+      page: data.page,
+      limit: data.limit,
     });
-
-    if (result.data.length === 0) {
-      return handleResponse({
-        success: true,
-        message: "Data Master Masih Kosong",
-        data: [],
-        meta: {
-          total: 0,
-          page: result.page,
-          limit: result.limit,
-          totalPages: 0,
-        },
-        status: 200,
-      });
-    }
 
     return handleResponse({
       success: true,

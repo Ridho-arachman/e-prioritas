@@ -1,11 +1,6 @@
 "use client";
 
-import "dotenv/config";
-import { Turnstile } from "@marsidev/react-turnstile";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -15,20 +10,25 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { loginSchema } from "@/schema/login";
-import { useRouter } from "next/navigation";
-import { Eye, EyeClosed } from "lucide-react";
-import { useState, useEffect } from "react";
-import { notifier } from "../../../lib/ToastNotifier";
-import { usePost } from "@/hooks/useApi";
-import { AxiosError } from "axios";
-import { ApiError } from "@/types/ApiError";
-import { Checkbox } from "../../ui/checkbox";
-import Link from "next/link";
-import { motion } from "framer-motion";
-import { FcGoogle } from "react-icons/fc";
 import { Spinner } from "@/components/ui/spinner";
+import { usePost } from "@/hooks/useApi";
+import { cn } from "@/lib/utils";
+import { loginSchema } from "@/schema/login";
+import { ApiError } from "@/types/ApiError";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Turnstile } from "@marsidev/react-turnstile";
+import { AxiosError } from "axios";
+import "dotenv/config";
+import { motion } from "framer-motion";
+import { Eye, EyeClosed } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { FcGoogle } from "react-icons/fc";
+import { z } from "zod";
+import { notifier } from "../../../lib/ToastNotifier";
+import { Checkbox } from "../../ui/checkbox";
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
@@ -151,7 +151,7 @@ export function LoginForm({
       );
       return;
     }
-    router.push(`/api/auth/google?captcha=${token}`);
+    window.location.href = `/api/auth/google?captcha=${token}`;
   };
 
   return (
