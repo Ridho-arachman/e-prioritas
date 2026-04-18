@@ -1,4 +1,7 @@
 "use client";
+import MasukanWargaFormAdd from "@/components/sections/masukan/masukanFormAdd";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -6,25 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  MessageSquare,
-  Building2,
-  CalendarDays,
-  MapPinned,
-  ArrowRight,
-  Sparkles,
-  Search,
-  MapPin,
-  FileText,
-  User,
-  Loader2,
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import MasukanWargaFormAdd from "@/components/sections/masukan/masukanFormAdd";
-import { motion } from "framer-motion";
-import { useGet } from "@/hooks/useApi";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -34,8 +18,24 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useGet } from "@/hooks/useApi";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  Building2,
+  CalendarDays,
+  FileText,
+  Loader2,
+  MapPin,
+  MapPinned,
+  MessageSquare,
+  Search,
+  Sparkles,
+  User,
+} from "lucide-react";
+import { useState } from "react";
 
 // Mapping status masukan
 const statusConfig: Record<string, { color: string; label: string }> = {
@@ -88,11 +88,9 @@ const statusRekomendasiConfig: Record<
 const parseRekomendasiItems = (items: any): { prioritas: any[] } | null => {
   try {
     if (!items || typeof items !== "object") return null;
-    // Format snapshot dengan properti prioritas (array)
     if (items.prioritas && Array.isArray(items.prioritas)) {
       return { prioritas: items.prioritas };
     }
-    // Jika langsung array (format lama)
     if (Array.isArray(items)) {
       return { prioritas: items };
     }
@@ -110,7 +108,7 @@ export default function MasukanClient() {
 
   // State untuk dialog cek status
   const [open, setOpen] = useState(false);
-  const [trackingId, setTrackingId] = useState("");
+  const [nomorHp, setNomorHp] = useState("");
   const [statusData, setStatusData] = useState<any>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -122,34 +120,55 @@ export default function MasukanClient() {
   const [agendaDetailError, setAgendaDetailError] = useState("");
 
   const handleCekStatus = async () => {
-    if (!trackingId.trim()) {
-      setError("Masukkan kode tracking");
+    const cleanNomorHp = nomorHp.trim();
+
+    if (!cleanNomorHp) {
+      setError("Nomor HP tidak boleh kosong.");
       setStatusData(null);
       return;
     }
+    if (!/^[0-9]+$/.test(cleanNomorHp)) {
+      setError("Nomor HP hanya boleh berisi angka.");
+      setStatusData(null);
+      return;
+    }
+
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(`/api/public/cek-status/${trackingId}`);
+      const res = await fetch(`/api/public/cek-status/${cleanNomorHp}`);
       const result = await res.json();
+
       if (res.ok) {
         setStatusData(result.data);
         setError("");
       } else {
         setStatusData(null);
-        setError(result.message || "Kode tracking tidak ditemukan.");
+        if (res.status === 404) {
+          setError(
+            "Data dengan nomor HP tersebut tidak ditemukan. Pastikan nomor HP sudah benar.",
+          );
+        } else if (res.status === 400) {
+          setError(result.message || "Nomor HP tidak valid.");
+        } else {
+          setError(
+            result.message || "Terjadi kesalahan. Silakan coba lagi nanti.",
+          );
+        }
       }
     } catch (err) {
       console.error(err);
       setStatusData(null);
-      setError("Gagal menghubungi server. Coba lagi nanti.");
+      setError(
+        "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.",
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const handleClear = () => {
-    setTrackingId("");
+    setNomorHp("");
     setStatusData(null);
     setError("");
   };
@@ -176,7 +195,6 @@ export default function MasukanClient() {
     }
   };
 
-  // Parsing rekomendasi dari selectedAgenda
   const rekomendasiData = selectedAgenda
     ? parseRekomendasiItems(selectedAgenda.rekomendasiItems)
     : null;
@@ -273,7 +291,7 @@ export default function MasukanClient() {
             </CardContent>
           </Card>
 
-          {/* Card Cek Status Masukan */}
+          {/* Card Cek Status Masukan (dengan nomor HP) */}
           <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl overflow-hidden group relative">
             <div className="absolute inset-0 bg-linear-to-r from-blue-600 to-cyan-600 opacity-0 group-hover:opacity-10 transition-opacity pointer-events-none" />
             <CardHeader className="flex items-center gap-3 pb-2">
@@ -297,18 +315,17 @@ export default function MasukanClient() {
                   <DialogHeader>
                     <DialogTitle>Cek Status Masukan</DialogTitle>
                     <DialogDescription>
-                      Masukkan kode tracking yang Anda terima saat mengirim
-                      masukan.
+                      Masukkan nomor HP yang Anda gunakan saat mengirim masukan.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4 py-4">
                     <div className="space-y-2">
-                      <Label htmlFor="trackingId">Kode Tracking</Label>
+                      <Label htmlFor="nomorHp">Nomor HP</Label>
                       <Input
-                        id="trackingId"
-                        placeholder="Contoh: clx... (kode unik)"
-                        value={trackingId}
-                        onChange={(e) => setTrackingId(e.target.value)}
+                        id="nomorHp"
+                        placeholder="Contoh: 08123456789"
+                        value={nomorHp}
+                        onChange={(e) => setNomorHp(e.target.value)}
                       />
                     </div>
                     <div className="flex flex-col sm:flex-row gap-2">
@@ -329,9 +346,9 @@ export default function MasukanClient() {
                       </Button>
                     </div>
                     {error && (
-                      <p className="text-sm text-red-500 text-center">
+                      <div className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg text-center">
                         {error}
-                      </p>
+                      </div>
                     )}
                     {statusData && (
                       <div className="mt-4 p-4 rounded-lg border bg-muted/30 space-y-3">

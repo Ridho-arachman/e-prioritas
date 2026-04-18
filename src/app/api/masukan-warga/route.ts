@@ -1,12 +1,13 @@
 // app/api/masukan-warga/route.ts
-import { NextRequest } from "next/server";
-import { createMasukanWargaSchema } from "@/schema/masukanWarga";
-import { handleResponse } from "@/lib/handleResponse";
+import { deleteFromCloudinary, uploadToCloudinary } from "@/lib/cloudinary";
+import { decrypt, encrypt } from "@/lib/encryption"; // 👈 tambahkan
 import { handlePrismaError } from "@/lib/handlePrismaError";
+import { handleResponse } from "@/lib/handleResponse";
 import { handleZodValidation } from "@/lib/handleZodValidation";
-import { checkRateLimit } from "@/lib/rate-limit";
-import { uploadToCloudinary, deleteFromCloudinary } from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
+import { checkRateLimit } from "@/lib/rate-limit";
+import { createMasukanWargaSchema } from "@/schema/masukanWarga";
+import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
   // Rate limiting
@@ -43,7 +44,13 @@ export async function POST(req: NextRequest) {
       namaPengirim: namaPengirim || undefined,
       nomorHp: nomorHp || undefined,
     });
+
     if (!parsed.success) return handleZodValidation(parsed);
+
+    // 👇 Enkripsi nomor HP sebelum disimpan
+    const encryptedNomorHp = parsed.data.nomorHp
+      ? encrypt(parsed.data.nomorHp)
+      : null;
 
     const imageFiles = formData.getAll("images") as File[];
     const MAX_IMAGES = 5;
@@ -77,14 +84,14 @@ export async function POST(req: NextRequest) {
       masukan = await prisma.$transaction(async (tx) => {
         const newMasukan = await tx.masukanWarga.create({
           data: {
-            id: trackingId || undefined, // pakai trackingId jika ada
+            id: trackingId || undefined,
             judul: parsed.data.judul,
             deskripsi: parsed.data.deskripsi,
             lokasiRt: parsed.data.lokasiRt,
             lokasiRw: parsed.data.lokasiRw,
             domainIsuId: parsed.data.domainIsuId,
             namaPengirim: parsed.data.namaPengirim,
-            nomorHp: parsed.data.nomorHp,
+            nomorHp: encryptedNomorHp, // 👈 simpan ciphertext
             status: "MENUNGGU",
           },
         });
@@ -108,10 +115,16 @@ export async function POST(req: NextRequest) {
       throw dbError;
     }
 
+    // 👇 Dekripsi nomor HP untuk response (opsional)
+    const decryptedMasukan = {
+      ...masukan,
+      nomorHp: masukan.nomorHp ? decrypt(masukan.nomorHp) : null,
+    };
+
     return handleResponse({
       success: true,
       message: "Masukan Warga Berhasil Ditambahkan",
-      data: masukan,
+      data: decryptedMasukan,
       status: 201,
     });
   } catch (err) {

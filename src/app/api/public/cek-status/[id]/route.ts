@@ -1,16 +1,34 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+// app/api/masukan-warga/[nomorHp]/route.ts (atau sesuai struktur folder Anda)
+import { encrypt } from "@/lib/encryption"; // 👈 import fungsi enkripsi
 import { handlePrismaError } from "@/lib/handlePrismaError";
 import { handleResponse } from "@/lib/handleResponse";
+import prisma from "@/lib/prisma";
+import { NextRequest } from "next/server";
 
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const { id } = await params;
+
+  console.log("id:", id);
   try {
-    const { id } = await params;
-    const masukan = await prisma.masukanWarga.findUniqueOrThrow({
-      where: { id },
+    if (!id) {
+      return handleResponse({
+        success: false,
+        message: "Nomor HP diperlukan",
+        status: 400,
+      });
+    }
+
+    // 👇 Enkripsi nomor HP yang diterima dari parameter
+    const encryptedNomorHp = encrypt(id);
+
+    // 👇 Cari data berdasarkan ciphertext
+    const masukan = await prisma.masukanWarga.findFirstOrThrow({
+      where: {
+        nomorHp: encryptedNomorHp, // gunakan ciphertext untuk pencarian
+      },
       select: {
         id: true,
         judul: true,
@@ -22,6 +40,8 @@ export async function GET(
         domainIsu: {
           select: { nama: true },
         },
+        // Jika ingin menampilkan nomor HP, bisa ditambahkan:
+        // nomorHp: true,
       },
     });
 
@@ -29,6 +49,8 @@ export async function GET(
     const formattedData = {
       ...masukan,
       createdAt: masukan.createdAt.toISOString(),
+      // Jika nomorHp ikut di-select dan ingin didekripsi:
+      // nomorHp: masukan.nomorHp ? decrypt(masukan.nomorHp) : null,
     };
 
     return handleResponse({
@@ -36,8 +58,9 @@ export async function GET(
       data: formattedData,
     });
   } catch (error) {
-    console.error("Error cek status:", error);
     const prismaResponse = handlePrismaError(error);
+    console.log(prismaResponse);
+
     if (prismaResponse) {
       return handleResponse({
         success: false,

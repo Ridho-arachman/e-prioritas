@@ -1,16 +1,14 @@
-import { Prisma } from "../app/generated/prisma/client";
-
 interface PrismaErrorResponse {
   status: number;
   message: string;
 }
 
 export function handlePrismaError(error: any): PrismaErrorResponse | null {
-  if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    console.log(error);
+  if (error && typeof error === "object" && "code" in error) {
+    const code = error.code as string;
 
     // Sekarang TypeScript tahu `error.code` valid
-    switch (error.code) {
+    switch (code) {
       case "P2002":
         return { status: 409, message: "Data sudah ada (unique constraint)" };
       case "P2003":
@@ -20,6 +18,11 @@ export function handlePrismaError(error: any): PrismaErrorResponse | null {
         };
       case "P2000":
         return { status: 400, message: "Nilai field terlalu panjang" };
+      case "P2025":
+        return {
+          status: 404,
+          message: "Data tidak ditemukan", // Ubah pesan sesuai konteks
+        };
       case "P2025":
         return {
           status: 404,
@@ -70,7 +73,6 @@ export function handlePrismaError(error: any): PrismaErrorResponse | null {
         "Data ini memiliki relasi dengan data lain. Hapus data terkait terlebih dahulu atau putuskan relasi sebelum menghapus",
     };
   }
-
   // Kalau bukan error Prisma
   return null;
 }
