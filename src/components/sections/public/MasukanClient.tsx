@@ -273,7 +273,7 @@ export default function MasukanClient() {
               <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                 <MapPinned className="w-4 h-4 text-green-600 dark:text-green-400" />
                 <p>
-                  <strong className="font-medium">Kabupaten:</strong> Serang
+                  <strong className="font-medium">Kota:</strong> Serang
                 </p>
               </div>
               <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">

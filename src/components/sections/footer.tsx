@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Heart, Mail, MapPin, Phone } from "lucide-react";
 // Ikon brand dari React Icons (Font Awesome)
 import { motion } from "framer-motion";
-import { FaFacebook, FaGithub, FaInstagram, FaTwitter } from "react-icons/fa";
+import { FaInstagram, FaTiktok } from "react-icons/fa";
 
 const footerLinks = [
   {
@@ -32,24 +32,14 @@ const footerLinks = [
 // GANTI KOMPONEN DI SINI
 const socialMedia = [
   {
-    icon: FaFacebook, // Ganti Facebook jadi FaFacebook
-    href: "https://facebook.com/desapanggungjati",
-    label: "Facebook",
-  },
-  {
     icon: FaInstagram, // Ganti Instagram jadi FaInstagram
-    href: "https://instagram.com/desapanggungjati",
+    href: "https://www.instagram.com/kelurahan_panggungjati/",
     label: "Instagram",
   },
   {
-    icon: FaTwitter, // Ganti Twitter jadi FaTwitter
-    href: "https://twitter.com/desapanggungjati",
-    label: "Twitter",
-  },
-  {
-    icon: FaGithub, // Ganti Github jadi FaGithub
-    href: "https://github.com/Ridho-arachman",
-    label: "GitHub",
+    icon: FaTiktok, // Ganti Tiktok jadi FaTiktok
+    href: "https://www.tiktok.com/@kanjengdalemtv",
+    label: "Tiktok",
   },
 ];
 
@@ -87,9 +77,8 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-gray-400 max-w-md leading-relaxed">
-              Platform berbasis AI untuk memprioritaskan pembangunan fasilitas
-              umum secara akurat dan transparan. Bersama wujudkan Panggungjati
-              yang lebih baik.
+              Platform AI untuk prioritas pembantu keputusan kegiatan kelurahan
+              yang akurat & transparan. Wujudkan Panggungjati lebih baik.
             </p>
             <div className="flex items-center space-x-4 pt-4">
               {socialMedia.map((social) => (
@@ -151,7 +140,7 @@ export default function Footer() {
                   href="mailto:info@panggungjati.go.id"
                   className="hover:text-white transition-colors"
                 >
-                  info@panggungjati.go.id
+                  panggungjatikelurahan@gmail.com
                 </a>
               </motion.li>
               <motion.li
@@ -172,8 +161,7 @@ export default function Footer() {
               >
                 <MapPin className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
                 <span className="flex-1">
-                  Jl. Raya Panggungjati No. 123, Kel. Panggungjati, Kec.
-                  Taktakan, Kota Serang
+                  Jl. Kibuyut Kanjeng Dalem No. 36 B, RT/RW 001/005
                 </span>
               </motion.li>
             </ul>

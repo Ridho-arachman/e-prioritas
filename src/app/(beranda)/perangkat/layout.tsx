@@ -1,3 +1,4 @@
+"use client";
 import { AppSidebar } from "@/components/sections/app-sidebar-perangkat";
 import { NavActions } from "@/components/sections/nav-actions";
 import {

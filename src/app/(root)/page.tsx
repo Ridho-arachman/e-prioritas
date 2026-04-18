@@ -229,24 +229,24 @@ export default function LandingPage() {
 
   const testimonials = [
     {
-      name: "Bapak RT 03",
-      role: "Ketua RW 05",
+      name: "Warga",
+      role: "Panggungjati",
       content:
-        "Sistem ini sangat membantu dalam menjaring aspirasi warga. Sekarang pembangunan lebih terarah.",
-      avatar: "👨‍🌾",
+        "Saya senang bisa memberikan masukan langsung. Jalan di lingkungan saya sekarang sudah diperbaiki.",
+      avatar: "👨",
     },
     {
-      name: "Ibu Lurah",
-      role: "Lurah Panggungjati",
+      name: "Warga",
+      role: "Panggungjati",
       content:
-        "Dengan AI, kami bisa memprioritaskan program yang benar-benar dibutuhkan masyarakat.",
-      avatar: "👩‍💼",
+        "Aplikasinya mudah digunakan. Aspirasi kami tentang posyandu akhirnya didengar.",
+      avatar: "👩",
     },
     {
-      name: "Warga RT 02",
-      role: "Warga",
+      name: "Warga",
+      role: "Panggungjati",
       content:
-        "Saya merasa didengar. Masukan saya tentang perbaikan jalan langsung masuk prioritas.",
+        "Transparan dan cepat. Prioritas pembangunan jadi jelas dan tidak asal-asalan.",
       avatar: "👴",
     },
   ];
@@ -329,8 +329,8 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            Platform berbasis Next.js dan Google Gemini AI untuk memprioritaskan
-            pembangunan fasilitas umum secara akurat dan transparan di Kelurahan
+            Sistem layanan digital untuk membantu menentukan prioritas pembantu
+            keputusan kegiatan kelurahan secara tepat dan terbuka di Kelurahan
             Panggungjati.
           </motion.p>
         </div>
@@ -510,33 +510,41 @@ export default function LandingPage() {
             Testimoni dari warga dan perangkat desa yang telah menggunakan
             sistem ini.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
             {testimonials.map((testimonial, idx) => (
               <motion.div
                 key={idx}
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.05, y: -5 }} // sama seperti features card
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: false, amount: 0.2 }}
                 transition={{ delay: idx * 0.1 }}
+                className="flex"
               >
-                <Card className="p-6 border-0 shadow-md hover:shadow-xl transition-all bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm">
-                  <CardContent className="p-0 space-y-4">
-                    <div className="flex items-center gap-2">
-                      <div className="text-3xl">{testimonial.avatar}</div>
-                      <div>
-                        <p className="font-semibold text-gray-900 dark:text-white">
-                          {testimonial.name}
-                        </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {testimonial.role}
-                        </p>
+                <Card className="p-6 text-left border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm w-full flex flex-col rounded-2xl">
+                  <CardContent className="p-0 flex-1 flex flex-col justify-between">
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        {/* Avatar dengan gradien tema utama (biru ke cyan) */}
+                        <div className="w-12 h-12 rounded-full bg-linear-to-r from-blue-600 to-cyan-600 flex items-center justify-center text-white font-bold shadow-md">
+                          {testimonial.avatar || testimonial.name.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900 dark:text-white">
+                            {testimonial.name}
+                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {testimonial.role}
+                          </p>
+                        </div>
                       </div>
+                      <p className="text-gray-600 dark:text-gray-300 italic leading-relaxed">
+                        "{testimonial.content}"
+                      </p>
                     </div>
-                    <p className="text-gray-600 dark:text-gray-300 italic">
-                      "{testimonial.content}"
-                    </p>
-                    <div className="flex text-yellow-400">
+                    {/* Garis pemisah dan rating */}
+                    <div className="flex text-yellow-400 mt-4 pt-2 border-t border-gray-200 dark:border-gray-700">
                       {[...Array(5)].map((_, i) => (
                         <Star key={i} className="w-4 h-4 fill-current" />
                       ))}

@@ -1,39 +1,43 @@
 // components/sections/masukan/masukanFormAdd.tsx
 "use client";
 
-import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { DomainIsu } from "@/app/generated/prisma";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { Field, FieldError, FieldLabel } from "../../ui/field";
-import { notifier } from "../../../lib/ToastNotifier";
-import { createMasukanWargaFormSchema } from "@/schema/masukanWarga";
 import { useGet } from "@/hooks/useApi";
-import { DomainIsu } from "@/app/generated/prisma";
-import { useState, useEffect, useMemo } from "react";
-import { ImagePlus, X, Loader2, Send, CheckCircle } from "lucide-react";
+import { useFormPersist } from "@/hooks/useFormPersist";
+import { createMasukanWargaFormSchema } from "@/schema/masukanWarga";
+import { useMasukanDraftStore } from "@/stores/masukanFormAddDraft";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  CheckCircle,
+  ClipboardList,
+  Heading,
+  ImagePlus,
+  Loader2,
+  MapPin,
+  MessageSquare,
+  Phone,
+  Send,
+  User,
+  X,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { z } from "zod";
+import { notifier } from "../../../lib/ToastNotifier";
+import { Field, FieldError, FieldLabel } from "../../ui/field";
 import {
   Select,
   SelectContent,
   SelectGroup,
-  SelectTrigger,
-  SelectValue,
   SelectItem,
   SelectLabel,
+  SelectTrigger,
+  SelectValue,
 } from "../../ui/select";
-import {
-  MessageSquare,
-  MapPin,
-  User,
-  ClipboardList,
-  Phone,
-  Heading,
-} from "lucide-react";
-import { useFormPersist } from "@/hooks/useFormPersist";
-import { useMasukanDraftStore } from "@/stores/masukanFormAddDraft";
-import { Skeleton } from "@/components/ui/skeleton";
 
 // Helper generate UUID (fallback untuk browser lama)
 const generateTrackingId = (): string => {
@@ -582,6 +586,7 @@ export default function MasukanWargaFormAdd() {
       </div>
 
       {!showConfirm ? (
+        // ... bagian form normal (tidak berubah)
         <div className="flex justify-end gap-2 pt-4">
           <Button
             type="button"
@@ -616,13 +621,13 @@ export default function MasukanWargaFormAdd() {
           </Button>
         </div>
       ) : (
-        <div className="space-y-4 pt-4 border-t">
+        // BAGIAN KONFIRMASI DIPERBARUI
+        <div className="space-y-6 pt-4 border-t">
           <div className="bg-blue-50 p-4 rounded-lg">
             <p className="text-sm text-blue-800 mb-2">
               <strong>Penting:</strong> Anda harus mengirim pesan WhatsApp yang
               sudah terbuka. Setelah mengirim, klik tombol di bawah untuk
-              menyimpan masukan. Masukan <strong>tidak akan tersimpan</strong>{" "}
-              sebelum Anda menekan tombol ini.
+              menyimpan masukan.
             </p>
             {whatsappLink && (
               <a
@@ -635,6 +640,71 @@ export default function MasukanWargaFormAdd() {
               </a>
             )}
           </div>
+
+          {/* Ringkasan Data yang Akan Disimpan */}
+          <div className="bg-gray-50 p-4 rounded-lg border">
+            <h3 className="font-medium text-gray-700 mb-3 flex items-center gap-2">
+              <ClipboardList className="h-4 w-4" />
+              Ringkasan Masukan Anda
+            </h3>
+            <dl className="space-y-2 text-sm">
+              {form.getValues("namaPengirim") && (
+                <div className="flex">
+                  <dt className="w-24 text-gray-500">Nama:</dt>
+                  <dd className="text-gray-800">
+                    {form.getValues("namaPengirim")}
+                  </dd>
+                </div>
+              )}
+              {form.getValues("nomorHp") && (
+                <div className="flex">
+                  <dt className="w-24 text-gray-500">Nomor HP:</dt>
+                  <dd className="text-gray-800">{form.getValues("nomorHp")}</dd>
+                </div>
+              )}
+              <div className="flex">
+                <dt className="w-24 text-gray-500">Judul:</dt>
+                <dd className="text-gray-800">{form.getValues("judul")}</dd>
+              </div>
+              <div className="flex">
+                <dt className="w-24 text-gray-500">Lokasi:</dt>
+                <dd className="text-gray-800">
+                  RT {form.getValues("lokasiRt")} / RW{" "}
+                  {form.getValues("lokasiRw")}
+                </dd>
+              </div>
+              <div className="flex">
+                <dt className="w-24 text-gray-500">Kategori:</dt>
+                <dd className="text-gray-800">
+                  {domainIsu.find(
+                    (d: DomainIsu) => d.id === form.getValues("domainIsuId"),
+                  )?.nama || "Tidak dipilih"}
+                </dd>
+              </div>
+              <div className="flex">
+                <dt className="w-24 text-gray-500">Deskripsi:</dt>
+                <dd className="text-gray-800 whitespace-pre-wrap">
+                  {form.getValues("deskripsi")}
+                </dd>
+              </div>
+              {imagePreviews.length > 0 && (
+                <div className="flex items-start">
+                  <dt className="w-24 text-gray-500 pt-1">Gambar:</dt>
+                  <dd className="flex flex-wrap gap-2">
+                    {imagePreviews.map((src, idx) => (
+                      <img
+                        key={idx}
+                        src={src}
+                        alt={`preview ${idx}`}
+                        className="w-16 h-16 object-cover rounded border"
+                      />
+                    ))}
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </div>
+
           <div className="flex justify-end gap-2">
             <Button
               type="button"
