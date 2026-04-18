@@ -3,8 +3,9 @@ import { NavActions } from "@/components/sections/nav-actions";
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -12,8 +13,14 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { generateBreadcrumbSegments } from "@/utils/generateBreadcrumbSegments";
+import { SlashIcon } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Fragment } from "react/jsx-runtime";
 
 export default function Page({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const segments = generateBreadcrumbSegments(pathname);
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -25,13 +32,29 @@ export default function Page({ children }: { children: React.ReactNode }) {
               orientation="vertical"
               className="mr-2 data-[orientation=vertical]:h-4"
             />
+
+            {/* 🔥 Breadcrumb Auto */}
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink className="line-clamp-1">
-                    Project Management & Task Tracking
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
+                {segments.map((segment, idx) => {
+                  const isLast = idx === segments.length - 1;
+                  return (
+                    <Fragment key={idx}>
+                      <BreadcrumbItem>
+                        {isLast ? (
+                          <BreadcrumbPage>{segment}</BreadcrumbPage>
+                        ) : (
+                          <span>{segment}</span>
+                        )}
+                      </BreadcrumbItem>
+                      {idx < segments.length - 1 && (
+                        <BreadcrumbSeparator>
+                          <SlashIcon className="h-4 w-4" />
+                        </BreadcrumbSeparator>
+                      )}
+                    </Fragment>
+                  );
+                })}
               </BreadcrumbList>
             </Breadcrumb>
           </div>

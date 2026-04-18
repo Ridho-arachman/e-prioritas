@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import {
   Calendar,
   Database,
@@ -8,9 +7,8 @@ import {
   MessageCircleMore,
   MessageCircleQuestion,
   Settings2,
-  Tags,
-  User2Icon,
 } from "lucide-react";
+import * as React from "react";
 
 import { NavMain } from "@/components/sections/nav-main";
 import { NavSecondary } from "@/components/sections/nav-secondary";
@@ -40,13 +38,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: "/perangkat/kelola-data",
         icon: Database,
       },
-    ],
-    navSecondary: [
       {
         title: "Atur Jadwal Program Mendatang",
         url: "/perangkat/jadwal-program",
         icon: Calendar,
       },
+    ],
+    navSecondary: [
       {
         title: "Setting Profile perangkat",
         url: `/perangkat/setting`,

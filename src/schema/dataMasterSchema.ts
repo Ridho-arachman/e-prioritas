@@ -62,7 +62,7 @@ export const dataMasterQuerySchema = z.object({
     if (val === null || val === undefined || val === "") return undefined;
     const num = Number(val);
     return isNaN(num) ? undefined : num;
-  }, z.number().int().min(1900).max(2100).optional()),
+  }, z.number().int().optional()),
   createdAt: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, {
