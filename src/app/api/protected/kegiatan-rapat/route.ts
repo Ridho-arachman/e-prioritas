@@ -1,27 +1,27 @@
 // src/app/api/protected/kegiatan-rapat/route.ts
-import { auth } from "@/lib/auth";
-import { handlePrismaError } from "@/lib/handlePrismaError";
-import { handleZodValidation } from "@/lib/handleZodValidation";
-import { handleResponse } from "@/lib/handleResponse";
 import {
-  kegiatanRapatService,
-  generateFingerprint,
-} from "@/services/kegiatanRapatService";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
-import { NextRequest } from "next/server";
-import {
+  ModeRekomendasi,
   Role,
   StatusRekomendasi,
-  ModeRekomendasi,
 } from "@/app/generated/prisma";
-import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
+import { handlePrismaError } from "@/lib/handlePrismaError";
+import { handleResponse } from "@/lib/handleResponse";
+import { handleZodValidation } from "@/lib/handleZodValidation";
+import prisma from "@/lib/prisma";
 import {
   kegiatanRapatQuerySchema,
   kegiatanRapatSchema,
 } from "@/schema/kegiatanRapatSchema";
-import prisma from "@/lib/prisma";
+import {
+  generateFingerprint,
+  kegiatanRapatService,
+} from "@/services/kegiatanRapatService";
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+import { headers } from "next/headers";
+import { NextRequest } from "next/server";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -189,12 +189,18 @@ export const GET = async (req: NextRequest) => {
       judul: searchParams.get("judul") || undefined,
       lokasi: searchParams.get("lokasi") || undefined,
       domainIsuId: searchParams.get("domainIsuId") || undefined,
+      dibuatOlehId: searchParams.get("dibuatOlehId") || undefined, // ✅
+      diprosesOlehId: searchParams.get("diprosesOlehId") || undefined, // ✅
       aiModel: searchParams.get("aiModel") || undefined,
       mode: searchParams.get("mode") || undefined,
       statusRekomendasi: searchParams.get("statusRekomendasi") || undefined,
       createdAt: searchParams.get("createdAt") || undefined,
       updatedAt: searchParams.get("updatedAt") || undefined,
       tanggal: searchParams.get("tanggal") || undefined,
+      page: Number(searchParams.get("page")) || 1,
+      limit: Number(searchParams.get("limit")) || 10,
+      sortBy: searchParams.get("sortBy") || "updatedAt",
+      sortOrder: (searchParams.get("sortOrder") as "asc" | "desc") || "desc",
     });
 
     if (!parsed.success) return handleZodValidation(parsed);
@@ -219,6 +225,8 @@ export const GET = async (req: NextRequest) => {
       judul: data.judul,
       lokasi: data.lokasi,
       domainIsuId: data.domainIsuId,
+      dibuatOlehId: data.dibuatOlehId, // ✅
+      diprosesOlehId: data.diprosesOlehId, // ✅
       aiModel: data.aiModel,
       mode: data.mode as ModeRekomendasi | undefined,
       statusRekomendasi: data.statusRekomendasi as
@@ -230,10 +238,11 @@ export const GET = async (req: NextRequest) => {
       updatedAtTo: updatedAtRange.to,
       tanggalFrom: tanggalRange.from,
       tanggalTo: tanggalRange.to,
-      sortBy: (searchParams.get("sortBy") as any) || "updatedAt",
-      sortOrder: (searchParams.get("sortOrder") as "asc" | "desc") || "desc",
-      page: Number(searchParams.get("page")) || 1,
-      limit: Number(searchParams.get("limit")) || 10,
+      role: session.user.role as Role,
+      sortBy: data.sortBy,
+      sortOrder: data.sortOrder,
+      page: data.page,
+      limit: data.limit,
     });
 
     if (result.data.length === 0) {

@@ -1,27 +1,27 @@
 // src/app/api/protected/kegiatan-rapat/route.ts
-import { auth } from "@/lib/auth";
-import { handlePrismaError } from "@/lib/handlePrismaError";
-import { handleZodValidation } from "@/lib/handleZodValidation";
-import { handleResponse } from "@/lib/handleResponse";
 import {
-  kegiatanRapatService,
-  generateFingerprint,
-} from "@/services/kegiatanRapatService";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
-import { NextRequest } from "next/server";
-import {
+  ModeRekomendasi,
   Role,
   StatusRekomendasi,
-  ModeRekomendasi,
 } from "@/app/generated/prisma";
-import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
+import { handlePrismaError } from "@/lib/handlePrismaError";
+import { handleResponse } from "@/lib/handleResponse";
+import { handleZodValidation } from "@/lib/handleZodValidation";
+import prisma from "@/lib/prisma";
 import {
   kegiatanRapatQuerySchema,
   kegiatanRapatSchema,
 } from "@/schema/kegiatanRapatSchema";
-import prisma from "@/lib/prisma";
+import {
+  generateFingerprint,
+  kegiatanRapatService,
+} from "@/services/kegiatanRapatService";
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+import { headers } from "next/headers";
+import { NextRequest } from "next/server";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -189,6 +189,8 @@ export const GET = async (req: NextRequest) => {
       judul: searchParams.get("judul") || undefined,
       lokasi: searchParams.get("lokasi") || undefined,
       domainIsuId: searchParams.get("domainIsuId") || undefined,
+      dibuatOlehId: searchParams.get("dibuatOlehId") || undefined, // ✅ tambahan
+      diprosesOlehId: searchParams.get("diprosesOlehId") || undefined, // ✅ tambahan
       aiModel: searchParams.get("aiModel") || undefined,
       mode: searchParams.get("mode") || undefined,
       statusRekomendasi: searchParams.get("statusRekomendasi") || undefined,
@@ -219,6 +221,8 @@ export const GET = async (req: NextRequest) => {
       judul: data.judul,
       lokasi: data.lokasi,
       domainIsuId: data.domainIsuId,
+      dibuatOlehId: data.dibuatOlehId, // ✅ teruskan
+      diprosesOlehId: data.diprosesOlehId, // ✅ teruskan
       aiModel: data.aiModel,
       mode: data.mode as ModeRekomendasi | undefined,
       statusRekomendasi: data.statusRekomendasi as

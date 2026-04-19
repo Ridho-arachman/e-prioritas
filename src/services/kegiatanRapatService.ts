@@ -1,18 +1,19 @@
 // src/services/kegiatanRapatService.ts
 import {
-  Prisma,
   ModeRekomendasi,
-  StatusRekomendasi,
+  Prisma,
+  Role,
   StatusMasukan,
+  StatusRekomendasi,
 } from "@/app/generated/prisma";
-import prisma from "@/lib/prisma";
-import { createHash } from "crypto";
 import {
   buildPrompt,
-  type MasukanWargaInput,
   type DataMasterInput,
+  type MasukanWargaInput,
 } from "@/lib/buildPrompt";
 import { geminiAi, type GeminiResponse } from "@/lib/gemini";
+import prisma from "@/lib/prisma";
+import { createHash } from "crypto";
 
 // ========================
 // TIPE INPUT
@@ -42,27 +43,28 @@ export type UpdateKegiatanRapatInput = Partial<
   >
 >;
 
-export type KegiatanRapatGetAllParams = {
+interface KegiatanRapatGetAllParams {
   judul?: string;
   lokasi?: string;
   domainIsuId?: string;
   dibuatOlehId?: string;
+  diprosesOlehId?: string; // ✅ Tambahan
   aiModel?: string;
   mode?: ModeRekomendasi;
   statusRekomendasi?: StatusRekomendasi;
   createdAtFrom?: Date;
   createdAtTo?: Date;
-  role?: string;
   updatedAtFrom?: Date;
   updatedAtTo?: Date;
   tanggalFrom?: Date;
   tanggalTo?: Date;
   search?: string;
-  sortBy?: keyof Prisma.KegiatanRapatOrderByWithRelationInput;
+  role?: Role;
+  sortBy?: string;
   sortOrder?: "asc" | "desc";
   page?: number;
   limit?: number;
-};
+}
 
 // ========================
 // HELPER: Generate Fingerprint
@@ -181,6 +183,7 @@ export const kegiatanRapatService = {
       lokasi,
       domainIsuId,
       dibuatOlehId,
+      diprosesOlehId, // ✅ Tambahan
       aiModel,
       mode,
       role,
@@ -200,9 +203,8 @@ export const kegiatanRapatService = {
 
     const where: Prisma.KegiatanRapatWhereInput = {};
 
-    if (dibuatOlehId) {
-      where.dibuatOlehId = dibuatOlehId;
-    }
+    if (dibuatOlehId) where.dibuatOlehId = dibuatOlehId;
+    if (diprosesOlehId) where.diprosesOlehId = diprosesOlehId; // ✅ Tambahan
 
     if (role === "LURAH") {
       where.statusRekomendasi = { not: StatusRekomendasi.DRAFT };

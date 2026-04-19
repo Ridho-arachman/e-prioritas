@@ -117,24 +117,32 @@ export const userService = {
 
   getAll: async ({
     q,
+    roles, // ✅ array role untuk filter
     page = 1,
     perPage = 20,
   }: {
     q?: string;
+    roles?: Role[]; // contoh: ["ADMIN", "PERANGKAT_DESA"]
     page?: number;
     perPage?: number;
   }) => {
     const skip = (page - 1) * perPage;
     const take = perPage;
 
-    const where = q
-      ? {
-          OR: [
-            { name: { contains: q, mode: "insensitive" as const } },
-            { email: { contains: q, mode: "insensitive" as const } },
-          ],
-        }
-      : {};
+    const where: Prisma.UserWhereInput = {};
+
+    // Filter pencarian
+    if (q) {
+      where.OR = [
+        { name: { contains: q, mode: "insensitive" } },
+        { email: { contains: q, mode: "insensitive" } },
+      ];
+    }
+
+    // Filter role (jika diberikan)
+    if (roles && roles.length > 0) {
+      where.role = { in: roles };
+    }
 
     const [total, data] = await Promise.all([
       prisma.user.count({ where }),

@@ -36,9 +36,23 @@ export const GET = async (req: NextRequest) => {
       ? parseInt(searchParams.get("perPage")!)
       : 20;
 
-    // Jika tidak ada parameter pencarian/pagination, gunakan getAll (all data)
-    // Tapi untuk keperluan combobox, kita akan selalu pakai getAllPaginated
-    const result = await userService.getAll({ q, page, perPage });
+    // ✅ Baca parameter roles (comma-separated: roles=ADMIN,PERANGKAT_DESA)
+    const rolesParam = searchParams.get("roles");
+    const rolesStrings = rolesParam ? rolesParam.split(",") : undefined;
+
+    // Konversi string[] ke Role[] dengan validasi
+    let roles: Role[] | undefined;
+    if (rolesStrings && rolesStrings.length > 0) {
+      const validRoles: Role[] = [];
+      for (const r of rolesStrings) {
+        if (r === "ADMIN" || r === "PERANGKAT_DESA" || r === "LURAH") {
+          validRoles.push(r as Role);
+        }
+      }
+      roles = validRoles.length > 0 ? validRoles : undefined;
+    }
+
+    const result = await userService.getAll({ q, roles, page, perPage });
 
     if (result.data.length === 0) {
       return handleResponse({

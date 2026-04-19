@@ -1,52 +1,8 @@
 "use client";
 
-import {
-  ChevronLeft,
-  ChevronRight,
-  XIcon,
-  Filter,
-  ArrowUp,
-  ArrowDown,
-  SlidersHorizontal,
-  Trash,
-  Edit,
-  Calendar,
-  MapPin,
-  Users,
-  FileText,
-  X,
-  SparklesIcon,
-  ClockIcon,
-  TargetIcon,
-  ArrowRightIcon,
-  Eye,
-  Plus,
-  CpuIcon,
-} from "lucide-react";
-import { useDebounce } from "use-debounce";
-import { useState, useEffect } from "react";
-import { notifier } from "@/lib/ToastNotifier";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { useDelete, useGet } from "@/hooks/useApi";
+import DataError from "@/components/blocks/DataError";
 import DataKosong from "@/components/blocks/DataKosong";
 import DataTidakDitemukan from "@/components/blocks/DataTidakDitemukan";
-import DataError from "@/components/blocks/DataError";
-import { useQueryState } from "nuqs";
-import { buildQuery } from "@/utils/query";
-import { useRouter } from "next/navigation";
-import { AxiosError } from "axios";
-import { Spinner } from "@/components/ui/spinner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -57,6 +13,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -64,8 +23,67 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
+import { useDelete, useGet } from "@/hooks/useApi";
+import { notifier } from "@/lib/ToastNotifier";
+import { cn } from "@/lib/utils";
+import { buildQuery } from "@/utils/query";
+import { AxiosError } from "axios";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
+import {
+  ArrowDown,
+  ArrowUp,
+  Calendar,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsUpDown,
+  ClockIcon,
+  CpuIcon,
+  Edit,
+  Eye,
+  FileText,
+  Filter,
+  MapPin,
+  Plus,
+  SlidersHorizontal,
+  SparklesIcon,
+  TargetIcon,
+  Trash,
+  Users,
+  X,
+  XIcon,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
+import { useCallback, useEffect, useState } from "react";
+import { useDebounce } from "use-debounce";
+
+// Command components untuk combobox
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
 
 // ═══════════════════════════════════════════════════════════════
 // 📦 ENUMS (Sesuai Schema Prisma)
@@ -139,7 +157,7 @@ export interface MasukanWarga {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// 📦 REKOMENDASI (JSON STRUCTURE - Bukan Table)
+// 📦 REKOMENDASI (JSON STRUCTURE)
 // ═══════════════════════════════════════════════════════════════
 
 export interface RekomendasiEvidence {
@@ -272,6 +290,170 @@ const parseRekomendasiItems = (items: any): RekomendasiSnapshot | null => {
 };
 
 // ═══════════════════════════════════════════════════════════════
+// 🧩 USER COMBOBOX (dengan allowedRoles)
+// ═══════════════════════════════════════════════════════════════
+
+interface UserComboboxProps {
+  value: string;
+  onChange: (
+    value: string,
+    user?: { id: string; name: string; email: string; jabatan?: string | null },
+  ) => void;
+  placeholder?: string;
+  allowedRoles?: string[];
+}
+
+const UserCombobox = ({
+  value,
+  onChange,
+  placeholder,
+  allowedRoles,
+}: UserComboboxProps) => {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebounce(search, 300);
+  const [page, setPage] = useState(1);
+  const [users, setUsers] = useState<any[]>([]);
+  const [meta, setMeta] = useState<{ totalPages: number } | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+
+  const { data: userDetail } = useGet(value ? `/protected/user/${value}` : "");
+
+  useEffect(() => {
+    if (userDetail) setSelectedUser(userDetail);
+  }, [userDetail]);
+
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (debouncedSearch) params.append("q", debouncedSearch);
+      params.append("page", String(page));
+      params.append("perPage", "10");
+      if (allowedRoles && allowedRoles.length > 0) {
+        params.append("roles", allowedRoles.join(","));
+      }
+      const query = params.toString() ? `?${params.toString()}` : "";
+      const res = await fetch(`/api/protected/user${query}`);
+      const json = await res.json();
+      if (json.success) {
+        if (page === 1) {
+          setUsers(json.data);
+        } else {
+          setUsers((prev) => [...prev, ...json.data]);
+        }
+        setMeta(json.meta);
+      }
+    } catch (error) {
+      console.error("Failed to fetch users", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [debouncedSearch, page, allowedRoles]);
+
+  useEffect(() => {
+    setPage(1);
+    setUsers([]);
+  }, [debouncedSearch]);
+
+  useEffect(() => {
+    if (open) {
+      fetchUsers();
+    }
+  }, [open, fetchUsers]);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const bottom =
+      e.currentTarget.scrollHeight - e.currentTarget.scrollTop ===
+      e.currentTarget.clientHeight;
+    if (bottom && !loading && meta && page < meta.totalPages) {
+      setPage((p) => p + 1);
+    }
+  };
+
+  const handleSelect = (userId: string) => {
+    const user = users.find((u) => u.id === userId);
+    if (user) {
+      setSelectedUser(user);
+      onChange(userId, user);
+    }
+    setOpen(false);
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between"
+        >
+          <span className="truncate">
+            {value && selectedUser
+              ? selectedUser.name
+              : placeholder || "Pilih user"}
+          </span>
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[--radix-popover-trigger-width] max-w-75 p-0">
+        <Command shouldFilter={false}>
+          <CommandInput
+            placeholder="Cari user..."
+            value={search}
+            onValueChange={setSearch}
+          />
+          <CommandList onScroll={handleScroll}>
+            {loading && users.length === 0 && (
+              <div className="py-6 text-center text-sm text-muted-foreground">
+                Loading...
+              </div>
+            )}
+            {!loading && users.length === 0 && (
+              <CommandEmpty>Tidak ada user ditemukan.</CommandEmpty>
+            )}
+            <CommandGroup>
+              {users.map((user) => (
+                <CommandItem
+                  key={user.id}
+                  value={user.id}
+                  onSelect={handleSelect}
+                  className="max-w-full"
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4 shrink-0",
+                      value === user.id ? "opacity-100" : "opacity-0",
+                    )}
+                  />
+                  <div className="flex flex-col">
+                    <span className="truncate font-medium">
+                      {user.name} ({user.email})
+                    </span>
+                    {user.jabatan && (
+                      <span className="text-xs text-muted-foreground truncate">
+                        {user.jabatan}
+                      </span>
+                    )}
+                  </div>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+            {loading && users.length > 0 && (
+              <div className="py-2 text-center text-sm text-muted-foreground">
+                Memuat lebih banyak...
+              </div>
+            )}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════
 // 🎯 MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════
 
@@ -281,11 +463,27 @@ export default function ListJadwalKegiatan() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
-  // Query states dengan nuqs (URL-based)
+  // Query states
   const [q, setQ] = useQueryState("q", { defaultValue: "" });
   const [domainIsuId, setDomainIsuId] = useQueryState("domainIsuId", {
     defaultValue: "",
   });
+  const [statusRekomendasi, setStatusRekomendasi] = useQueryState(
+    "statusRekomendasi",
+    { defaultValue: "" },
+  );
+  const [mode, setMode] = useQueryState("mode", { defaultValue: "" });
+  const [dibuatOlehId, setDibuatOlehId] = useQueryState("dibuatOlehId", {
+    defaultValue: "",
+  });
+  const [diprosesOlehId, setDiprosesOlehId] = useQueryState("diprosesOlehId", {
+    defaultValue: "",
+  });
+  const [tanggal, setTanggal] = useQueryState("tanggal", { defaultValue: "" });
+  const [createdAt, setCreatedAt] = useQueryState("createdAt", {
+    defaultValue: "",
+  });
+
   const [page, setPage] = useQueryState("page", { defaultValue: "1" });
   const [limit] = useQueryState("limit", { defaultValue: "10" });
 
@@ -297,13 +495,23 @@ export default function ListJadwalKegiatan() {
     defaultValue: "desc",
   });
 
+  // State untuk menyimpan nama user yang dipilih (untuk badge)
+  const [selectedDibuatOlehName, setSelectedDibuatOlehName] = useState("");
+  const [selectedDiprosesOlehName, setSelectedDiprosesOlehName] = useState("");
+
   const [debouncedQ] = useDebounce(q, 500);
   const pageNumber = Number(page);
   const limitNumber = Number(limit);
 
   const queryString = buildQuery({
-    q: debouncedQ,
+    q: debouncedQ || undefined,
     domainIsuId: domainIsuId || undefined,
+    statusRekomendasi: statusRekomendasi || undefined,
+    mode: mode || undefined,
+    dibuatOlehId: dibuatOlehId || undefined,
+    diprosesOlehId: diprosesOlehId || undefined,
+    tanggal: tanggal || undefined,
+    createdAt: createdAt || undefined,
     page: pageNumber,
     limit: limitNumber,
     sortBy,
@@ -329,11 +537,32 @@ export default function ListJadwalKegiatan() {
 
   const hasSignificantFilter =
     (debouncedQ?.trim() !== "" && debouncedQ !== undefined) ||
-    domainIsuId !== "";
+    domainIsuId !== "" ||
+    statusRekomendasi !== "" ||
+    mode !== "" ||
+    dibuatOlehId !== "" ||
+    diprosesOlehId !== "" ||
+    tanggal !== "" ||
+    createdAt !== "";
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    setPage("1");
+  }, [
+    debouncedQ,
+    domainIsuId,
+    statusRekomendasi,
+    mode,
+    dibuatOlehId,
+    diprosesOlehId,
+    tanggal,
+    createdAt,
+    sortBy,
+    sortOrder,
+  ]);
 
   const handleDelete = async () => {
     if (!selectedDeleteId) return;
@@ -353,13 +582,30 @@ export default function ListJadwalKegiatan() {
 
   const clearFilters = () => {
     setDomainIsuId("");
+    setStatusRekomendasi("");
+    setMode("");
+    setDibuatOlehId("");
+    setSelectedDibuatOlehName("");
+    setDiprosesOlehId("");
+    setSelectedDiprosesOlehName("");
+    setTanggal("");
+    setCreatedAt("");
     setSortBy("updatedAt");
     setSortOrder("desc");
     setIsFilterOpen(false);
+    setPage("1");
   };
 
   const hasActiveFilters =
-    domainIsuId !== "" || sortBy !== "updatedAt" || sortOrder !== "desc";
+    domainIsuId !== "" ||
+    statusRekomendasi !== "" ||
+    mode !== "" ||
+    dibuatOlehId !== "" ||
+    diprosesOlehId !== "" ||
+    tanggal !== "" ||
+    createdAt !== "" ||
+    sortBy !== "updatedAt" ||
+    sortOrder !== "desc";
 
   // Tampilkan loading saat belum mounted (SSR)
   if (!isMounted) {
@@ -455,7 +701,6 @@ export default function ListJadwalKegiatan() {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {/* Total Kegiatan */}
               <div className="group relative bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300">
                 <div className="absolute inset-0 bg-linear-to-br from-blue-50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="relative">
@@ -472,8 +717,6 @@ export default function ListJadwalKegiatan() {
                   </p>
                 </div>
               </div>
-
-              {/* Domain Isu */}
               <div className="group relative bg-white rounded-2xl p-5 border border-slate-200 hover:border-amber-400 hover:shadow-lg hover:shadow-amber-500/10 transition-all duration-300">
                 <div className="absolute inset-0 bg-linear-to-br from-amber-50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="relative">
@@ -490,8 +733,6 @@ export default function ListJadwalKegiatan() {
                   </p>
                 </div>
               </div>
-
-              {/* Halaman */}
               <div className="group relative bg-white rounded-2xl p-5 border border-slate-200 hover:border-violet-400 hover:shadow-lg hover:shadow-violet-500/10 transition-all duration-300">
                 <div className="absolute inset-0 bg-linear-to-br from-violet-50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="relative">
@@ -514,7 +755,6 @@ export default function ListJadwalKegiatan() {
           {/* Toolbar */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-10">
             <div className="flex flex-wrap items-center gap-3">
-              {/* ✅ Search Input */}
               <div className="relative group">
                 <div className="absolute inset-0 bg-linear-to-r from-blue-500/10 to-indigo-500/10 rounded-xl blur opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none" />
                 <XIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
@@ -522,34 +762,21 @@ export default function ListJadwalKegiatan() {
                   placeholder="Cari nama kegiatan..."
                   className="pl-12 pr-12 py-3 w-72 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-sm relative z-10"
                   value={q}
-                  onChange={(e) => {
-                    setQ(e.target.value);
-                    setPage("1");
-                  }}
+                  onChange={(e) => setQ(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === "Escape") {
-                      setQ("");
-                      setPage("1");
-                    }
+                    if (e.key === "Escape") setQ("");
                   }}
                 />
                 {q && (
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setQ("");
-                      setPage("1");
-                    }}
+                    onClick={() => setQ("")}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full p-1 transition-all z-20"
-                    type="button"
-                    aria-label="Clear search"
                   >
                     <X className="h-4 w-4" />
                   </button>
                 )}
               </div>
 
-              {/* Filter Button */}
               <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
                 <Button
                   variant="outline"
@@ -560,12 +787,22 @@ export default function ListJadwalKegiatan() {
                   Filter & Sort
                   {hasActiveFilters && (
                     <Badge variant="secondary" className="ml-2">
-                      {domainIsuId !== "" ? 1 : 0} +{" "}
-                      {sortBy !== "updatedAt" || sortOrder !== "desc" ? 1 : 0}
+                      {[
+                        domainIsuId,
+                        statusRekomendasi,
+                        mode,
+                        dibuatOlehId,
+                        diprosesOlehId,
+                        tanggal,
+                        createdAt,
+                      ].filter(Boolean).length +
+                        (sortBy !== "updatedAt" || sortOrder !== "desc"
+                          ? 1
+                          : 0)}
                     </Badge>
                   )}
                 </Button>
-                <DialogContent className="sm:max-w-md">
+                <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>
                       <div className="flex items-center gap-2">
@@ -577,8 +814,8 @@ export default function ListJadwalKegiatan() {
                       Atur filter dan urutan data kegiatan rapat
                     </DialogDescription>
                   </DialogHeader>
-                  <div className="grid gap-6 py-4">
-                    {/* Domain Isu Filter */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
+                    {/* Domain Isu */}
                     <div className="grid gap-2">
                       <Label>Domain Isu</Label>
                       <Select
@@ -601,66 +838,153 @@ export default function ListJadwalKegiatan() {
                       </Select>
                     </div>
 
-                    {/* Sort Options */}
+                    {/* Status Rekomendasi */}
                     <div className="grid gap-2">
-                      <Label>Urutkan Berdasarkan</Label>
-                      <Select value={sortBy} onValueChange={setSortBy}>
+                      <Label>Status Rekomendasi</Label>
+                      <Select
+                        value={statusRekomendasi || "all"}
+                        onValueChange={(val) =>
+                          setStatusRekomendasi(val === "all" ? "" : val)
+                        }
+                      >
                         <SelectTrigger>
-                          <SelectValue placeholder="Pilih kolom" />
+                          <SelectValue placeholder="Pilih status" />
                         </SelectTrigger>
                         <SelectContent>
-                          {sortOptions.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
+                          <SelectItem value="all">Semua</SelectItem>
+                          {Object.values(StatusRekomendasi).map((status) => (
+                            <SelectItem key={status} value={status}>
+                              {status}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
-                      <div className="flex gap-2">
-                        <Button
-                          variant={sortOrder === "asc" ? "default" : "outline"}
-                          className="flex-1 cursor-pointer"
-                          onClick={() => setSortOrder("asc")}
-                        >
-                          <ArrowUp className="mr-2 h-4 w-4" />
-                          Ascending
-                        </Button>
-                        <Button
-                          variant={sortOrder === "desc" ? "default" : "outline"}
-                          className="flex-1 cursor-pointer"
-                          onClick={() => setSortOrder("desc")}
-                        >
-                          <ArrowDown className="mr-2 h-4 w-4" />
-                          Descending
-                        </Button>
-                      </div>
+                    </div>
+
+                    {/* Mode Rekomendasi */}
+                    <div className="grid gap-2">
+                      <Label>Mode Rekomendasi</Label>
+                      <Select
+                        value={mode || "all"}
+                        onValueChange={(val) =>
+                          setMode(val === "all" ? "" : val)
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih mode" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Semua</SelectItem>
+                          {Object.values(ModeRekomendasi).map((m) => (
+                            <SelectItem key={m} value={m}>
+                              {m === "FUSI_DATA" ? "Fusi Data" : "Data Master"}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Dibuat Oleh - hanya ADMIN & PERANGKAT_DESA */}
+                    <div className="grid gap-2">
+                      <Label>Dibuat Oleh</Label>
+                      <UserCombobox
+                        value={dibuatOlehId}
+                        onChange={(val, user) => {
+                          setDibuatOlehId(val);
+                          setSelectedDibuatOlehName(user?.name || "");
+                        }}
+                        placeholder="Pilih pembuat"
+                        allowedRoles={["ADMIN", "PERANGKAT_DESA"]}
+                      />
+                    </div>
+
+                    {/* Diproses Oleh - semua role */}
+                    <div className="grid gap-2">
+                      <Label>Diproses Oleh</Label>
+                      <UserCombobox
+                        value={diprosesOlehId}
+                        onChange={(val, user) => {
+                          setDiprosesOlehId(val);
+                          setSelectedDiprosesOlehName(user?.name || "");
+                        }}
+                        placeholder="Pilih pemroses"
+                      />
+                    </div>
+
+                    {/* Tanggal Rapat */}
+                    <div className="grid gap-2">
+                      <Label>Tanggal Rapat</Label>
+                      <Input
+                        type="date"
+                        value={tanggal}
+                        onChange={(e) => setTanggal(e.target.value)}
+                      />
+                    </div>
+
+                    {/* Tanggal Dibuat */}
+                    <div className="grid gap-2">
+                      <Label>Tanggal Dibuat</Label>
+                      <Input
+                        type="date"
+                        value={createdAt}
+                        onChange={(e) => setCreatedAt(e.target.value)}
+                      />
                     </div>
                   </div>
-                  <div className="flex justify-between gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={clearFilters}
-                      className="cursor-pointer"
-                    >
+
+                  <Separator className="my-2" />
+
+                  {/* Sort Options */}
+                  <div className="grid gap-2 mt-4">
+                    <Label>Urutkan Berdasarkan</Label>
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih kolom" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {sortOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <div className="flex gap-2">
+                      <Button
+                        variant={sortOrder === "asc" ? "default" : "outline"}
+                        className="flex-1"
+                        onClick={() => setSortOrder("asc")}
+                      >
+                        <ArrowUp className="mr-2 h-4 w-4" />
+                        Ascending
+                      </Button>
+                      <Button
+                        variant={sortOrder === "desc" ? "default" : "outline"}
+                        className="flex-1"
+                        onClick={() => setSortOrder("desc")}
+                      >
+                        <ArrowDown className="mr-2 h-4 w-4" />
+                        Descending
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between gap-2 mt-6">
+                    <Button variant="outline" onClick={clearFilters}>
                       Reset
                     </Button>
-                    <Button
-                      onClick={() => setIsFilterOpen(false)}
-                      className="cursor-pointer"
-                    >
+                    <Button onClick={() => setIsFilterOpen(false)}>
                       Terapkan
                     </Button>
                   </div>
                 </DialogContent>
               </Dialog>
 
-              {/* Badge hasil */}
               <Badge
                 variant="outline"
                 className="bg-slate-100 border-slate-200 text-slate-600 px-4 py-2 rounded-xl font-medium"
               >
                 {data?.length || 0} kegiatan
-                {q && ` (filtered from ${meta?.total || 0})`}
               </Badge>
             </div>
           </div>
@@ -668,30 +992,84 @@ export default function ListJadwalKegiatan() {
           {/* Active Filters Badge */}
           {hasActiveFilters && (
             <div className="flex flex-wrap gap-2 mb-6">
-              {domainIsuId !== "" && (
+              {domainIsuId && (
                 <Badge variant="secondary" className="gap-2">
                   Domain:{" "}
                   {domainIsuOptions?.find(
-                    (opt: DomainIsu) => opt.id === domainIsuId,
+                    (d: DomainIsu) => d.id === domainIsuId,
                   )?.nama || domainIsuId}
+                  <button onClick={() => setDomainIsuId("")}>
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+              {statusRekomendasi && (
+                <Badge variant="secondary" className="gap-2">
+                  Status: {statusRekomendasi}
+                  <button onClick={() => setStatusRekomendasi("")}>
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+              {mode && (
+                <Badge variant="secondary" className="gap-2">
+                  Mode: {mode === "FUSI_DATA" ? "Fusi Data" : "Data Master"}
+                  <button onClick={() => setMode("")}>
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+              {dibuatOlehId && (
+                <Badge variant="secondary" className="gap-2">
+                  Dibuat: {selectedDibuatOlehName || dibuatOlehId}
                   <button
-                    onClick={() => setDomainIsuId("")}
-                    className="hover:text-red-500"
+                    onClick={() => {
+                      setDibuatOlehId("");
+                      setSelectedDibuatOlehName("");
+                    }}
                   >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+              {diprosesOlehId && (
+                <Badge variant="secondary" className="gap-2">
+                  Diproses: {selectedDiprosesOlehName || diprosesOlehId}
+                  <button
+                    onClick={() => {
+                      setDiprosesOlehId("");
+                      setSelectedDiprosesOlehName("");
+                    }}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+              {tanggal && (
+                <Badge variant="secondary" className="gap-2">
+                  Tgl Rapat: {format(new Date(tanggal), "dd MMM yyyy")}
+                  <button onClick={() => setTanggal("")}>
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+              {createdAt && (
+                <Badge variant="secondary" className="gap-2">
+                  Dibuat: {format(new Date(createdAt), "dd MMM yyyy")}
+                  <button onClick={() => setCreatedAt("")}>
                     <X className="h-3 w-3" />
                   </button>
                 </Badge>
               )}
               {(sortBy !== "updatedAt" || sortOrder !== "desc") && (
                 <Badge variant="secondary" className="gap-2">
-                  Sort: {sortOptions.find((opt) => opt.value === sortBy)?.label}{" "}
+                  Sort: {sortOptions.find((o) => o.value === sortBy)?.label}{" "}
                   {sortOrder === "asc" ? "↑" : "↓"}
                   <button
                     onClick={() => {
                       setSortBy("updatedAt");
                       setSortOrder("desc");
                     }}
-                    className="hover:text-red-500"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -740,7 +1118,6 @@ export default function ListJadwalKegiatan() {
 
             {data?.length > 0 && (
               <>
-                {/* Timeline Line */}
                 <div className="relative pl-8">
                   <div className="absolute left-4 top-0 bottom-0 w-1 bg-linear-to-b from-blue-400 via-indigo-400 to-purple-400 rounded-full" />
                   <div className="space-y-6">
@@ -754,16 +1131,13 @@ export default function ListJadwalKegiatan() {
 
                       return (
                         <div key={k.id} className="relative group">
-                          {/* Timeline Dot */}
                           <div
                             className={`absolute -left-6.5 top-6 w-6 h-6 rounded-full bg-linear-to-br ${gradient} border-4 border-white shadow-lg z-10`}
                           />
                           <Card className="group/card border border-slate-200 bg-white rounded-2xl overflow-hidden hover:border-blue-400 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-500 hover:-translate-y-1">
-                            {/* Top Gradient Bar */}
                             <div className={`h-2 bg-linear-to-r ${gradient}`} />
                             <div className="p-6">
                               <div className="flex flex-col lg:flex-row lg:items-start gap-6">
-                                {/* Date Badge */}
                                 <div className="shrink-0">
                                   <div className="relative">
                                     <div
@@ -785,8 +1159,6 @@ export default function ListJadwalKegiatan() {
                                     </div>
                                   </div>
                                 </div>
-
-                                {/* Content */}
                                 <div className="flex-1 min-w-0">
                                   <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
                                     <div>
@@ -827,7 +1199,6 @@ export default function ListJadwalKegiatan() {
                                       </div>
                                     )}
                                   </div>
-
                                   <div className="flex flex-wrap gap-4 text-sm text-slate-500 mb-4">
                                     <div className="flex items-center gap-2">
                                       <div className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center">
@@ -846,12 +1217,9 @@ export default function ListJadwalKegiatan() {
                                       </span>
                                     </div>
                                   </div>
-
                                   <p className="text-slate-600 leading-relaxed mb-5 line-clamp-2">
                                     {k.deskripsi}
                                   </p>
-
-                                  {/* ✅ Rekomendasi Section (dari JSON) */}
                                   {rekomendasiData && prioritasCount > 0 && (
                                     <div className="space-y-4">
                                       <div className="flex items-center gap-2">
@@ -866,15 +1234,11 @@ export default function ListJadwalKegiatan() {
                                       </div>
                                       <div className="grid gap-3 md:grid-cols-2">
                                         {rekomendasiData.prioritas.map(
-                                          (
-                                            rec: RekomendasiItem,
-                                            idx: number,
-                                          ) => (
+                                          (rec, idx) => (
                                             <div
                                               key={rec.fingerprint || idx}
                                               className="group/rec relative bg-linear-to-br from-slate-50 to-white rounded-xl p-4 border border-slate-200 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300"
                                             >
-                                              {/* Priority Score Badge */}
                                               <div className="absolute top-3 right-3">
                                                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200">
                                                   <TargetIcon className="h-3.5 w-3.5 text-amber-600" />
@@ -897,8 +1261,6 @@ export default function ListJadwalKegiatan() {
                                               <p className="text-xs text-slate-500 line-clamp-2 mb-3">
                                                 {rec.alasanAnalisis}
                                               </p>
-
-                                              {/* Evidence */}
                                               {rec.evidence && (
                                                 <div className="pt-3 border-t border-slate-200">
                                                   <div className="flex items-center justify-between mb-2">
@@ -932,8 +1294,6 @@ export default function ListJadwalKegiatan() {
                                       </div>
                                     </div>
                                   )}
-
-                                  {/* Action Buttons - Hanya tampilkan Edit & Hapus jika status DRAFT atau DIAJUKAN */}
                                   <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-slate-100">
                                     <Button
                                       size="sm"
@@ -996,19 +1356,9 @@ export default function ListJadwalKegiatan() {
                 {meta && (
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 mt-8 border-t border-slate-200">
                     <p className="text-sm text-slate-500 font-medium">
-                      Menampilkan{" "}
-                      <span className="font-semibold text-slate-800">
-                        {(pageNumber - 1) * limitNumber + 1}
-                      </span>{" "}
-                      -{" "}
-                      <span className="font-semibold text-slate-800">
-                        {Math.min(pageNumber * limitNumber, meta.total)}
-                      </span>{" "}
-                      dari{" "}
-                      <span className="font-semibold text-slate-800">
-                        {meta.total}
-                      </span>{" "}
-                      kegiatan
+                      Menampilkan {(pageNumber - 1) * limitNumber + 1} -{" "}
+                      {Math.min(pageNumber * limitNumber, meta.total)} dari{" "}
+                      {meta.total} kegiatan
                     </p>
                     <div className="flex items-center gap-2">
                       <Button

@@ -1,6 +1,6 @@
 // src/schema/kegiatanRapatSchema.ts
-import { z } from "zod";
 import { ModeRekomendasi, StatusRekomendasi } from "@/app/generated/prisma";
+import { z } from "zod";
 
 // ═══════════════════════════════════════════════════════════════
 // Schema untuk CREATE/UPDATE KegiatanRapat
@@ -66,54 +66,29 @@ export const kegiatanRapatQuerySchema = z.object({
   // Text search
   q: z.string().trim().optional(),
   judul: z.string().trim().optional(),
-  lokasi: z.string().trim().optional(), // ✅ Tambah field lokasi
-  domainIsuId: z.string().cuid().optional(),
-  dibuatOlehId: z.string().cuid().optional(),
-  aiModel: z.string().trim().optional(), // ✅ Tambah field aiModel
+  lokasi: z.string().trim().optional(),
+  domainIsuId: z.string().optional(),
+  dibuatOlehId: z.string().optional(),
+  diprosesOlehId: z.string().optional(), // ✅ Tambahan
+  aiModel: z.string().trim().optional(),
   mode: z.nativeEnum(ModeRekomendasi).optional(),
   statusRekomendasi: z.nativeEnum(StatusRekomendasi).optional(),
 
-  // ✅ Date filters (YYYY-MM-DD format)
+  // Date filters (single date, akan dikonversi jadi range)
   createdAt: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/)
-    .optional(), // ✅ Tambah
-  createdAtFrom: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/)
     .optional(),
-  createdAtTo: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/)
-    .optional(),
-
   updatedAt: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/)
-    .optional(), // ✅ Tambah
-  updatedAtFrom: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/)
     .optional(),
-  updatedAtTo: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/)
-    .optional(),
-
   tanggal: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/)
-    .optional(), // ✅ Tambah
-  tanggalFrom: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/)
-    .optional(),
-  tanggalTo: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/)
     .optional(),
 
-  // ✅ Pagination (gunakan 'limit' bukan 'perPage' agar match service)
+  // Pagination
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(10),
 
