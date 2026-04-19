@@ -1,13 +1,13 @@
 // app/api/masukan/route.ts
 
-import { NextRequest } from "next/server";
-import { masukanWargaService } from "@/services/masukanWargaService";
-import { masukanWargaQuerySchema } from "@/schema/masukanWarga";
+import { Role, StatusMasukan } from "@/app/generated/prisma";
+import { auth } from "@/lib/auth";
 import { handlePrismaError } from "@/lib/handlePrismaError";
 import { handleResponse } from "@/lib/handleResponse";
-import { auth } from "@/lib/auth";
+import { masukanWargaQuerySchema } from "@/schema/masukanWarga";
+import { masukanWargaService } from "@/services/masukanWargaService";
 import { headers } from "next/headers";
-import { Role, StatusMasukan } from "@/app/generated/prisma";
+import { NextRequest } from "next/server";
 
 export const GET = async (req: NextRequest) => {
   const allowedRoles: Role[] = ["ADMIN", "PERANGKAT_DESA", "LURAH"];
@@ -49,7 +49,7 @@ export const GET = async (req: NextRequest) => {
     const validationResult = masukanWargaQuerySchema.safeParse({
       q: params.q,
       status: params.status,
-      kategoriId: params.domainIsuId, // backward compatibility schema lama
+      kategoriId: params.domainIsuId,
       diprosesOlehId: params.diprosesOlehId,
       createdAt: params.createdAt,
     });
@@ -63,7 +63,17 @@ export const GET = async (req: NextRequest) => {
       });
     }
 
-    const result = await masukanWargaService.getAllMasukan(params);
+    const result = await masukanWargaService.getAllMasukan({
+      q: params.q,
+      status: params.status,
+      domainIsuId: params.domainIsuId,
+      diverifikasiOlehId: params.diprosesOlehId, // ✅ mapping
+      createdAt: params.createdAt,
+      page: params.page,
+      perPage: params.perPage,
+      sortBy: params.sortBy,
+      sortOrder: params.sortOrder,
+    });
 
     return handleResponse({
       success: true,

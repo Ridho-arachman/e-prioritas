@@ -107,18 +107,24 @@ const StatusBadge = ({ status }: { status: string }) => {
 };
 
 // ============================================================
-// USER COMBOBOX DENGAN SEARCH & PAGINATION
+// USER COMBOBOX DENGAN SEARCH, PAGINATION, DAN FILTER ROLE
 // ============================================================
 interface UserComboboxProps {
   value: string;
   onChange: (
     value: string,
-    user?: { id: string; name: string; email: string },
+    user?: { id: string; name: string; email: string; jabatan?: string | null },
   ) => void;
   placeholder?: string;
+  allowedRoles?: string[];
 }
 
-const UserCombobox = ({ value, onChange, placeholder }: UserComboboxProps) => {
+const UserCombobox = ({
+  value,
+  onChange,
+  placeholder,
+  allowedRoles,
+}: UserComboboxProps) => {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebounce(search, 300);
@@ -138,11 +144,14 @@ const UserCombobox = ({ value, onChange, placeholder }: UserComboboxProps) => {
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const query = buildQuery({
-        q: debouncedSearch || undefined,
-        page,
-        perPage: 10,
-      });
+      const params = new URLSearchParams();
+      if (debouncedSearch) params.append("q", debouncedSearch);
+      params.append("page", String(page));
+      params.append("perPage", "10");
+      if (allowedRoles && allowedRoles.length > 0) {
+        params.append("roles", allowedRoles.join(","));
+      }
+      const query = params.toString() ? `?${params.toString()}` : "";
       const res = await fetch(`/api/protected/user${query}`);
       const json = await res.json();
       if (json.success) {
@@ -158,7 +167,7 @@ const UserCombobox = ({ value, onChange, placeholder }: UserComboboxProps) => {
     } finally {
       setLoading(false);
     }
-  }, [debouncedSearch, page]);
+  }, [debouncedSearch, page, allowedRoles]);
 
   useEffect(() => {
     setPage(1);
@@ -215,7 +224,9 @@ const UserCombobox = ({ value, onChange, placeholder }: UserComboboxProps) => {
           />
           <CommandList onScroll={handleScroll}>
             {loading && users.length === 0 && (
-              <CommandEmpty>Loading...</CommandEmpty>
+              <div className="py-6 text-center text-sm text-muted-foreground">
+                Loading...
+              </div>
             )}
             {!loading && users.length === 0 && (
               <CommandEmpty>Tidak ada user ditemukan.</CommandEmpty>
@@ -234,15 +245,22 @@ const UserCombobox = ({ value, onChange, placeholder }: UserComboboxProps) => {
                       value === user.id ? "opacity-100" : "opacity-0",
                     )}
                   />
-                  <span className="truncate">
-                    {user.name} ({user.email})
-                  </span>
+                  <div className="flex flex-col">
+                    <span className="truncate font-medium">
+                      {user.name} ({user.email})
+                    </span>
+                    {user.jabatan && (
+                      <span className="text-xs text-muted-foreground truncate">
+                        {user.jabatan}
+                      </span>
+                    )}
+                  </div>
                 </CommandItem>
               ))}
             </CommandGroup>
             {loading && users.length > 0 && (
               <div className="py-2 text-center text-sm text-muted-foreground">
-                Loading...
+                Memuat lebih banyak...
               </div>
             )}
           </CommandList>
@@ -318,7 +336,7 @@ export default function MasukanListTable() {
   const { data: domainIsuData } = useGet("/protected/kategori");
 
   const masukanList = data || [];
-  const paginationMeta = meta;
+  const paginationMeta = meta || { total: 0, totalPages: 1 };
 
   // ============================================================
   // FILTER STATE
@@ -501,6 +519,7 @@ export default function MasukanListTable() {
                       }
                     }}
                     placeholder="Pilih verifikator"
+                    allowedRoles={["ADMIN", "PERANGKAT_DESA"]}
                   />
                 </div>
 
@@ -853,7 +872,7 @@ export default function MasukanListTable() {
         {/* PAGINATION */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 pt-4 border-t">
           <div className="text-sm text-muted-foreground">
-            Total: {paginationMeta?.total || 0}
+            Total: {paginationMeta.total}
           </div>
           <div className="flex gap-2">
             <Button
@@ -866,13 +885,13 @@ export default function MasukanListTable() {
               <ChevronLeft className="h-4 w-4" /> Prev
             </Button>
             <span className="px-4 py-2 bg-muted rounded-md">
-              Halaman {pageNumber} dari {paginationMeta?.totalPages || 1}
+              Halaman {pageNumber} dari {paginationMeta.totalPages}
             </span>
             <Button
               size="sm"
               variant="outline"
               onClick={() => setPage(String(pageNumber + 1))}
-              disabled={pageNumber >= (paginationMeta?.totalPages || 1)}
+              disabled={pageNumber >= paginationMeta.totalPages}
               className="shadow-sm hover:shadow-md transition-all"
             >
               Next <ChevronRight className="h-4 w-4" />

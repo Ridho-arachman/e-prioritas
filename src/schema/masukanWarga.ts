@@ -1,5 +1,5 @@
-import z from "zod";
 import { StatusMasukan } from "@/app/generated/prisma";
+import z from "zod";
 
 //////////////////////////////////////////////////////////////
 // CREATE MASUKAN WARGA
@@ -123,7 +123,7 @@ export const masukanWargaQuerySchema = z.object({
     .nativeEnum(StatusMasukan, { message: "Status tidak valid" })
     .optional(),
 
-  domainIsuId: z.string().trim().cuid("Domain isu tidak valid").optional(),
+  domainIsuId: z.string().trim().optional(),
 
   diverifikasiOlehId: z.string().trim().optional(),
 

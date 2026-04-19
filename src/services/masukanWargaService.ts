@@ -1,4 +1,5 @@
 import { Prisma, StatusMasukan } from "@/app/generated/prisma";
+import { decrypt } from "@/lib/encryption";
 import prisma from "@/lib/prisma";
 
 //////////////////////////////////////////////////////////////
@@ -190,7 +191,7 @@ export const masukanWargaService = {
   ////////////////////////////////////////////////////////////
 
   getById: async (id: string) => {
-    return prisma.masukanWarga.findUniqueOrThrow({
+    const masukan = await prisma.masukanWarga.findUniqueOrThrow({
       where: { id },
 
       include: {
@@ -213,6 +214,17 @@ export const masukanWargaService = {
         relasiRapat: true,
       },
     });
+
+    if (masukan.nomorHp) {
+      try {
+        masukan.nomorHp = decrypt(masukan.nomorHp);
+      } catch (error) {
+        console.error("Gagal mendekripsi nomor HP:", error);
+        // Biarkan tetap terenkripsi atau set ke null
+      }
+    }
+
+    return masukan;
   },
 
   ////////////////////////////////////////////////////////////
