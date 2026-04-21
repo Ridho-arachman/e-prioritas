@@ -27,6 +27,7 @@ export const GET = async (req: NextRequest) => {
       `${config.appUrl}/login?google=success`,
       req.nextUrl.origin,
     ).toString();
+
     const result = await auth.api.signInSocial({
       headers: { "x-captcha-response": captchaToken },
       body: {

@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { handleBetterAuthError } from "@/lib/handleBetterAuthError";
 import { handleResponse } from "@/lib/handleResponse";
 import { handleZodValidation } from "@/lib/handleZodValidation";
+import prisma from "@/lib/prisma";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { loginSchema } from "@/schema/login";
 import { NextRequest } from "next/server";
@@ -38,6 +39,27 @@ export const POST = async (req: NextRequest) => {
     if (!parsed.success) return handleZodValidation(parsed);
 
     const { email, password, rememberMe } = parsed.data;
+
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: { isActive: true },
+    });
+
+    if (!user) {
+      return handleResponse({
+        success: false,
+        message: "Email tidak terdaftar",
+        status: 404,
+      });
+    }
+
+    if (!user.isActive) {
+      return handleResponse({
+        success: false,
+        message: "Akun Anda telah dinonaktifkan. Silakan hubungi admin.",
+        status: 403,
+      });
+    }
 
     const result = await auth.api.signInEmail({
       headers: {

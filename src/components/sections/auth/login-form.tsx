@@ -75,6 +75,7 @@ export function LoginForm({
   }, []);
 
   // Efek untuk menangani redirect setelah login Google sukses
+  // Efek untuk menangani redirect setelah login Google sukses
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("google") === "success") {
@@ -83,12 +84,28 @@ export function LoginForm({
       url.searchParams.delete("google");
       window.history.replaceState({}, "", url.toString());
 
-      // Ambil session untuk cek role
+      // Ambil session untuk cek role dan status aktif
       const fetchUserAndRedirect = async () => {
         try {
           const res = await fetch("/api/auth/session");
           const session = await res.json();
           if (session?.user) {
+            // 🔥 Cek status aktif user
+            const activeRes = await fetch("/api/user/check-active");
+            const { isActive } = await activeRes.json();
+
+            if (!isActive) {
+              notifier.error(
+                "Akses Ditolak",
+                "Akun Anda telah dinonaktifkan. Silakan hubungi admin.",
+              );
+              // Logout user
+              await fetch("/api/auth/logout", { method: "POST" });
+              router.push("/login");
+              return;
+            }
+
+            // Redirect berdasarkan role
             if (session.user.role === "ADMIN") {
               router.push("/admin");
             } else if (session.user.role === "LURAH") {
