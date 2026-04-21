@@ -1,16 +1,15 @@
 "use client";
 
-import * as React from "react";
 import {
   Calendar,
+  ClipboardList,
   Database,
   LayoutDashboard,
   MessageCircleMore,
   MessageCircleQuestion,
   Settings2,
-  Tags,
-  User2Icon,
 } from "lucide-react";
+import * as React from "react";
 
 import { NavMain } from "@/components/sections/nav-main";
 import { NavSecondary } from "@/components/sections/nav-secondary";
@@ -39,6 +38,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: "Melihat Data Master",
         url: "/lurah/kelola-data",
         icon: Database,
+      },
+      {
+        title: "Melihat Program Kelurahan",
+        url: "/lurah/program-kelurahan",
+        icon: ClipboardList,
       },
       {
         title: "Persetujuan Jadwal Program Mendatang",

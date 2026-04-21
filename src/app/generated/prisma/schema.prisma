@@ -54,9 +54,10 @@ model DomainIsu {
   nama      String  @db.VarChar(100)
   deskripsi String?
 
-  masukan       MasukanWarga[]
-  dataMaster    DataMaster[]
-  kegiatanRapat KegiatanRapat[]
+  masukan          MasukanWarga[]
+  dataMaster       DataMaster[]
+  kegiatanRapat    KegiatanRapat[]
+  programKelurahan ProgramKelurahan[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -318,4 +319,34 @@ model RateLimit {
 
   @@unique([key])
   @@map("rateLimit")
+}
+
+enum StatusProgram {
+  BERJALAN
+  SELESAI
+  DITUNDA
+}
+
+model ProgramKelurahan {
+  id String @id @default(cuid())
+
+  judul     String @db.VarChar(255)
+  deskripsi String @db.Text
+
+  status StatusProgram @default(BERJALAN) // ✅ Langsung aktif
+
+  tanggalMulai   DateTime?
+  tanggalSelesai DateTime?
+
+  // Kategori (opsional)
+  domainIsuId String?
+  domainIsu   DomainIsu? @relation(fields: [domainIsuId], references: [id])
+
+  pic String? @db.VarChar(100)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@map("program_kelurahan")
 }

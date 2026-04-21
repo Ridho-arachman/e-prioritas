@@ -2,6 +2,7 @@
 
 import {
   Calendar,
+  ClipboardList,
   Database,
   LayoutDashboard,
   MessageCircleMore,
@@ -37,6 +38,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: "Kelola Data Master",
         url: "/perangkat/kelola-data",
         icon: Database,
+      },
+      {
+        title: "Program Kelurahan",
+        url: "/perangkat/program-kelurahan",
+        icon: ClipboardList,
       },
       {
         title: "Atur Jadwal Program Mendatang",

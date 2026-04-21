@@ -73,6 +73,11 @@ export type Verification = $Result.DefaultSelection<Prisma.$VerificationPayload>
  * 
  */
 export type RateLimit = $Result.DefaultSelection<Prisma.$RateLimitPayload>
+/**
+ * Model ProgramKelurahan
+ * 
+ */
+export type ProgramKelurahan = $Result.DefaultSelection<Prisma.$ProgramKelurahanPayload>
 
 /**
  * Enums
@@ -125,6 +130,15 @@ export const ModeRekomendasi: {
 
 export type ModeRekomendasi = (typeof ModeRekomendasi)[keyof typeof ModeRekomendasi]
 
+
+export const StatusProgram: {
+  BERJALAN: 'BERJALAN',
+  SELESAI: 'SELESAI',
+  DITUNDA: 'DITUNDA'
+};
+
+export type StatusProgram = (typeof StatusProgram)[keyof typeof StatusProgram]
+
 }
 
 export type Role = $Enums.Role
@@ -146,6 +160,10 @@ export const NilaiKritikalitas: typeof $Enums.NilaiKritikalitas
 export type ModeRekomendasi = $Enums.ModeRekomendasi
 
 export const ModeRekomendasi: typeof $Enums.ModeRekomendasi
+
+export type StatusProgram = $Enums.StatusProgram
+
+export const StatusProgram: typeof $Enums.StatusProgram
 
 /**
  * ##  Prisma Client ʲˢ
@@ -387,6 +405,16 @@ export class PrismaClient<
     * ```
     */
   get rateLimit(): Prisma.RateLimitDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.programKelurahan`: Exposes CRUD operations for the **ProgramKelurahan** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ProgramKelurahans
+    * const programKelurahans = await prisma.programKelurahan.findMany()
+    * ```
+    */
+  get programKelurahan(): Prisma.ProgramKelurahanDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -832,7 +860,8 @@ export namespace Prisma {
     Session: 'Session',
     Account: 'Account',
     Verification: 'Verification',
-    RateLimit: 'RateLimit'
+    RateLimit: 'RateLimit',
+    ProgramKelurahan: 'ProgramKelurahan'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -848,7 +877,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "domainIsu" | "user" | "masukanWarga" | "gambarMasukan" | "dataMaster" | "kegiatanRapat" | "kegiatanRapatMasukan" | "kegiatanRapatDataMaster" | "session" | "account" | "verification" | "rateLimit"
+      modelProps: "domainIsu" | "user" | "masukanWarga" | "gambarMasukan" | "dataMaster" | "kegiatanRapat" | "kegiatanRapatMasukan" | "kegiatanRapatDataMaster" | "session" | "account" | "verification" | "rateLimit" | "programKelurahan"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1740,6 +1769,80 @@ export namespace Prisma {
           }
         }
       }
+      ProgramKelurahan: {
+        payload: Prisma.$ProgramKelurahanPayload<ExtArgs>
+        fields: Prisma.ProgramKelurahanFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ProgramKelurahanFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProgramKelurahanPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ProgramKelurahanFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProgramKelurahanPayload>
+          }
+          findFirst: {
+            args: Prisma.ProgramKelurahanFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProgramKelurahanPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ProgramKelurahanFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProgramKelurahanPayload>
+          }
+          findMany: {
+            args: Prisma.ProgramKelurahanFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProgramKelurahanPayload>[]
+          }
+          create: {
+            args: Prisma.ProgramKelurahanCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProgramKelurahanPayload>
+          }
+          createMany: {
+            args: Prisma.ProgramKelurahanCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ProgramKelurahanCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProgramKelurahanPayload>[]
+          }
+          delete: {
+            args: Prisma.ProgramKelurahanDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProgramKelurahanPayload>
+          }
+          update: {
+            args: Prisma.ProgramKelurahanUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProgramKelurahanPayload>
+          }
+          deleteMany: {
+            args: Prisma.ProgramKelurahanDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ProgramKelurahanUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ProgramKelurahanUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProgramKelurahanPayload>[]
+          }
+          upsert: {
+            args: Prisma.ProgramKelurahanUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProgramKelurahanPayload>
+          }
+          aggregate: {
+            args: Prisma.ProgramKelurahanAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateProgramKelurahan>
+          }
+          groupBy: {
+            args: Prisma.ProgramKelurahanGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ProgramKelurahanGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ProgramKelurahanCountArgs<ExtArgs>
+            result: $Utils.Optional<ProgramKelurahanCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1860,6 +1963,7 @@ export namespace Prisma {
     account?: AccountOmit
     verification?: VerificationOmit
     rateLimit?: RateLimitOmit
+    programKelurahan?: ProgramKelurahanOmit
   }
 
   /* Types for Logging */
@@ -1943,12 +2047,14 @@ export namespace Prisma {
     masukan: number
     dataMaster: number
     kegiatanRapat: number
+    programKelurahan: number
   }
 
   export type DomainIsuCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     masukan?: boolean | DomainIsuCountOutputTypeCountMasukanArgs
     dataMaster?: boolean | DomainIsuCountOutputTypeCountDataMasterArgs
     kegiatanRapat?: boolean | DomainIsuCountOutputTypeCountKegiatanRapatArgs
+    programKelurahan?: boolean | DomainIsuCountOutputTypeCountProgramKelurahanArgs
   }
 
   // Custom InputTypes
@@ -1981,6 +2087,13 @@ export namespace Prisma {
    */
   export type DomainIsuCountOutputTypeCountKegiatanRapatArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: KegiatanRapatWhereInput
+  }
+
+  /**
+   * DomainIsuCountOutputType without action
+   */
+  export type DomainIsuCountOutputTypeCountProgramKelurahanArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProgramKelurahanWhereInput
   }
 
 
@@ -2350,6 +2463,7 @@ export namespace Prisma {
     masukan?: boolean | DomainIsu$masukanArgs<ExtArgs>
     dataMaster?: boolean | DomainIsu$dataMasterArgs<ExtArgs>
     kegiatanRapat?: boolean | DomainIsu$kegiatanRapatArgs<ExtArgs>
+    programKelurahan?: boolean | DomainIsu$programKelurahanArgs<ExtArgs>
     _count?: boolean | DomainIsuCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["domainIsu"]>
 
@@ -2385,6 +2499,7 @@ export namespace Prisma {
     masukan?: boolean | DomainIsu$masukanArgs<ExtArgs>
     dataMaster?: boolean | DomainIsu$dataMasterArgs<ExtArgs>
     kegiatanRapat?: boolean | DomainIsu$kegiatanRapatArgs<ExtArgs>
+    programKelurahan?: boolean | DomainIsu$programKelurahanArgs<ExtArgs>
     _count?: boolean | DomainIsuCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type DomainIsuIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -2396,6 +2511,7 @@ export namespace Prisma {
       masukan: Prisma.$MasukanWargaPayload<ExtArgs>[]
       dataMaster: Prisma.$DataMasterPayload<ExtArgs>[]
       kegiatanRapat: Prisma.$KegiatanRapatPayload<ExtArgs>[]
+      programKelurahan: Prisma.$ProgramKelurahanPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2801,6 +2917,7 @@ export namespace Prisma {
     masukan<T extends DomainIsu$masukanArgs<ExtArgs> = {}>(args?: Subset<T, DomainIsu$masukanArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MasukanWargaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     dataMaster<T extends DomainIsu$dataMasterArgs<ExtArgs> = {}>(args?: Subset<T, DomainIsu$dataMasterArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataMasterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     kegiatanRapat<T extends DomainIsu$kegiatanRapatArgs<ExtArgs> = {}>(args?: Subset<T, DomainIsu$kegiatanRapatArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KegiatanRapatPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    programKelurahan<T extends DomainIsu$programKelurahanArgs<ExtArgs> = {}>(args?: Subset<T, DomainIsu$programKelurahanArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProgramKelurahanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3298,6 +3415,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: KegiatanRapatScalarFieldEnum | KegiatanRapatScalarFieldEnum[]
+  }
+
+  /**
+   * DomainIsu.programKelurahan
+   */
+  export type DomainIsu$programKelurahanArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProgramKelurahan
+     */
+    select?: ProgramKelurahanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProgramKelurahan
+     */
+    omit?: ProgramKelurahanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProgramKelurahanInclude<ExtArgs> | null
+    where?: ProgramKelurahanWhereInput
+    orderBy?: ProgramKelurahanOrderByWithRelationInput | ProgramKelurahanOrderByWithRelationInput[]
+    cursor?: ProgramKelurahanWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ProgramKelurahanScalarFieldEnum | ProgramKelurahanScalarFieldEnum[]
   }
 
   /**
@@ -15937,6 +16078,1153 @@ export namespace Prisma {
 
 
   /**
+   * Model ProgramKelurahan
+   */
+
+  export type AggregateProgramKelurahan = {
+    _count: ProgramKelurahanCountAggregateOutputType | null
+    _min: ProgramKelurahanMinAggregateOutputType | null
+    _max: ProgramKelurahanMaxAggregateOutputType | null
+  }
+
+  export type ProgramKelurahanMinAggregateOutputType = {
+    id: string | null
+    judul: string | null
+    deskripsi: string | null
+    status: $Enums.StatusProgram | null
+    tanggalMulai: Date | null
+    tanggalSelesai: Date | null
+    domainIsuId: string | null
+    pic: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ProgramKelurahanMaxAggregateOutputType = {
+    id: string | null
+    judul: string | null
+    deskripsi: string | null
+    status: $Enums.StatusProgram | null
+    tanggalMulai: Date | null
+    tanggalSelesai: Date | null
+    domainIsuId: string | null
+    pic: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ProgramKelurahanCountAggregateOutputType = {
+    id: number
+    judul: number
+    deskripsi: number
+    status: number
+    tanggalMulai: number
+    tanggalSelesai: number
+    domainIsuId: number
+    pic: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ProgramKelurahanMinAggregateInputType = {
+    id?: true
+    judul?: true
+    deskripsi?: true
+    status?: true
+    tanggalMulai?: true
+    tanggalSelesai?: true
+    domainIsuId?: true
+    pic?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ProgramKelurahanMaxAggregateInputType = {
+    id?: true
+    judul?: true
+    deskripsi?: true
+    status?: true
+    tanggalMulai?: true
+    tanggalSelesai?: true
+    domainIsuId?: true
+    pic?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ProgramKelurahanCountAggregateInputType = {
+    id?: true
+    judul?: true
+    deskripsi?: true
+    status?: true
+    tanggalMulai?: true
+    tanggalSelesai?: true
+    domainIsuId?: true
+    pic?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ProgramKelurahanAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProgramKelurahan to aggregate.
+     */
+    where?: ProgramKelurahanWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProgramKelurahans to fetch.
+     */
+    orderBy?: ProgramKelurahanOrderByWithRelationInput | ProgramKelurahanOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ProgramKelurahanWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProgramKelurahans from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProgramKelurahans.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ProgramKelurahans
+    **/
+    _count?: true | ProgramKelurahanCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ProgramKelurahanMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ProgramKelurahanMaxAggregateInputType
+  }
+
+  export type GetProgramKelurahanAggregateType<T extends ProgramKelurahanAggregateArgs> = {
+        [P in keyof T & keyof AggregateProgramKelurahan]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateProgramKelurahan[P]>
+      : GetScalarType<T[P], AggregateProgramKelurahan[P]>
+  }
+
+
+
+
+  export type ProgramKelurahanGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProgramKelurahanWhereInput
+    orderBy?: ProgramKelurahanOrderByWithAggregationInput | ProgramKelurahanOrderByWithAggregationInput[]
+    by: ProgramKelurahanScalarFieldEnum[] | ProgramKelurahanScalarFieldEnum
+    having?: ProgramKelurahanScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ProgramKelurahanCountAggregateInputType | true
+    _min?: ProgramKelurahanMinAggregateInputType
+    _max?: ProgramKelurahanMaxAggregateInputType
+  }
+
+  export type ProgramKelurahanGroupByOutputType = {
+    id: string
+    judul: string
+    deskripsi: string
+    status: $Enums.StatusProgram
+    tanggalMulai: Date | null
+    tanggalSelesai: Date | null
+    domainIsuId: string | null
+    pic: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: ProgramKelurahanCountAggregateOutputType | null
+    _min: ProgramKelurahanMinAggregateOutputType | null
+    _max: ProgramKelurahanMaxAggregateOutputType | null
+  }
+
+  type GetProgramKelurahanGroupByPayload<T extends ProgramKelurahanGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ProgramKelurahanGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ProgramKelurahanGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ProgramKelurahanGroupByOutputType[P]>
+            : GetScalarType<T[P], ProgramKelurahanGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ProgramKelurahanSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    judul?: boolean
+    deskripsi?: boolean
+    status?: boolean
+    tanggalMulai?: boolean
+    tanggalSelesai?: boolean
+    domainIsuId?: boolean
+    pic?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    domainIsu?: boolean | ProgramKelurahan$domainIsuArgs<ExtArgs>
+  }, ExtArgs["result"]["programKelurahan"]>
+
+  export type ProgramKelurahanSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    judul?: boolean
+    deskripsi?: boolean
+    status?: boolean
+    tanggalMulai?: boolean
+    tanggalSelesai?: boolean
+    domainIsuId?: boolean
+    pic?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    domainIsu?: boolean | ProgramKelurahan$domainIsuArgs<ExtArgs>
+  }, ExtArgs["result"]["programKelurahan"]>
+
+  export type ProgramKelurahanSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    judul?: boolean
+    deskripsi?: boolean
+    status?: boolean
+    tanggalMulai?: boolean
+    tanggalSelesai?: boolean
+    domainIsuId?: boolean
+    pic?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    domainIsu?: boolean | ProgramKelurahan$domainIsuArgs<ExtArgs>
+  }, ExtArgs["result"]["programKelurahan"]>
+
+  export type ProgramKelurahanSelectScalar = {
+    id?: boolean
+    judul?: boolean
+    deskripsi?: boolean
+    status?: boolean
+    tanggalMulai?: boolean
+    tanggalSelesai?: boolean
+    domainIsuId?: boolean
+    pic?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ProgramKelurahanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "judul" | "deskripsi" | "status" | "tanggalMulai" | "tanggalSelesai" | "domainIsuId" | "pic" | "createdAt" | "updatedAt", ExtArgs["result"]["programKelurahan"]>
+  export type ProgramKelurahanInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    domainIsu?: boolean | ProgramKelurahan$domainIsuArgs<ExtArgs>
+  }
+  export type ProgramKelurahanIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    domainIsu?: boolean | ProgramKelurahan$domainIsuArgs<ExtArgs>
+  }
+  export type ProgramKelurahanIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    domainIsu?: boolean | ProgramKelurahan$domainIsuArgs<ExtArgs>
+  }
+
+  export type $ProgramKelurahanPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ProgramKelurahan"
+    objects: {
+      domainIsu: Prisma.$DomainIsuPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      judul: string
+      deskripsi: string
+      status: $Enums.StatusProgram
+      tanggalMulai: Date | null
+      tanggalSelesai: Date | null
+      domainIsuId: string | null
+      pic: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["programKelurahan"]>
+    composites: {}
+  }
+
+  type ProgramKelurahanGetPayload<S extends boolean | null | undefined | ProgramKelurahanDefaultArgs> = $Result.GetResult<Prisma.$ProgramKelurahanPayload, S>
+
+  type ProgramKelurahanCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ProgramKelurahanFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ProgramKelurahanCountAggregateInputType | true
+    }
+
+  export interface ProgramKelurahanDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ProgramKelurahan'], meta: { name: 'ProgramKelurahan' } }
+    /**
+     * Find zero or one ProgramKelurahan that matches the filter.
+     * @param {ProgramKelurahanFindUniqueArgs} args - Arguments to find a ProgramKelurahan
+     * @example
+     * // Get one ProgramKelurahan
+     * const programKelurahan = await prisma.programKelurahan.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ProgramKelurahanFindUniqueArgs>(args: SelectSubset<T, ProgramKelurahanFindUniqueArgs<ExtArgs>>): Prisma__ProgramKelurahanClient<$Result.GetResult<Prisma.$ProgramKelurahanPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ProgramKelurahan that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ProgramKelurahanFindUniqueOrThrowArgs} args - Arguments to find a ProgramKelurahan
+     * @example
+     * // Get one ProgramKelurahan
+     * const programKelurahan = await prisma.programKelurahan.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ProgramKelurahanFindUniqueOrThrowArgs>(args: SelectSubset<T, ProgramKelurahanFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ProgramKelurahanClient<$Result.GetResult<Prisma.$ProgramKelurahanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ProgramKelurahan that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProgramKelurahanFindFirstArgs} args - Arguments to find a ProgramKelurahan
+     * @example
+     * // Get one ProgramKelurahan
+     * const programKelurahan = await prisma.programKelurahan.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ProgramKelurahanFindFirstArgs>(args?: SelectSubset<T, ProgramKelurahanFindFirstArgs<ExtArgs>>): Prisma__ProgramKelurahanClient<$Result.GetResult<Prisma.$ProgramKelurahanPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ProgramKelurahan that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProgramKelurahanFindFirstOrThrowArgs} args - Arguments to find a ProgramKelurahan
+     * @example
+     * // Get one ProgramKelurahan
+     * const programKelurahan = await prisma.programKelurahan.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ProgramKelurahanFindFirstOrThrowArgs>(args?: SelectSubset<T, ProgramKelurahanFindFirstOrThrowArgs<ExtArgs>>): Prisma__ProgramKelurahanClient<$Result.GetResult<Prisma.$ProgramKelurahanPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ProgramKelurahans that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProgramKelurahanFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ProgramKelurahans
+     * const programKelurahans = await prisma.programKelurahan.findMany()
+     * 
+     * // Get first 10 ProgramKelurahans
+     * const programKelurahans = await prisma.programKelurahan.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const programKelurahanWithIdOnly = await prisma.programKelurahan.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ProgramKelurahanFindManyArgs>(args?: SelectSubset<T, ProgramKelurahanFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProgramKelurahanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ProgramKelurahan.
+     * @param {ProgramKelurahanCreateArgs} args - Arguments to create a ProgramKelurahan.
+     * @example
+     * // Create one ProgramKelurahan
+     * const ProgramKelurahan = await prisma.programKelurahan.create({
+     *   data: {
+     *     // ... data to create a ProgramKelurahan
+     *   }
+     * })
+     * 
+     */
+    create<T extends ProgramKelurahanCreateArgs>(args: SelectSubset<T, ProgramKelurahanCreateArgs<ExtArgs>>): Prisma__ProgramKelurahanClient<$Result.GetResult<Prisma.$ProgramKelurahanPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ProgramKelurahans.
+     * @param {ProgramKelurahanCreateManyArgs} args - Arguments to create many ProgramKelurahans.
+     * @example
+     * // Create many ProgramKelurahans
+     * const programKelurahan = await prisma.programKelurahan.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ProgramKelurahanCreateManyArgs>(args?: SelectSubset<T, ProgramKelurahanCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ProgramKelurahans and returns the data saved in the database.
+     * @param {ProgramKelurahanCreateManyAndReturnArgs} args - Arguments to create many ProgramKelurahans.
+     * @example
+     * // Create many ProgramKelurahans
+     * const programKelurahan = await prisma.programKelurahan.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ProgramKelurahans and only return the `id`
+     * const programKelurahanWithIdOnly = await prisma.programKelurahan.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ProgramKelurahanCreateManyAndReturnArgs>(args?: SelectSubset<T, ProgramKelurahanCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProgramKelurahanPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ProgramKelurahan.
+     * @param {ProgramKelurahanDeleteArgs} args - Arguments to delete one ProgramKelurahan.
+     * @example
+     * // Delete one ProgramKelurahan
+     * const ProgramKelurahan = await prisma.programKelurahan.delete({
+     *   where: {
+     *     // ... filter to delete one ProgramKelurahan
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ProgramKelurahanDeleteArgs>(args: SelectSubset<T, ProgramKelurahanDeleteArgs<ExtArgs>>): Prisma__ProgramKelurahanClient<$Result.GetResult<Prisma.$ProgramKelurahanPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ProgramKelurahan.
+     * @param {ProgramKelurahanUpdateArgs} args - Arguments to update one ProgramKelurahan.
+     * @example
+     * // Update one ProgramKelurahan
+     * const programKelurahan = await prisma.programKelurahan.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ProgramKelurahanUpdateArgs>(args: SelectSubset<T, ProgramKelurahanUpdateArgs<ExtArgs>>): Prisma__ProgramKelurahanClient<$Result.GetResult<Prisma.$ProgramKelurahanPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ProgramKelurahans.
+     * @param {ProgramKelurahanDeleteManyArgs} args - Arguments to filter ProgramKelurahans to delete.
+     * @example
+     * // Delete a few ProgramKelurahans
+     * const { count } = await prisma.programKelurahan.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ProgramKelurahanDeleteManyArgs>(args?: SelectSubset<T, ProgramKelurahanDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ProgramKelurahans.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProgramKelurahanUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ProgramKelurahans
+     * const programKelurahan = await prisma.programKelurahan.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ProgramKelurahanUpdateManyArgs>(args: SelectSubset<T, ProgramKelurahanUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ProgramKelurahans and returns the data updated in the database.
+     * @param {ProgramKelurahanUpdateManyAndReturnArgs} args - Arguments to update many ProgramKelurahans.
+     * @example
+     * // Update many ProgramKelurahans
+     * const programKelurahan = await prisma.programKelurahan.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ProgramKelurahans and only return the `id`
+     * const programKelurahanWithIdOnly = await prisma.programKelurahan.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ProgramKelurahanUpdateManyAndReturnArgs>(args: SelectSubset<T, ProgramKelurahanUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProgramKelurahanPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ProgramKelurahan.
+     * @param {ProgramKelurahanUpsertArgs} args - Arguments to update or create a ProgramKelurahan.
+     * @example
+     * // Update or create a ProgramKelurahan
+     * const programKelurahan = await prisma.programKelurahan.upsert({
+     *   create: {
+     *     // ... data to create a ProgramKelurahan
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ProgramKelurahan we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ProgramKelurahanUpsertArgs>(args: SelectSubset<T, ProgramKelurahanUpsertArgs<ExtArgs>>): Prisma__ProgramKelurahanClient<$Result.GetResult<Prisma.$ProgramKelurahanPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ProgramKelurahans.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProgramKelurahanCountArgs} args - Arguments to filter ProgramKelurahans to count.
+     * @example
+     * // Count the number of ProgramKelurahans
+     * const count = await prisma.programKelurahan.count({
+     *   where: {
+     *     // ... the filter for the ProgramKelurahans we want to count
+     *   }
+     * })
+    **/
+    count<T extends ProgramKelurahanCountArgs>(
+      args?: Subset<T, ProgramKelurahanCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ProgramKelurahanCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ProgramKelurahan.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProgramKelurahanAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ProgramKelurahanAggregateArgs>(args: Subset<T, ProgramKelurahanAggregateArgs>): Prisma.PrismaPromise<GetProgramKelurahanAggregateType<T>>
+
+    /**
+     * Group by ProgramKelurahan.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProgramKelurahanGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ProgramKelurahanGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ProgramKelurahanGroupByArgs['orderBy'] }
+        : { orderBy?: ProgramKelurahanGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ProgramKelurahanGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetProgramKelurahanGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ProgramKelurahan model
+   */
+  readonly fields: ProgramKelurahanFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ProgramKelurahan.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ProgramKelurahanClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    domainIsu<T extends ProgramKelurahan$domainIsuArgs<ExtArgs> = {}>(args?: Subset<T, ProgramKelurahan$domainIsuArgs<ExtArgs>>): Prisma__DomainIsuClient<$Result.GetResult<Prisma.$DomainIsuPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ProgramKelurahan model
+   */
+  interface ProgramKelurahanFieldRefs {
+    readonly id: FieldRef<"ProgramKelurahan", 'String'>
+    readonly judul: FieldRef<"ProgramKelurahan", 'String'>
+    readonly deskripsi: FieldRef<"ProgramKelurahan", 'String'>
+    readonly status: FieldRef<"ProgramKelurahan", 'StatusProgram'>
+    readonly tanggalMulai: FieldRef<"ProgramKelurahan", 'DateTime'>
+    readonly tanggalSelesai: FieldRef<"ProgramKelurahan", 'DateTime'>
+    readonly domainIsuId: FieldRef<"ProgramKelurahan", 'String'>
+    readonly pic: FieldRef<"ProgramKelurahan", 'String'>
+    readonly createdAt: FieldRef<"ProgramKelurahan", 'DateTime'>
+    readonly updatedAt: FieldRef<"ProgramKelurahan", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ProgramKelurahan findUnique
+   */
+  export type ProgramKelurahanFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProgramKelurahan
+     */
+    select?: ProgramKelurahanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProgramKelurahan
+     */
+    omit?: ProgramKelurahanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProgramKelurahanInclude<ExtArgs> | null
+    /**
+     * Filter, which ProgramKelurahan to fetch.
+     */
+    where: ProgramKelurahanWhereUniqueInput
+  }
+
+  /**
+   * ProgramKelurahan findUniqueOrThrow
+   */
+  export type ProgramKelurahanFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProgramKelurahan
+     */
+    select?: ProgramKelurahanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProgramKelurahan
+     */
+    omit?: ProgramKelurahanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProgramKelurahanInclude<ExtArgs> | null
+    /**
+     * Filter, which ProgramKelurahan to fetch.
+     */
+    where: ProgramKelurahanWhereUniqueInput
+  }
+
+  /**
+   * ProgramKelurahan findFirst
+   */
+  export type ProgramKelurahanFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProgramKelurahan
+     */
+    select?: ProgramKelurahanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProgramKelurahan
+     */
+    omit?: ProgramKelurahanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProgramKelurahanInclude<ExtArgs> | null
+    /**
+     * Filter, which ProgramKelurahan to fetch.
+     */
+    where?: ProgramKelurahanWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProgramKelurahans to fetch.
+     */
+    orderBy?: ProgramKelurahanOrderByWithRelationInput | ProgramKelurahanOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProgramKelurahans.
+     */
+    cursor?: ProgramKelurahanWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProgramKelurahans from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProgramKelurahans.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProgramKelurahans.
+     */
+    distinct?: ProgramKelurahanScalarFieldEnum | ProgramKelurahanScalarFieldEnum[]
+  }
+
+  /**
+   * ProgramKelurahan findFirstOrThrow
+   */
+  export type ProgramKelurahanFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProgramKelurahan
+     */
+    select?: ProgramKelurahanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProgramKelurahan
+     */
+    omit?: ProgramKelurahanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProgramKelurahanInclude<ExtArgs> | null
+    /**
+     * Filter, which ProgramKelurahan to fetch.
+     */
+    where?: ProgramKelurahanWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProgramKelurahans to fetch.
+     */
+    orderBy?: ProgramKelurahanOrderByWithRelationInput | ProgramKelurahanOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProgramKelurahans.
+     */
+    cursor?: ProgramKelurahanWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProgramKelurahans from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProgramKelurahans.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProgramKelurahans.
+     */
+    distinct?: ProgramKelurahanScalarFieldEnum | ProgramKelurahanScalarFieldEnum[]
+  }
+
+  /**
+   * ProgramKelurahan findMany
+   */
+  export type ProgramKelurahanFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProgramKelurahan
+     */
+    select?: ProgramKelurahanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProgramKelurahan
+     */
+    omit?: ProgramKelurahanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProgramKelurahanInclude<ExtArgs> | null
+    /**
+     * Filter, which ProgramKelurahans to fetch.
+     */
+    where?: ProgramKelurahanWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProgramKelurahans to fetch.
+     */
+    orderBy?: ProgramKelurahanOrderByWithRelationInput | ProgramKelurahanOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ProgramKelurahans.
+     */
+    cursor?: ProgramKelurahanWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProgramKelurahans from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProgramKelurahans.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProgramKelurahans.
+     */
+    distinct?: ProgramKelurahanScalarFieldEnum | ProgramKelurahanScalarFieldEnum[]
+  }
+
+  /**
+   * ProgramKelurahan create
+   */
+  export type ProgramKelurahanCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProgramKelurahan
+     */
+    select?: ProgramKelurahanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProgramKelurahan
+     */
+    omit?: ProgramKelurahanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProgramKelurahanInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ProgramKelurahan.
+     */
+    data: XOR<ProgramKelurahanCreateInput, ProgramKelurahanUncheckedCreateInput>
+  }
+
+  /**
+   * ProgramKelurahan createMany
+   */
+  export type ProgramKelurahanCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ProgramKelurahans.
+     */
+    data: ProgramKelurahanCreateManyInput | ProgramKelurahanCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ProgramKelurahan createManyAndReturn
+   */
+  export type ProgramKelurahanCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProgramKelurahan
+     */
+    select?: ProgramKelurahanSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProgramKelurahan
+     */
+    omit?: ProgramKelurahanOmit<ExtArgs> | null
+    /**
+     * The data used to create many ProgramKelurahans.
+     */
+    data: ProgramKelurahanCreateManyInput | ProgramKelurahanCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProgramKelurahanIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ProgramKelurahan update
+   */
+  export type ProgramKelurahanUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProgramKelurahan
+     */
+    select?: ProgramKelurahanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProgramKelurahan
+     */
+    omit?: ProgramKelurahanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProgramKelurahanInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ProgramKelurahan.
+     */
+    data: XOR<ProgramKelurahanUpdateInput, ProgramKelurahanUncheckedUpdateInput>
+    /**
+     * Choose, which ProgramKelurahan to update.
+     */
+    where: ProgramKelurahanWhereUniqueInput
+  }
+
+  /**
+   * ProgramKelurahan updateMany
+   */
+  export type ProgramKelurahanUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ProgramKelurahans.
+     */
+    data: XOR<ProgramKelurahanUpdateManyMutationInput, ProgramKelurahanUncheckedUpdateManyInput>
+    /**
+     * Filter which ProgramKelurahans to update
+     */
+    where?: ProgramKelurahanWhereInput
+    /**
+     * Limit how many ProgramKelurahans to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProgramKelurahan updateManyAndReturn
+   */
+  export type ProgramKelurahanUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProgramKelurahan
+     */
+    select?: ProgramKelurahanSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProgramKelurahan
+     */
+    omit?: ProgramKelurahanOmit<ExtArgs> | null
+    /**
+     * The data used to update ProgramKelurahans.
+     */
+    data: XOR<ProgramKelurahanUpdateManyMutationInput, ProgramKelurahanUncheckedUpdateManyInput>
+    /**
+     * Filter which ProgramKelurahans to update
+     */
+    where?: ProgramKelurahanWhereInput
+    /**
+     * Limit how many ProgramKelurahans to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProgramKelurahanIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ProgramKelurahan upsert
+   */
+  export type ProgramKelurahanUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProgramKelurahan
+     */
+    select?: ProgramKelurahanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProgramKelurahan
+     */
+    omit?: ProgramKelurahanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProgramKelurahanInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ProgramKelurahan to update in case it exists.
+     */
+    where: ProgramKelurahanWhereUniqueInput
+    /**
+     * In case the ProgramKelurahan found by the `where` argument doesn't exist, create a new ProgramKelurahan with this data.
+     */
+    create: XOR<ProgramKelurahanCreateInput, ProgramKelurahanUncheckedCreateInput>
+    /**
+     * In case the ProgramKelurahan was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ProgramKelurahanUpdateInput, ProgramKelurahanUncheckedUpdateInput>
+  }
+
+  /**
+   * ProgramKelurahan delete
+   */
+  export type ProgramKelurahanDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProgramKelurahan
+     */
+    select?: ProgramKelurahanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProgramKelurahan
+     */
+    omit?: ProgramKelurahanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProgramKelurahanInclude<ExtArgs> | null
+    /**
+     * Filter which ProgramKelurahan to delete.
+     */
+    where: ProgramKelurahanWhereUniqueInput
+  }
+
+  /**
+   * ProgramKelurahan deleteMany
+   */
+  export type ProgramKelurahanDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProgramKelurahans to delete
+     */
+    where?: ProgramKelurahanWhereInput
+    /**
+     * Limit how many ProgramKelurahans to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProgramKelurahan.domainIsu
+   */
+  export type ProgramKelurahan$domainIsuArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DomainIsu
+     */
+    select?: DomainIsuSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DomainIsu
+     */
+    omit?: DomainIsuOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DomainIsuInclude<ExtArgs> | null
+    where?: DomainIsuWhereInput
+  }
+
+  /**
+   * ProgramKelurahan without action
+   */
+  export type ProgramKelurahanDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProgramKelurahan
+     */
+    select?: ProgramKelurahanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProgramKelurahan
+     */
+    omit?: ProgramKelurahanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProgramKelurahanInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -16125,6 +17413,22 @@ export namespace Prisma {
   };
 
   export type RateLimitScalarFieldEnum = (typeof RateLimitScalarFieldEnum)[keyof typeof RateLimitScalarFieldEnum]
+
+
+  export const ProgramKelurahanScalarFieldEnum: {
+    id: 'id',
+    judul: 'judul',
+    deskripsi: 'deskripsi',
+    status: 'status',
+    tanggalMulai: 'tanggalMulai',
+    tanggalSelesai: 'tanggalSelesai',
+    domainIsuId: 'domainIsuId',
+    pic: 'pic',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ProgramKelurahanScalarFieldEnum = (typeof ProgramKelurahanScalarFieldEnum)[keyof typeof ProgramKelurahanScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -16320,6 +17624,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'StatusProgram'
+   */
+  export type EnumStatusProgramFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StatusProgram'>
+    
+
+
+  /**
+   * Reference to a field of type 'StatusProgram[]'
+   */
+  export type ListEnumStatusProgramFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StatusProgram[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -16349,6 +17667,7 @@ export namespace Prisma {
     masukan?: MasukanWargaListRelationFilter
     dataMaster?: DataMasterListRelationFilter
     kegiatanRapat?: KegiatanRapatListRelationFilter
+    programKelurahan?: ProgramKelurahanListRelationFilter
   }
 
   export type DomainIsuOrderByWithRelationInput = {
@@ -16361,6 +17680,7 @@ export namespace Prisma {
     masukan?: MasukanWargaOrderByRelationAggregateInput
     dataMaster?: DataMasterOrderByRelationAggregateInput
     kegiatanRapat?: KegiatanRapatOrderByRelationAggregateInput
+    programKelurahan?: ProgramKelurahanOrderByRelationAggregateInput
   }
 
   export type DomainIsuWhereUniqueInput = Prisma.AtLeast<{
@@ -16376,6 +17696,7 @@ export namespace Prisma {
     masukan?: MasukanWargaListRelationFilter
     dataMaster?: DataMasterListRelationFilter
     kegiatanRapat?: KegiatanRapatListRelationFilter
+    programKelurahan?: ProgramKelurahanListRelationFilter
   }, "id" | "code">
 
   export type DomainIsuOrderByWithAggregationInput = {
@@ -17276,6 +18597,86 @@ export namespace Prisma {
     lastRequest?: BigIntWithAggregatesFilter<"RateLimit"> | bigint | number
   }
 
+  export type ProgramKelurahanWhereInput = {
+    AND?: ProgramKelurahanWhereInput | ProgramKelurahanWhereInput[]
+    OR?: ProgramKelurahanWhereInput[]
+    NOT?: ProgramKelurahanWhereInput | ProgramKelurahanWhereInput[]
+    id?: StringFilter<"ProgramKelurahan"> | string
+    judul?: StringFilter<"ProgramKelurahan"> | string
+    deskripsi?: StringFilter<"ProgramKelurahan"> | string
+    status?: EnumStatusProgramFilter<"ProgramKelurahan"> | $Enums.StatusProgram
+    tanggalMulai?: DateTimeNullableFilter<"ProgramKelurahan"> | Date | string | null
+    tanggalSelesai?: DateTimeNullableFilter<"ProgramKelurahan"> | Date | string | null
+    domainIsuId?: StringNullableFilter<"ProgramKelurahan"> | string | null
+    pic?: StringNullableFilter<"ProgramKelurahan"> | string | null
+    createdAt?: DateTimeFilter<"ProgramKelurahan"> | Date | string
+    updatedAt?: DateTimeFilter<"ProgramKelurahan"> | Date | string
+    domainIsu?: XOR<DomainIsuNullableScalarRelationFilter, DomainIsuWhereInput> | null
+  }
+
+  export type ProgramKelurahanOrderByWithRelationInput = {
+    id?: SortOrder
+    judul?: SortOrder
+    deskripsi?: SortOrder
+    status?: SortOrder
+    tanggalMulai?: SortOrderInput | SortOrder
+    tanggalSelesai?: SortOrderInput | SortOrder
+    domainIsuId?: SortOrderInput | SortOrder
+    pic?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    domainIsu?: DomainIsuOrderByWithRelationInput
+  }
+
+  export type ProgramKelurahanWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ProgramKelurahanWhereInput | ProgramKelurahanWhereInput[]
+    OR?: ProgramKelurahanWhereInput[]
+    NOT?: ProgramKelurahanWhereInput | ProgramKelurahanWhereInput[]
+    judul?: StringFilter<"ProgramKelurahan"> | string
+    deskripsi?: StringFilter<"ProgramKelurahan"> | string
+    status?: EnumStatusProgramFilter<"ProgramKelurahan"> | $Enums.StatusProgram
+    tanggalMulai?: DateTimeNullableFilter<"ProgramKelurahan"> | Date | string | null
+    tanggalSelesai?: DateTimeNullableFilter<"ProgramKelurahan"> | Date | string | null
+    domainIsuId?: StringNullableFilter<"ProgramKelurahan"> | string | null
+    pic?: StringNullableFilter<"ProgramKelurahan"> | string | null
+    createdAt?: DateTimeFilter<"ProgramKelurahan"> | Date | string
+    updatedAt?: DateTimeFilter<"ProgramKelurahan"> | Date | string
+    domainIsu?: XOR<DomainIsuNullableScalarRelationFilter, DomainIsuWhereInput> | null
+  }, "id">
+
+  export type ProgramKelurahanOrderByWithAggregationInput = {
+    id?: SortOrder
+    judul?: SortOrder
+    deskripsi?: SortOrder
+    status?: SortOrder
+    tanggalMulai?: SortOrderInput | SortOrder
+    tanggalSelesai?: SortOrderInput | SortOrder
+    domainIsuId?: SortOrderInput | SortOrder
+    pic?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ProgramKelurahanCountOrderByAggregateInput
+    _max?: ProgramKelurahanMaxOrderByAggregateInput
+    _min?: ProgramKelurahanMinOrderByAggregateInput
+  }
+
+  export type ProgramKelurahanScalarWhereWithAggregatesInput = {
+    AND?: ProgramKelurahanScalarWhereWithAggregatesInput | ProgramKelurahanScalarWhereWithAggregatesInput[]
+    OR?: ProgramKelurahanScalarWhereWithAggregatesInput[]
+    NOT?: ProgramKelurahanScalarWhereWithAggregatesInput | ProgramKelurahanScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ProgramKelurahan"> | string
+    judul?: StringWithAggregatesFilter<"ProgramKelurahan"> | string
+    deskripsi?: StringWithAggregatesFilter<"ProgramKelurahan"> | string
+    status?: EnumStatusProgramWithAggregatesFilter<"ProgramKelurahan"> | $Enums.StatusProgram
+    tanggalMulai?: DateTimeNullableWithAggregatesFilter<"ProgramKelurahan"> | Date | string | null
+    tanggalSelesai?: DateTimeNullableWithAggregatesFilter<"ProgramKelurahan"> | Date | string | null
+    domainIsuId?: StringNullableWithAggregatesFilter<"ProgramKelurahan"> | string | null
+    pic?: StringNullableWithAggregatesFilter<"ProgramKelurahan"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"ProgramKelurahan"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ProgramKelurahan"> | Date | string
+  }
+
   export type DomainIsuCreateInput = {
     id?: string
     code: string
@@ -17286,6 +18687,7 @@ export namespace Prisma {
     masukan?: MasukanWargaCreateNestedManyWithoutDomainIsuInput
     dataMaster?: DataMasterCreateNestedManyWithoutDomainIsuInput
     kegiatanRapat?: KegiatanRapatCreateNestedManyWithoutDomainIsuInput
+    programKelurahan?: ProgramKelurahanCreateNestedManyWithoutDomainIsuInput
   }
 
   export type DomainIsuUncheckedCreateInput = {
@@ -17298,6 +18700,7 @@ export namespace Prisma {
     masukan?: MasukanWargaUncheckedCreateNestedManyWithoutDomainIsuInput
     dataMaster?: DataMasterUncheckedCreateNestedManyWithoutDomainIsuInput
     kegiatanRapat?: KegiatanRapatUncheckedCreateNestedManyWithoutDomainIsuInput
+    programKelurahan?: ProgramKelurahanUncheckedCreateNestedManyWithoutDomainIsuInput
   }
 
   export type DomainIsuUpdateInput = {
@@ -17310,6 +18713,7 @@ export namespace Prisma {
     masukan?: MasukanWargaUpdateManyWithoutDomainIsuNestedInput
     dataMaster?: DataMasterUpdateManyWithoutDomainIsuNestedInput
     kegiatanRapat?: KegiatanRapatUpdateManyWithoutDomainIsuNestedInput
+    programKelurahan?: ProgramKelurahanUpdateManyWithoutDomainIsuNestedInput
   }
 
   export type DomainIsuUncheckedUpdateInput = {
@@ -17322,6 +18726,7 @@ export namespace Prisma {
     masukan?: MasukanWargaUncheckedUpdateManyWithoutDomainIsuNestedInput
     dataMaster?: DataMasterUncheckedUpdateManyWithoutDomainIsuNestedInput
     kegiatanRapat?: KegiatanRapatUncheckedUpdateManyWithoutDomainIsuNestedInput
+    programKelurahan?: ProgramKelurahanUncheckedUpdateManyWithoutDomainIsuNestedInput
   }
 
   export type DomainIsuCreateManyInput = {
@@ -18305,6 +19710,96 @@ export namespace Prisma {
     lastRequest?: BigIntFieldUpdateOperationsInput | bigint | number
   }
 
+  export type ProgramKelurahanCreateInput = {
+    id?: string
+    judul: string
+    deskripsi: string
+    status?: $Enums.StatusProgram
+    tanggalMulai?: Date | string | null
+    tanggalSelesai?: Date | string | null
+    pic?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    domainIsu?: DomainIsuCreateNestedOneWithoutProgramKelurahanInput
+  }
+
+  export type ProgramKelurahanUncheckedCreateInput = {
+    id?: string
+    judul: string
+    deskripsi: string
+    status?: $Enums.StatusProgram
+    tanggalMulai?: Date | string | null
+    tanggalSelesai?: Date | string | null
+    domainIsuId?: string | null
+    pic?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ProgramKelurahanUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    judul?: StringFieldUpdateOperationsInput | string
+    deskripsi?: StringFieldUpdateOperationsInput | string
+    status?: EnumStatusProgramFieldUpdateOperationsInput | $Enums.StatusProgram
+    tanggalMulai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tanggalSelesai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    pic?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    domainIsu?: DomainIsuUpdateOneWithoutProgramKelurahanNestedInput
+  }
+
+  export type ProgramKelurahanUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    judul?: StringFieldUpdateOperationsInput | string
+    deskripsi?: StringFieldUpdateOperationsInput | string
+    status?: EnumStatusProgramFieldUpdateOperationsInput | $Enums.StatusProgram
+    tanggalMulai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tanggalSelesai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    domainIsuId?: NullableStringFieldUpdateOperationsInput | string | null
+    pic?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProgramKelurahanCreateManyInput = {
+    id?: string
+    judul: string
+    deskripsi: string
+    status?: $Enums.StatusProgram
+    tanggalMulai?: Date | string | null
+    tanggalSelesai?: Date | string | null
+    domainIsuId?: string | null
+    pic?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ProgramKelurahanUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    judul?: StringFieldUpdateOperationsInput | string
+    deskripsi?: StringFieldUpdateOperationsInput | string
+    status?: EnumStatusProgramFieldUpdateOperationsInput | $Enums.StatusProgram
+    tanggalMulai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tanggalSelesai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    pic?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProgramKelurahanUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    judul?: StringFieldUpdateOperationsInput | string
+    deskripsi?: StringFieldUpdateOperationsInput | string
+    status?: EnumStatusProgramFieldUpdateOperationsInput | $Enums.StatusProgram
+    tanggalMulai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tanggalSelesai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    domainIsuId?: NullableStringFieldUpdateOperationsInput | string | null
+    pic?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -18364,6 +19859,12 @@ export namespace Prisma {
     none?: KegiatanRapatWhereInput
   }
 
+  export type ProgramKelurahanListRelationFilter = {
+    every?: ProgramKelurahanWhereInput
+    some?: ProgramKelurahanWhereInput
+    none?: ProgramKelurahanWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -18378,6 +19879,10 @@ export namespace Prisma {
   }
 
   export type KegiatanRapatOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ProgramKelurahanOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -19233,6 +20738,67 @@ export namespace Prisma {
     _max?: NestedBigIntFilter<$PrismaModel>
   }
 
+  export type EnumStatusProgramFilter<$PrismaModel = never> = {
+    equals?: $Enums.StatusProgram | EnumStatusProgramFieldRefInput<$PrismaModel>
+    in?: $Enums.StatusProgram[] | ListEnumStatusProgramFieldRefInput<$PrismaModel>
+    notIn?: $Enums.StatusProgram[] | ListEnumStatusProgramFieldRefInput<$PrismaModel>
+    not?: NestedEnumStatusProgramFilter<$PrismaModel> | $Enums.StatusProgram
+  }
+
+  export type DomainIsuNullableScalarRelationFilter = {
+    is?: DomainIsuWhereInput | null
+    isNot?: DomainIsuWhereInput | null
+  }
+
+  export type ProgramKelurahanCountOrderByAggregateInput = {
+    id?: SortOrder
+    judul?: SortOrder
+    deskripsi?: SortOrder
+    status?: SortOrder
+    tanggalMulai?: SortOrder
+    tanggalSelesai?: SortOrder
+    domainIsuId?: SortOrder
+    pic?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ProgramKelurahanMaxOrderByAggregateInput = {
+    id?: SortOrder
+    judul?: SortOrder
+    deskripsi?: SortOrder
+    status?: SortOrder
+    tanggalMulai?: SortOrder
+    tanggalSelesai?: SortOrder
+    domainIsuId?: SortOrder
+    pic?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ProgramKelurahanMinOrderByAggregateInput = {
+    id?: SortOrder
+    judul?: SortOrder
+    deskripsi?: SortOrder
+    status?: SortOrder
+    tanggalMulai?: SortOrder
+    tanggalSelesai?: SortOrder
+    domainIsuId?: SortOrder
+    pic?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumStatusProgramWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.StatusProgram | EnumStatusProgramFieldRefInput<$PrismaModel>
+    in?: $Enums.StatusProgram[] | ListEnumStatusProgramFieldRefInput<$PrismaModel>
+    notIn?: $Enums.StatusProgram[] | ListEnumStatusProgramFieldRefInput<$PrismaModel>
+    not?: NestedEnumStatusProgramWithAggregatesFilter<$PrismaModel> | $Enums.StatusProgram
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumStatusProgramFilter<$PrismaModel>
+    _max?: NestedEnumStatusProgramFilter<$PrismaModel>
+  }
+
   export type MasukanWargaCreateNestedManyWithoutDomainIsuInput = {
     create?: XOR<MasukanWargaCreateWithoutDomainIsuInput, MasukanWargaUncheckedCreateWithoutDomainIsuInput> | MasukanWargaCreateWithoutDomainIsuInput[] | MasukanWargaUncheckedCreateWithoutDomainIsuInput[]
     connectOrCreate?: MasukanWargaCreateOrConnectWithoutDomainIsuInput | MasukanWargaCreateOrConnectWithoutDomainIsuInput[]
@@ -19254,6 +20820,13 @@ export namespace Prisma {
     connect?: KegiatanRapatWhereUniqueInput | KegiatanRapatWhereUniqueInput[]
   }
 
+  export type ProgramKelurahanCreateNestedManyWithoutDomainIsuInput = {
+    create?: XOR<ProgramKelurahanCreateWithoutDomainIsuInput, ProgramKelurahanUncheckedCreateWithoutDomainIsuInput> | ProgramKelurahanCreateWithoutDomainIsuInput[] | ProgramKelurahanUncheckedCreateWithoutDomainIsuInput[]
+    connectOrCreate?: ProgramKelurahanCreateOrConnectWithoutDomainIsuInput | ProgramKelurahanCreateOrConnectWithoutDomainIsuInput[]
+    createMany?: ProgramKelurahanCreateManyDomainIsuInputEnvelope
+    connect?: ProgramKelurahanWhereUniqueInput | ProgramKelurahanWhereUniqueInput[]
+  }
+
   export type MasukanWargaUncheckedCreateNestedManyWithoutDomainIsuInput = {
     create?: XOR<MasukanWargaCreateWithoutDomainIsuInput, MasukanWargaUncheckedCreateWithoutDomainIsuInput> | MasukanWargaCreateWithoutDomainIsuInput[] | MasukanWargaUncheckedCreateWithoutDomainIsuInput[]
     connectOrCreate?: MasukanWargaCreateOrConnectWithoutDomainIsuInput | MasukanWargaCreateOrConnectWithoutDomainIsuInput[]
@@ -19273,6 +20846,13 @@ export namespace Prisma {
     connectOrCreate?: KegiatanRapatCreateOrConnectWithoutDomainIsuInput | KegiatanRapatCreateOrConnectWithoutDomainIsuInput[]
     createMany?: KegiatanRapatCreateManyDomainIsuInputEnvelope
     connect?: KegiatanRapatWhereUniqueInput | KegiatanRapatWhereUniqueInput[]
+  }
+
+  export type ProgramKelurahanUncheckedCreateNestedManyWithoutDomainIsuInput = {
+    create?: XOR<ProgramKelurahanCreateWithoutDomainIsuInput, ProgramKelurahanUncheckedCreateWithoutDomainIsuInput> | ProgramKelurahanCreateWithoutDomainIsuInput[] | ProgramKelurahanUncheckedCreateWithoutDomainIsuInput[]
+    connectOrCreate?: ProgramKelurahanCreateOrConnectWithoutDomainIsuInput | ProgramKelurahanCreateOrConnectWithoutDomainIsuInput[]
+    createMany?: ProgramKelurahanCreateManyDomainIsuInputEnvelope
+    connect?: ProgramKelurahanWhereUniqueInput | ProgramKelurahanWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -19329,6 +20909,20 @@ export namespace Prisma {
     deleteMany?: KegiatanRapatScalarWhereInput | KegiatanRapatScalarWhereInput[]
   }
 
+  export type ProgramKelurahanUpdateManyWithoutDomainIsuNestedInput = {
+    create?: XOR<ProgramKelurahanCreateWithoutDomainIsuInput, ProgramKelurahanUncheckedCreateWithoutDomainIsuInput> | ProgramKelurahanCreateWithoutDomainIsuInput[] | ProgramKelurahanUncheckedCreateWithoutDomainIsuInput[]
+    connectOrCreate?: ProgramKelurahanCreateOrConnectWithoutDomainIsuInput | ProgramKelurahanCreateOrConnectWithoutDomainIsuInput[]
+    upsert?: ProgramKelurahanUpsertWithWhereUniqueWithoutDomainIsuInput | ProgramKelurahanUpsertWithWhereUniqueWithoutDomainIsuInput[]
+    createMany?: ProgramKelurahanCreateManyDomainIsuInputEnvelope
+    set?: ProgramKelurahanWhereUniqueInput | ProgramKelurahanWhereUniqueInput[]
+    disconnect?: ProgramKelurahanWhereUniqueInput | ProgramKelurahanWhereUniqueInput[]
+    delete?: ProgramKelurahanWhereUniqueInput | ProgramKelurahanWhereUniqueInput[]
+    connect?: ProgramKelurahanWhereUniqueInput | ProgramKelurahanWhereUniqueInput[]
+    update?: ProgramKelurahanUpdateWithWhereUniqueWithoutDomainIsuInput | ProgramKelurahanUpdateWithWhereUniqueWithoutDomainIsuInput[]
+    updateMany?: ProgramKelurahanUpdateManyWithWhereWithoutDomainIsuInput | ProgramKelurahanUpdateManyWithWhereWithoutDomainIsuInput[]
+    deleteMany?: ProgramKelurahanScalarWhereInput | ProgramKelurahanScalarWhereInput[]
+  }
+
   export type MasukanWargaUncheckedUpdateManyWithoutDomainIsuNestedInput = {
     create?: XOR<MasukanWargaCreateWithoutDomainIsuInput, MasukanWargaUncheckedCreateWithoutDomainIsuInput> | MasukanWargaCreateWithoutDomainIsuInput[] | MasukanWargaUncheckedCreateWithoutDomainIsuInput[]
     connectOrCreate?: MasukanWargaCreateOrConnectWithoutDomainIsuInput | MasukanWargaCreateOrConnectWithoutDomainIsuInput[]
@@ -19369,6 +20963,20 @@ export namespace Prisma {
     update?: KegiatanRapatUpdateWithWhereUniqueWithoutDomainIsuInput | KegiatanRapatUpdateWithWhereUniqueWithoutDomainIsuInput[]
     updateMany?: KegiatanRapatUpdateManyWithWhereWithoutDomainIsuInput | KegiatanRapatUpdateManyWithWhereWithoutDomainIsuInput[]
     deleteMany?: KegiatanRapatScalarWhereInput | KegiatanRapatScalarWhereInput[]
+  }
+
+  export type ProgramKelurahanUncheckedUpdateManyWithoutDomainIsuNestedInput = {
+    create?: XOR<ProgramKelurahanCreateWithoutDomainIsuInput, ProgramKelurahanUncheckedCreateWithoutDomainIsuInput> | ProgramKelurahanCreateWithoutDomainIsuInput[] | ProgramKelurahanUncheckedCreateWithoutDomainIsuInput[]
+    connectOrCreate?: ProgramKelurahanCreateOrConnectWithoutDomainIsuInput | ProgramKelurahanCreateOrConnectWithoutDomainIsuInput[]
+    upsert?: ProgramKelurahanUpsertWithWhereUniqueWithoutDomainIsuInput | ProgramKelurahanUpsertWithWhereUniqueWithoutDomainIsuInput[]
+    createMany?: ProgramKelurahanCreateManyDomainIsuInputEnvelope
+    set?: ProgramKelurahanWhereUniqueInput | ProgramKelurahanWhereUniqueInput[]
+    disconnect?: ProgramKelurahanWhereUniqueInput | ProgramKelurahanWhereUniqueInput[]
+    delete?: ProgramKelurahanWhereUniqueInput | ProgramKelurahanWhereUniqueInput[]
+    connect?: ProgramKelurahanWhereUniqueInput | ProgramKelurahanWhereUniqueInput[]
+    update?: ProgramKelurahanUpdateWithWhereUniqueWithoutDomainIsuInput | ProgramKelurahanUpdateWithWhereUniqueWithoutDomainIsuInput[]
+    updateMany?: ProgramKelurahanUpdateManyWithWhereWithoutDomainIsuInput | ProgramKelurahanUpdateManyWithWhereWithoutDomainIsuInput[]
+    deleteMany?: ProgramKelurahanScalarWhereInput | ProgramKelurahanScalarWhereInput[]
   }
 
   export type MasukanWargaCreateNestedManyWithoutDiverifikasiOlehInput = {
@@ -20091,6 +21699,26 @@ export namespace Prisma {
     divide?: bigint | number
   }
 
+  export type DomainIsuCreateNestedOneWithoutProgramKelurahanInput = {
+    create?: XOR<DomainIsuCreateWithoutProgramKelurahanInput, DomainIsuUncheckedCreateWithoutProgramKelurahanInput>
+    connectOrCreate?: DomainIsuCreateOrConnectWithoutProgramKelurahanInput
+    connect?: DomainIsuWhereUniqueInput
+  }
+
+  export type EnumStatusProgramFieldUpdateOperationsInput = {
+    set?: $Enums.StatusProgram
+  }
+
+  export type DomainIsuUpdateOneWithoutProgramKelurahanNestedInput = {
+    create?: XOR<DomainIsuCreateWithoutProgramKelurahanInput, DomainIsuUncheckedCreateWithoutProgramKelurahanInput>
+    connectOrCreate?: DomainIsuCreateOrConnectWithoutProgramKelurahanInput
+    upsert?: DomainIsuUpsertWithoutProgramKelurahanInput
+    disconnect?: DomainIsuWhereInput | boolean
+    delete?: DomainIsuWhereInput | boolean
+    connect?: DomainIsuWhereUniqueInput
+    update?: XOR<XOR<DomainIsuUpdateToOneWithWhereWithoutProgramKelurahanInput, DomainIsuUpdateWithoutProgramKelurahanInput>, DomainIsuUncheckedUpdateWithoutProgramKelurahanInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -20440,6 +22068,23 @@ export namespace Prisma {
     _max?: NestedBigIntFilter<$PrismaModel>
   }
 
+  export type NestedEnumStatusProgramFilter<$PrismaModel = never> = {
+    equals?: $Enums.StatusProgram | EnumStatusProgramFieldRefInput<$PrismaModel>
+    in?: $Enums.StatusProgram[] | ListEnumStatusProgramFieldRefInput<$PrismaModel>
+    notIn?: $Enums.StatusProgram[] | ListEnumStatusProgramFieldRefInput<$PrismaModel>
+    not?: NestedEnumStatusProgramFilter<$PrismaModel> | $Enums.StatusProgram
+  }
+
+  export type NestedEnumStatusProgramWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.StatusProgram | EnumStatusProgramFieldRefInput<$PrismaModel>
+    in?: $Enums.StatusProgram[] | ListEnumStatusProgramFieldRefInput<$PrismaModel>
+    notIn?: $Enums.StatusProgram[] | ListEnumStatusProgramFieldRefInput<$PrismaModel>
+    not?: NestedEnumStatusProgramWithAggregatesFilter<$PrismaModel> | $Enums.StatusProgram
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumStatusProgramFilter<$PrismaModel>
+    _max?: NestedEnumStatusProgramFilter<$PrismaModel>
+  }
+
   export type MasukanWargaCreateWithoutDomainIsuInput = {
     id?: string
     namaPengirim?: string | null
@@ -20572,6 +22217,40 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ProgramKelurahanCreateWithoutDomainIsuInput = {
+    id?: string
+    judul: string
+    deskripsi: string
+    status?: $Enums.StatusProgram
+    tanggalMulai?: Date | string | null
+    tanggalSelesai?: Date | string | null
+    pic?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ProgramKelurahanUncheckedCreateWithoutDomainIsuInput = {
+    id?: string
+    judul: string
+    deskripsi: string
+    status?: $Enums.StatusProgram
+    tanggalMulai?: Date | string | null
+    tanggalSelesai?: Date | string | null
+    pic?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ProgramKelurahanCreateOrConnectWithoutDomainIsuInput = {
+    where: ProgramKelurahanWhereUniqueInput
+    create: XOR<ProgramKelurahanCreateWithoutDomainIsuInput, ProgramKelurahanUncheckedCreateWithoutDomainIsuInput>
+  }
+
+  export type ProgramKelurahanCreateManyDomainIsuInputEnvelope = {
+    data: ProgramKelurahanCreateManyDomainIsuInput | ProgramKelurahanCreateManyDomainIsuInput[]
+    skipDuplicates?: boolean
+  }
+
   export type MasukanWargaUpsertWithWhereUniqueWithoutDomainIsuInput = {
     where: MasukanWargaWhereUniqueInput
     update: XOR<MasukanWargaUpdateWithoutDomainIsuInput, MasukanWargaUncheckedUpdateWithoutDomainIsuInput>
@@ -20676,6 +22355,38 @@ export namespace Prisma {
     diprosesOlehId?: StringNullableFilter<"KegiatanRapat"> | string | null
     createdAt?: DateTimeFilter<"KegiatanRapat"> | Date | string
     updatedAt?: DateTimeFilter<"KegiatanRapat"> | Date | string
+  }
+
+  export type ProgramKelurahanUpsertWithWhereUniqueWithoutDomainIsuInput = {
+    where: ProgramKelurahanWhereUniqueInput
+    update: XOR<ProgramKelurahanUpdateWithoutDomainIsuInput, ProgramKelurahanUncheckedUpdateWithoutDomainIsuInput>
+    create: XOR<ProgramKelurahanCreateWithoutDomainIsuInput, ProgramKelurahanUncheckedCreateWithoutDomainIsuInput>
+  }
+
+  export type ProgramKelurahanUpdateWithWhereUniqueWithoutDomainIsuInput = {
+    where: ProgramKelurahanWhereUniqueInput
+    data: XOR<ProgramKelurahanUpdateWithoutDomainIsuInput, ProgramKelurahanUncheckedUpdateWithoutDomainIsuInput>
+  }
+
+  export type ProgramKelurahanUpdateManyWithWhereWithoutDomainIsuInput = {
+    where: ProgramKelurahanScalarWhereInput
+    data: XOR<ProgramKelurahanUpdateManyMutationInput, ProgramKelurahanUncheckedUpdateManyWithoutDomainIsuInput>
+  }
+
+  export type ProgramKelurahanScalarWhereInput = {
+    AND?: ProgramKelurahanScalarWhereInput | ProgramKelurahanScalarWhereInput[]
+    OR?: ProgramKelurahanScalarWhereInput[]
+    NOT?: ProgramKelurahanScalarWhereInput | ProgramKelurahanScalarWhereInput[]
+    id?: StringFilter<"ProgramKelurahan"> | string
+    judul?: StringFilter<"ProgramKelurahan"> | string
+    deskripsi?: StringFilter<"ProgramKelurahan"> | string
+    status?: EnumStatusProgramFilter<"ProgramKelurahan"> | $Enums.StatusProgram
+    tanggalMulai?: DateTimeNullableFilter<"ProgramKelurahan"> | Date | string | null
+    tanggalSelesai?: DateTimeNullableFilter<"ProgramKelurahan"> | Date | string | null
+    domainIsuId?: StringNullableFilter<"ProgramKelurahan"> | string | null
+    pic?: StringNullableFilter<"ProgramKelurahan"> | string | null
+    createdAt?: DateTimeFilter<"ProgramKelurahan"> | Date | string
+    updatedAt?: DateTimeFilter<"ProgramKelurahan"> | Date | string
   }
 
   export type MasukanWargaCreateWithoutDiverifikasiOlehInput = {
@@ -21082,6 +22793,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     dataMaster?: DataMasterCreateNestedManyWithoutDomainIsuInput
     kegiatanRapat?: KegiatanRapatCreateNestedManyWithoutDomainIsuInput
+    programKelurahan?: ProgramKelurahanCreateNestedManyWithoutDomainIsuInput
   }
 
   export type DomainIsuUncheckedCreateWithoutMasukanInput = {
@@ -21093,6 +22805,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     dataMaster?: DataMasterUncheckedCreateNestedManyWithoutDomainIsuInput
     kegiatanRapat?: KegiatanRapatUncheckedCreateNestedManyWithoutDomainIsuInput
+    programKelurahan?: ProgramKelurahanUncheckedCreateNestedManyWithoutDomainIsuInput
   }
 
   export type DomainIsuCreateOrConnectWithoutMasukanInput = {
@@ -21209,6 +22922,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     dataMaster?: DataMasterUpdateManyWithoutDomainIsuNestedInput
     kegiatanRapat?: KegiatanRapatUpdateManyWithoutDomainIsuNestedInput
+    programKelurahan?: ProgramKelurahanUpdateManyWithoutDomainIsuNestedInput
   }
 
   export type DomainIsuUncheckedUpdateWithoutMasukanInput = {
@@ -21220,6 +22934,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     dataMaster?: DataMasterUncheckedUpdateManyWithoutDomainIsuNestedInput
     kegiatanRapat?: KegiatanRapatUncheckedUpdateManyWithoutDomainIsuNestedInput
+    programKelurahan?: ProgramKelurahanUncheckedUpdateManyWithoutDomainIsuNestedInput
   }
 
   export type UserUpsertWithoutMasukanVerifikasiInput = {
@@ -21416,6 +23131,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     masukan?: MasukanWargaCreateNestedManyWithoutDomainIsuInput
     kegiatanRapat?: KegiatanRapatCreateNestedManyWithoutDomainIsuInput
+    programKelurahan?: ProgramKelurahanCreateNestedManyWithoutDomainIsuInput
   }
 
   export type DomainIsuUncheckedCreateWithoutDataMasterInput = {
@@ -21427,6 +23143,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     masukan?: MasukanWargaUncheckedCreateNestedManyWithoutDomainIsuInput
     kegiatanRapat?: KegiatanRapatUncheckedCreateNestedManyWithoutDomainIsuInput
+    programKelurahan?: ProgramKelurahanUncheckedCreateNestedManyWithoutDomainIsuInput
   }
 
   export type DomainIsuCreateOrConnectWithoutDataMasterInput = {
@@ -21517,6 +23234,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     masukan?: MasukanWargaUpdateManyWithoutDomainIsuNestedInput
     kegiatanRapat?: KegiatanRapatUpdateManyWithoutDomainIsuNestedInput
+    programKelurahan?: ProgramKelurahanUpdateManyWithoutDomainIsuNestedInput
   }
 
   export type DomainIsuUncheckedUpdateWithoutDataMasterInput = {
@@ -21528,6 +23246,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     masukan?: MasukanWargaUncheckedUpdateManyWithoutDomainIsuNestedInput
     kegiatanRapat?: KegiatanRapatUncheckedUpdateManyWithoutDomainIsuNestedInput
+    programKelurahan?: ProgramKelurahanUncheckedUpdateManyWithoutDomainIsuNestedInput
   }
 
   export type UserUpsertWithoutDataMasterDibuatInput = {
@@ -21612,6 +23331,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     masukan?: MasukanWargaCreateNestedManyWithoutDomainIsuInput
     dataMaster?: DataMasterCreateNestedManyWithoutDomainIsuInput
+    programKelurahan?: ProgramKelurahanCreateNestedManyWithoutDomainIsuInput
   }
 
   export type DomainIsuUncheckedCreateWithoutKegiatanRapatInput = {
@@ -21623,6 +23343,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     masukan?: MasukanWargaUncheckedCreateNestedManyWithoutDomainIsuInput
     dataMaster?: DataMasterUncheckedCreateNestedManyWithoutDomainIsuInput
+    programKelurahan?: ProgramKelurahanUncheckedCreateNestedManyWithoutDomainIsuInput
   }
 
   export type DomainIsuCreateOrConnectWithoutKegiatanRapatInput = {
@@ -21776,6 +23497,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     masukan?: MasukanWargaUpdateManyWithoutDomainIsuNestedInput
     dataMaster?: DataMasterUpdateManyWithoutDomainIsuNestedInput
+    programKelurahan?: ProgramKelurahanUpdateManyWithoutDomainIsuNestedInput
   }
 
   export type DomainIsuUncheckedUpdateWithoutKegiatanRapatInput = {
@@ -21787,6 +23509,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     masukan?: MasukanWargaUncheckedUpdateManyWithoutDomainIsuNestedInput
     dataMaster?: DataMasterUncheckedUpdateManyWithoutDomainIsuNestedInput
+    programKelurahan?: ProgramKelurahanUncheckedUpdateManyWithoutDomainIsuNestedInput
   }
 
   export type UserUpsertWithoutKegiatanRapatDibuatInput = {
@@ -22443,6 +24166,70 @@ export namespace Prisma {
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
   }
 
+  export type DomainIsuCreateWithoutProgramKelurahanInput = {
+    id?: string
+    code: string
+    nama: string
+    deskripsi?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    masukan?: MasukanWargaCreateNestedManyWithoutDomainIsuInput
+    dataMaster?: DataMasterCreateNestedManyWithoutDomainIsuInput
+    kegiatanRapat?: KegiatanRapatCreateNestedManyWithoutDomainIsuInput
+  }
+
+  export type DomainIsuUncheckedCreateWithoutProgramKelurahanInput = {
+    id?: string
+    code: string
+    nama: string
+    deskripsi?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    masukan?: MasukanWargaUncheckedCreateNestedManyWithoutDomainIsuInput
+    dataMaster?: DataMasterUncheckedCreateNestedManyWithoutDomainIsuInput
+    kegiatanRapat?: KegiatanRapatUncheckedCreateNestedManyWithoutDomainIsuInput
+  }
+
+  export type DomainIsuCreateOrConnectWithoutProgramKelurahanInput = {
+    where: DomainIsuWhereUniqueInput
+    create: XOR<DomainIsuCreateWithoutProgramKelurahanInput, DomainIsuUncheckedCreateWithoutProgramKelurahanInput>
+  }
+
+  export type DomainIsuUpsertWithoutProgramKelurahanInput = {
+    update: XOR<DomainIsuUpdateWithoutProgramKelurahanInput, DomainIsuUncheckedUpdateWithoutProgramKelurahanInput>
+    create: XOR<DomainIsuCreateWithoutProgramKelurahanInput, DomainIsuUncheckedCreateWithoutProgramKelurahanInput>
+    where?: DomainIsuWhereInput
+  }
+
+  export type DomainIsuUpdateToOneWithWhereWithoutProgramKelurahanInput = {
+    where?: DomainIsuWhereInput
+    data: XOR<DomainIsuUpdateWithoutProgramKelurahanInput, DomainIsuUncheckedUpdateWithoutProgramKelurahanInput>
+  }
+
+  export type DomainIsuUpdateWithoutProgramKelurahanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    nama?: StringFieldUpdateOperationsInput | string
+    deskripsi?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    masukan?: MasukanWargaUpdateManyWithoutDomainIsuNestedInput
+    dataMaster?: DataMasterUpdateManyWithoutDomainIsuNestedInput
+    kegiatanRapat?: KegiatanRapatUpdateManyWithoutDomainIsuNestedInput
+  }
+
+  export type DomainIsuUncheckedUpdateWithoutProgramKelurahanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    nama?: StringFieldUpdateOperationsInput | string
+    deskripsi?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    masukan?: MasukanWargaUncheckedUpdateManyWithoutDomainIsuNestedInput
+    dataMaster?: DataMasterUncheckedUpdateManyWithoutDomainIsuNestedInput
+    kegiatanRapat?: KegiatanRapatUncheckedUpdateManyWithoutDomainIsuNestedInput
+  }
+
   export type MasukanWargaCreateManyDomainIsuInput = {
     id?: string
     namaPengirim?: string | null
@@ -22485,6 +24272,18 @@ export namespace Prisma {
     aiModel?: string | null
     aiProcessedAt?: Date | string | null
     diprosesOlehId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ProgramKelurahanCreateManyDomainIsuInput = {
+    id?: string
+    judul: string
+    deskripsi: string
+    status?: $Enums.StatusProgram
+    tanggalMulai?: Date | string | null
+    tanggalSelesai?: Date | string | null
+    pic?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -22633,6 +24432,42 @@ export namespace Prisma {
     aiModel?: NullableStringFieldUpdateOperationsInput | string | null
     aiProcessedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     diprosesOlehId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProgramKelurahanUpdateWithoutDomainIsuInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    judul?: StringFieldUpdateOperationsInput | string
+    deskripsi?: StringFieldUpdateOperationsInput | string
+    status?: EnumStatusProgramFieldUpdateOperationsInput | $Enums.StatusProgram
+    tanggalMulai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tanggalSelesai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    pic?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProgramKelurahanUncheckedUpdateWithoutDomainIsuInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    judul?: StringFieldUpdateOperationsInput | string
+    deskripsi?: StringFieldUpdateOperationsInput | string
+    status?: EnumStatusProgramFieldUpdateOperationsInput | $Enums.StatusProgram
+    tanggalMulai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tanggalSelesai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    pic?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProgramKelurahanUncheckedUpdateManyWithoutDomainIsuInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    judul?: StringFieldUpdateOperationsInput | string
+    deskripsi?: StringFieldUpdateOperationsInput | string
+    status?: EnumStatusProgramFieldUpdateOperationsInput | $Enums.StatusProgram
+    tanggalMulai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tanggalSelesai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    pic?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

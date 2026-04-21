@@ -261,6 +261,19 @@ exports.Prisma.RateLimitScalarFieldEnum = {
   lastRequest: 'lastRequest'
 };
 
+exports.Prisma.ProgramKelurahanScalarFieldEnum = {
+  id: 'id',
+  judul: 'judul',
+  deskripsi: 'deskripsi',
+  status: 'status',
+  tanggalMulai: 'tanggalMulai',
+  tanggalSelesai: 'tanggalSelesai',
+  domainIsuId: 'domainIsuId',
+  pic: 'pic',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -318,6 +331,12 @@ exports.StatusRekomendasi = exports.$Enums.StatusRekomendasi = {
   DITOLAK: 'DITOLAK'
 };
 
+exports.StatusProgram = exports.$Enums.StatusProgram = {
+  BERJALAN: 'BERJALAN',
+  SELESAI: 'SELESAI',
+  DITUNDA: 'DITUNDA'
+};
+
 exports.Prisma.ModelName = {
   DomainIsu: 'DomainIsu',
   User: 'User',
@@ -330,7 +349,8 @@ exports.Prisma.ModelName = {
   Session: 'Session',
   Account: 'Account',
   Verification: 'Verification',
-  RateLimit: 'RateLimit'
+  RateLimit: 'RateLimit',
+  ProgramKelurahan: 'ProgramKelurahan'
 };
 
 /**
