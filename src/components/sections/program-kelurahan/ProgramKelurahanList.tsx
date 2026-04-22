@@ -138,9 +138,6 @@ export default function ProgramKelurahanList({
 
   const programList = data || [];
 
-  console.log(programList);
-  console.log(error);
-
   useEffect(() => {
     setPage("1");
   }, [debouncedQ, status, domainIsuId, sortBy, sortOrder]);
@@ -187,6 +184,13 @@ export default function ProgramKelurahanList({
 
   const canEdit = role === "admin" || role === "lurah";
   const basePath = `/${role}/program-kelurahan`;
+
+  const formatLokasi = (rt: string | null, rw: string | null) => {
+    if (rt && rw) return `RT ${rt} / RW ${rw}`;
+    if (rt) return `RT ${rt}`;
+    if (rw) return `RW ${rw}`;
+    return "Seluruh kelurahan";
+  };
 
   return (
     <>
@@ -403,6 +407,7 @@ export default function ProgramKelurahanList({
                   <TableHead>Status</TableHead>
                   <TableHead>PIC</TableHead>
                   <TableHead>Domain Isu</TableHead>
+                  <TableHead>Lokasi</TableHead>
                   <TableHead>Tgl Mulai</TableHead>
                   <TableHead className="text-center">Aksi</TableHead>
                 </TableRow>
@@ -411,7 +416,7 @@ export default function ProgramKelurahanList({
                 {isLoading && <TableSkeleton rows={5} />}
                 {error && (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-10">
+                    <TableCell colSpan={8} className="text-center py-10">
                       <DataError message={error?.message} />
                     </TableCell>
                   </TableRow>
@@ -421,7 +426,7 @@ export default function ProgramKelurahanList({
                   !debouncedQ &&
                   !hasActiveFilters && (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-10">
+                      <TableCell colSpan={8} className="text-center py-10">
                         <DataKosong title="Belum ada program kelurahan" />
                       </TableCell>
                     </TableRow>
@@ -430,7 +435,7 @@ export default function ProgramKelurahanList({
                   programList.length === 0 &&
                   (debouncedQ || hasActiveFilters) && (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-10">
+                      <TableCell colSpan={8} className="text-center py-10">
                         <DataTidakDitemukan />
                       </TableCell>
                     </TableRow>
@@ -466,6 +471,9 @@ export default function ProgramKelurahanList({
                         ) : (
                           "-"
                         )}
+                      </TableCell>
+                      <TableCell>
+                        {formatLokasi(item.lokasiRt, item.lokasiRw)}
                       </TableCell>
                       <TableCell>
                         {item.tanggalMulai

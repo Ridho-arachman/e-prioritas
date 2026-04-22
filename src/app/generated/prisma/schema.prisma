@@ -337,6 +337,8 @@ model ProgramKelurahan {
 
   tanggalMulai   DateTime?
   tanggalSelesai DateTime?
+  lokasiRt       String?   @db.VarChar(3)
+  lokasiRw       String?   @db.VarChar(3)
 
   // Kategori (opsional)
   domainIsuId String?

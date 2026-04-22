@@ -9,6 +9,8 @@ export type ProgramKelurahanCreateInput = {
   tanggalSelesai?: Date | null;
   pic?: string | null;
   domainIsuId?: string | null;
+  lokasiRt?: string | null;
+  lokasiRw?: string | null;
 };
 
 export type ProgramKelurahanUpdateInput = Partial<ProgramKelurahanCreateInput>;
@@ -34,6 +36,8 @@ export const programKelurahanService = {
         tanggalSelesai: data.tanggalSelesai,
         pic: data.pic,
         domainIsuId: data.domainIsuId,
+        lokasiRt: data.lokasiRt,
+        lokasiRw: data.lokasiRw,
       },
       include: {
         domainIsu: { select: { id: true, nama: true, code: true } },
@@ -110,6 +114,8 @@ export const programKelurahanService = {
         tanggalSelesai: data.tanggalSelesai,
         pic: data.pic,
         domainIsuId: data.domainIsuId,
+        lokasiRt: data.lokasiRt,
+        lokasiRw: data.lokasiRw,
       },
       include: {
         domainIsu: { select: { id: true, nama: true, code: true } },

@@ -90,10 +90,12 @@ export const PUT = async (
   try {
     const { id } = await ctx.params;
     const paramParsed = programKelurahanParamSchema.safeParse({ id });
+    console.log("Parsed param data:", paramParsed);
     if (!paramParsed.success) return handleZodValidation(paramParsed);
 
     const body = await req.json();
     const bodyParsed = programKelurahanUpdateSchema.safeParse(body);
+    console.log("Parsed update data:", bodyParsed);
     if (!bodyParsed.success) return handleZodValidation(bodyParsed);
 
     const updateData = {
@@ -122,6 +124,7 @@ export const PUT = async (
       status: 200,
     });
   } catch (err) {
+    console.log("Error in PUT /program-kelurahan/[id]:", err);
     const prismaResponse = handlePrismaError(err);
     if (prismaResponse) {
       return handleResponse({

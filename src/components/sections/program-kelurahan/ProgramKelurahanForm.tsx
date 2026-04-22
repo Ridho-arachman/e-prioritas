@@ -1,3 +1,4 @@
+// components/sections/program-kelurahan/ProgramKelurahanForm.tsx
 "use client";
 
 import { ArrowLeft, Save } from "lucide-react";
@@ -18,7 +19,6 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 
-// ✅ Import AlertDialog
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,6 +47,8 @@ interface FormState {
   tanggalSelesai: string;
   pic: string;
   domainIsuId: string;
+  lokasiRt: string;
+  lokasiRw: string;
 }
 
 const initialForm: FormState = {
@@ -57,6 +59,8 @@ const initialForm: FormState = {
   tanggalSelesai: "",
   pic: "",
   domainIsuId: "",
+  lokasiRt: "",
+  lokasiRw: "",
 };
 
 export default function ProgramKelurahanForm({
@@ -72,7 +76,7 @@ export default function ProgramKelurahanForm({
     Partial<Record<keyof FormState, string>>
   >({});
   const [loading, setLoading] = useState(false);
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false); // ✅ state dialog
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const { data: existingData, isLoading: isLoadingData } = useGet(
     isEdit ? `/protected/program-kelurahan/${id}` : "",
@@ -102,6 +106,8 @@ export default function ProgramKelurahanForm({
           : "",
         pic: existingData.pic || "",
         domainIsuId: existingData.domainIsuId || "",
+        lokasiRt: existingData.lokasiRt || "",
+        lokasiRw: existingData.lokasiRw || "",
       });
     }
   }, [existingData]);
@@ -130,18 +136,29 @@ export default function ProgramKelurahanForm({
       newErrors.pic = "PIC maksimal 100 karakter";
     }
 
+    if (
+      form.lokasiRt &&
+      (form.lokasiRt.length > 3 || !/^\d{1,3}$/.test(form.lokasiRt))
+    ) {
+      newErrors.lokasiRt = "RT harus berupa angka 1-3 digit";
+    }
+    if (
+      form.lokasiRw &&
+      (form.lokasiRw.length > 3 || !/^\d{1,3}$/.test(form.lokasiRw))
+    ) {
+      newErrors.lokasiRw = "RW harus berupa angka 1-3 digit";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // ✅ Dipanggil saat user klik submit form
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    setShowConfirmDialog(true); // tampilkan dialog konfirmasi
+    setShowConfirmDialog(true);
   };
 
-  // ✅ Dipanggil setelah user konfirmasi
   const handleConfirmSubmit = async () => {
     setShowConfirmDialog(false);
     setLoading(true);
@@ -154,6 +171,8 @@ export default function ProgramKelurahanForm({
         tanggalSelesai: form.tanggalSelesai || null,
         pic: form.pic || null,
         domainIsuId: form.domainIsuId || null,
+        lokasiRt: form.lokasiRt || null,
+        lokasiRw: form.lokasiRw || null,
       };
 
       const res = isEdit ? await put(payload) : await post(payload);
@@ -183,7 +202,6 @@ export default function ProgramKelurahanForm({
 
   return (
     <>
-      {/* ✅ AlertDialog Konfirmasi */}
       <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -315,6 +333,42 @@ export default function ProgramKelurahanForm({
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              {/* RT / RW */}
+              <div className="space-y-2">
+                <Label>Lokasi (opsional)</Label>
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <Input
+                      placeholder="RT"
+                      value={form.lokasiRt}
+                      onChange={(e) => handleChange("lokasiRt", e.target.value)}
+                      maxLength={3}
+                    />
+                    {errors.lokasiRt && (
+                      <p className="text-sm text-red-500 mt-1">
+                        {errors.lokasiRt}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <Input
+                      placeholder="RW"
+                      value={form.lokasiRw}
+                      onChange={(e) => handleChange("lokasiRw", e.target.value)}
+                      maxLength={3}
+                    />
+                    {errors.lokasiRw && (
+                      <p className="text-sm text-red-500 mt-1">
+                        {errors.lokasiRw}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Kosongkan jika program mencakup seluruh kelurahan
+                </p>
               </div>
             </div>
 

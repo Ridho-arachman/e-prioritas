@@ -268,6 +268,8 @@ exports.Prisma.ProgramKelurahanScalarFieldEnum = {
   status: 'status',
   tanggalMulai: 'tanggalMulai',
   tanggalSelesai: 'tanggalSelesai',
+  lokasiRt: 'lokasiRt',
+  lokasiRw: 'lokasiRw',
   domainIsuId: 'domainIsuId',
   pic: 'pic',
   createdAt: 'createdAt',

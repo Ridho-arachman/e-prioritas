@@ -420,20 +420,77 @@ export const kegiatanRapatService = {
       select: { rekomendasiItems: true },
     });
 
-    const exclusionTitles = existingPrioritas
-      .flatMap((r) => {
+    const programs = await prisma.programKelurahan.findMany({
+      where: {
+        domainIsuId,
+        status: { in: ["BERJALAN", "SELESAI"] },
+      },
+      select: {
+        judul: true,
+        status: true,
+        lokasiRt: true,
+        lokasiRw: true,
+        deskripsi: true,
+      },
+    });
+
+    let filteredMasukanWarga = [...masukanWarga];
+    const programBerjalanDenganLokasi = programs.filter(
+      (p) => p.status === "BERJALAN" && p.lokasiRt && p.lokasiRw,
+    );
+
+    for (const prog of programBerjalanDenganLokasi) {
+      filteredMasukanWarga = filteredMasukanWarga.filter(
+        (m) => !(m.lokasiRt === prog.lokasiRt && m.lokasiRw === prog.lokasiRw),
+      );
+    }
+
+    // Daftar judul program yang akan dikecualikan
+    let programExclusionTitles: string[] = [];
+
+    for (const program of programs) {
+      if (program.status === "BERJALAN") {
+        if (!program.lokasiRt) {
+          // Program berjalan tanpa lokasi -> blokir semua (masukkan judul)
+          programExclusionTitles.push(program.judul);
+        }
+        // Program berjalan dengan lokasi sudah ditangani dengan filter, tidak perlu exclusion
+      } else if (program.status === "SELESAI") {
+        // Program selesai hanya dikecualikan jika TIDAK ada masukan warga yang relevan
+        // Gunakan filteredMasukanWarga (bukan masukanWarga asli)
+        const hasRelatedMasukan = filteredMasukanWarga.some((m) => {
+          const matchJudul =
+            m.judul.toLowerCase().includes(program.judul.toLowerCase()) ||
+            program.judul.toLowerCase().includes(m.judul.toLowerCase());
+          const matchLokasi =
+            !program.lokasiRt ||
+            (m.lokasiRt === program.lokasiRt &&
+              m.lokasiRw === program.lokasiRw);
+          return matchJudul && matchLokasi;
+        });
+        if (!hasRelatedMasukan) {
+          programExclusionTitles.push(program.judul);
+        }
+      }
+    }
+
+    // Kemudian buat exclusionTitles seperti biasa
+    const exclusionTitles = [
+      ...programExclusionTitles,
+      ...existingPrioritas.flatMap((r) => {
         try {
           const parsed = r.rekomendasiItems as any;
           return parsed?.prioritas?.map((p: any) => p.deskripsi) || [];
         } catch {
           return [];
         }
-      })
+      }),
+    ]
       .filter(Boolean)
       .slice(0, 10);
 
-    // 3. Transform data
-    const masukanInput: MasukanWargaInput[] = masukanWarga.map((m) => ({
+    // Selanjutnya, untuk transformasi data masukanInput, gunakan filteredMasukanWarga, bukan masukanWarga asli
+    const masukanInput: MasukanWargaInput[] = filteredMasukanWarga.map((m) => ({
       id: m.id,
       judul: m.judul,
       deskripsi: m.deskripsi,

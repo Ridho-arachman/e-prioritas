@@ -2,8 +2,8 @@
 "use client";
 
 import { format } from "date-fns";
-import { id as idLocale } from "date-fns/locale"; // ✅ Import Indonesian locale
-import { ArrowLeft, Calendar, Edit, Tag, User } from "lucide-react";
+import { id as idLocale } from "date-fns/locale";
+import { ArrowLeft, Calendar, Edit, MapPin, Tag, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
@@ -63,8 +63,15 @@ export default function ProgramKelurahanDetail({
     return <DataError message={error?.message || "Gagal memuat data"} />;
   }
 
-  // Pastikan status adalah enum yang valid
   const status = data?.status as StatusProgram;
+  const lokasi =
+    data?.lokasiRt && data?.lokasiRw
+      ? `RT ${data.lokasiRt} / RW ${data.lokasiRw}`
+      : data?.lokasiRt
+        ? `RT ${data.lokasiRt}`
+        : data?.lokasiRw
+          ? `RW ${data.lokasiRw}`
+          : "Seluruh Kelurahan";
 
   return (
     <Card className="w-full mx-auto">
@@ -121,6 +128,13 @@ export default function ProgramKelurahanDetail({
               </div>
             </div>
             <div className="flex items-start gap-3">
+              <MapPin className="h-5 w-5 text-slate-400 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-slate-500">Lokasi</p>
+                <p className="text-slate-700">{lokasi}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
               <Calendar className="h-5 w-5 text-slate-400 mt-0.5" />
               <div>
                 <p className="text-sm font-medium text-slate-500">
@@ -129,7 +143,7 @@ export default function ProgramKelurahanDetail({
                 <p className="text-slate-700">
                   {data?.tanggalMulai
                     ? format(new Date(data.tanggalMulai), "dd MMMM yyyy", {
-                        locale: idLocale, // ✅ Use imported locale object
+                        locale: idLocale,
                       })
                     : "-"}
                 </p>
@@ -144,7 +158,7 @@ export default function ProgramKelurahanDetail({
                 <p className="text-slate-700">
                   {data?.tanggalSelesai
                     ? format(new Date(data.tanggalSelesai), "dd MMMM yyyy", {
-                        locale: idLocale, // ✅ Use imported locale object
+                        locale: idLocale,
                       })
                     : "-"}
                 </p>
@@ -156,13 +170,13 @@ export default function ProgramKelurahanDetail({
             <p>
               Dibuat:{" "}
               {format(new Date(data?.createdAt), "dd MMM yyyy, HH:mm", {
-                locale: idLocale, // ✅ Use imported locale object
+                locale: idLocale,
               })}
             </p>
             <p>
               Terakhir diperbarui:{" "}
               {format(new Date(data?.updatedAt), "dd MMM yyyy, HH:mm", {
-                locale: idLocale, // ✅ Use imported locale object
+                locale: idLocale,
               })}
             </p>
           </div>

@@ -16094,6 +16094,8 @@ export namespace Prisma {
     status: $Enums.StatusProgram | null
     tanggalMulai: Date | null
     tanggalSelesai: Date | null
+    lokasiRt: string | null
+    lokasiRw: string | null
     domainIsuId: string | null
     pic: string | null
     createdAt: Date | null
@@ -16107,6 +16109,8 @@ export namespace Prisma {
     status: $Enums.StatusProgram | null
     tanggalMulai: Date | null
     tanggalSelesai: Date | null
+    lokasiRt: string | null
+    lokasiRw: string | null
     domainIsuId: string | null
     pic: string | null
     createdAt: Date | null
@@ -16120,6 +16124,8 @@ export namespace Prisma {
     status: number
     tanggalMulai: number
     tanggalSelesai: number
+    lokasiRt: number
+    lokasiRw: number
     domainIsuId: number
     pic: number
     createdAt: number
@@ -16135,6 +16141,8 @@ export namespace Prisma {
     status?: true
     tanggalMulai?: true
     tanggalSelesai?: true
+    lokasiRt?: true
+    lokasiRw?: true
     domainIsuId?: true
     pic?: true
     createdAt?: true
@@ -16148,6 +16156,8 @@ export namespace Prisma {
     status?: true
     tanggalMulai?: true
     tanggalSelesai?: true
+    lokasiRt?: true
+    lokasiRw?: true
     domainIsuId?: true
     pic?: true
     createdAt?: true
@@ -16161,6 +16171,8 @@ export namespace Prisma {
     status?: true
     tanggalMulai?: true
     tanggalSelesai?: true
+    lokasiRt?: true
+    lokasiRw?: true
     domainIsuId?: true
     pic?: true
     createdAt?: true
@@ -16247,6 +16259,8 @@ export namespace Prisma {
     status: $Enums.StatusProgram
     tanggalMulai: Date | null
     tanggalSelesai: Date | null
+    lokasiRt: string | null
+    lokasiRw: string | null
     domainIsuId: string | null
     pic: string | null
     createdAt: Date
@@ -16277,6 +16291,8 @@ export namespace Prisma {
     status?: boolean
     tanggalMulai?: boolean
     tanggalSelesai?: boolean
+    lokasiRt?: boolean
+    lokasiRw?: boolean
     domainIsuId?: boolean
     pic?: boolean
     createdAt?: boolean
@@ -16291,6 +16307,8 @@ export namespace Prisma {
     status?: boolean
     tanggalMulai?: boolean
     tanggalSelesai?: boolean
+    lokasiRt?: boolean
+    lokasiRw?: boolean
     domainIsuId?: boolean
     pic?: boolean
     createdAt?: boolean
@@ -16305,6 +16323,8 @@ export namespace Prisma {
     status?: boolean
     tanggalMulai?: boolean
     tanggalSelesai?: boolean
+    lokasiRt?: boolean
+    lokasiRw?: boolean
     domainIsuId?: boolean
     pic?: boolean
     createdAt?: boolean
@@ -16319,13 +16339,15 @@ export namespace Prisma {
     status?: boolean
     tanggalMulai?: boolean
     tanggalSelesai?: boolean
+    lokasiRt?: boolean
+    lokasiRw?: boolean
     domainIsuId?: boolean
     pic?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ProgramKelurahanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "judul" | "deskripsi" | "status" | "tanggalMulai" | "tanggalSelesai" | "domainIsuId" | "pic" | "createdAt" | "updatedAt", ExtArgs["result"]["programKelurahan"]>
+  export type ProgramKelurahanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "judul" | "deskripsi" | "status" | "tanggalMulai" | "tanggalSelesai" | "lokasiRt" | "lokasiRw" | "domainIsuId" | "pic" | "createdAt" | "updatedAt", ExtArgs["result"]["programKelurahan"]>
   export type ProgramKelurahanInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     domainIsu?: boolean | ProgramKelurahan$domainIsuArgs<ExtArgs>
   }
@@ -16348,6 +16370,8 @@ export namespace Prisma {
       status: $Enums.StatusProgram
       tanggalMulai: Date | null
       tanggalSelesai: Date | null
+      lokasiRt: string | null
+      lokasiRw: string | null
       domainIsuId: string | null
       pic: string | null
       createdAt: Date
@@ -16782,6 +16806,8 @@ export namespace Prisma {
     readonly status: FieldRef<"ProgramKelurahan", 'StatusProgram'>
     readonly tanggalMulai: FieldRef<"ProgramKelurahan", 'DateTime'>
     readonly tanggalSelesai: FieldRef<"ProgramKelurahan", 'DateTime'>
+    readonly lokasiRt: FieldRef<"ProgramKelurahan", 'String'>
+    readonly lokasiRw: FieldRef<"ProgramKelurahan", 'String'>
     readonly domainIsuId: FieldRef<"ProgramKelurahan", 'String'>
     readonly pic: FieldRef<"ProgramKelurahan", 'String'>
     readonly createdAt: FieldRef<"ProgramKelurahan", 'DateTime'>
@@ -17422,6 +17448,8 @@ export namespace Prisma {
     status: 'status',
     tanggalMulai: 'tanggalMulai',
     tanggalSelesai: 'tanggalSelesai',
+    lokasiRt: 'lokasiRt',
+    lokasiRw: 'lokasiRw',
     domainIsuId: 'domainIsuId',
     pic: 'pic',
     createdAt: 'createdAt',
@@ -18607,6 +18635,8 @@ export namespace Prisma {
     status?: EnumStatusProgramFilter<"ProgramKelurahan"> | $Enums.StatusProgram
     tanggalMulai?: DateTimeNullableFilter<"ProgramKelurahan"> | Date | string | null
     tanggalSelesai?: DateTimeNullableFilter<"ProgramKelurahan"> | Date | string | null
+    lokasiRt?: StringNullableFilter<"ProgramKelurahan"> | string | null
+    lokasiRw?: StringNullableFilter<"ProgramKelurahan"> | string | null
     domainIsuId?: StringNullableFilter<"ProgramKelurahan"> | string | null
     pic?: StringNullableFilter<"ProgramKelurahan"> | string | null
     createdAt?: DateTimeFilter<"ProgramKelurahan"> | Date | string
@@ -18621,6 +18651,8 @@ export namespace Prisma {
     status?: SortOrder
     tanggalMulai?: SortOrderInput | SortOrder
     tanggalSelesai?: SortOrderInput | SortOrder
+    lokasiRt?: SortOrderInput | SortOrder
+    lokasiRw?: SortOrderInput | SortOrder
     domainIsuId?: SortOrderInput | SortOrder
     pic?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -18638,6 +18670,8 @@ export namespace Prisma {
     status?: EnumStatusProgramFilter<"ProgramKelurahan"> | $Enums.StatusProgram
     tanggalMulai?: DateTimeNullableFilter<"ProgramKelurahan"> | Date | string | null
     tanggalSelesai?: DateTimeNullableFilter<"ProgramKelurahan"> | Date | string | null
+    lokasiRt?: StringNullableFilter<"ProgramKelurahan"> | string | null
+    lokasiRw?: StringNullableFilter<"ProgramKelurahan"> | string | null
     domainIsuId?: StringNullableFilter<"ProgramKelurahan"> | string | null
     pic?: StringNullableFilter<"ProgramKelurahan"> | string | null
     createdAt?: DateTimeFilter<"ProgramKelurahan"> | Date | string
@@ -18652,6 +18686,8 @@ export namespace Prisma {
     status?: SortOrder
     tanggalMulai?: SortOrderInput | SortOrder
     tanggalSelesai?: SortOrderInput | SortOrder
+    lokasiRt?: SortOrderInput | SortOrder
+    lokasiRw?: SortOrderInput | SortOrder
     domainIsuId?: SortOrderInput | SortOrder
     pic?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -18671,6 +18707,8 @@ export namespace Prisma {
     status?: EnumStatusProgramWithAggregatesFilter<"ProgramKelurahan"> | $Enums.StatusProgram
     tanggalMulai?: DateTimeNullableWithAggregatesFilter<"ProgramKelurahan"> | Date | string | null
     tanggalSelesai?: DateTimeNullableWithAggregatesFilter<"ProgramKelurahan"> | Date | string | null
+    lokasiRt?: StringNullableWithAggregatesFilter<"ProgramKelurahan"> | string | null
+    lokasiRw?: StringNullableWithAggregatesFilter<"ProgramKelurahan"> | string | null
     domainIsuId?: StringNullableWithAggregatesFilter<"ProgramKelurahan"> | string | null
     pic?: StringNullableWithAggregatesFilter<"ProgramKelurahan"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"ProgramKelurahan"> | Date | string
@@ -19717,6 +19755,8 @@ export namespace Prisma {
     status?: $Enums.StatusProgram
     tanggalMulai?: Date | string | null
     tanggalSelesai?: Date | string | null
+    lokasiRt?: string | null
+    lokasiRw?: string | null
     pic?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -19730,6 +19770,8 @@ export namespace Prisma {
     status?: $Enums.StatusProgram
     tanggalMulai?: Date | string | null
     tanggalSelesai?: Date | string | null
+    lokasiRt?: string | null
+    lokasiRw?: string | null
     domainIsuId?: string | null
     pic?: string | null
     createdAt?: Date | string
@@ -19743,6 +19785,8 @@ export namespace Prisma {
     status?: EnumStatusProgramFieldUpdateOperationsInput | $Enums.StatusProgram
     tanggalMulai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tanggalSelesai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
+    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
     pic?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19756,6 +19800,8 @@ export namespace Prisma {
     status?: EnumStatusProgramFieldUpdateOperationsInput | $Enums.StatusProgram
     tanggalMulai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tanggalSelesai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
+    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
     domainIsuId?: NullableStringFieldUpdateOperationsInput | string | null
     pic?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19769,6 +19815,8 @@ export namespace Prisma {
     status?: $Enums.StatusProgram
     tanggalMulai?: Date | string | null
     tanggalSelesai?: Date | string | null
+    lokasiRt?: string | null
+    lokasiRw?: string | null
     domainIsuId?: string | null
     pic?: string | null
     createdAt?: Date | string
@@ -19782,6 +19830,8 @@ export namespace Prisma {
     status?: EnumStatusProgramFieldUpdateOperationsInput | $Enums.StatusProgram
     tanggalMulai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tanggalSelesai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
+    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
     pic?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19794,6 +19844,8 @@ export namespace Prisma {
     status?: EnumStatusProgramFieldUpdateOperationsInput | $Enums.StatusProgram
     tanggalMulai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tanggalSelesai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
+    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
     domainIsuId?: NullableStringFieldUpdateOperationsInput | string | null
     pic?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20757,6 +20809,8 @@ export namespace Prisma {
     status?: SortOrder
     tanggalMulai?: SortOrder
     tanggalSelesai?: SortOrder
+    lokasiRt?: SortOrder
+    lokasiRw?: SortOrder
     domainIsuId?: SortOrder
     pic?: SortOrder
     createdAt?: SortOrder
@@ -20770,6 +20824,8 @@ export namespace Prisma {
     status?: SortOrder
     tanggalMulai?: SortOrder
     tanggalSelesai?: SortOrder
+    lokasiRt?: SortOrder
+    lokasiRw?: SortOrder
     domainIsuId?: SortOrder
     pic?: SortOrder
     createdAt?: SortOrder
@@ -20783,6 +20839,8 @@ export namespace Prisma {
     status?: SortOrder
     tanggalMulai?: SortOrder
     tanggalSelesai?: SortOrder
+    lokasiRt?: SortOrder
+    lokasiRw?: SortOrder
     domainIsuId?: SortOrder
     pic?: SortOrder
     createdAt?: SortOrder
@@ -22224,6 +22282,8 @@ export namespace Prisma {
     status?: $Enums.StatusProgram
     tanggalMulai?: Date | string | null
     tanggalSelesai?: Date | string | null
+    lokasiRt?: string | null
+    lokasiRw?: string | null
     pic?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -22236,6 +22296,8 @@ export namespace Prisma {
     status?: $Enums.StatusProgram
     tanggalMulai?: Date | string | null
     tanggalSelesai?: Date | string | null
+    lokasiRt?: string | null
+    lokasiRw?: string | null
     pic?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -22383,6 +22445,8 @@ export namespace Prisma {
     status?: EnumStatusProgramFilter<"ProgramKelurahan"> | $Enums.StatusProgram
     tanggalMulai?: DateTimeNullableFilter<"ProgramKelurahan"> | Date | string | null
     tanggalSelesai?: DateTimeNullableFilter<"ProgramKelurahan"> | Date | string | null
+    lokasiRt?: StringNullableFilter<"ProgramKelurahan"> | string | null
+    lokasiRw?: StringNullableFilter<"ProgramKelurahan"> | string | null
     domainIsuId?: StringNullableFilter<"ProgramKelurahan"> | string | null
     pic?: StringNullableFilter<"ProgramKelurahan"> | string | null
     createdAt?: DateTimeFilter<"ProgramKelurahan"> | Date | string
@@ -24283,6 +24347,8 @@ export namespace Prisma {
     status?: $Enums.StatusProgram
     tanggalMulai?: Date | string | null
     tanggalSelesai?: Date | string | null
+    lokasiRt?: string | null
+    lokasiRw?: string | null
     pic?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -24443,6 +24509,8 @@ export namespace Prisma {
     status?: EnumStatusProgramFieldUpdateOperationsInput | $Enums.StatusProgram
     tanggalMulai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tanggalSelesai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
+    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
     pic?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24455,6 +24523,8 @@ export namespace Prisma {
     status?: EnumStatusProgramFieldUpdateOperationsInput | $Enums.StatusProgram
     tanggalMulai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tanggalSelesai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
+    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
     pic?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24467,6 +24537,8 @@ export namespace Prisma {
     status?: EnumStatusProgramFieldUpdateOperationsInput | $Enums.StatusProgram
     tanggalMulai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tanggalSelesai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lokasiRt?: NullableStringFieldUpdateOperationsInput | string | null
+    lokasiRw?: NullableStringFieldUpdateOperationsInput | string | null
     pic?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
