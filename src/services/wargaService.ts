@@ -165,15 +165,6 @@ export const wargaService = {
 
   // Delete (dengan pengecekan relasi)
   delete: async (id: string) => {
-    // Cek apakah warga memiliki masukan
-    const masukanCount = await prisma.masukanWarga.count({
-      where: { wargaId: id },
-    });
-    if (masukanCount > 0) {
-      throw new Error(
-        "Warga memiliki masukan, tidak dapat dihapus. Hapus masukan terlebih dahulu.",
-      );
-    }
     return prisma.warga.delete({ where: { id } });
   },
 };

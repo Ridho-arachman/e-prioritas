@@ -1,42 +1,41 @@
+// components/sections/masukan/CardDetailMasukanWarga.tsx
 "use client";
 
-import { useState } from "react";
-import Image from "next/image"; // ✅ ditambahkan
-import { Card, CardContent } from "@/components/ui/card";
+import { StatusMasukan } from "@/app/generated/prisma";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { toast } from "sonner";
-import {
-  RotateCcw,
-  CheckCircle,
-  XCircle,
-  Clock,
-  CheckCheck,
-  Loader2,
-  ArrowLeft,
-  Image as ImageIcon, // ✅ ikon gambar
-  ChevronLeft, // ✅ navigasi slider
-  ChevronRight,
-} from "lucide-react";
-
-import { useParams } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
-import { useRouter } from "next/navigation";
-import { Skeleton } from "../../../ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
 import { useGet, usePost } from "@/hooks/useApi";
-import { StatusMasukan } from "@/app/generated/prisma";
-import { cn } from "@/lib/utils";
 import { notifier } from "@/lib/ToastNotifier";
+import { cn } from "@/lib/utils";
+import {
+  ArrowLeft,
+  CheckCheck,
+  CheckCircle,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Image as ImageIcon,
+  Loader2,
+  RotateCcw,
+  XCircle,
+} from "lucide-react";
+import Image from "next/image";
+import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function CardDetailMasukanWarga() {
   const router = useRouter();
@@ -49,8 +48,6 @@ export default function CardDetailMasukanWarga() {
     null,
   );
   const [alasan, setAlasan] = useState("");
-
-  // ✅ state untuk gambar
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -63,7 +60,6 @@ export default function CardDetailMasukanWarga() {
   } = useGet(`/protected/masukan/${id}`);
   const { post, loading: updating } = usePost(`/protected/masukan/${id}`);
 
-  // mapping status → warna badge dengan desain lebih modern
   const statusConfig: Record<
     StatusMasukan,
     { color: string; icon: React.ReactNode; label: string }
@@ -121,19 +117,16 @@ export default function CardDetailMasukanWarga() {
 
   async function handleConfirmChange() {
     if (!pendingStatus || !id) return;
-
     if (pendingStatus === "DITOLAK" && alasan.trim() === "") {
       toast.error("Alasan penolakan wajib diisi");
       return;
     }
-
     try {
       await post({
         status: pendingStatus,
         alasanPenolakan:
           pendingStatus === "DITOLAK" ? alasan.trim() : undefined,
       });
-
       notifier.success(
         "Berhasil",
         `Status berhasil diubah menjadi ${pendingStatus}`,
@@ -150,6 +143,7 @@ export default function CardDetailMasukanWarga() {
     }
   }
 
+  // Loading state
   if (isLoading) {
     return (
       <Card className="border shadow-lg overflow-hidden">
@@ -184,6 +178,7 @@ export default function CardDetailMasukanWarga() {
     );
   }
 
+  // Error state
   if (error || !masukan) {
     return (
       <div className="text-center text-red-600 py-12">
@@ -201,6 +196,7 @@ export default function CardDetailMasukanWarga() {
   }
 
   const images = masukan.gambarMasukan || [];
+  const warga = masukan.warga; // data warga dari relasi
 
   return (
     <div className="p-4 md:p-6 space-y-6">
@@ -216,6 +212,7 @@ export default function CardDetailMasukanWarga() {
         </Button>
         <h1 className="text-2xl font-bold">Kembali</h1>
       </div>
+
       <Card className="border shadow-lg shadow-primary/5 overflow-hidden bg-card/50 backdrop-blur-sm">
         <CardContent className="p-4 md:p-6 space-y-6">
           {/* Header pengirim dengan status */}
@@ -225,10 +222,12 @@ export default function CardDetailMasukanWarga() {
                 {masukan.judul}
               </h2>
               <h3 className="text-xl font-semibold text-foreground flex flex-wrap items-center gap-2">
-                <span className="wrap-break-words">{masukan.namaPengirim}</span>
-                {masukan.nomorHp && (
+                <span className="wrap-">
+                  {warga?.nama || "Tidak diketahui"}
+                </span>
+                {warga?.noHp && (
                   <span className="text-sm font-normal text-muted-foreground break-all">
-                    ({masukan.nomorHp})
+                    ({warga.noHp})
                   </span>
                 )}
               </h3>
@@ -248,8 +247,7 @@ export default function CardDetailMasukanWarga() {
 
           {/* Grid informasi dengan ikon */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <InfoItem label="Lokasi RT" value={masukan.lokasiRt} />
-            <InfoItem label="Lokasi RW" value={masukan.lokasiRw} />
+            <InfoItem label="Lokasi" value={masukan.lokasi || "-"} />
             <InfoItem
               label="Kategori (Domain Isu)"
               value={masukan.domainIsu?.nama ?? "-"}
@@ -266,9 +264,7 @@ export default function CardDetailMasukanWarga() {
               label="Diperbarui Pada"
               value={formatDate(masukan.updatedAt)}
             />
-            {masukan.nomorHp && (
-              <InfoItem label="Nomor HP" value={masukan.nomorHp} />
-            )}
+            {warga?.noHp && <InfoItem label="Nomor HP" value={warga.noHp} />}
           </div>
 
           {/* Deskripsi */}
@@ -276,7 +272,7 @@ export default function CardDetailMasukanWarga() {
             <Label className="text-sm font-medium text-foreground">
               Deskripsi Masukan
             </Label>
-            <div className="bg-muted/30 p-4 rounded-lg border border-border/50 text-foreground whitespace-pre-wrap wrap-break-words">
+            <div className="bg-muted/30 p-4 rounded-lg border border-border/50 text-foreground whitespace-pre-wrap wrap-">
               {masukan.deskripsi}
             </div>
           </div>
@@ -287,13 +283,13 @@ export default function CardDetailMasukanWarga() {
               <Label className="text-sm font-medium text-destructive">
                 Alasan Penolakan
               </Label>
-              <div className="bg-destructive/10 p-4 rounded-lg border border-destructive/20 text-destructive whitespace-pre-wrap wrap-break-words">
+              <div className="bg-destructive/10 p-4 rounded-lg border border-destructive/20 text-destructive whitespace-pre-wrap wrap-">
                 {masukan.alasanPenolakan}
               </div>
             </div>
           )}
 
-          {/* ✅ BAGIAN GAMBAR (ditambahkan) */}
+          {/* Gambar */}
           {images.length > 0 && (
             <div className="space-y-3">
               <Label className="text-sm font-medium text-foreground flex items-center gap-2">
@@ -326,7 +322,7 @@ export default function CardDetailMasukanWarga() {
             </div>
           )}
 
-          {/* Tombol aksi (tidak diubah) */}
+          {/* Tombol aksi */}
           <div className="flex flex-wrap gap-3 pt-4 border-t border-border/50 justify-center sm:justify-start">
             {masukan.status !== "MENUNGGU" && (
               <Button
@@ -411,7 +407,7 @@ export default function CardDetailMasukanWarga() {
           </div>
         </CardContent>
 
-        {/* Modal Penolakan (tidak diubah) */}
+        {/* Modal Penolakan */}
         <Dialog open={openRejectModal} onOpenChange={setOpenRejectModal}>
           <DialogContent className="sm:max-w-lg w-[95vw] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
@@ -453,14 +449,13 @@ export default function CardDetailMasukanWarga() {
                 disabled={updating}
                 className="w-full sm:w-auto"
               >
-                {updating && <Spinner className="mr-2 h-4 w-4" />}
-                Kirim
+                {updating && <Spinner className="mr-2 h-4 w-4" />} Kirim
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
 
-        {/* Modal Konfirmasi (tidak diubah) */}
+        {/* Modal Konfirmasi */}
         <Dialog open={openConfirmModal} onOpenChange={setOpenConfirmModal}>
           <DialogContent className="sm:max-w-md w-[95vw]">
             <DialogHeader>
@@ -469,7 +464,7 @@ export default function CardDetailMasukanWarga() {
               </DialogTitle>
             </DialogHeader>
             <div className="py-4">
-              <p className="text-center text-lg wrap-wrap-break-words">
+              <p className="text-center text-lg wrap-break-words">
                 Ubah status menjadi{" "}
                 <span className="font-semibold text-primary">
                   {pendingStatus}
@@ -491,18 +486,16 @@ export default function CardDetailMasukanWarga() {
                 disabled={updating}
                 className="w-full sm:w-auto"
               >
-                {updating && <Spinner className="mr-2 h-4 w-4" />}
-                Ya, Ubah
+                {updating && <Spinner className="mr-2 h-4 w-4" />} Ya, Ubah
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </Card>
 
-      {/* ✅ Modal untuk gambar besar dengan slider */}
+      {/* Modal gambar besar dengan slider */}
       <Dialog open={imageModalOpen} onOpenChange={setImageModalOpen}>
         <DialogContent className="sm:max-w-4xl max-h-[90vh] p-0 bg-transparent border-none shadow-none">
-          {/* Judul tersembunyi untuk aksesibilitas */}
           <div className="sr-only">
             <DialogTitle>Gambar Masukan</DialogTitle>
           </div>
@@ -567,14 +560,14 @@ export default function CardDetailMasukanWarga() {
   );
 }
 
-// Komponen InfoItem (tidak diubah)
+// Komponen InfoItem
 function InfoItem({ label, value }: { label: string; value: string }) {
   return (
     <div className="space-y-1 min-w-0">
       <Label className="text-xs text-muted-foreground font-medium">
         {label}
       </Label>
-      <p className="text-sm md:text-base font-medium text-foreground warp-wrap-break-words">
+      <p className="text-sm md:text-base font-medium text-foreground wrap-">
         {value}
       </p>
     </div>

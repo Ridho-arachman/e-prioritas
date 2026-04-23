@@ -1,82 +1,71 @@
-// app/api/masukan-warga/route.ts
 import { deleteFromCloudinary, uploadToCloudinary } from "@/lib/cloudinary";
-import { decrypt, encrypt } from "@/lib/encryption"; // 👈 tambahkan
 import { handlePrismaError } from "@/lib/handlePrismaError";
 import { handleResponse } from "@/lib/handleResponse";
-import { handleZodValidation } from "@/lib/handleZodValidation";
 import prisma from "@/lib/prisma";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { createMasukanWargaSchema } from "@/schema/masukanWarga";
+import { createMasukanWargaInternalSchema } from "@/schema/masukanWarga";
 import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
-  // Rate limiting
   const ip = req.headers.get("x-forwarded-for") ?? "anonymous";
   const key = `api:ip:${ip}`;
   const limit = await checkRateLimit(key, 60, 60 * 1000);
   if (!limit.success) {
     return handleResponse({
       success: false,
-      message: "Terlalu banyak percobaan, coba lagi nanti",
+      message: "Terlalu banyak percobaan",
       status: 429,
-      headers: { "Retry-After": String(limit.retryAfter) },
     });
   }
 
   try {
     const formData = await req.formData();
-
+    const wargaId = formData.get("wargaId") as string;
     const judul = formData.get("judul") as string;
     const deskripsi = formData.get("deskripsi") as string;
-    const lokasiRt = formData.get("lokasiRt") as string;
-    const lokasiRw = formData.get("lokasiRw") as string;
+    const lokasi = formData.get("lokasi") as string;
     const domainIsuId = formData.get("domainIsuId") as string;
-    const namaPengirim = formData.get("namaPengirim") as string | null;
-    const nomorHp = formData.get("nomorHp") as string | null;
-    const trackingId = formData.get("trackingId") as string | null;
+    const imageFiles = formData.getAll("images") as File[];
 
-    const parsed = createMasukanWargaSchema.safeParse({
+    const parsed = createMasukanWargaInternalSchema.safeParse({
+      wargaId,
       judul,
       deskripsi,
-      lokasiRt,
-      lokasiRw,
+      lokasi,
       domainIsuId,
-      namaPengirim: namaPengirim || undefined,
-      nomorHp: nomorHp || undefined,
     });
+    if (!parsed.success)
+      return handleResponse({
+        success: false,
+        message: "Data tidak valid",
+        status: 400,
+      });
 
-    if (!parsed.success) return handleZodValidation(parsed);
+    // Validasi warga dan status verifikasi
+    const warga = await prisma.warga.findUnique({
+      where: { id: wargaId },
+      select: { statusNoHp: true },
+    });
+    if (!warga)
+      return handleResponse({
+        success: false,
+        message: "Warga tidak ditemukan",
+        status: 404,
+      });
+    if (warga.statusNoHp !== "TERVERIFIKASI") {
+      return handleResponse({
+        success: false,
+        message: "Nomor HP belum diverifikasi. Silakan verifikasi dulu.",
+        status: 403,
+      });
+    }
 
-    // 👇 Enkripsi nomor HP sebelum disimpan
-    const encryptedNomorHp = parsed.data.nomorHp
-      ? encrypt(parsed.data.nomorHp)
-      : null;
-
-    const imageFiles = formData.getAll("images") as File[];
-    const MAX_IMAGES = 5;
-    const filesToUpload = imageFiles.slice(0, MAX_IMAGES);
-
-    // Upload semua file ke Cloudinary
+    // Upload gambar dengan tipe eksplisit
     const uploadResults: Array<{ url: string; publicId: string }> = [];
-    for (const file of filesToUpload) {
-      try {
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-        const result = await uploadToCloudinary(
-          buffer,
-          "masukan-warga",
-          `masukan_${Date.now()}_${Math.random().toString(36).substring(7)}`,
-        );
-        uploadResults.push({
-          url: result.url,
-          publicId: result.public_id,
-        });
-      } catch (uploadError) {
-        for (const uploaded of uploadResults) {
-          await deleteFromCloudinary(uploaded.publicId).catch(console.error);
-        }
-        throw new Error("Gagal mengupload gambar");
-      }
+    for (const file of imageFiles.slice(0, 5)) {
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const result = await uploadToCloudinary(buffer, "masukan-warga");
+      uploadResults.push({ url: result.url, publicId: result.public_id });
     }
 
     let masukan;
@@ -84,18 +73,14 @@ export async function POST(req: NextRequest) {
       masukan = await prisma.$transaction(async (tx) => {
         const newMasukan = await tx.masukanWarga.create({
           data: {
-            id: trackingId || undefined,
             judul: parsed.data.judul,
             deskripsi: parsed.data.deskripsi,
-            lokasiRt: parsed.data.lokasiRt,
-            lokasiRw: parsed.data.lokasiRw,
+            lokasi: parsed.data.lokasi,
             domainIsuId: parsed.data.domainIsuId,
-            namaPengirim: parsed.data.namaPengirim,
-            nomorHp: encryptedNomorHp, // 👈 simpan ciphertext
+            wargaId: parsed.data.wargaId,
             status: "MENUNGGU",
           },
         });
-
         for (const img of uploadResults) {
           await tx.gambarMasukan.create({
             data: {
@@ -105,42 +90,32 @@ export async function POST(req: NextRequest) {
             },
           });
         }
-
         return newMasukan;
       });
-    } catch (dbError) {
-      for (const img of uploadResults) {
+    } catch (err) {
+      for (const img of uploadResults)
         await deleteFromCloudinary(img.publicId).catch(console.error);
-      }
-      throw dbError;
+      throw err;
     }
-
-    // 👇 Dekripsi nomor HP untuk response (opsional)
-    const decryptedMasukan = {
-      ...masukan,
-      nomorHp: masukan.nomorHp ? decrypt(masukan.nomorHp) : null,
-    };
 
     return handleResponse({
       success: true,
-      message: "Masukan Warga Berhasil Ditambahkan",
-      data: decryptedMasukan,
+      message: "Masukan berhasil disimpan",
+      data: masukan,
       status: 201,
     });
   } catch (err) {
-    console.error("CREATE MASUKAN ERROR:", err);
-    const prismaResponse = handlePrismaError(err);
-    if (prismaResponse) {
+    console.error(err);
+    const prismaError = handlePrismaError(err);
+    if (prismaError)
       return handleResponse({
         success: false,
-        message: prismaResponse.message,
-        status: prismaResponse.status,
+        message: prismaError.message,
+        status: prismaError.status,
       });
-    }
-
     return handleResponse({
       success: false,
-      message: err instanceof Error ? err.message : "Terjadi error pada server",
+      message: "Terjadi kesalahan",
       status: 500,
     });
   }

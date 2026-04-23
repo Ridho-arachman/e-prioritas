@@ -1,266 +1,206 @@
 import { Prisma, StatusMasukan } from "@/app/generated/prisma";
 import { decrypt } from "@/lib/encryption";
 import prisma from "@/lib/prisma";
-
-//////////////////////////////////////////////////////////////
-// DOMAIN DTO (MANUAL TYPES)
-//////////////////////////////////////////////////////////////
-
-export interface CreateMasukanDTO {
-  namaPengirim?: string | null;
-  nomorHp?: string | null;
-  judul: string;
-  deskripsi: string;
-  lokasiRt: string;
-  lokasiRw: string;
-  domainIsuId: string;
-}
-
-export interface UpdateStatusMasukanDTO {
-  status: StatusMasukan;
-  diverifikasiOlehId?: string | null;
-  alasanPenolakan?: string | null;
-}
-
-export interface GetAllMasukanParams {
-  q?: string;
-  status?: StatusMasukan;
-  domainIsuId?: string;
-  diverifikasiOlehId?: string;
-  lokasiRt?: string;
-  lokasiRw?: string;
-  createdAt?: string;
-  page?: number;
-  perPage?: number;
-  sortBy?: string;
-  sortOrder?: "asc" | "desc";
-}
-
-type WhereInput = Prisma.MasukanWargaWhereInput;
+import { createMasukanWargaInternalSchema } from "@/schema/masukanWarga";
 
 export const masukanWargaService = {
-  ////////////////////////////////////////////////////////////
-  // CREATE
-  ////////////////////////////////////////////////////////////
-
-  create: async (data: CreateMasukanDTO) => {
+  create: async (data: {
+    wargaId: string;
+    judul: string;
+    deskripsi: string;
+    lokasi: string;
+    domainIsuId: string;
+  }) => {
+    const parsed = createMasukanWargaInternalSchema.parse(data);
     return prisma.masukanWarga.create({
       data: {
-        ...data,
+        judul: parsed.judul,
+        deskripsi: parsed.deskripsi,
+        lokasi: parsed.lokasi,
+        domainIsuId: parsed.domainIsuId,
+        wargaId: parsed.wargaId,
         status: StatusMasukan.MENUNGGU,
+      },
+      include: {
+        warga: {
+          select: { id: true, nama: true, noHp: true, statusNoHp: true },
+        },
+        domainIsu: true,
       },
     });
   },
 
-  ////////////////////////////////////////////////////////////
-  // GET ALL (FILTER + PAGINATION + SORT)
-  ////////////////////////////////////////////////////////////
+  getAllMasukan: async (params: {
+    q?: string;
+    status?: StatusMasukan;
+    domainIsuId?: string;
+    diverifikasiOlehId?: string;
+    lokasi?: string;
+    createdAt?: string;
+    page?: number;
+    perPage?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }) => {
+    const {
+      q,
+      status,
+      domainIsuId,
+      diverifikasiOlehId,
+      lokasi,
+      createdAt,
+      page = 1,
+      perPage = 10,
+      sortBy = "createdAt",
+      sortOrder = "desc",
+    } = params;
 
-  getAllMasukan: async ({
-    q,
-    status,
-    domainIsuId,
-    diverifikasiOlehId,
-    lokasiRt,
-    lokasiRw,
-    createdAt,
-    page = 1,
-    perPage = 10,
-    sortBy = "createdAt",
-    sortOrder = "desc",
-  }: GetAllMasukanParams) => {
-    const skip = (page - 1) * perPage;
-    const take = perPage;
+    // Bangun array kondisi untuk AND
+    const andConditions: Prisma.MasukanWargaWhereInput[] = [];
 
-    ////////////////////////////////////////////////////////////
-    // SORTING SAFETY
-    ////////////////////////////////////////////////////////////
+    if (status) andConditions.push({ status });
+    if (domainIsuId) andConditions.push({ domainIsuId });
+    if (diverifikasiOlehId) andConditions.push({ diverifikasiOlehId });
+    if (lokasi) {
+      andConditions.push({
+        lokasi: { contains: lokasi, mode: "insensitive" as Prisma.QueryMode },
+      });
+    }
+    if (q) {
+      andConditions.push({
+        OR: [
+          { judul: { contains: q, mode: "insensitive" as Prisma.QueryMode } },
+          {
+            deskripsi: { contains: q, mode: "insensitive" as Prisma.QueryMode },
+          },
+          {
+            warga: {
+              nama: { contains: q, mode: "insensitive" as Prisma.QueryMode },
+            },
+          },
+        ],
+      });
+    }
+    if (createdAt) {
+      const startDate = new Date(createdAt);
+      startDate.setHours(0, 0, 0, 0);
+      const endDate = new Date(createdAt);
+      endDate.setHours(23, 59, 59, 999);
+      andConditions.push({
+        createdAt: { gte: startDate, lte: endDate },
+      });
+    }
 
+    const where: Prisma.MasukanWargaWhereInput = andConditions.length
+      ? { AND: andConditions }
+      : {};
+
+    // Validasi sortBy
     const validSortFields = [
       "createdAt",
       "updatedAt",
       "judul",
       "status",
-      "namaPengirim",
-      "lokasiRt",
-      "lokasiRw",
+      "lokasi",
     ];
-
-    const order = sortOrder === "asc" ? "asc" : "desc";
     const sortField = validSortFields.includes(sortBy) ? sortBy : "createdAt";
-
     const orderBy: Prisma.MasukanWargaOrderByWithRelationInput = {
-      [sortField]: order,
+      [sortField]: sortOrder,
     };
+    const skip = (page - 1) * perPage;
 
-    ////////////////////////////////////////////////////////////
-    // DATE FILTER
-    ////////////////////////////////////////////////////////////
-
-    let createdAtFilter: WhereInput = {};
-
-    if (createdAt) {
-      const startDate = new Date(createdAt);
-      startDate.setHours(0, 0, 0, 0);
-
-      const endDate = new Date(createdAt);
-      endDate.setHours(23, 59, 59, 999);
-
-      createdAtFilter = {
-        createdAt: {
-          gte: startDate,
-          lte: endDate,
-        },
-      };
-    }
-
-    ////////////////////////////////////////////////////////////
-    // WHERE CLAUSE s
-    ////////////////////////////////////////////////////////////
-
-    const where: WhereInput = {
-      AND: [
-        q
-          ? {
-              OR: [
-                { id: { contains: q, mode: "insensitive" } },
-                { namaPengirim: { contains: q, mode: "insensitive" } },
-                { nomorHp: { contains: q, mode: "insensitive" } },
-                { judul: { contains: q, mode: "insensitive" } },
-                { deskripsi: { contains: q, mode: "insensitive" } },
-              ],
-            }
-          : {},
-
-        status ? { status } : {},
-        domainIsuId ? { domainIsuId } : {},
-        diverifikasiOlehId ? { diverifikasiOlehId } : {},
-        lokasiRt ? { lokasiRt } : {},
-        lokasiRw ? { lokasiRw } : {},
-
-        createdAtFilter,
-      ],
-    };
-
-    ////////////////////////////////////////////////////////////
-    // QUERY
-    ////////////////////////////////////////////////////////////
-
-    const [total, data] = await Promise.all([
+    const [total, data] = await prisma.$transaction([
       prisma.masukanWarga.count({ where }),
-
       prisma.masukanWarga.findMany({
         where,
         orderBy,
         skip,
-        take,
+        take: perPage,
         include: {
-          domainIsu: {
+          warga: {
             select: {
               id: true,
               nama: true,
+              noHp: true,
+              statusNoHp: true,
+              alamat: true,
             },
           },
-
-          diverifikasiOleh: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
+          domainIsu: { select: { id: true, nama: true } },
+          diverifikasiOleh: { select: { id: true, name: true } },
         },
       }),
     ]);
 
+    // Dekripsi nomor HP untuk response
+    const dataWithDecrypted = data.map((item) => ({
+      ...item,
+      warga: item.warga
+        ? {
+            ...item.warga,
+            noHp: item.warga.noHp ? decrypt(item.warga.noHp) : null,
+          }
+        : null,
+    }));
+
     return {
-      data,
-      meta: {
-        total,
-        page,
-        perPage,
-        totalPages: Math.ceil(total / perPage),
-        sortBy: sortField,
-        sortOrder: order,
-      },
+      data: dataWithDecrypted,
+      total,
+      page,
+      perPage,
+      totalPages: Math.ceil(total / perPage),
     };
   },
-
-  ////////////////////////////////////////////////////////////
-  // GET BY ID
-  ////////////////////////////////////////////////////////////
 
   getById: async (id: string) => {
     const masukan = await prisma.masukanWarga.findUniqueOrThrow({
       where: { id },
-
       include: {
-        domainIsu: {
-          select: { id: true, nama: true },
-        },
-
-        gambarMasukan: {
+        warga: {
           select: {
             id: true,
-            url: true,
-            publicId: true,
+            nama: true,
+            noHp: true,
+            statusNoHp: true,
+            alamat: true,
           },
         },
-
-        diverifikasiOleh: {
-          select: { id: true, name: true, email: true },
-        },
-
+        domainIsu: true,
+        gambarMasukan: true,
+        diverifikasiOleh: { select: { id: true, name: true } },
         relasiRapat: true,
       },
     });
-
-    if (masukan.nomorHp) {
-      try {
-        masukan.nomorHp = decrypt(masukan.nomorHp);
-      } catch (error) {
-        console.error("Gagal mendekripsi nomor HP:", error);
-        // Biarkan tetap terenkripsi atau set ke null
-      }
-    }
-
-    return masukan;
+    return {
+      ...masukan,
+      warga: masukan.warga
+        ? {
+            ...masukan.warga,
+            noHp: masukan.warga.noHp ? decrypt(masukan.warga.noHp) : null,
+          }
+        : null,
+    };
   },
 
-  ////////////////////////////////////////////////////////////
-  // UPDATE STATUS
-  ////////////////////////////////////////////////////////////
-
-  updateStatus: async (id: string, data: UpdateStatusMasukanDTO) => {
-    ////////////////////////////////////////////////////////////
-    // BUSINESS RULE HARDENING
-    ////////////////////////////////////////////////////////////
-
+  updateStatus: async (
+    id: string,
+    data: {
+      status: StatusMasukan;
+      diverifikasiOlehId?: string | null;
+      alasanPenolakan?: string | null;
+    },
+  ) => {
     if (data.status === StatusMasukan.DITOLAK && !data.alasanPenolakan) {
       throw new Error("Alasan penolakan wajib jika status DITOLAK");
     }
-
     return prisma.masukanWarga.update({
       where: { id },
-
       data: {
         status: data.status,
-
-        ////////////////////////////////////////////////////////////
-        // RELATION SAFE UPDATE (PRISMA WAY)
-        ////////////////////////////////////////////////////////////
-
-        diverifikasiOleh:
+        diverifikasiOlehId:
           data.status === StatusMasukan.MENUNGGU
-            ? { disconnect: true }
-            : data.diverifikasiOlehId
-              ? { connect: { id: data.diverifikasiOlehId } }
-              : undefined,
-
-        ////////////////////////////////////////////////////////////
-        // BUSINESS RULE
-        ////////////////////////////////////////////////////////////
-
+            ? null
+            : data.diverifikasiOlehId,
         alasanPenolakan:
           data.status === StatusMasukan.DITOLAK ? data.alasanPenolakan : null,
       },

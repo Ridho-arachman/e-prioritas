@@ -12,49 +12,62 @@ import { NextRequest } from "next/server";
 export const GET = async (req: NextRequest) => {
   const allowedRoles: Role[] = ["ADMIN", "PERANGKAT_DESA", "LURAH"];
   const session = await auth.api.getSession({ headers: await headers() });
-
-  if (!session) {
+  if (!session)
     return handleResponse({
       success: false,
       message: "User belum login",
       status: 401,
     });
-  }
-
-  if (!allowedRoles.includes(session.user.role as Role)) {
+  if (!allowedRoles.includes(session.user.role as Role))
     return handleResponse({
       success: false,
       message: "Akses ditolak",
       status: 403,
     });
-  }
 
   try {
     const searchParams = req.nextUrl.searchParams;
 
+    // Sanitasi parameter: ubah string kosong menjadi undefined
+    const statusParam = searchParams.get("status");
+    const domainIsuIdParam = searchParams.get("domainIsuId");
+    const diverifikasiOlehIdParam =
+      searchParams.get("diprosesOlehId") ||
+      searchParams.get("diverifikasiOlehId"); // terima kedua nama
+    const lokasiParam = searchParams.get("lokasi");
+    const createdAtParam = searchParams.get("createdAt");
+    const qParam = searchParams.get("q");
+    const pageParam = searchParams.get("page");
+    const perPageParam = searchParams.get("perPage");
+    const sortByParam = searchParams.get("sortBy");
+    const sortOrderParam = searchParams.get("sortOrder");
+
     const params = {
-      q: searchParams.get("q") || undefined,
-      status: (searchParams.get("status") as StatusMasukan) || undefined,
-      domainIsuId: searchParams.get("domainIsuId") || undefined,
-      diprosesOlehId: searchParams.get("diprosesOlehId") || undefined,
-      createdAt: searchParams.get("createdAt") || undefined,
-      page: searchParams.get("page") ? parseInt(searchParams.get("page")!) : 1,
-      perPage: searchParams.get("perPage")
-        ? parseInt(searchParams.get("perPage")!)
-        : 10,
-      sortBy: searchParams.get("sortBy") || "createdAt",
-      sortOrder: (searchParams.get("sortOrder") as "asc" | "desc") || "desc",
+      q: qParam || undefined,
+      status:
+        statusParam && statusParam !== ""
+          ? (statusParam as StatusMasukan)
+          : undefined,
+      domainIsuId:
+        domainIsuIdParam && domainIsuIdParam !== ""
+          ? domainIsuIdParam
+          : undefined,
+      diverifikasiOlehId:
+        diverifikasiOlehIdParam && diverifikasiOlehIdParam !== ""
+          ? diverifikasiOlehIdParam
+          : undefined,
+      lokasi: lokasiParam && lokasiParam !== "" ? lokasiParam : undefined,
+      createdAt:
+        createdAtParam && createdAtParam !== "" ? createdAtParam : undefined,
+      page: pageParam ? parseInt(pageParam) : 1,
+      perPage: perPageParam ? parseInt(perPageParam) : 10,
+      sortBy: sortByParam || "createdAt",
+      sortOrder: (sortOrderParam as "asc" | "desc") || "desc",
     };
 
-    const validationResult = masukanWargaQuerySchema.safeParse({
-      q: params.q,
-      status: params.status,
-      kategoriId: params.domainIsuId,
-      diprosesOlehId: params.diprosesOlehId,
-      createdAt: params.createdAt,
-    });
-
+    const validationResult = masukanWargaQuerySchema.safeParse(params);
     if (!validationResult.success) {
+      console.error("Validation error:", validationResult.error);
       return handleResponse({
         success: false,
         message: "Parameter tidak valid",
@@ -63,36 +76,29 @@ export const GET = async (req: NextRequest) => {
       });
     }
 
-    const result = await masukanWargaService.getAllMasukan({
-      q: params.q,
-      status: params.status,
-      domainIsuId: params.domainIsuId,
-      diverifikasiOlehId: params.diprosesOlehId, // ✅ mapping
-      createdAt: params.createdAt,
-      page: params.page,
-      perPage: params.perPage,
-      sortBy: params.sortBy,
-      sortOrder: params.sortOrder,
-    });
-
+    const result = await masukanWargaService.getAllMasukan(
+      validationResult.data,
+    );
     return handleResponse({
       success: true,
       message: "Data masukan berhasil diambil",
       data: result.data,
-      meta: result.meta,
+      meta: {
+        total: result.total,
+        page: result.page,
+        perPage: result.perPage,
+        totalPages: result.totalPages,
+      },
       status: 200,
     });
   } catch (error) {
     const prismaResponse = handlePrismaError(error);
-
-    if (prismaResponse) {
+    if (prismaResponse)
       return handleResponse({
         success: false,
         message: prismaResponse.message,
         status: prismaResponse.status,
       });
-    }
-
     return handleResponse({
       success: false,
       message: "Terjadi kesalahan pada server",

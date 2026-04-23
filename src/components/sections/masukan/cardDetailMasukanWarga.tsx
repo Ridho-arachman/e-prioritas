@@ -1,42 +1,56 @@
+// components/sections/masukan/CardDetailMasukanWarga.tsx
 "use client";
 
-import { useState } from "react";
-import Image from "next/image"; // ✅ ditambahkan
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { toast } from "sonner";
+import { Textarea } from "@/components/ui/textarea";
 import {
-  RotateCcw,
-  CheckCircle,
-  XCircle,
-  Clock,
-  CheckCheck,
-  Loader2,
   ArrowLeft,
-  Image as ImageIcon, // ✅ ikon gambar
-  ChevronLeft, // ✅ navigasi slider
+  CheckCheck,
+  CheckCircle,
+  ChevronLeft,
   ChevronRight,
+  Clock,
+  Image as ImageIcon,
+  Loader2,
+  RotateCcw,
+  XCircle,
 } from "lucide-react";
+import Image from "next/image";
+import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
-import { useParams } from "next/navigation";
-import { Spinner } from "@/components/ui/spinner";
-import { useRouter } from "next/navigation";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useGet, usePost } from "@/hooks/useApi";
 import { StatusMasukan } from "@/app/generated/prisma";
-import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
+import { useGet, usePost } from "@/hooks/useApi";
 import { notifier } from "@/lib/ToastNotifier";
+import { cn } from "@/lib/utils";
+
+// Komponen InfoItem (helper)
+function InfoItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="space-y-1 min-w-0">
+      <Label className="text-xs text-muted-foreground font-medium">
+        {label}
+      </Label>
+      <p className="text-sm md:text-base font-medium text-foreground break-words">
+        {value}
+      </p>
+    </div>
+  );
+}
 
 export default function CardDetailMasukanWarga() {
   const router = useRouter();
@@ -50,7 +64,7 @@ export default function CardDetailMasukanWarga() {
   );
   const [alasan, setAlasan] = useState("");
 
-  // ✅ state untuk gambar
+  // State untuk gambar
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -63,7 +77,7 @@ export default function CardDetailMasukanWarga() {
   } = useGet(`/protected/masukan/${id}`);
   const { post, loading: updating } = usePost(`/protected/masukan/${id}`);
 
-  // mapping status → warna badge dengan desain lebih modern
+  // Mapping status ke tampilan
   const statusConfig: Record<
     StatusMasukan,
     { color: string; icon: React.ReactNode; label: string }
@@ -216,6 +230,7 @@ export default function CardDetailMasukanWarga() {
         </Button>
         <h1 className="text-2xl font-bold">Kembali</h1>
       </div>
+
       <Card className="border shadow-lg shadow-primary/5 overflow-hidden bg-card/50 backdrop-blur-sm">
         <CardContent className="p-4 md:p-6 space-y-6">
           {/* Header pengirim dengan status */}
@@ -225,10 +240,12 @@ export default function CardDetailMasukanWarga() {
                 {masukan.judul}
               </h2>
               <h3 className="text-xl font-semibold text-foreground flex flex-wrap items-center gap-2">
-                <span className="wrap-break-words">{masukan.namaPengirim}</span>
-                {masukan.nomorHp && (
+                <span className="break-words">
+                  {masukan.warga?.nama || "Tidak diketahui"}
+                </span>
+                {masukan.warga?.noHp && (
                   <span className="text-sm font-normal text-muted-foreground break-all">
-                    ({masukan.nomorHp})
+                    ({masukan.warga.noHp})
                   </span>
                 )}
               </h3>
@@ -246,10 +263,9 @@ export default function CardDetailMasukanWarga() {
 
           <Separator className="bg-border/50" />
 
-          {/* Grid informasi dengan ikon */}
+          {/* Grid informasi */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <InfoItem label="Lokasi RT" value={masukan.lokasiRt} />
-            <InfoItem label="Lokasi RW" value={masukan.lokasiRw} />
+            <InfoItem label="Lokasi" value={masukan.lokasi || "-"} />
             <InfoItem
               label="Kategori (Domain Isu)"
               value={masukan.domainIsu?.nama ?? "-"}
@@ -266,8 +282,8 @@ export default function CardDetailMasukanWarga() {
               label="Diperbarui Pada"
               value={formatDate(masukan.updatedAt)}
             />
-            {masukan.nomorHp && (
-              <InfoItem label="Nomor HP" value={masukan.nomorHp} />
+            {masukan.warga?.noHp && (
+              <InfoItem label="Nomor HP" value={masukan.warga.noHp} />
             )}
           </div>
 
@@ -276,7 +292,7 @@ export default function CardDetailMasukanWarga() {
             <Label className="text-sm font-medium text-foreground">
               Deskripsi Masukan
             </Label>
-            <div className="bg-muted/30 p-4 rounded-lg border border-border/50 text-foreground whitespace-pre-wrap wrap-break-words">
+            <div className="bg-muted/30 p-4 rounded-lg border border-border/50 text-foreground whitespace-pre-wrap break-words">
               {masukan.deskripsi}
             </div>
           </div>
@@ -287,13 +303,13 @@ export default function CardDetailMasukanWarga() {
               <Label className="text-sm font-medium text-destructive">
                 Alasan Penolakan
               </Label>
-              <div className="bg-destructive/10 p-4 rounded-lg border border-destructive/20 text-destructive whitespace-pre-wrap wrap-break-words">
+              <div className="bg-destructive/10 p-4 rounded-lg border border-destructive/20 text-destructive whitespace-pre-wrap break-words">
                 {masukan.alasanPenolakan}
               </div>
             </div>
           )}
 
-          {/* ✅ BAGIAN GAMBAR (ditambahkan) */}
+          {/* Gambar */}
           {images.length > 0 && (
             <div className="space-y-3">
               <Label className="text-sm font-medium text-foreground flex items-center gap-2">
@@ -326,7 +342,7 @@ export default function CardDetailMasukanWarga() {
             </div>
           )}
 
-          {/* Tombol aksi (tidak diubah) */}
+          {/* Tombol aksi */}
           <div className="flex flex-wrap gap-3 pt-4 border-t border-border/50 justify-center sm:justify-start">
             {masukan.status !== "MENUNGGU" && (
               <Button
@@ -410,99 +426,96 @@ export default function CardDetailMasukanWarga() {
             )}
           </div>
         </CardContent>
-
-        {/* Modal Penolakan (tidak diubah) */}
-        <Dialog open={openRejectModal} onOpenChange={setOpenRejectModal}>
-          <DialogContent className="sm:max-w-lg w-[95vw] max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-xl flex items-center gap-2">
-                <XCircle className="h-5 w-5 text-destructive" />
-                Alasan Penolakan
-              </DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="alasan" className="text-base">
-                  Tuliskan alasan penolakan
-                </Label>
-                <Textarea
-                  id="alasan"
-                  placeholder="Alasan penolakan akan terlihat oleh pengirim..."
-                  value={alasan}
-                  onChange={(e) => setAlasan(e.target.value)}
-                  rows={4}
-                  className="resize-none focus:ring-2 focus:ring-primary/50 w-full"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Alasan wajib diisi jika status ditolak.
-                </p>
-              </div>
-            </div>
-            <DialogFooter className="flex-col sm:flex-row gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setOpenRejectModal(false)}
-                disabled={updating}
-                className="w-full sm:w-auto"
-              >
-                Batal
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={handleConfirmChange}
-                disabled={updating}
-                className="w-full sm:w-auto"
-              >
-                {updating && <Spinner className="mr-2 h-4 w-4" />}
-                Kirim
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        {/* Modal Konfirmasi (tidak diubah) */}
-        <Dialog open={openConfirmModal} onOpenChange={setOpenConfirmModal}>
-          <DialogContent className="sm:max-w-md w-[95vw]">
-            <DialogHeader>
-              <DialogTitle className="text-xl">
-                Konfirmasi Perubahan
-              </DialogTitle>
-            </DialogHeader>
-            <div className="py-4">
-              <p className="text-center text-lg wrap-wrap-break-words">
-                Ubah status menjadi{" "}
-                <span className="font-semibold text-primary">
-                  {pendingStatus}
-                </span>
-                ?
-              </p>
-            </div>
-            <DialogFooter className="flex-col sm:flex-row gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setOpenConfirmModal(false)}
-                disabled={updating}
-                className="w-full sm:w-auto"
-              >
-                Batal
-              </Button>
-              <Button
-                onClick={handleConfirmChange}
-                disabled={updating}
-                className="w-full sm:w-auto"
-              >
-                {updating && <Spinner className="mr-2 h-4 w-4" />}
-                Ya, Ubah
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </Card>
 
-      {/* ✅ Modal untuk gambar besar dengan slider */}
+      {/* Modal Penolakan */}
+      <Dialog open={openRejectModal} onOpenChange={setOpenRejectModal}>
+        <DialogContent className="sm:max-w-lg w-[95vw] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl flex items-center gap-2">
+              <XCircle className="h-5 w-5 text-destructive" />
+              Alasan Penolakan
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="alasan" className="text-base">
+                Tuliskan alasan penolakan
+              </Label>
+              <Textarea
+                id="alasan"
+                placeholder="Alasan penolakan akan terlihat oleh pengirim..."
+                value={alasan}
+                onChange={(e) => setAlasan(e.target.value)}
+                rows={4}
+                className="resize-none focus:ring-2 focus:ring-primary/50 w-full"
+              />
+              <p className="text-xs text-muted-foreground">
+                Alasan wajib diisi jika status ditolak.
+              </p>
+            </div>
+          </div>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setOpenRejectModal(false)}
+              disabled={updating}
+              className="w-full sm:w-auto"
+            >
+              Batal
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmChange}
+              disabled={updating}
+              className="w-full sm:w-auto"
+            >
+              {updating && <Spinner className="mr-2 h-4 w-4" />}
+              Kirim
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal Konfirmasi */}
+      <Dialog open={openConfirmModal} onOpenChange={setOpenConfirmModal}>
+        <DialogContent className="sm:max-w-md w-[95vw]">
+          <DialogHeader>
+            <DialogTitle className="text-xl">Konfirmasi Perubahan</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-center text-lg wrap-break-words">
+              Ubah status menjadi{" "}
+              <span className="font-semibold text-primary">
+                {pendingStatus}
+              </span>
+              ?
+            </p>
+          </div>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setOpenConfirmModal(false)}
+              disabled={updating}
+              className="w-full sm:w-auto"
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={handleConfirmChange}
+              disabled={updating}
+              className="w-full sm:w-auto"
+            >
+              {updating && <Spinner className="mr-2 h-4 w-4" />}
+              Ya, Ubah
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal Gambar Besar dengan Slider */}
       <Dialog open={imageModalOpen} onOpenChange={setImageModalOpen}>
         <DialogContent className="sm:max-w-4xl max-h-[90vh] p-0 bg-transparent border-none shadow-none">
-          {/* Judul tersembunyi untuk aksesibilitas */}
           <div className="sr-only">
             <DialogTitle>Gambar Masukan</DialogTitle>
           </div>
@@ -563,20 +576,6 @@ export default function CardDetailMasukanWarga() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
-}
-
-// Komponen InfoItem (tidak diubah)
-function InfoItem({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="space-y-1 min-w-0">
-      <Label className="text-xs text-muted-foreground font-medium">
-        {label}
-      </Label>
-      <p className="text-sm md:text-base font-medium text-foreground warp-wrap-break-words">
-        {value}
-      </p>
     </div>
   );
 }

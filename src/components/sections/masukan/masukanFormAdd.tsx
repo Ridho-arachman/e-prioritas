@@ -1,30 +1,27 @@
-// components/sections/masukan/masukanFormAdd.tsx
+// components/sections/masukan/MasukanWargaFormAdd.tsx
 "use client";
 
 import { DomainIsu } from "@/app/generated/prisma";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { useGet } from "@/hooks/useApi";
-import { useFormPersist } from "@/hooks/useFormPersist";
 import { createMasukanWargaFormSchema } from "@/schema/masukanWarga";
-import { useMasukanDraftStore } from "@/stores/masukanFormAddDraft";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   CheckCircle,
-  ClipboardList,
-  Heading,
   ImagePlus,
   Loader2,
-  MapPin,
   MessageSquare,
   Phone,
+  RefreshCw,
   Send,
-  User,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { notifier } from "../../../lib/ToastNotifier";
@@ -39,305 +36,380 @@ import {
   SelectValue,
 } from "../../ui/select";
 
-// Helper generate UUID (fallback untuk browser lama)
-const generateTrackingId = (): string => {
-  if (typeof window !== "undefined" && window.crypto?.randomUUID) {
-    return window.crypto.randomUUID();
-  }
-  // fallback sederhana
-  return (
-    Math.random().toString(36).substring(2, 15) +
-    Math.random().toString(36).substring(2, 15)
-  );
-};
+type FormValues = z.infer<typeof createMasukanWargaFormSchema>;
 
 export default function MasukanWargaFormAdd() {
+  const router = useRouter();
   const { data, isLoading: domainLoading } = useGet("/kategori");
   const domainIsu = data?.data ?? [];
 
+  // State alur
+  const [step, setStep] = useState<"cek" | "daftar" | "masukan">("cek");
+  const [noHp, setNoHp] = useState("");
+  const [wargaId, setWargaId] = useState<string | null>(null);
+  const [namaWarga, setNamaWarga] = useState("");
+  const [alamatWarga, setAlamatWarga] = useState("");
+  const [statusVerifikasi, setStatusVerifikasi] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+
+  // State gambar
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [tempData, setTempData] = useState<FormData | null>(null);
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [whatsappLink, setWhatsappLink] = useState<string | null>(null);
-  const [trackingId, setTrackingId] = useState<string | null>(null);
-  const [hasSyncedDraft, setHasSyncedDraft] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
 
-  const {
-    data: draft,
-    updateDraft,
-    clearDraft,
-    isHydrated,
-  } = useMasukanDraftStore();
+  const daftarForm = useForm<{ nama: string; alamat?: string }>({
+    defaultValues: { nama: "", alamat: "" },
+  });
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  const form = useForm<z.infer<typeof createMasukanWargaFormSchema>>({
+  const masukanForm = useForm<FormValues>({
     resolver: zodResolver(createMasukanWargaFormSchema),
     defaultValues: {
-      namaPengirim: "",
-      nomorHp: "",
+      nama: "",
+      noHp: "",
+      alamat: "",
       judul: "",
-      lokasiRt: "",
-      lokasiRw: "",
+      lokasi: "",
       deskripsi: "",
       domainIsuId: "",
     },
   });
 
-  // Sync draft ke form (hanya sekali setelah mount dan hydrated)
-  useEffect(() => {
-    if (!isMounted || hasSyncedDraft) return;
-    if (isHydrated && draft) {
-      const hasDraft =
-        draft.namaPengirim ||
-        draft.judul ||
-        draft.deskripsi ||
-        draft.imagePreview;
-      if (hasDraft) {
-        if (draft.namaPengirim)
-          form.setValue("namaPengirim", draft.namaPengirim);
-        if (draft.nomorHp) form.setValue("nomorHp", draft.nomorHp);
-        if (draft.judul) form.setValue("judul", draft.judul);
-        if (draft.lokasiRt) form.setValue("lokasiRt", draft.lokasiRt);
-        if (draft.lokasiRw) form.setValue("lokasiRw", draft.lokasiRw);
-        if (draft.deskripsi) form.setValue("deskripsi", draft.deskripsi);
-        if (draft.domainIsuId) form.setValue("domainIsuId", draft.domainIsuId);
-        if (draft.imagePreview) setImagePreviews([draft.imagePreview]);
-        if (draft.trackingId) setTrackingId(draft.trackingId);
-        setHasSyncedDraft(true);
-        notifier.info("Draft Dimuat", "Data draft sebelumnya telah dimuat");
-      }
-
-      // Restore status pending WhatsApp
-      if (draft.pendingWhatsApp && draft.whatsappLink) {
-        setShowConfirm(true);
-        setWhatsappLink(draft.whatsappLink);
-        setHasSyncedDraft(true);
-        rebuildTempData();
-      }
+  // Step 1: Cek nomor HP
+  const handleCekNoHp = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const nomor = formData.get("noHp") as string;
+    if (!nomor) {
+      notifier.error("Nomor HP harus diisi");
+      return;
     }
-  }, [isMounted, isHydrated, draft, form, hasSyncedDraft]);
-
-  // Auto-save dengan useFormPersist
-  useFormPersist(
-    form.watch,
-    (safeData) => {
-      if (!isMounted) return;
-      updateDraft({
-        ...safeData,
-        imagePreview: imagePreviews[0] || null,
-        imageFileName: images[0]?.name,
-        imageSize: images[0]?.size,
-        trackingId: trackingId,
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/warga/check-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ noHp: nomor }),
       });
-    },
-    {
-      skipFields: [],
-      waitTime: 800,
-      isActive: !isSubmitting && isMounted,
-    },
-  );
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error);
 
-  // Fungsi untuk membuat FormData dari state saat ini (dipanggil saat perlu)
-  const rebuildTempData = () => {
-    const fd = new FormData();
-    const values = form.getValues();
-    fd.append("judul", values.judul);
-    fd.append("deskripsi", values.deskripsi);
-    fd.append("lokasiRt", values.lokasiRt);
-    fd.append("lokasiRw", values.lokasiRw);
-    fd.append("domainIsuId", values.domainIsuId);
-    if (values.namaPengirim) fd.append("namaPengirim", values.namaPengirim);
-    if (values.nomorHp) fd.append("nomorHp", values.nomorHp);
-    images.forEach((file) => fd.append("images", file));
-    if (trackingId) fd.append("trackingId", trackingId);
-    setTempData(fd);
+      if (result.exists && result.statusNoHp === "TERVERIFIKASI") {
+        // Sudah terverifikasi
+        setNoHp(nomor);
+        setWargaId(result.wargaId);
+        setNamaWarga(result.nama);
+        setAlamatWarga(result.alamat || "");
+        setStatusVerifikasi("TERVERIFIKASI");
+        masukanForm.setValue("nama", result.nama);
+        masukanForm.setValue("noHp", nomor);
+        masukanForm.setValue("alamat", result.alamat || "");
+        setStep("masukan");
+        notifier.success("Terverifikasi", "Silakan isi masukan Anda.");
+      } else if (result.exists && result.statusNoHp !== "TERVERIFIKASI") {
+        setNoHp(nomor);
+        setWargaId(result.wargaId);
+        setNamaWarga(result.nama);
+        setAlamatWarga(result.alamat || "");
+        setStatusVerifikasi(result.statusNoHp);
+        daftarForm.setValue("nama", result.nama);
+        daftarForm.setValue("alamat", result.alamat || "");
+        setStep("daftar");
+        notifier.info(
+          "Belum Terverifikasi",
+          "Silakan verifikasi nomor HP Anda.",
+        );
+      } else {
+        setNoHp(nomor);
+        setWargaId(null);
+        setNamaWarga("");
+        setAlamatWarga("");
+        setStatusVerifikasi(null);
+        daftarForm.reset({ nama: "", alamat: "" });
+        setStep("daftar");
+      }
+    } catch (err: any) {
+      notifier.error("Gagal", err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Update store ketika images berubah
-  useEffect(() => {
-    if (images.length > 0 && imagePreviews[0]) {
-      updateDraft({
-        imagePreview: imagePreviews[0],
-        imageFileName: images[0].name,
-        imageSize: images[0].size,
+  // Step 2: Daftar dan kirim verifikasi
+  const handleKirimVerifikasi = async (data: {
+    nama: string;
+    alamat?: string;
+  }) => {
+    setIsLoading(true);
+    try {
+      let targetWargaId = wargaId;
+      if (!targetWargaId) {
+        const wargaRes = await fetch("/api/warga/check-or-create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            noHp,
+            nama: data.nama,
+            alamat: data.alamat || "",
+          }),
+        });
+        const wargaResult = await wargaRes.json();
+        if (!wargaRes.ok) throw new Error(wargaResult.error);
+        targetWargaId = wargaResult.wargaId;
+        setWargaId(targetWargaId);
+        setNamaWarga(data.nama);
+        setAlamatWarga(data.alamat || "");
+      }
+      const linkRes = await fetch("/api/warga/send-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wargaId: targetWargaId }),
       });
-    } else {
-      updateDraft({
-        imagePreview: null,
-        imageFileName: undefined,
-        imageSize: undefined,
-      });
+      const linkData = await linkRes.json();
+      if (!linkRes.ok) throw new Error(linkData.error);
+      window.open(linkData.waLink, "_blank");
+      notifier.success("Link Verifikasi Dikirim", "Cek WhatsApp Anda.");
+    } catch (err: any) {
+      notifier.error("Gagal", err.message);
+    } finally {
+      setIsLoading(false);
     }
-  }, [images, imagePreviews, updateDraft]);
+  };
 
+  const handleResendVerification = async () => {
+    if (!wargaId) return;
+    setIsResending(true);
+    try {
+      const linkRes = await fetch("/api/masukan-warga/send-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wargaId }),
+      });
+      const linkData = await linkRes.json();
+      if (!linkRes.ok) throw new Error(linkData.error);
+      window.open(linkData.waLink, "_blank");
+      notifier.success("Link Dikirim Ulang", "Cek WhatsApp Anda.");
+    } catch (err: any) {
+      notifier.error("Gagal", err.message);
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  const handleCekStatusSetelahDaftar = async () => {
+    if (!noHp) return;
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/warga/check-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ noHp }),
+      });
+      const result = await res.json();
+      if (result.statusNoHp === "TERVERIFIKASI") {
+        setStatusVerifikasi("TERVERIFIKASI");
+        setWargaId(result.wargaId);
+        setNamaWarga(result.nama);
+        setAlamatWarga(result.alamat || "");
+        masukanForm.setValue("nama", result.nama);
+        masukanForm.setValue("noHp", noHp);
+        masukanForm.setValue("alamat", result.alamat || "");
+        setStep("masukan");
+        notifier.success("Terverifikasi", "Silakan isi masukan Anda.");
+      } else {
+        notifier.info(
+          "Belum Verifikasi",
+          "Silakan klik link di WhatsApp Anda.",
+        );
+      }
+    } catch (err: any) {
+      notifier.error("Gagal", err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Step 3: Kirim masukan
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length + images.length > 5) {
-      notifier.error("Batas maksimal 5 gambar");
-      e.target.value = "";
+      notifier.error("Maksimal 5 gambar");
       return;
     }
-    const validFiles = files.filter((f) => f.type.startsWith("image/"));
-    if (validFiles.length !== files.length) {
-      notifier.error("Hanya file gambar yang diperbolehkan");
-      e.target.value = "";
-      return;
-    }
-    validFiles.forEach((file) => {
+    const valid = files.filter((f) => f.type.startsWith("image/"));
+    valid.forEach((file) => {
       const reader = new FileReader();
-      reader.onload = (event) => {
-        const dataUrl = event.target?.result as string;
+      reader.onload = (ev) => {
         setImages((prev) => [...prev, file]);
-        setImagePreviews((prev) => [...prev, dataUrl]);
+        setImagePreviews((prev) => [...prev, ev.target?.result as string]);
       };
-      reader.onerror = () => notifier.error(`Gagal membaca file ${file.name}`);
       reader.readAsDataURL(file);
     });
     e.target.value = "";
   };
 
-  const removeImage = (index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
-    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+  const removeImage = (idx: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== idx));
+    setImagePreviews((prev) => prev.filter((_, i) => i !== idx));
   };
 
-  // Langkah 1: Buka WhatsApp dan simpan draft
-  const handleOpenWhatsApp = async (
-    data: z.infer<typeof createMasukanWargaFormSchema>,
-  ) => {
+  const onSubmitMasukan = async (data: FormValues) => {
+    if (!wargaId) {
+      notifier.error("Gagal", "Data warga tidak valid");
+      return;
+    }
     setIsSubmitting(true);
     try {
-      // Generate tracking ID jika belum ada
-      const newTrackingId = trackingId || generateTrackingId();
-      if (!trackingId) setTrackingId(newTrackingId);
-
       const formData = new FormData();
+      formData.append("wargaId", wargaId);
       formData.append("judul", data.judul);
       formData.append("deskripsi", data.deskripsi);
-      formData.append("lokasiRt", data.lokasiRt);
-      formData.append("lokasiRw", data.lokasiRw);
+      formData.append("lokasi", data.lokasi);
       formData.append("domainIsuId", data.domainIsuId);
-      if (data.namaPengirim) formData.append("namaPengirim", data.namaPengirim);
-      if (data.nomorHp) formData.append("nomorHp", data.nomorHp);
-      images.forEach((file) => formData.append("images", file));
-      formData.append("trackingId", newTrackingId);
+      images.forEach((img) => formData.append("images", img));
 
-      setTempData(formData);
-
-      // Simpan draft + status pending
-      updateDraft({
-        ...data,
-        imagePreview: imagePreviews[0] || null,
-        imageFileName: images[0]?.name,
-        imageSize: images[0]?.size,
-        pendingWhatsApp: true,
-        trackingId: newTrackingId,
-      });
-
-      const response = await fetch(
-        "/api/masukan-warga/generate-whatsapp-link",
-        {
-          method: "POST",
-          body: formData,
-        },
-      );
-      const result = await response.json();
-      if (response.ok && result.data?.whatsappLink) {
-        const link = result.data.whatsappLink;
-        setWhatsappLink(link);
-        setShowConfirm(true);
-        updateDraft({ whatsappLink: link });
-        window.open(link, "_blank");
-        notifier.info(
-          "Buka WhatsApp",
-          "Kirim pesan konfirmasi ke perangkat desa, lalu klik 'Saya sudah kirim' untuk menyimpan masukan.",
-        );
-      } else {
-        notifier.error("Gagal", result.message);
-      }
-    } catch (error) {
-      console.error(error);
-      notifier.error("Gagal", "Terjadi kesalahan saat membuat link WhatsApp");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // Langkah 2: Submit ke server
-  const handleFinalSubmit = async () => {
-    if (!tempData) return;
-    setIsSubmitting(true);
-    try {
-      const response = await fetch("/api/masukan-warga", {
+      const submitRes = await fetch("/api/masukan-warga", {
         method: "POST",
-        body: tempData,
+        body: formData,
       });
-      const result = await response.json();
-      if (response.ok) {
-        notifier.success("Berhasil", result.message);
-        clearDraft(); // hapus draft
-        form.reset();
-        setImages([]);
-        setImagePreviews([]);
-        setTempData(null);
-        setShowConfirm(false);
-        setWhatsappLink(null);
-        setTrackingId(null);
-      } else {
-        notifier.error("Gagal", result.message);
-      }
-    } catch (error) {
-      console.error(error);
-      notifier.error("Gagal", "Terjadi kesalahan saat menyimpan data");
+      const submitResult = await submitRes.json();
+      if (!submitRes.ok)
+        throw new Error(submitResult.message || "Gagal menyimpan masukan");
+      notifier.success("Berhasil", "Masukan Anda telah dikirim");
+      // Reset
+      setStep("cek");
+      setNoHp("");
+      setWargaId(null);
+      setNamaWarga("");
+      setAlamatWarga("");
+      setImages([]);
+      setImagePreviews([]);
+      daftarForm.reset();
+      masukanForm.reset();
+      router.refresh();
+    } catch (err: any) {
+      notifier.error("Gagal", err.message);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleCancel = () => {
-    clearDraft();
-    setTempData(null);
-    setShowConfirm(false);
-    setWhatsappLink(null);
-    setTrackingId(null);
-    form.reset();
-    setImages([]);
-    setImagePreviews([]);
-  };
-
-  const hasDraft = useMemo(() => {
-    if (!draft || !isMounted) return false;
-    return !!(
-      draft.namaPengirim ||
-      draft.judul ||
-      draft.deskripsi ||
-      draft.imagePreview
+  // Render step 1
+  if (step === "cek") {
+    return (
+      <div className="max-w-md mx-auto bg-white p-6 rounded-2xl shadow">
+        <h2 className="text-xl font-semibold text-center mb-4">
+          Verifikasi Nomor HP
+        </h2>
+        <form onSubmit={handleCekNoHp} className="space-y-4">
+          <div>
+            <Label>Nomor HP *</Label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                name="noHp"
+                className="pl-9"
+                placeholder="08123456789"
+                disabled={isLoading}
+              />
+            </div>
+          </div>
+          <Button type="submit" disabled={isLoading} className="w-full">
+            {isLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <CheckCircle className="mr-2 h-4 w-4" />
+            )}
+            Cek & Lanjutkan
+          </Button>
+        </form>
+      </div>
     );
-  }, [draft, isMounted]);
+  }
 
-  // Skeleton loading saat hydrating
-  if (!isMounted || !isHydrated) {
+  // Render step 2
+  if (step === "daftar") {
+    return (
+      <div className="max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow">
+        <h2 className="text-xl font-semibold mb-4">
+          Lengkapi Data & Verifikasi
+        </h2>
+        <form
+          onSubmit={daftarForm.handleSubmit(handleKirimVerifikasi)}
+          className="space-y-4"
+        >
+          <div>
+            <Label>Nama Lengkap *</Label>
+            <Input {...daftarForm.register("nama")} disabled={isLoading} />
+          </div>
+          <div>
+            <Label>Alamat (opsional)</Label>
+            <Textarea
+              {...daftarForm.register("alamat")}
+              rows={2}
+              disabled={isLoading}
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button type="submit" disabled={isLoading} className="flex-1">
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-2 h-4 w-4" />
+              )}
+              Daftar & Kirim Verifikasi
+            </Button>
+            {wargaId && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleResendVerification}
+                disabled={isResending}
+              >
+                {isResending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4" />
+                )}
+              </Button>
+            )}
+          </div>
+          {wargaId && (
+            <Button
+              type="button"
+              variant="link"
+              onClick={handleCekStatusSetelahDaftar}
+              disabled={isLoading}
+              className="w-full"
+            >
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                "Sudah verifikasi? Cek status sekarang"
+              )}
+            </Button>
+          )}
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setStep("cek")}
+            className="w-full"
+          >
+            Ganti Nomor HP
+          </Button>
+        </form>
+      </div>
+    );
+  }
+
+  // Render step 3 (masukan)
+  if (step === "masukan" && domainLoading) {
     return (
       <div className="space-y-6 bg-white p-6 rounded-2xl">
-        <Skeleton className="h-8 w-48 mb-4" />
-        <div className="space-y-4">
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-          <div className="grid grid-cols-2 gap-4">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-32 w-full" />
-        </div>
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-10 w-full" />
         <div className="flex justify-end gap-2">
           <Skeleton className="h-10 w-20" />
           <Skeleton className="h-10 w-32" />
@@ -346,14 +418,24 @@ export default function MasukanWargaFormAdd() {
     );
   }
 
-  // JSX utama (sama seperti sebelumnya, dengan penambahan indikator draft)
   return (
-    <form className="space-y-6 bg-white p-6 rounded-2xl">
-      {hasDraft && isHydrated && (
-        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700">
-          ⚡ Draft tersimpan. Data tidak akan hilang saat halaman direfresh.
-        </div>
-      )}
+    <form
+      onSubmit={masukanForm.handleSubmit(onSubmitMasukan)}
+      className="space-y-6 bg-white p-6 rounded-2xl"
+    >
+      <div className="bg-green-50 p-3 rounded-lg text-sm text-green-800 flex justify-between items-center">
+        <span>
+          ✅ Terverifikasi sebagai: <strong>{namaWarga}</strong> ({noHp})
+        </span>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => setStep("cek")}
+        >
+          Ganti Nomor
+        </Button>
+      </div>
 
       <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
         <MessageSquare className="w-5 h-5 text-blue-500" />
@@ -361,158 +443,89 @@ export default function MasukanWargaFormAdd() {
       </h2>
 
       <div className="grid gap-4">
-        {/* Nama */}
-        <Controller
-          control={form.control}
-          name="namaPengirim"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>
-                Nama Lengkap
-                {draft?.namaPengirim && isHydrated && (
-                  <span className="text-green-600 text-xs ml-1">• Draft</span>
-                )}
-              </FieldLabel>
-              <div className="relative">
-                <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  {...field}
-                  className="pl-9"
-                  placeholder="Masukkan nama lengkap"
-                  disabled={isSubmitting || showConfirm}
-                />
-              </div>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-
-        {/* Nomor HP */}
-        <Controller
-          control={form.control}
-          name="nomorHp"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Nomor HP</FieldLabel>
-              <div className="relative">
-                <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  {...field}
-                  type="tel"
-                  placeholder="081234567890"
-                  className="pl-9"
-                  disabled={isSubmitting || showConfirm}
-                />
-              </div>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-
-        {/* Judul */}
-        <Controller
-          control={form.control}
-          name="judul"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Judul Masukan</FieldLabel>
-              <div className="relative">
-                <Heading className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  {...field}
-                  placeholder="Contoh: Perbaikan lampu jalan"
-                  className="pl-9"
-                  disabled={isSubmitting || showConfirm}
-                />
-              </div>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-
-        {/* RT & RW */}
-        <div className="grid grid-cols-2 gap-4">
-          <Controller
-            control={form.control}
-            name="lokasiRt"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>RT</FieldLabel>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    {...field}
-                    placeholder="003"
-                    className="pl-9"
-                    disabled={isSubmitting || showConfirm}
-                  />
-                </div>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-          <Controller
-            control={form.control}
-            name="lokasiRw"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>RW</FieldLabel>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    {...field}
-                    placeholder="001"
-                    className="pl-9"
-                    disabled={isSubmitting || showConfirm}
-                  />
-                </div>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
+        {/* Readonly fields */}
+        <div>
+          <Label>Nama Lengkap</Label>
+          <Input value={namaWarga} disabled className="bg-gray-50" />
+        </div>
+        <div>
+          <Label>Nomor HP</Label>
+          <Input value={noHp} disabled className="bg-gray-50" />
+        </div>
+        <div>
+          <Label>Alamat</Label>
+          <Textarea
+            value={alamatWarga}
+            disabled
+            className="bg-gray-50"
+            rows={2}
           />
         </div>
 
-        {/* Deskripsi */}
+        {/* Masukan fields */}
         <Controller
-          control={form.control}
-          name="deskripsi"
+          name="judul"
+          control={masukanForm.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Deskripsi Masukan</FieldLabel>
-              <div className="relative">
-                <ClipboardList className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Textarea
-                  {...field}
-                  rows={4}
-                  placeholder="Tulis masukan atau saran Anda secara lengkap..."
-                  className="pl-9"
-                  disabled={isSubmitting || showConfirm}
-                />
-              </div>
+              <FieldLabel>Judul Masukan *</FieldLabel>
+              <Input
+                {...field}
+                placeholder="Contoh: Perbaikan lampu jalan"
+                disabled={isSubmitting}
+              />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />
 
-        {/* Domain Isu */}
+        <Controller
+          name="lokasi"
+          control={masukanForm.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel>Lokasi (RT/RW atau alamat) *</FieldLabel>
+              <Input
+                {...field}
+                placeholder="RT 003 RW 001"
+                disabled={isSubmitting}
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          name="deskripsi"
+          control={masukanForm.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel>Deskripsi *</FieldLabel>
+              <Textarea
+                {...field}
+                rows={4}
+                placeholder="Tulis masukan Anda..."
+                disabled={isSubmitting}
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
         <div suppressHydrationWarning>
           <Controller
-            control={form.control}
             name="domainIsuId"
+            control={masukanForm.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Kategori Masukan</FieldLabel>
+                <FieldLabel>Kategori *</FieldLabel>
                 <Select
                   onValueChange={field.onChange}
                   value={field.value}
-                  disabled={isSubmitting || domainLoading || showConfirm}
+                  disabled={isSubmitting || domainLoading}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Pilih kategori masukan" />
+                    <SelectValue placeholder="Pilih kategori" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
@@ -533,207 +546,64 @@ export default function MasukanWargaFormAdd() {
           />
         </div>
 
-        {/* Upload Gambar */}
+        {/* Gambar */}
         <div>
-          <FieldLabel>Lampiran Gambar (Maksimal 5)</FieldLabel>
-          <div className="mt-2 flex flex-wrap gap-4">
+          <FieldLabel>Lampiran Gambar (maks 5)</FieldLabel>
+          <div className="flex flex-wrap gap-2 mt-2">
             {imagePreviews.map((src, idx) => (
               <div
                 key={idx}
-                className="relative w-24 h-24 rounded-lg overflow-hidden border"
+                className="relative w-20 h-20 border rounded overflow-hidden"
               >
-                <img
-                  src={src}
-                  alt={`preview ${idx}`}
-                  className="w-full h-full object-cover"
-                />
-                {!showConfirm && (
+                <img src={src} className="w-full h-full object-cover" />
+                {!isSubmitting && (
                   <button
                     type="button"
                     onClick={() => removeImage(idx)}
-                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-0.5"
                   >
-                    <X className="h-4 w-4" />
+                    <X className="h-3 w-3" />
                   </button>
                 )}
               </div>
             ))}
-            {images.length < 5 && !showConfirm && (
-              <label className="w-24 h-24 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50">
-                <ImagePlus className="h-8 w-8 text-gray-400" />
-                <span className="text-xs text-gray-500">Tambah</span>
+            {images.length < 5 && !isSubmitting && (
+              <label className="w-20 h-20 border-2 border-dashed rounded flex flex-col items-center justify-center cursor-pointer">
+                <ImagePlus className="h-6 w-6 text-gray-400" />
                 <input
                   type="file"
                   accept="image/*"
                   multiple
                   onChange={handleImageChange}
                   className="hidden"
-                  disabled={isSubmitting || showConfirm}
                 />
               </label>
             )}
           </div>
           <p className="text-xs text-gray-500 mt-1">
-            Format: JPG, PNG, GIF. Ukuran maksimal 5MB per file.
+            Format: JPG, PNG. Maksimal 5MB per file.
           </p>
-          {draft?.imagePreview && isHydrated && !imagePreviews.length && (
-            <p className="text-xs text-amber-600 mt-1">
-              ⚠️ Gambar draft tersimpan sebagai preview. Pilih ulang file gambar
-              sebelum submit untuk memastikan upload.
-            </p>
-          )}
         </div>
       </div>
 
-      {!showConfirm ? (
-        // ... bagian form normal (tidak berubah)
-        <div className="flex justify-end gap-2 pt-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
-              clearDraft();
-              form.reset();
-              setImages([]);
-              setImagePreviews([]);
-              setTrackingId(null);
-            }}
-            disabled={isSubmitting}
-          >
-            Reset & Hapus Draft
-          </Button>
-          <Button
-            type="button"
-            onClick={form.handleSubmit(handleOpenWhatsApp)}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <div className="flex items-center">
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Memproses...
-              </div>
-            ) : (
-              <>
-                <Send className="mr-2 h-4 w-4" />
-                Kirim & Buka WhatsApp
-              </>
-            )}
-          </Button>
-        </div>
-      ) : (
-        // BAGIAN KONFIRMASI DIPERBARUI
-        <div className="space-y-6 pt-4 border-t">
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <p className="text-sm text-blue-800 mb-2">
-              <strong>Penting:</strong> Anda harus mengirim pesan WhatsApp yang
-              sudah terbuka. Setelah mengirim, klik tombol di bawah untuk
-              menyimpan masukan.
-            </p>
-            {whatsappLink && (
-              <a
-                href={whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 underline text-sm"
-              >
-                Buka WhatsApp lagi jika perlu
-              </a>
-            )}
-          </div>
-
-          {/* Ringkasan Data yang Akan Disimpan */}
-          <div className="bg-gray-50 p-4 rounded-lg border">
-            <h3 className="font-medium text-gray-700 mb-3 flex items-center gap-2">
-              <ClipboardList className="h-4 w-4" />
-              Ringkasan Masukan Anda
-            </h3>
-            <dl className="space-y-2 text-sm">
-              {form.getValues("namaPengirim") && (
-                <div className="flex">
-                  <dt className="w-24 text-gray-500">Nama:</dt>
-                  <dd className="text-gray-800">
-                    {form.getValues("namaPengirim")}
-                  </dd>
-                </div>
-              )}
-              {form.getValues("nomorHp") && (
-                <div className="flex">
-                  <dt className="w-24 text-gray-500">Nomor HP:</dt>
-                  <dd className="text-gray-800">{form.getValues("nomorHp")}</dd>
-                </div>
-              )}
-              <div className="flex">
-                <dt className="w-24 text-gray-500">Judul:</dt>
-                <dd className="text-gray-800">{form.getValues("judul")}</dd>
-              </div>
-              <div className="flex">
-                <dt className="w-24 text-gray-500">Lokasi:</dt>
-                <dd className="text-gray-800">
-                  RT {form.getValues("lokasiRt")} / RW{" "}
-                  {form.getValues("lokasiRw")}
-                </dd>
-              </div>
-              <div className="flex">
-                <dt className="w-24 text-gray-500">Kategori:</dt>
-                <dd className="text-gray-800">
-                  {domainIsu.find(
-                    (d: DomainIsu) => d.id === form.getValues("domainIsuId"),
-                  )?.nama || "Tidak dipilih"}
-                </dd>
-              </div>
-              <div className="flex">
-                <dt className="w-24 text-gray-500">Deskripsi:</dt>
-                <dd className="text-gray-800 whitespace-pre-wrap">
-                  {form.getValues("deskripsi")}
-                </dd>
-              </div>
-              {imagePreviews.length > 0 && (
-                <div className="flex items-start">
-                  <dt className="w-24 text-gray-500 pt-1">Gambar:</dt>
-                  <dd className="flex flex-wrap gap-2">
-                    {imagePreviews.map((src, idx) => (
-                      <img
-                        key={idx}
-                        src={src}
-                        alt={`preview ${idx}`}
-                        className="w-16 h-16 object-cover rounded border"
-                      />
-                    ))}
-                  </dd>
-                </div>
-              )}
-            </dl>
-          </div>
-
-          <div className="flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleCancel}
-              disabled={isSubmitting}
-            >
-              Batal
-            </Button>
-            <Button
-              type="button"
-              onClick={handleFinalSubmit}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <div className="flex items-center">
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Menyimpan...
-                </div>
-              ) : (
-                <>
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  Saya sudah kirim, simpan sekarang
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
-      )}
+      <div className="flex justify-end gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setStep("cek")}
+          disabled={isSubmitting}
+        >
+          Ganti Nomor
+        </Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Send className="mr-2 h-4 w-4" />
+          )}
+          Kirim Masukan
+        </Button>
+      </div>
     </form>
   );
 }

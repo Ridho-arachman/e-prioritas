@@ -1,158 +1,59 @@
 import { StatusMasukan } from "@/app/generated/prisma";
-import z from "zod";
+import { z } from "zod";
 
-//////////////////////////////////////////////////////////////
-// CREATE MASUKAN WARGA
-//////////////////////////////////////////////////////////////
+// Schema untuk form dari user (belum punya wargaId)
 export const createMasukanWargaFormSchema = z.object({
-  namaPengirim: z
-    .string()
-    .trim()
-    .min(1, "Nama pengirim tidak boleh kosong")
-    .max(255),
-  nomorHp: z
-    .string()
-    .trim()
-    .regex(/^08[0-9]{8,12}$/, "Format harus 08xxxxxxxxxx"),
-  judul: z.string().trim().min(1, "Judul tidak boleh kosong").max(255),
-  lokasiRt: z
-    .string()
-    .trim()
-    .regex(/^[0-9]{3}$/, "RT harus 3 digit"),
-  lokasiRw: z
-    .string()
-    .trim()
-    .regex(/^[0-9]{3}$/, "RW harus 3 digit"),
-  deskripsi: z.string().trim().min(1, "Deskripsi tidak boleh kosong"),
-  domainIsuId: z.string().trim().cuid("Domain isu tidak valid"),
+  nama: z.string().min(1, "Nama wajib diisi").max(255),
+  noHp: z.string().min(10, "Nomor HP minimal 10 digit").max(20),
+  alamat: z.string().optional(),
+  judul: z.string().min(1, "Judul tidak boleh kosong").max(255),
+  lokasi: z.string().min(1, "Lokasi wajib diisi"),
+  deskripsi: z.string().min(1, "Deskripsi tidak boleh kosong"),
+  domainIsuId: z.string().cuid("Domain isu tidak valid"),
 });
 
-export const createMasukanWargaSchema = z.object({
-  namaPengirim: z
-    .string()
-    .trim()
-    .min(1, "Nama pengirim tidak boleh kosong")
-    .max(255, "Nama pengirim maksimal 255 karakter"),
-
-  nomorHp: z
-    .string()
-    .trim()
-    .regex(/^08[0-9]{8,12}$/, "Format harus 08xxxxxxxxxx"),
-
-  judul: z
-    .string()
-    .trim()
-    .min(1, "Judul tidak boleh kosong")
-    .max(255, "Judul maksimal 255 karakter"),
-
-  lokasiRt: z
-    .string()
-    .trim()
-    .regex(/^[0-9]{3}$/, "RT harus 3 digit (contoh: 001)"),
-
-  lokasiRw: z
-    .string()
-    .trim()
-    .regex(/^[0-9]{3}$/, "RW harus 3 digit (contoh: 001)"),
-
-  deskripsi: z.string().trim().min(1, "Deskripsi tidak boleh kosong"),
-
-  domainIsuId: z.string().trim().cuid("Domain isu tidak valid"),
+// Schema untuk internal create (menggunakan wargaId)
+export const createMasukanWargaInternalSchema = z.object({
+  wargaId: z.string().cuid(),
+  judul: z.string().min(1),
+  deskripsi: z.string().min(1),
+  lokasi: z.string().min(1),
+  domainIsuId: z.string().cuid(),
 });
 
-//////////////////////////////////////////////////////////////
-// EDIT STATUS MASUKAN WARGA
-//////////////////////////////////////////////////////////////
-
+// Schema untuk update status
 export const editStatusMasukanWargaSchema = z
   .object({
-    status: z.nativeEnum(StatusMasukan, {
-      message: "Status tidak valid",
-    }),
-
-    diverifikasiOlehId: z.string("ID user tidak valid").trim(),
-
-    alasanPenolakan: z
-      .string()
-      .trim()
-      .min(1, "Alasan penolakan wajib diisi")
-      .optional(),
+    status: z.nativeEnum(StatusMasukan),
+    diverifikasiOlehId: z.string().optional(), // hapus .cuid()
+    alasanPenolakan: z.string().optional(),
   })
   .superRefine((data, ctx) => {
-    /**
-     * RULE:
-     * Jika status DITOLAK → alasan wajib
-     */
-    if (data.status === StatusMasukan.DITOLAK && !data.alasanPenolakan) {
+    if (data.status === "DITOLAK" && !data.alasanPenolakan) {
       ctx.addIssue({
         code: "custom",
-        message: "Alasan penolakan wajib jika status DITOLAK",
-        path: ["alasanPenolakan"],
-      });
-    }
-
-    /**
-     * RULE:
-     * Jika status bukan DITOLAK → alasan harus kosong
-     */
-    if (data.status !== StatusMasukan.DITOLAK && data.alasanPenolakan) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Alasan penolakan hanya boleh diisi jika status DITOLAK",
+        message: "Alasan penolakan wajib",
         path: ["alasanPenolakan"],
       });
     }
   });
 
-//////////////////////////////////////////////////////////////
-// MASUKAN WARGA BY ID
-//////////////////////////////////////////////////////////////
-
-export const masukanWargaByIdSchema = z.object({
-  id: z.string().trim(),
-});
-
-//////////////////////////////////////////////////////////////
-// QUERY / FILTER MASUKAN WARGA
-//////////////////////////////////////////////////////////////
+export const masukanWargaByIdSchema = z.object({ id: z.string().cuid() });
 
 export const masukanWargaQuerySchema = z.object({
-  q: z.string().trim().optional(),
-
-  status: z
-    .nativeEnum(StatusMasukan, { message: "Status tidak valid" })
-    .optional(),
-
-  domainIsuId: z.string().trim().optional(),
-
-  diverifikasiOlehId: z.string().trim().optional(),
-
-  lokasiRt: z
-    .string()
-    .trim()
-    .regex(/^[0-9]{3}$/, "RT harus 3 digit")
-    .optional(),
-
-  lokasiRw: z
-    .string()
-    .trim()
-    .regex(/^[0-9]{3}$/, "RW harus 3 digit")
-    .optional(),
-
+  q: z.string().optional(),
+  status: z.nativeEnum(StatusMasukan).optional(),
+  domainIsuId: z.string().cuid().optional(),
+  diverifikasiOlehId: z.string().optional(),
+  lokasi: z.string().optional(),
   createdAt: z
     .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, {
-      message: "Format tanggal harus YYYY-MM-DD",
-    })
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
     .optional(),
-
   page: z.coerce.number().int().positive().default(1),
-
   perPage: z.coerce.number().int().positive().max(100).default(10),
-
   sortBy: z
-    .enum(["createdAt", "updatedAt", "judul", "status"])
+    .enum(["createdAt", "updatedAt", "judul", "status", "lokasi"])
     .default("createdAt"),
-
   sortOrder: z.enum(["asc", "desc"]).default("desc"),
 });

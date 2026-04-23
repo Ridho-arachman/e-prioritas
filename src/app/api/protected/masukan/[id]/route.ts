@@ -1,15 +1,15 @@
+import { Role } from "@/app/generated/prisma";
+import { auth } from "@/lib/auth";
 import { handlePrismaError } from "@/lib/handlePrismaError";
-import { handleZodValidation } from "@/lib/handleZodValidation";
 import { handleResponse } from "@/lib/handleResponse";
+import { handleZodValidation } from "@/lib/handleZodValidation";
 import {
   editStatusMasukanWargaSchema,
   masukanWargaByIdSchema,
 } from "@/schema/masukanWarga";
 import { masukanWargaService } from "@/services/masukanWargaService";
-import { NextRequest } from "next/server";
-import { Role } from "@/app/generated/prisma";
-import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { NextRequest } from "next/server";
 
 const POST = async (
   req: NextRequest,
@@ -157,4 +157,4 @@ const GET = async (
   }
 };
 
-export { POST, GET };
+export { GET, POST };

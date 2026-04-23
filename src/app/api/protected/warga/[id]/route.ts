@@ -140,6 +140,7 @@ export const DELETE = async (
       status: 200,
     });
   } catch (err) {
+    console.log(err);
     const prismaError = handlePrismaError(err);
     if (prismaError)
       return handleResponse({

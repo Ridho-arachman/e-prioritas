@@ -98,7 +98,6 @@ const statusLabelMap: Record<string, string> = {
 const StatusBadge = ({ status }: { status: string }) => {
   const color = statusColorMap[status] || "bg-gray-400 hover:bg-gray-500";
   const label = statusLabelMap[status] || status;
-
   return (
     <Badge variant="default" className={cn(color, "text-white shadow-sm")}>
       {label}
@@ -107,7 +106,7 @@ const StatusBadge = ({ status }: { status: string }) => {
 };
 
 // ============================================================
-// USER COMBOBOX DENGAN SEARCH, PAGINATION, DAN FILTER ROLE
+// USER COMBOBOX (sama seperti sebelumnya)
 // ============================================================
 interface UserComboboxProps {
   value: string;
@@ -134,9 +133,7 @@ const UserCombobox = ({
   const [loading, setLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
 
-  // Fetch user detail jika value ada (untuk menampilkan label)
   const { data: userDetail } = useGet(value ? `/protected/user/${value}` : "");
-
   useEffect(() => {
     if (userDetail) setSelectedUser(userDetail);
   }, [userDetail]);
@@ -148,18 +145,14 @@ const UserCombobox = ({
       if (debouncedSearch) params.append("q", debouncedSearch);
       params.append("page", String(page));
       params.append("perPage", "10");
-      if (allowedRoles && allowedRoles.length > 0) {
+      if (allowedRoles && allowedRoles.length > 0)
         params.append("roles", allowedRoles.join(","));
-      }
       const query = params.toString() ? `?${params.toString()}` : "";
       const res = await fetch(`/api/protected/user${query}`);
       const json = await res.json();
       if (json.success) {
-        if (page === 1) {
-          setUsers(json.data);
-        } else {
-          setUsers((prev) => [...prev, ...json.data]);
-        }
+        if (page === 1) setUsers(json.data);
+        else setUsers((prev) => [...prev, ...json.data]);
         setMeta(json.meta);
       }
     } catch (error) {
@@ -173,20 +166,16 @@ const UserCombobox = ({
     setPage(1);
     setUsers([]);
   }, [debouncedSearch]);
-
   useEffect(() => {
-    if (open) {
-      fetchUsers();
-    }
+    if (open) fetchUsers();
   }, [open, fetchUsers]);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const bottom =
       e.currentTarget.scrollHeight - e.currentTarget.scrollTop ===
       e.currentTarget.clientHeight;
-    if (bottom && !loading && meta && page < meta.totalPages) {
+    if (bottom && !loading && meta && page < meta.totalPages)
       setPage((p) => p + 1);
-    }
   };
 
   const handleSelect = (userId: string) => {
@@ -278,9 +267,7 @@ export default function MasukanListTable() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
-  // ============================================================
-  // QUERY STATE
-  // ============================================================
+  // Query states
   const [q, setQ] = useQueryState("q", { defaultValue: "" });
   const [status, setStatus] = useQueryState("status", { defaultValue: "" });
   const [domainIsuId, setDomainIsuId] = useQueryState("domainIsuId", {
@@ -294,25 +281,17 @@ export default function MasukanListTable() {
   });
   const [page, setPage] = useQueryState("page", { defaultValue: "1" });
   const [perPage] = useQueryState("perPage", { defaultValue: "10" });
-
   const [sortBy, setSortBy] = useQueryState("sortBy", {
     defaultValue: "createdAt",
   });
-
   const [sortOrder, setSortOrder] = useQueryState("sortOrder", {
     defaultValue: "desc",
   });
 
-  // State untuk menyimpan nama verifikator yang dipilih (untuk badge)
-  const [selectedVerifikatorName, setSelectedVerifikatorName] = useState("");
-
-  // ============================================================
-  // DERIVED STATE
-  // ============================================================
   const [debouncedQ] = useDebounce(q, 500);
-
   const pageNumber = Number(page);
   const perPageNumber = Number(perPage);
+  const [selectedVerifikatorName, setSelectedVerifikatorName] = useState("");
 
   const queryString = buildQuery({
     q: debouncedQ || undefined,
@@ -326,21 +305,14 @@ export default function MasukanListTable() {
     sortOrder,
   });
 
-  // ============================================================
-  // API CALLS
-  // ============================================================
   const { data, error, isLoading, meta } = useGet(
     `/protected/masukan${queryString}`,
   );
-
   const { data: domainIsuData } = useGet("/protected/kategori");
 
   const masukanList = data || [];
-  const paginationMeta = meta;
+  const paginationMeta = meta || { total: 0, totalPages: 1 };
 
-  // ============================================================
-  // FILTER STATE
-  // ============================================================
   const hasSignificantFilter =
     (debouncedQ?.trim() !== "" && debouncedQ !== undefined) ||
     status !== "" ||
@@ -356,14 +328,9 @@ export default function MasukanListTable() {
     sortBy !== "createdAt" ||
     sortOrder !== "desc";
 
-  // ============================================================
-  // EFFECTS
-  // ============================================================
   useEffect(() => {
     setIsMounted(true);
   }, []);
-
-  // Reset ke halaman 1 ketika filter berubah
   useEffect(() => {
     setPage("1");
   }, [debouncedQ, status, domainIsuId, diprosesOlehId, createdAt, setPage]);
@@ -396,9 +363,6 @@ export default function MasukanListTable() {
     return domain?.nama || id;
   };
 
-  // ============================================================
-  // SSR SKELETON
-  // ============================================================
   if (!isMounted) {
     return (
       <div className="p-4 md:p-6">
@@ -420,22 +384,17 @@ export default function MasukanListTable() {
     );
   }
 
-  // ============================================================
-  // RENDER
-  // ============================================================
   return (
     <>
       <CardHeader className="space-y-4 p-4 md:p-6 border-b bg-linear-to-r from-primary/5 to-transparent">
         <div className="flex flex-col lg:flex-row justify-between gap-4">
-          {/* FILTER BUTTON */}
           <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
             <Button
               variant="outline"
               onClick={() => setIsFilterOpen(true)}
               className="shadow-sm hover:shadow-md transition-all"
             >
-              <Filter className="mr-2 h-4 w-4" />
-              Filter & Sort
+              <Filter className="mr-2 h-4 w-4" /> Filter & Sort
               {hasActiveFilters && (
                 <Badge variant="secondary" className="ml-2">
                   {Number(Boolean(status)) +
@@ -446,27 +405,23 @@ export default function MasukanListTable() {
                 </Badge>
               )}
             </Button>
-
             <DialogContent className="sm:max-w-2xl">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
-                  <SlidersHorizontal className="h-5 w-5" />
-                  Filter & Pengurutan Masukan
+                  <SlidersHorizontal className="h-5 w-5" /> Filter & Pengurutan
+                  Masukan
                 </DialogTitle>
                 <DialogDescription>
                   Atur filter dan urutan data masukan warga
                 </DialogDescription>
               </DialogHeader>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
                 {/* STATUS */}
                 <div className="grid gap-2">
                   <Label>Status</Label>
                   <Select
                     value={status || "ALL"}
-                    onValueChange={(v) => {
-                      setStatus(v === "ALL" ? "" : v);
-                    }}
+                    onValueChange={(v) => setStatus(v === "ALL" ? "" : v)}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -481,15 +436,12 @@ export default function MasukanListTable() {
                     </SelectContent>
                   </Select>
                 </div>
-
                 {/* DOMAIN ISU */}
                 <div className="grid gap-2">
                   <Label>Domain Isu</Label>
                   <Select
                     value={domainIsuId || "ALL"}
-                    onValueChange={(v) => {
-                      setDomainIsuId(v === "ALL" ? "" : v);
-                    }}
+                    onValueChange={(v) => setDomainIsuId(v === "ALL" ? "" : v)}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Pilih domain isu" />
@@ -504,41 +456,32 @@ export default function MasukanListTable() {
                     </SelectContent>
                   </Select>
                 </div>
-
-                {/* DIPROSES OLEH - DENGAN COMBOBOX */}
+                {/* DIPROSES OLEH */}
                 <div className="grid gap-2">
                   <Label>Diverifikasi Oleh</Label>
                   <UserCombobox
                     value={diprosesOlehId}
                     onChange={(val, user) => {
                       setDiprosesOlehId(val);
-                      if (user) {
-                        setSelectedVerifikatorName(user.name);
-                      } else {
-                        setSelectedVerifikatorName("");
-                      }
+                      if (user) setSelectedVerifikatorName(user.name);
+                      else setSelectedVerifikatorName("");
                     }}
                     placeholder="Pilih verifikator"
                     allowedRoles={["ADMIN", "PERANGKAT_DESA"]}
                   />
                 </div>
-
-                {/* TANGGAL DIBUAT */}
+                {/* TANGGAL */}
                 <div className="grid gap-2">
                   <Label>Tanggal Dibuat</Label>
                   <Input
                     type="date"
                     value={createdAt}
-                    onChange={(e) => {
-                      setCreatedAt(e.target.value);
-                    }}
+                    onChange={(e) => setCreatedAt(e.target.value)}
                   />
                 </div>
-
                 <div className="col-span-full">
                   <Separator />
                 </div>
-
                 {/* SORT */}
                 <div className="col-span-full grid gap-2">
                   <Label>Urutkan Berdasarkan</Label>
@@ -558,15 +501,13 @@ export default function MasukanListTable() {
                         ))}
                     </Button>
                     <Button
-                      variant={
-                        sortBy === "namaPengirim" ? "default" : "outline"
-                      }
+                      variant={sortBy === "judul" ? "default" : "outline"}
                       size="sm"
-                      onClick={() => handleSortChange("namaPengirim")}
+                      onClick={() => handleSortChange("judul")}
                       className="shadow-sm hover:shadow-md transition-all"
                     >
-                      Nama
-                      {sortBy === "namaPengirim" &&
+                      Judul
+                      {sortBy === "judul" &&
                         (sortOrder === "asc" ? (
                           <ArrowUp className="ml-1 h-3 w-3" />
                         ) : (
@@ -588,27 +529,13 @@ export default function MasukanListTable() {
                         ))}
                     </Button>
                     <Button
-                      variant={sortBy === "lokasiRt" ? "default" : "outline"}
+                      variant={sortBy === "lokasi" ? "default" : "outline"}
                       size="sm"
-                      onClick={() => handleSortChange("lokasiRt")}
+                      onClick={() => handleSortChange("lokasi")}
                       className="shadow-sm hover:shadow-md transition-all"
                     >
-                      RT
-                      {sortBy === "lokasiRt" &&
-                        (sortOrder === "asc" ? (
-                          <ArrowUp className="ml-1 h-3 w-3" />
-                        ) : (
-                          <ArrowDown className="ml-1 h-3 w-3" />
-                        ))}
-                    </Button>
-                    <Button
-                      variant={sortBy === "lokasiRw" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => handleSortChange("lokasiRw")}
-                      className="shadow-sm hover:shadow-md transition-all"
-                    >
-                      RW
-                      {sortBy === "lokasiRw" &&
+                      Lokasi
+                      {sortBy === "lokasi" &&
                         (sortOrder === "asc" ? (
                           <ArrowUp className="ml-1 h-3 w-3" />
                         ) : (
@@ -618,7 +545,6 @@ export default function MasukanListTable() {
                   </div>
                 </div>
               </div>
-
               <div className="flex justify-between">
                 <Button variant="outline" onClick={clearFilters}>
                   Reset Semua
@@ -627,30 +553,20 @@ export default function MasukanListTable() {
               </div>
             </DialogContent>
           </Dialog>
-
-          {/* SEARCH */}
           <div className="flex gap-2">
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Cari masukan..."
-              className="min-w-62.5 transition-shadow focus:ring-2 focus:ring-primary/50"
+              className="min-w-62.5"
             />
             {q && (
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setQ("");
-                }}
-                className="shadow-sm hover:shadow-md transition-all"
-              >
+              <Button variant="outline" onClick={() => setQ("")}>
                 <X className="h-4 w-4" />
               </Button>
             )}
           </div>
         </div>
-
-        {/* ACTIVE FILTER CHIPS */}
         {hasActiveFilters && (
           <div className="flex flex-wrap gap-2">
             {status && (
@@ -692,12 +608,7 @@ export default function MasukanListTable() {
             )}
             {(sortBy !== "createdAt" || sortOrder !== "desc") && (
               <Badge variant="secondary" className="gap-2">
-                Sort: {sortBy}{" "}
-                {sortOrder === "asc" ? (
-                  <ArrowUp className="h-3 w-3 inline" />
-                ) : (
-                  <ArrowDown className="h-3 w-3 inline" />
-                )}
+                Sort: {sortBy} {sortOrder === "asc" ? "↑" : "↓"}
                 <button
                   onClick={() => {
                     setSortBy("createdAt");
@@ -711,82 +622,22 @@ export default function MasukanListTable() {
           </div>
         )}
       </CardHeader>
-
       <CardContent className="max-w-full overflow-hidden p-4 md:p-6">
-        {/* Area tabel dengan scroll horizontal */}
         <div className="overflow-x-auto border rounded-lg">
           <Table className="w-full">
             <TableHeader>
               <TableRow className="bg-muted/50 hover:bg-muted/50">
-                <TableHead
-                  className="text-center cursor-pointer hover:bg-muted/70"
-                  onClick={() => handleSortChange("namaPengirim")}
-                >
-                  <div className="flex justify-center items-center gap-1 font-semibold">
-                    Nama Pengirim
-                    {sortBy === "namaPengirim" &&
-                      (sortOrder === "asc" ? (
-                        <ArrowUp className="h-3 w-3" />
-                      ) : (
-                        <ArrowDown className="h-3 w-3" />
-                      ))}
-                  </div>
+                <TableHead className="text-center font-semibold">
+                  Nama Pengirim
                 </TableHead>
-                <TableHead
-                  className="text-center cursor-pointer hover:bg-muted/70"
-                  onClick={() => handleSortChange("status")}
-                >
-                  <div className="flex justify-center items-center gap-1 font-semibold">
-                    Status
-                    {sortBy === "status" &&
-                      (sortOrder === "asc" ? (
-                        <ArrowUp className="h-3 w-3" />
-                      ) : (
-                        <ArrowDown className="h-3 w-3" />
-                      ))}
-                  </div>
+                <TableHead className="text-center font-semibold">
+                  Status
                 </TableHead>
-                <TableHead
-                  className="text-center cursor-pointer hover:bg-muted/70"
-                  onClick={() => handleSortChange("lokasiRt")}
-                >
-                  <div className="flex justify-center items-center gap-1 font-semibold">
-                    RT
-                    {sortBy === "lokasiRt" &&
-                      (sortOrder === "asc" ? (
-                        <ArrowUp className="h-3 w-3" />
-                      ) : (
-                        <ArrowDown className="h-3 w-3" />
-                      ))}
-                  </div>
+                <TableHead className="text-center font-semibold">
+                  Lokasi
                 </TableHead>
-                <TableHead
-                  className="text-center cursor-pointer hover:bg-muted/70"
-                  onClick={() => handleSortChange("lokasiRw")}
-                >
-                  <div className="flex justify-center items-center gap-1 font-semibold">
-                    RW
-                    {sortBy === "lokasiRw" &&
-                      (sortOrder === "asc" ? (
-                        <ArrowUp className="h-3 w-3" />
-                      ) : (
-                        <ArrowDown className="h-3 w-3" />
-                      ))}
-                  </div>
-                </TableHead>
-                <TableHead
-                  className="text-center cursor-pointer hover:bg-muted/70"
-                  onClick={() => handleSortChange("createdAt")}
-                >
-                  <div className="flex justify-center items-center gap-1 font-semibold">
-                    Tanggal
-                    {sortBy === "createdAt" &&
-                      (sortOrder === "asc" ? (
-                        <ArrowUp className="h-3 w-3" />
-                      ) : (
-                        <ArrowDown className="h-3 w-3" />
-                      ))}
-                  </div>
+                <TableHead className="text-center font-semibold">
+                  Tanggal
                 </TableHead>
                 <TableHead className="text-center font-semibold">
                   Domain Isu
@@ -800,31 +651,22 @@ export default function MasukanListTable() {
               {isLoading && <TableSkeleton rows={5} />}
               {error && (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-10">
+                  <TableCell colSpan={6} className="text-center py-10">
                     <DataError message={error.message} />
                   </TableCell>
                 </TableRow>
               )}
-              {masukanList.length === 0 &&
-                !hasSignificantFilter &&
-                !error &&
-                !isLoading && (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-10">
-                      <DataKosong />
-                    </TableCell>
-                  </TableRow>
-                )}
-              {masukanList.length === 0 &&
-                hasSignificantFilter &&
-                !error &&
-                !isLoading && (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-10">
+              {!isLoading && !error && masukanList.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-10">
+                    {hasSignificantFilter ? (
                       <DataTidakDitemukan />
-                    </TableCell>
-                  </TableRow>
-                )}
+                    ) : (
+                      <DataKosong />
+                    )}
+                  </TableCell>
+                </TableRow>
+              )}
               {masukanList.map((item: any) => (
                 <TableRow
                   key={item.id}
@@ -833,36 +675,24 @@ export default function MasukanListTable() {
                     router.push(`/lurah/kelola-masukan/${item.id}`)
                   }
                 >
-                  <TableCell
-                    className="text-center truncate max-w-50"
-                    title={item.namaPengirim || ""}
-                  >
-                    {item.namaPengirim || "-"}
+                  <TableCell className="text-center">
+                    {item.warga?.nama || "-"}
                   </TableCell>
                   <TableCell className="text-center">
                     <StatusBadge status={item.status} />
                   </TableCell>
                   <TableCell className="text-center">
-                    {item.lokasiRt || "-"}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {item.lokasiRw || "-"}
+                    {item.lokasi || "-"}
                   </TableCell>
                   <TableCell className="text-center">
                     {format(new Date(item.createdAt), "dd MMM yyyy", {
                       locale: id,
                     })}
                   </TableCell>
-                  <TableCell
-                    className="text-center truncate max-w-37.5"
-                    title={item.domainIsu?.nama || ""}
-                  >
+                  <TableCell className="text-center">
                     {item.domainIsu?.nama || "-"}
                   </TableCell>
-                  <TableCell
-                    className="text-center truncate max-w-37.5"
-                    title={item.diverifikasiOleh?.name || ""}
-                  >
+                  <TableCell className="text-center">
                     {item.diverifikasiOleh?.name || "-"}
                   </TableCell>
                 </TableRow>
@@ -870,11 +700,9 @@ export default function MasukanListTable() {
             </TableBody>
           </Table>
         </div>
-
-        {/* PAGINATION */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 pt-4 border-t">
           <div className="text-sm text-muted-foreground">
-            Total: {paginationMeta?.total || 0}
+            Total: {paginationMeta.total}
           </div>
           <div className="flex gap-2">
             <Button
@@ -882,19 +710,17 @@ export default function MasukanListTable() {
               variant="outline"
               onClick={() => setPage(String(pageNumber - 1))}
               disabled={pageNumber === 1}
-              className="shadow-sm hover:shadow-md transition-all"
             >
               <ChevronLeft className="h-4 w-4" /> Prev
             </Button>
             <span className="px-4 py-2 bg-muted rounded-md">
-              Halaman {pageNumber} dari {paginationMeta?.totalPages || 1}
+              Halaman {pageNumber} dari {paginationMeta.totalPages}
             </span>
             <Button
               size="sm"
               variant="outline"
               onClick={() => setPage(String(pageNumber + 1))}
-              disabled={pageNumber >= (paginationMeta?.totalPages || 1)}
-              className="shadow-sm hover:shadow-md transition-all"
+              disabled={pageNumber >= paginationMeta.totalPages}
             >
               Next <ChevronRight className="h-4 w-4" />
             </Button>
