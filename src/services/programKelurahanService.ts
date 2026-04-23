@@ -9,8 +9,7 @@ export type ProgramKelurahanCreateInput = {
   tanggalSelesai?: Date | null;
   pic?: string | null;
   domainIsuId?: string | null;
-  lokasiRt?: string | null;
-  lokasiRw?: string | null;
+  lokasi?: string | null; // ✅ single field
 };
 
 export type ProgramKelurahanUpdateInput = Partial<ProgramKelurahanCreateInput>;
@@ -21,7 +20,13 @@ export type ProgramKelurahanGetAllParams = {
   domainIsuId?: string;
   page?: number;
   limit?: number;
-  sortBy?: "judul" | "status" | "createdAt" | "updatedAt" | "tanggalMulai";
+  sortBy?:
+    | "judul"
+    | "status"
+    | "createdAt"
+    | "updatedAt"
+    | "tanggalMulai"
+    | "lokasi";
   sortOrder?: "asc" | "desc";
 };
 
@@ -36,8 +41,7 @@ export const programKelurahanService = {
         tanggalSelesai: data.tanggalSelesai,
         pic: data.pic,
         domainIsuId: data.domainIsuId,
-        lokasiRt: data.lokasiRt,
-        lokasiRw: data.lokasiRw,
+        lokasi: data.lokasi, // ✅
       },
       include: {
         domainIsu: { select: { id: true, nama: true, code: true } },
@@ -63,13 +67,22 @@ export const programKelurahanService = {
       where.OR = [
         { judul: { contains: search, mode: "insensitive" } },
         { deskripsi: { contains: search, mode: "insensitive" } },
+        { lokasi: { contains: search, mode: "insensitive" } }, // ✅ tambah pencarian lokasi
       ];
     }
 
+    const validSortFields = [
+      "judul",
+      "status",
+      "createdAt",
+      "updatedAt",
+      "tanggalMulai",
+      "lokasi",
+    ];
+    const safeSortBy = validSortFields.includes(sortBy) ? sortBy : "updatedAt";
     const orderBy: Prisma.ProgramKelurahanOrderByWithRelationInput = {
-      [sortBy]: sortOrder,
+      [safeSortBy]: sortOrder,
     };
-
     const skip = (page - 1) * limit;
 
     const [data, total] = await prisma.$transaction([
@@ -85,13 +98,7 @@ export const programKelurahanService = {
       prisma.programKelurahan.count({ where }),
     ]);
 
-    return {
-      data,
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    };
+    return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
   },
 
   getById: async (id: string) => {
@@ -114,8 +121,7 @@ export const programKelurahanService = {
         tanggalSelesai: data.tanggalSelesai,
         pic: data.pic,
         domainIsuId: data.domainIsuId,
-        lokasiRt: data.lokasiRt,
-        lokasiRw: data.lokasiRw,
+        lokasi: data.lokasi, // ✅
       },
       include: {
         domainIsu: { select: { id: true, nama: true, code: true } },

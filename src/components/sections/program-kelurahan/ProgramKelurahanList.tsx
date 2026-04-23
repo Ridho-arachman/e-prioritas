@@ -177,6 +177,7 @@ export default function ProgramKelurahanList({
   const sortOptions = [
     { value: "judul", label: "Judul" },
     { value: "status", label: "Status" },
+    { value: "lokasi", label: "Lokasi" },
     { value: "tanggalMulai", label: "Tanggal Mulai" },
     { value: "createdAt", label: "Tanggal Dibuat" },
     { value: "updatedAt", label: "Terakhir Update" },
@@ -184,13 +185,6 @@ export default function ProgramKelurahanList({
 
   const canEdit = role === "admin" || role === "lurah";
   const basePath = `/${role}/program-kelurahan`;
-
-  const formatLokasi = (rt: string | null, rw: string | null) => {
-    if (rt && rw) return `RT ${rt} / RW ${rw}`;
-    if (rt) return `RT ${rt}`;
-    if (rw) return `RW ${rw}`;
-    return "Seluruh kelurahan";
-  };
 
   return (
     <>
@@ -472,9 +466,7 @@ export default function ProgramKelurahanList({
                           "-"
                         )}
                       </TableCell>
-                      <TableCell>
-                        {formatLokasi(item.lokasiRt, item.lokasiRw)}
-                      </TableCell>
+                      <TableCell>{item.lokasi || "-"}</TableCell>
                       <TableCell>
                         {item.tanggalMulai
                           ? format(new Date(item.tanggalMulai), "dd MMM yyyy", {

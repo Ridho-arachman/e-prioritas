@@ -45,7 +45,7 @@ function InfoItem({ label, value }: { label: string; value: string }) {
       <Label className="text-xs text-muted-foreground font-medium">
         {label}
       </Label>
-      <p className="text-sm md:text-base font-medium text-foreground break-words">
+      <p className="text-sm md:text-base font-medium text-foreground wrap-break-words">
         {value}
       </p>
     </div>
@@ -240,7 +240,7 @@ export default function CardDetailMasukanWarga() {
                 {masukan.judul}
               </h2>
               <h3 className="text-xl font-semibold text-foreground flex flex-wrap items-center gap-2">
-                <span className="break-words">
+                <span className="wrap-break-words">
                   {masukan.warga?.nama || "Tidak diketahui"}
                 </span>
                 {masukan.warga?.noHp && (
@@ -292,7 +292,7 @@ export default function CardDetailMasukanWarga() {
             <Label className="text-sm font-medium text-foreground">
               Deskripsi Masukan
             </Label>
-            <div className="bg-muted/30 p-4 rounded-lg border border-border/50 text-foreground whitespace-pre-wrap break-words">
+            <div className="bg-muted/30 p-4 rounded-lg border border-border/50 text-foreground whitespace-pre-wrap wrap-break-words">
               {masukan.deskripsi}
             </div>
           </div>
@@ -303,7 +303,7 @@ export default function CardDetailMasukanWarga() {
               <Label className="text-sm font-medium text-destructive">
                 Alasan Penolakan
               </Label>
-              <div className="bg-destructive/10 p-4 rounded-lg border border-destructive/20 text-destructive whitespace-pre-wrap break-words">
+              <div className="bg-destructive/10 p-4 rounded-lg border border-destructive/20 text-destructive whitespace-pre-wrap wrap-break-words">
                 {masukan.alasanPenolakan}
               </div>
             </div>
@@ -484,7 +484,7 @@ export default function CardDetailMasukanWarga() {
             <DialogTitle className="text-xl">Konfirmasi Perubahan</DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <p className="text-center text-lg wrap-break-words">
+            <p className="text-center text-lg wrap-wrap-break-words">
               Ubah status menjadi{" "}
               <span className="font-semibold text-primary">
                 {pendingStatus}

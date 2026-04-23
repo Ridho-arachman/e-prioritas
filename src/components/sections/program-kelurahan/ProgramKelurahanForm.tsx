@@ -47,8 +47,7 @@ interface FormState {
   tanggalSelesai: string;
   pic: string;
   domainIsuId: string;
-  lokasiRt: string;
-  lokasiRw: string;
+  lokasi: string;
 }
 
 const initialForm: FormState = {
@@ -59,8 +58,7 @@ const initialForm: FormState = {
   tanggalSelesai: "",
   pic: "",
   domainIsuId: "",
-  lokasiRt: "",
-  lokasiRw: "",
+  lokasi: "",
 };
 
 export default function ProgramKelurahanForm({
@@ -106,8 +104,7 @@ export default function ProgramKelurahanForm({
           : "",
         pic: existingData.pic || "",
         domainIsuId: existingData.domainIsuId || "",
-        lokasiRt: existingData.lokasiRt || "",
-        lokasiRw: existingData.lokasiRw || "",
+        lokasi: existingData.lokasi || "",
       });
     }
   }, [existingData]);
@@ -136,17 +133,8 @@ export default function ProgramKelurahanForm({
       newErrors.pic = "PIC maksimal 100 karakter";
     }
 
-    if (
-      form.lokasiRt &&
-      (form.lokasiRt.length > 3 || !/^\d{1,3}$/.test(form.lokasiRt))
-    ) {
-      newErrors.lokasiRt = "RT harus berupa angka 1-3 digit";
-    }
-    if (
-      form.lokasiRw &&
-      (form.lokasiRw.length > 3 || !/^\d{1,3}$/.test(form.lokasiRw))
-    ) {
-      newErrors.lokasiRw = "RW harus berupa angka 1-3 digit";
+    if (form.lokasi && form.lokasi.length > 255) {
+      newErrors.lokasi = "Lokasi maksimal 255 karakter";
     }
 
     setErrors(newErrors);
@@ -171,8 +159,7 @@ export default function ProgramKelurahanForm({
         tanggalSelesai: form.tanggalSelesai || null,
         pic: form.pic || null,
         domainIsuId: form.domainIsuId || null,
-        lokasiRt: form.lokasiRt || null,
-        lokasiRw: form.lokasiRw || null,
+        lokasi: form.lokasi || null,
       };
 
       const res = isEdit ? await put(payload) : await post(payload);
@@ -335,37 +322,19 @@ export default function ProgramKelurahanForm({
                 </Select>
               </div>
 
-              {/* RT / RW */}
+              {/* Lokasi */}
               <div className="space-y-2">
-                <Label>Lokasi (opsional)</Label>
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <Input
-                      placeholder="RT"
-                      value={form.lokasiRt}
-                      onChange={(e) => handleChange("lokasiRt", e.target.value)}
-                      maxLength={3}
-                    />
-                    {errors.lokasiRt && (
-                      <p className="text-sm text-red-500 mt-1">
-                        {errors.lokasiRt}
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <Input
-                      placeholder="RW"
-                      value={form.lokasiRw}
-                      onChange={(e) => handleChange("lokasiRw", e.target.value)}
-                      maxLength={3}
-                    />
-                    {errors.lokasiRw && (
-                      <p className="text-sm text-red-500 mt-1">
-                        {errors.lokasiRw}
-                      </p>
-                    )}
-                  </div>
-                </div>
+                <Label htmlFor="lokasi">Lokasi (opsional)</Label>
+                <Input
+                  id="lokasi"
+                  value={form.lokasi}
+                  onChange={(e) => handleChange("lokasi", e.target.value)}
+                  placeholder="Contoh: RT 003 / RW 005, atau Jalan Merdeka No 10"
+                  maxLength={255}
+                />
+                {errors.lokasi && (
+                  <p className="text-sm text-red-500 mt-1">{errors.lokasi}</p>
+                )}
                 <p className="text-xs text-muted-foreground">
                   Kosongkan jika program mencakup seluruh kelurahan
                 </p>

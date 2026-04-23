@@ -64,14 +64,6 @@ export default function ProgramKelurahanDetail({
   }
 
   const status = data?.status as StatusProgram;
-  const lokasi =
-    data?.lokasiRt && data?.lokasiRw
-      ? `RT ${data.lokasiRt} / RW ${data.lokasiRw}`
-      : data?.lokasiRt
-        ? `RT ${data.lokasiRt}`
-        : data?.lokasiRw
-          ? `RW ${data.lokasiRw}`
-          : "Seluruh Kelurahan";
 
   return (
     <Card className="w-full mx-auto">
@@ -131,7 +123,9 @@ export default function ProgramKelurahanDetail({
               <MapPin className="h-5 w-5 text-slate-400 mt-0.5" />
               <div>
                 <p className="text-sm font-medium text-slate-500">Lokasi</p>
-                <p className="text-slate-700">{lokasi}</p>
+                <p className="text-slate-700">
+                  {data?.lokasi ? data.lokasi : "Seluruh Kelurahan"}
+                </p>
               </div>
             </div>
             <div className="flex items-start gap-3">

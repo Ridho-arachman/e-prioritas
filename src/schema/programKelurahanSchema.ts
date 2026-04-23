@@ -1,7 +1,6 @@
 import { StatusProgram } from "@/app/generated/prisma";
 import { z } from "zod";
 
-// Helper untuk mengubah string kosong atau null menjadi undefined
 const emptyToUndefined = z.preprocess(
   (val) => (val === "" || val === null ? undefined : val),
   z.any(),
@@ -15,32 +14,19 @@ export const programKelurahanCreateSchema = z.object({
   tanggalSelesai: z.string().optional().nullable(),
   pic: z.string().max(100).optional().nullable(),
   domainIsuId: z.string().optional().nullable(),
-  lokasiRt: z
-    .string()
-    .max(3)
-    .regex(/^\d{1,3}$/)
-    .optional()
-    .nullable(),
-  lokasiRw: z
-    .string()
-    .max(3)
-    .regex(/^\d{1,3}$/)
-    .optional()
-    .nullable(),
+  lokasi: z.string().optional().nullable(), // ✅ single field
 });
 
 export type ProgramKelurahanFormData = z.infer<
   typeof programKelurahanCreateSchema
 >;
 
-// Schema untuk update: semua field optional, dan untuk status kita handle empty string/null
 export const programKelurahanUpdateSchema = programKelurahanCreateSchema
   .partial()
   .extend({
     status: emptyToUndefined.pipe(z.nativeEnum(StatusProgram).optional()),
   });
 
-// Schema untuk query params (tidak berubah)
 export const programKelurahanQuerySchema = z.object({
   q: z.string().optional(),
   status: z.nativeEnum(StatusProgram).optional(),
@@ -48,7 +34,14 @@ export const programKelurahanQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(10),
   sortBy: z
-    .enum(["judul", "status", "createdAt", "updatedAt", "tanggalMulai"])
+    .enum([
+      "judul",
+      "status",
+      "createdAt",
+      "updatedAt",
+      "tanggalMulai",
+      "lokasi",
+    ])
     .default("updatedAt"),
   sortOrder: z.enum(["asc", "desc"]).default("desc"),
 });
