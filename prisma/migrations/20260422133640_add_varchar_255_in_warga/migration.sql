@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "warga" ALTER COLUMN "noHp" SET DATA TYPE VARCHAR(255);

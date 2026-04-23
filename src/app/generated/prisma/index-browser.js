@@ -144,15 +144,13 @@ exports.Prisma.UserScalarFieldEnum = {
 
 exports.Prisma.MasukanWargaScalarFieldEnum = {
   id: 'id',
-  namaPengirim: 'namaPengirim',
-  nomorHp: 'nomorHp',
   judul: 'judul',
   deskripsi: 'deskripsi',
-  lokasiRt: 'lokasiRt',
-  lokasiRw: 'lokasiRw',
+  lokasi: 'lokasi',
   domainIsuId: 'domainIsuId',
   status: 'status',
   alasanPenolakan: 'alasanPenolakan',
+  wargaId: 'wargaId',
   diverifikasiOlehId: 'diverifikasiOlehId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -268,10 +266,19 @@ exports.Prisma.ProgramKelurahanScalarFieldEnum = {
   status: 'status',
   tanggalMulai: 'tanggalMulai',
   tanggalSelesai: 'tanggalSelesai',
-  lokasiRt: 'lokasiRt',
-  lokasiRw: 'lokasiRw',
+  lokasi: 'lokasi',
   domainIsuId: 'domainIsuId',
   pic: 'pic',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.WargaScalarFieldEnum = {
+  id: 'id',
+  nama: 'nama',
+  noHp: 'noHp',
+  alamat: 'alamat',
+  statusNoHp: 'statusNoHp',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -339,6 +346,11 @@ exports.StatusProgram = exports.$Enums.StatusProgram = {
   DITUNDA: 'DITUNDA'
 };
 
+exports.StatusNoHPWarga = exports.$Enums.StatusNoHPWarga = {
+  TERVERIFIKASI: 'TERVERIFIKASI',
+  BELUM_TERVERIFIKASI: 'BELUM_TERVERIFIKASI'
+};
+
 exports.Prisma.ModelName = {
   DomainIsu: 'DomainIsu',
   User: 'User',
@@ -352,7 +364,8 @@ exports.Prisma.ModelName = {
   Account: 'Account',
   Verification: 'Verification',
   RateLimit: 'RateLimit',
-  ProgramKelurahan: 'ProgramKelurahan'
+  ProgramKelurahan: 'ProgramKelurahan',
+  Warga: 'Warga'
 };
 
 /**

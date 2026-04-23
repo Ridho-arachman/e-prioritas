@@ -100,19 +100,19 @@ model User {
 //////////////////////////
 
 model MasukanWarga {
-  id           String  @id @default(cuid())
-  namaPengirim String? @db.VarChar(255)
-  nomorHp      String? @db.VarChar(255) /// @encrypted
-  judul        String  @db.VarChar(255)
-  deskripsi    String  @db.Text
-  lokasiRt     String  @db.VarChar(3)
-  lokasiRw     String  @db.VarChar(3)
+  id        String @id @default(cuid())
+  judul     String @db.VarChar(255)
+  deskripsi String @db.Text
+  lokasi    String @db.Text
 
   domainIsuId String
   domainIsu   DomainIsu @relation(fields: [domainIsuId], references: [id])
 
   status          StatusMasukan @default(MENUNGGU)
   alasanPenolakan String?       @db.Text
+
+  wargaId String
+  warga   Warga  @relation(fields: [wargaId], references: [id])
 
   diverifikasiOlehId String?
   diverifikasiOleh   User?   @relation("VerifikatorMasukan", fields: [diverifikasiOlehId], references: [id])
@@ -337,8 +337,7 @@ model ProgramKelurahan {
 
   tanggalMulai   DateTime?
   tanggalSelesai DateTime?
-  lokasiRt       String?   @db.VarChar(3)
-  lokasiRw       String?   @db.VarChar(3)
+  lokasi         String?   @db.Text
 
   // Kategori (opsional)
   domainIsuId String?
@@ -351,4 +350,26 @@ model ProgramKelurahan {
 
   @@index([status])
   @@map("program_kelurahan")
+}
+
+enum StatusNoHPWarga {
+  TERVERIFIKASI
+  BELUM_TERVERIFIKASI
+}
+
+model Warga {
+  id         String          @id @default(cuid())
+  nama       String          @db.VarChar(255)
+  noHp       String          @unique @db.VarChar(255) // Nomor HP sebagai identifier unik
+  alamat     String?         @db.Text // Alamat lengkap atau RT/RW
+  statusNoHp StatusNoHPWarga @default(BELUM_TERVERIFIKASI) // Status verifikasi nomor HP    
+
+  // Relasi ke masukan yang dibuat oleh warga ini
+  masukan MasukanWarga[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([noHp])
+  @@map("warga")
 }

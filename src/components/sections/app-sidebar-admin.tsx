@@ -10,6 +10,7 @@ import {
   Settings2,
   Tags,
   User2Icon,
+  Users2Icon,
 } from "lucide-react";
 import * as React from "react";
 
@@ -35,6 +36,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: "Kelola Perangkat",
         url: "/admin/kelola-perangkat",
         icon: User2Icon,
+      },
+      {
+        title: "Kelola Warga",
+        url: "/admin/kelola-warga",
+        icon: Users2Icon,
       },
       {
         title: "Kelola Kategori",
