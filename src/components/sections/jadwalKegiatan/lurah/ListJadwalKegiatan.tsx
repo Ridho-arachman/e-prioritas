@@ -42,6 +42,7 @@ import { buildQuery } from "@/utils/query";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import {
+  AlertCircle,
   ArrowDown,
   ArrowUp,
   Calendar,
@@ -73,7 +74,7 @@ import { useDebounce } from "use-debounce";
 
 export enum StatusMasukan {
   MENUNGGU = "MENUNGGU",
-  DIVERIFIKASI = "DIVERIFIKASI",
+  DIVERIFIKASI = "DVERIFIKASI",
   DITOLAK = "DITOLAK",
   DIPROSES = "DIPROSES",
   DISELESAIKAN = "DISELESAIKAN",
@@ -148,6 +149,7 @@ export interface RekomendasiEvidence {
   kritikalitas?: NilaiKritikalitas;
 }
 
+// ✅ Tambahkan properti warning
 export interface RekomendasiItem {
   prioritasKe: number;
   deskripsi: string;
@@ -158,6 +160,7 @@ export interface RekomendasiItem {
   lokasiRw?: string;
   fingerprint: string;
   evidence?: RekomendasiEvidence;
+  warning?: string | null;
 }
 
 export interface RekomendasiMetadata {
@@ -282,7 +285,7 @@ interface UserComboboxProps {
     user?: { id: string; name: string; email: string; jabatan?: string | null },
   ) => void;
   placeholder?: string;
-  allowedRoles?: string[]; // ✅ tambahan
+  allowedRoles?: string[];
 }
 
 const UserCombobox = ({
@@ -301,7 +304,6 @@ const UserCombobox = ({
   const [selectedUser, setSelectedUser] = useState<any>(null);
 
   const { data: userDetail } = useGet(value ? `/protected/user/${value}` : "");
-
   useEffect(() => {
     if (userDetail) setSelectedUser(userDetail);
   }, [userDetail]);
@@ -313,7 +315,6 @@ const UserCombobox = ({
       if (debouncedSearch) params.append("q", debouncedSearch);
       params.append("page", String(page));
       params.append("perPage", "10");
-      // ✅ Kirim roles jika allowedRoles disediakan
       if (allowedRoles && allowedRoles.length > 0) {
         params.append("roles", allowedRoles.join(","));
       }
@@ -321,11 +322,8 @@ const UserCombobox = ({
       const res = await fetch(`/api/protected/user${query}`);
       const json = await res.json();
       if (json.success) {
-        if (page === 1) {
-          setUsers(json.data);
-        } else {
-          setUsers((prev) => [...prev, ...json.data]);
-        }
+        if (page === 1) setUsers(json.data);
+        else setUsers((prev) => [...prev, ...json.data]);
         setMeta(json.meta);
       }
     } catch (error) {
@@ -341,18 +339,15 @@ const UserCombobox = ({
   }, [debouncedSearch]);
 
   useEffect(() => {
-    if (open) {
-      fetchUsers();
-    }
+    if (open) fetchUsers();
   }, [open, fetchUsers]);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const bottom =
       e.currentTarget.scrollHeight - e.currentTarget.scrollTop ===
       e.currentTarget.clientHeight;
-    if (bottom && !loading && meta && page < meta.totalPages) {
+    if (bottom && !loading && meta && page < meta.totalPages)
       setPage((p) => p + 1);
-    }
   };
 
   const handleSelect = (userId: string) => {
@@ -1161,6 +1156,15 @@ export default function ListJadwalKegiatan() {
                                               key={rec.fingerprint || idx}
                                               className="group/rec relative bg-linear-to-br from-slate-50 to-white rounded-xl p-4 border border-slate-200 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300"
                                             >
+                                              {/* ✅ Ikon warning */}
+                                              {rec.warning && (
+                                                <div
+                                                  className="absolute top-2 left-2 z-10"
+                                                  title={rec.warning}
+                                                >
+                                                  <AlertCircle className="h-4 w-4 text-amber-500" />
+                                                </div>
+                                              )}
                                               <div className="absolute top-3 right-3">
                                                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200">
                                                   <TargetIcon className="h-3.5 w-3.5 text-amber-600" />

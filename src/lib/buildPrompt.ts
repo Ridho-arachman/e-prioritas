@@ -8,8 +8,7 @@ export type MasukanWargaInput = {
   id: string;
   judul: string;
   deskripsi: string;
-  lokasiRt: string;
-  lokasiRw: string;
+  lokasi: string;
   domainIsuId: string;
   status: string;
 };
@@ -22,14 +21,21 @@ export type DataMasterInput = {
   domainIsuId: string;
 };
 
+export type RunningProgram = {
+  judul: string;
+  deskripsi: string;
+  lokasi: string;
+};
+
 export type PromptArgs = {
   mode: "FUSI_DATA" | "DATA_MASTER_SAJA";
   judulLaporan: string;
   domainIsuCode: string;
-  domainIsuId: string; // ✅ Tambah: ID aktual untuk output
+  domainIsuId: string;
   masukanWarga: MasukanWargaInput[];
   dataMaster: DataMasterInput[];
   exclusionTitles: string[];
+  runningPrograms?: RunningProgram[];
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -67,9 +73,9 @@ export function buildPrompt(args: PromptArgs): string {
     masukanWarga,
     dataMaster,
     exclusionTitles,
+    runningPrograms = [],
   } = args;
 
-  // ✅ Truncate data untuk hindari token limit (max 15 items each)
   const truncatedMasukan = truncateData(masukanWarga, 15);
   const truncatedDataMaster = truncateData(dataMaster, 15);
 
@@ -82,14 +88,10 @@ export function buildPrompt(args: PromptArgs): string {
   );
   const currentDate = new Date().toISOString();
 
-  // ═══════════════════════════════════════════════════════════════
-  // 📋 SYSTEM PROMPT (Base Instruction)
-  // ═══════════════════════════════════════════════════════════════
-
   const baseInstruction = `Anda adalah asisten AI ahli untuk menetukan prioritas pembantu pengambilan keputusan kegiatan kelurahan. Tugas Anda adalah menganalisis data dan menghasilkan 5 rekomendasi prioritas yang dapat ditindaklanjuti.
 
-  KONTEKS RAPAT:
-  ${judulLaporan}
+KONTEKS RAPAT:
+${judulLaporan}
 
 ATURAN WAJIB:
 1. Output HARUS berupa JSON valid sesuai skema yang ditentukan. Tanpa teks tambahan, tanpa markdown, tanpa penjelasan.
@@ -112,10 +114,6 @@ ANALISIS DATA:
 - Jumlah data yang digunakan dalam evidence HARUS sesuai dengan data yang tersedia. Misalnya, jika hanya ada 4 masukan warga, maka masukanWargaCount maksimal 4.
 - Jangan menciptakan data baru atau mengasumsikan jumlah yang tidak ada.`;
 
-  // ═══════════════════════════════════════════════════════════════
-  // 🔄 MODE-SPECIFIC INSTRUCTION
-  // ═══════════════════════════════════════════════════════════════
-
   let modeInstruction = "";
   let masukanSection = "";
 
@@ -123,8 +121,13 @@ ANALISIS DATA:
     modeInstruction = `MODE: FUSI DATA
 Strategi: Gabungkan frekuensi masukan warga dengan kritikalitas data master.
 - Prioritaskan isu yang sering muncul di masukan warga DAN memiliki kritikalitas tinggi di data master.
-- Cocokkan lokasi (RT/RW) antara kedua sumber data untuk validasi.
-- skorPrioritas = (frekuensiMasukan/10 * 0.4) + (bobotKritikalitas * 0.4) + (kesesuaianLokasi * 0.2).`;
+- Rumus perhitungan skor:
+  * Jika ada evidence (masukanWargaCount > 0 atau dataMasterCount > 0):
+    skorPrioritas = (frekuensiMasukan/10 * 0.4) + (bobotKritikalitas * 0.6)
+  * Jika tidak ada evidence (masukanWargaCount = 0 dan dataMasterCount = 0):
+    skorPrioritas MAKSIMAL 0.20 (karena tidak ada data pendukung). Jangan beri skor tinggi berdasarkan asumsi.
+- Untuk rekomendasi tanpa evidence, kritikalitas hanya boleh SEDANG atau RENDAH, tidak boleh KRITIS atau TINGGI.
+- Berikan prioritas lebih tinggi pada rekomendasi yang didukung oleh data master aktual atau masukan warga.`;
 
     masukanSection = `MASUKAN WARGA (Terverifikasi):
 ${masukanWargaJsonString}`;
@@ -139,9 +142,24 @@ Strategi: Analisis murni berdasarkan data master karena masukan warga tidak ters
     masukanSection = `MASUKAN WARGA: Tidak tersedia (mode cadangan)`;
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // 📦 OUTPUT SCHEMA (Valid JSON, No Comments)
-  // ═══════════════════════════════════════════════════════════════
+  // Buat daftar program berjalan
+  const runningProgramsList =
+    runningPrograms.length > 0
+      ? runningPrograms
+          .map(
+            (p) =>
+              `- Judul: "${p.judul}", Lokasi: ${p.lokasi}, Deskripsi: ${p.deskripsi.substring(0, 100)}`,
+          )
+          .join("\n")
+      : "Tidak ada program yang sedang berjalan.";
+
+  const runningInstruction = `
+INFORMASI PENTING - PROGRAM YANG SEDANG BERJALAN:
+Berikut adalah daftar program kelurahan yang statusnya "BERJALAN" (sedang dikerjakan). Anda WAJIB menghindari menghasilkan rekomendasi prioritas yang serupa dengan program-program ini, baik dari segi judul, deskripsi, maupun lokasi. Jangan merekomendasikan kegiatan yang sudah sedang berjalan.
+
+DAFTAR PROGRAM BERJALAN:
+${runningProgramsList}
+`;
 
   const outputSchema = `{
   "metadata": {
@@ -159,8 +177,7 @@ Strategi: Analisis murni berdasarkan data master karena masukan warga tidak ters
       "skorPrioritas": 0.95,
       "alasanAnalisis": "String, min 30 karakter, jelaskan sumber data dan logika scoring",
       "domainIsuId": "${domainIsuId}",
-      "lokasiRt": "001",
-      "lokasiRw": "002",
+      "lokasi": "RT 001 RW 002",
       "fingerprint": "",
       "evidence": {
         "masukanWargaCount": 0,
@@ -174,8 +191,7 @@ Strategi: Analisis murni berdasarkan data master karena masukan warga tidak ters
       "skorPrioritas": 0.88,
       "alasanAnalisis": "...",
       "domainIsuId": "${domainIsuId}",
-      "lokasiRt": "...",
-      "lokasiRw": "...",
+      "lokasi": "...",
       "fingerprint": "",
       "evidence": { "masukanWargaCount": 0, "dataMasterCount": 0, "kritikalitas": "TINGGI" }
     },
@@ -185,8 +201,7 @@ Strategi: Analisis murni berdasarkan data master karena masukan warga tidak ters
       "skorPrioritas": 0.82,
       "alasanAnalisis": "...",
       "domainIsuId": "${domainIsuId}",
-      "lokasiRt": "...",
-      "lokasiRw": "...",
+      "lokasi": "...",
       "fingerprint": "",
       "evidence": { "masukanWargaCount": 0, "dataMasterCount": 0, "kritikalitas": "SEDANG" }
     },
@@ -196,8 +211,7 @@ Strategi: Analisis murni berdasarkan data master karena masukan warga tidak ters
       "skorPrioritas": 0.75,
       "alasanAnalisis": "...",
       "domainIsuId": "${domainIsuId}",
-      "lokasiRt": "...",
-      "lokasiRw": "...",
+      "lokasi": "...",
       "fingerprint": "",
       "evidence": { "masukanWargaCount": 0, "dataMasterCount": 0, "kritikalitas": "SEDANG" }
     },
@@ -207,17 +221,12 @@ Strategi: Analisis murni berdasarkan data master karena masukan warga tidak ters
       "skorPrioritas": 0.68,
       "alasanAnalisis": "...",
       "domainIsuId": "${domainIsuId}",
-      "lokasiRt": "...",
-      "lokasiRw": "...",
+      "lokasi": "...",
       "fingerprint": "",
       "evidence": { "masukanWargaCount": 0, "dataMasterCount": 0, "kritikalitas": "RENDAH" }
     }
   ]
 }`;
-
-  // ═══════════════════════════════════════════════════════════════
-  // 🎯 FINAL PROMPT ASSEMBLY
-  // ═══════════════════════════════════════════════════════════════
 
   return `
 ${baseInstruction}
@@ -229,6 +238,8 @@ ${masukanSection}
 DAFTAR PENGECUALIAN (Jangan duplikat):
 ${exclusionListString}
 
+${runningInstruction}
+
 OUTPUT SCHEMA (WAJIB PERSIS, VALID JSON):
 ${outputSchema}
 
@@ -237,11 +248,12 @@ INSTRUKSI FINAL:
 - Jangan tambahkan field baru atau hapus field wajib.
 - Jangan gunakan komentar atau teks di luar JSON.
 - Pastikan JSON dapat di-parse oleh JSON.parse().
-- Untuk setiap rekomendasi, hitung masukanWargaCount dan dataMasterCount berdasarkan data       masukan dan data master yang benar-benar relevan dengan rekomendasi tersebut. Jangan membuat angka fiktif.
+- Untuk setiap rekomendasi, hitung masukanWargaCount dan dataMasterCount berdasarkan data masukan dan data master yang benar-benar relevan dengan rekomendasi tersebut. Jangan membuat angka fiktif.
 - Kritikalitas harus diambil dari data master yang paling dominan atau berdasarkan penilaian dari data yang ada.
 - evidence.masukanWargaCount harus diisi dengan jumlah masukan warga yang mendukung rekomendasi tersebut (dari data yang diberikan).
 - evidence.dataMasterCount harus diisi dengan jumlah data master yang mendukung rekomendasi tersebut (dari data yang diberikan).
 - evidence.kritikalitas harus diisi berdasarkan data master yang paling relevan.
+- PENTING: Rekomendasi prioritas harus didasarkan pada data yang tersedia (masukan warga atau data master). Jangan merekomendasikan isu yang sama sekali tidak memiliki evidence, kecuali jika sama sekali tidak ada data untuk domain isu tersebut. Jika terpaksa merekomendasikan tanpa evidence, beri skor maksimal 0.20 dan kritikalitas SEDANG atau RENDAH.
 
 Sekarang, hasilkan rekomendasi berdasarkan data di atas. Output HANYA JSON.`;
 }

@@ -11,9 +11,10 @@ import {
   type DataMasterInput,
   type MasukanWargaInput,
 } from "@/lib/buildPrompt";
-import { geminiAi, type GeminiResponse } from "@/lib/gemini";
+import { geminiAi } from "@/lib/gemini";
 import prisma from "@/lib/prisma";
 import { createHash } from "crypto";
+import * as levenshtein from "fast-levenshtein"; // ✅ tambahan
 
 // ========================
 // TIPE INPUT
@@ -48,7 +49,7 @@ interface KegiatanRapatGetAllParams {
   lokasi?: string;
   domainIsuId?: string;
   dibuatOlehId?: string;
-  diprosesOlehId?: string; // ✅ Tambahan
+  diprosesOlehId?: string;
   aiModel?: string;
   mode?: ModeRekomendasi;
   statusRekomendasi?: StatusRekomendasi;
@@ -78,23 +79,22 @@ export function generateFingerprint(content: string): string {
 // HELPER: Parse RekomendasiItems JSON
 // ========================
 
-// Tipe RekomendasiItem yang diperbarui dengan field ID
 export type RekomendasiItem = {
   prioritasKe: number;
   deskripsi: string;
   skorPrioritas: number;
   alasanAnalisis: string;
   domainIsuId: string;
-  lokasiRt?: string;
-  lokasiRw?: string;
+  lokasi?: string;
   fingerprint: string;
   evidence?: {
     masukanWargaCount?: number;
     dataMasterCount?: number;
     kritikalitas?: "KRITIS" | "TINGGI" | "SEDANG" | "RENDAH";
   };
-  usedMasukanIds?: string[]; // ID masukan warga yang terkait dengan prioritas ini
-  usedDataMasterIds?: string[]; // ID data master yang terkait dengan prioritas ini
+  usedMasukanIds?: string[];
+  usedDataMasterIds?: string[];
+  warning?: string | null;
 };
 
 export type RekomendasiSnapshot = {
@@ -112,8 +112,7 @@ export type RekomendasiSnapshot = {
       id: string;
       judul: string;
       deskripsi: string;
-      lokasiRt: string;
-      lokasiRw: string;
+      lokasi: string;
     }>;
     dataMaster: Array<{
       id: string;
@@ -141,14 +140,11 @@ export function parseRekomendasiItems(
 // ========================
 
 export const kegiatanRapatService = {
-  // CREATE
   create: async (input: CreateKegiatanRapatInput) => {
     const { dibuatOlehId, fingerprint: inputFingerprint, ...rest } = input;
-
     const fingerprint =
       inputFingerprint ??
       generateFingerprint(`${input.domainIsuId}-${input.judul}-${Date.now()}`);
-
     const rekomendasiItems = input.rekomendasiItems ?? {
       metadata: {
         generatedAt: new Date().toISOString(),
@@ -160,7 +156,6 @@ export const kegiatanRapatService = {
       },
       prioritas: [],
     };
-
     return prisma.kegiatanRapat.create({
       data: {
         ...rest,
@@ -176,14 +171,13 @@ export const kegiatanRapatService = {
     });
   },
 
-  // GET ALL
   getAll: async (params?: KegiatanRapatGetAllParams) => {
     const {
       judul,
       lokasi,
       domainIsuId,
       dibuatOlehId,
-      diprosesOlehId, // ✅ Tambahan
+      diprosesOlehId,
       aiModel,
       mode,
       role,
@@ -202,21 +196,17 @@ export const kegiatanRapatService = {
     } = params || {};
 
     const where: Prisma.KegiatanRapatWhereInput = {};
-
     if (dibuatOlehId) where.dibuatOlehId = dibuatOlehId;
-    if (diprosesOlehId) where.diprosesOlehId = diprosesOlehId; // ✅ Tambahan
-
+    if (diprosesOlehId) where.diprosesOlehId = diprosesOlehId;
     if (role === "LURAH") {
       where.statusRekomendasi = { not: StatusRekomendasi.DRAFT };
     }
-
     if (judul) where.judul = { contains: judul, mode: "insensitive" };
     if (lokasi) where.lokasi = { contains: lokasi, mode: "insensitive" };
     if (domainIsuId) where.domainIsuId = domainIsuId;
     if (aiModel) where.aiModel = { contains: aiModel, mode: "insensitive" };
     if (mode) where.mode = mode;
     if (statusRekomendasi) where.statusRekomendasi = statusRekomendasi;
-
     if (createdAtFrom || createdAtTo) {
       where.createdAt = {};
       if (createdAtFrom) where.createdAt.gte = createdAtFrom;
@@ -232,7 +222,6 @@ export const kegiatanRapatService = {
       if (tanggalFrom) where.tanggal.gte = tanggalFrom;
       if (tanggalTo) where.tanggal.lte = tanggalTo;
     }
-
     if (search) {
       where.OR = [
         { judul: { contains: search, mode: "insensitive" } },
@@ -247,11 +236,9 @@ export const kegiatanRapatService = {
     const safeSortBy = validSortFields.includes(sortBy as any)
       ? (sortBy as keyof Prisma.KegiatanRapatOrderByWithRelationInput)
       : "updatedAt";
-
     const orderBy: Prisma.KegiatanRapatOrderByWithRelationInput = {
       [safeSortBy]: sortOrder,
     };
-
     const skip = (page - 1) * limit;
 
     const [data, total] = await prisma.$transaction([
@@ -267,17 +254,9 @@ export const kegiatanRapatService = {
       }),
       prisma.kegiatanRapat.count({ where }),
     ]);
-
-    return {
-      data,
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    };
+    return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
   },
 
-  // GET BY ID (dengan include relasi data master)
   getById: async (id: string) => {
     return prisma.kegiatanRapat.findUniqueOrThrow({
       where: { id },
@@ -291,9 +270,8 @@ export const kegiatanRapatService = {
                 id: true,
                 judul: true,
                 deskripsi: true,
-                lokasiRt: true,
-                lokasiRw: true,
-                namaPengirim: true,
+                lokasi: true,
+                warga: { select: { nama: true } },
                 status: true,
               },
             },
@@ -316,7 +294,6 @@ export const kegiatanRapatService = {
     });
   },
 
-  // UPDATE
   update: async (id: string, data: UpdateKegiatanRapatInput) => {
     return prisma.kegiatanRapat.update({
       where: { id },
@@ -328,14 +305,10 @@ export const kegiatanRapatService = {
     });
   },
 
-  // DELETE
   deleteById: async (id: string) => {
-    return prisma.kegiatanRapat.delete({
-      where: { id },
-    });
+    return prisma.kegiatanRapat.delete({ where: { id } });
   },
 
-  // GET MASUKAN TERKAIT
   getMasukanTerkait: async (kegiatanRapatId: string) => {
     return prisma.kegiatanRapatMasukan.findMany({
       where: { kegiatanRapatId },
@@ -345,9 +318,8 @@ export const kegiatanRapatService = {
             id: true,
             judul: true,
             deskripsi: true,
-            lokasiRt: true,
-            lokasiRw: true,
-            namaPengirim: true,
+            lokasi: true,
+            warga: { select: { nama: true } },
             status: true,
           },
         },
@@ -355,10 +327,6 @@ export const kegiatanRapatService = {
       orderBy: { createdAt: "desc" },
     });
   },
-
-  // ═══════════════════════════════════════════════════════════════
-  // 🤖 GENERATE REKOMENDASI AI (dengan alokasi data berdasarkan evidence counts)
-  // ═══════════════════════════════════════════════════════════════
 
   generateRekomendasi: async (args: {
     kegiatanRapatId: string;
@@ -381,16 +349,12 @@ export const kegiatanRapatService = {
     let masukanWarga: any[] = [];
     if (mode === "FUSI_DATA") {
       masukanWarga = await prisma.masukanWarga.findMany({
-        where: {
-          domainIsuId,
-          status: StatusMasukan.DIVERIFIKASI,
-        },
+        where: { domainIsuId, status: StatusMasukan.DIVERIFIKASI },
         select: {
           id: true,
           judul: true,
           deskripsi: true,
-          lokasiRt: true,
-          lokasiRw: true,
+          lokasi: true,
           domainIsuId: true,
           status: true,
         },
@@ -410,7 +374,7 @@ export const kegiatanRapatService = {
       take: 50,
     });
 
-    // 2. Fetch exclusion titles
+    // 2. Fetch exclusion titles (prioritas kegiatan rapat lain)
     const existingPrioritas = await prisma.kegiatanRapat.findMany({
       where: {
         domainIsuId,
@@ -420,52 +384,76 @@ export const kegiatanRapatService = {
       select: { rekomendasiItems: true },
     });
 
+    // 3. Fetch program kelurahan (termasuk deskripsi untuk running program)
     const programs = await prisma.programKelurahan.findMany({
-      where: {
-        domainIsuId,
-        status: { in: ["BERJALAN", "SELESAI"] },
-      },
+      where: { domainIsuId, status: { in: ["BERJALAN", "SELESAI"] } },
       select: {
         judul: true,
         status: true,
-        lokasiRt: true,
-        lokasiRw: true,
+        lokasi: true,
+        tanggalSelesai: true,
         deskripsi: true,
       },
     });
 
+    // 3a. Siapkan data untuk program yang sedang BERJALAN (untuk diinformasikan ke AI)
+    const runningPrograms = programs
+      .filter((p) => p.status === "BERJALAN")
+      .map((p) => ({
+        judul: p.judul,
+        deskripsi: p.deskripsi || "",
+        lokasi: p.lokasi || "Tidak ditentukan",
+      }));
+
+    // 3b. Siapkan data untuk warning (program berjalan dan selesai dalam 21 hari)
+    const WARNING_DAYS = 21;
+    const today = new Date();
+    const warningPrograms = programs
+      .filter((prog) => {
+        if (prog.status === "BERJALAN") return true;
+        if (prog.status === "SELESAI" && prog.tanggalSelesai) {
+          const daysSince =
+            (today.getTime() - new Date(prog.tanggalSelesai).getTime()) /
+            (1000 * 3600 * 24);
+          return daysSince <= WARNING_DAYS;
+        }
+        return false;
+      })
+      .map((prog) => ({
+        judul: prog.judul,
+        judulLower: prog.judul.toLowerCase(),
+        status: prog.status,
+        tanggalSelesai: prog.tanggalSelesai,
+      }));
+
+    // 4. Filter masukan warga berdasarkan program berjalan yang memiliki lokasi
     let filteredMasukanWarga = [...masukanWarga];
     const programBerjalanDenganLokasi = programs.filter(
-      (p) => p.status === "BERJALAN" && p.lokasiRt && p.lokasiRw,
+      (p) => p.status === "BERJALAN" && p.lokasi && p.lokasi.trim() !== "",
     );
-
     for (const prog of programBerjalanDenganLokasi) {
       filteredMasukanWarga = filteredMasukanWarga.filter(
-        (m) => !(m.lokasiRt === prog.lokasiRt && m.lokasiRw === prog.lokasiRw),
+        (m) => m.lokasi !== prog.lokasi,
       );
     }
 
-    // Daftar judul program yang akan dikecualikan
+    // 5. Buat exclusion titles dari program berjalan (tanpa lokasi) dan program selesai tanpa masukan relevan
     let programExclusionTitles: string[] = [];
-
     for (const program of programs) {
       if (program.status === "BERJALAN") {
-        if (!program.lokasiRt) {
-          // Program berjalan tanpa lokasi -> blokir semua (masukkan judul)
+        if (!program.lokasi) {
           programExclusionTitles.push(program.judul);
         }
-        // Program berjalan dengan lokasi sudah ditangani dengan filter, tidak perlu exclusion
       } else if (program.status === "SELESAI") {
-        // Program selesai hanya dikecualikan jika TIDAK ada masukan warga yang relevan
-        // Gunakan filteredMasukanWarga (bukan masukanWarga asli)
         const hasRelatedMasukan = filteredMasukanWarga.some((m) => {
           const matchJudul =
             m.judul.toLowerCase().includes(program.judul.toLowerCase()) ||
             program.judul.toLowerCase().includes(m.judul.toLowerCase());
           const matchLokasi =
-            !program.lokasiRt ||
-            (m.lokasiRt === program.lokasiRt &&
-              m.lokasiRw === program.lokasiRw);
+            !program.lokasi ||
+            (m.lokasi &&
+              (m.lokasi.toLowerCase().includes(program.lokasi.toLowerCase()) ||
+                program.lokasi.toLowerCase().includes(m.lokasi.toLowerCase())));
           return matchJudul && matchLokasi;
         });
         if (!hasRelatedMasukan) {
@@ -474,7 +462,6 @@ export const kegiatanRapatService = {
       }
     }
 
-    // Kemudian buat exclusionTitles seperti biasa
     const exclusionTitles = [
       ...programExclusionTitles,
       ...existingPrioritas.flatMap((r) => {
@@ -489,13 +476,12 @@ export const kegiatanRapatService = {
       .filter(Boolean)
       .slice(0, 10);
 
-    // Selanjutnya, untuk transformasi data masukanInput, gunakan filteredMasukanWarga, bukan masukanWarga asli
+    // 6. Transform data untuk prompt
     const masukanInput: MasukanWargaInput[] = filteredMasukanWarga.map((m) => ({
       id: m.id,
       judul: m.judul,
       deskripsi: m.deskripsi,
-      lokasiRt: m.lokasiRt,
-      lokasiRw: m.lokasiRw,
+      lokasi: m.lokasi,
       domainIsuId: m.domainIsuId,
       status: m.status,
     }));
@@ -508,7 +494,7 @@ export const kegiatanRapatService = {
       domainIsuId: d.domainIsuId,
     }));
 
-    // 4. Build prompt
+    // 7. Build prompt dengan tambahan runningPrograms
     const prompt = buildPrompt({
       mode,
       judulLaporan,
@@ -517,13 +503,23 @@ export const kegiatanRapatService = {
       masukanWarga: masukanInput,
       dataMaster: dataMasterInput,
       exclusionTitles,
+      runningPrograms,
     });
 
-    // 5. Call Gemini AI
     const aiResponse = await geminiAi(prompt);
 
-    // 6. Post-process: alokasi data berdasarkan evidence counts
-    // Urutkan data agar alokasi konsisten (misal berdasarkan id)
+    // 8. Adaptasi lokasi (jika AI masih mengirim lokasiRt/lokasiRw)
+    const adaptedPrioritas = (aiResponse.prioritas as any[]).map(
+      (item: any) => {
+        if (item.lokasi) return item;
+        const rt = item.lokasiRt ? `RT ${item.lokasiRt}` : "";
+        const rw = item.lokasiRw ? `RW ${item.lokasiRw}` : "";
+        const lokasi = [rt, rw].filter(Boolean).join(" / ");
+        return { ...item, lokasi };
+      },
+    );
+
+    // 9. Urutkan data untuk alokasi evidence
     const sortedMasukan = [...masukanInput].sort((a, b) =>
       a.id.localeCompare(b.id),
     );
@@ -534,21 +530,55 @@ export const kegiatanRapatService = {
     let masukanIndex = 0;
     let dataMasterIndex = 0;
 
-    const processedPrioritas = aiResponse.prioritas.map((item, idx) => {
+    // 10. Proses setiap prioritas: alokasi evidence dan tambahkan warning
+    const processedPrioritas = adaptedPrioritas.map((item, idx) => {
       const masukanCount = item.evidence?.masukanWargaCount || 0;
       const dataMasterCount = item.evidence?.dataMasterCount || 0;
-
-      // Ambil sejumlah masukan dari sortedMasukan sesuai count
       const usedMasukanIds = sortedMasukan
         .slice(masukanIndex, masukanIndex + masukanCount)
         .map((m) => m.id);
       masukanIndex += masukanCount;
-
-      // Ambil sejumlah data master dari sortedDataMaster sesuai count
       const usedDataMasterIds = sortedDataMaster
         .slice(dataMasterIndex, dataMasterIndex + dataMasterCount)
         .map((d) => d.id);
       dataMasterIndex += dataMasterCount;
+
+      // 🔔 Deteksi warning dengan fast-levenshtein
+      // 🔔 Deteksi warning dengan fast-levenshtein + kata kunci + includes
+      let warningMessage: string | null = null;
+      const deskripsiLower = item.deskripsi.toLowerCase();
+      for (const prog of warningPrograms) {
+        // Hitung similarity Levenshtein
+        const distance = levenshtein.get(deskripsiLower, prog.judulLower);
+        const maxLen = Math.max(deskripsiLower.length, prog.judulLower.length);
+        const similarity = maxLen === 0 ? 1 : 1 - distance / maxLen;
+
+        // Cek kata kunci: apakah salah satu kata dari judul program (min 3 huruf) muncul di deskripsi?
+        const wordsInJudul = prog.judulLower.split(/\s+/);
+        const matchKeyword = wordsInJudul.some(
+          (word) => word.length >= 3 && deskripsiLower.includes(word),
+        );
+
+        if (
+          similarity >= 0.35 ||
+          matchKeyword ||
+          deskripsiLower.includes(prog.judulLower) ||
+          prog.judulLower.includes(deskripsiLower)
+        ) {
+          const statusText =
+            prog.status === "BERJALAN" ? "sedang berjalan" : "telah selesai";
+          let daysInfo = "";
+          if (prog.status === "SELESAI" && prog.tanggalSelesai) {
+            const daysSince = Math.floor(
+              (today.getTime() - new Date(prog.tanggalSelesai).getTime()) /
+                (1000 * 3600 * 24),
+            );
+            daysInfo = ` (selesai ${daysSince} hari yang lalu, masa peringatan ${WARNING_DAYS} hari)`;
+          }
+          warningMessage = `⚠️ Program serupa dengan judul "${prog.judul}" (${statusText}${daysInfo}). Perhatikan data terbaru.`;
+          break;
+        }
+      }
 
       return {
         ...item,
@@ -557,6 +587,7 @@ export const kegiatanRapatService = {
           item.fingerprint?.trim() ||
           generateFingerprint(`${kegiatanRapatId}-${idx}-${Date.now()}`),
         domainIsuId: item.domainIsuId || domainIsuId,
+        lokasi: item.lokasi || null,
         evidence: {
           masukanWargaCount: masukanCount,
           dataMasterCount: dataMasterCount,
@@ -564,12 +595,12 @@ export const kegiatanRapatService = {
         },
         usedMasukanIds,
         usedDataMasterIds,
+        warning: warningMessage,
       };
     });
 
-    const finalRekomendasi: GeminiResponse & {
-      prioritas: Array<RekomendasiItem>;
-    } = {
+    // 11. Bentuk final rekomendasi
+    const finalRekomendasi = {
       ...aiResponse,
       prioritas: processedPrioritas,
       metadata: {
@@ -585,8 +616,7 @@ export const kegiatanRapatService = {
           deskripsi:
             m.deskripsi?.substring(0, 100) +
             (m.deskripsi?.length > 100 ? "..." : ""),
-          lokasiRt: m.lokasiRt,
-          lokasiRw: m.lokasiRw,
+          lokasi: m.lokasi,
         })),
         dataMaster: dataMasterInput.slice(0, 10).map((d) => ({
           id: d.id,
@@ -597,17 +627,12 @@ export const kegiatanRapatService = {
       },
     };
 
-    // 7. Simpan relasi dalam transaksi
+    // 12. Simpan ke database dalam transaksi
     const updated = await prisma.$transaction(async (tx) => {
-      // Hapus relasi lama
-      await tx.kegiatanRapatMasukan.deleteMany({
-        where: { kegiatanRapatId },
-      });
+      await tx.kegiatanRapatMasukan.deleteMany({ where: { kegiatanRapatId } });
       await tx.kegiatanRapatDataMaster.deleteMany({
         where: { kegiatanRapatId },
       });
-
-      // Buat relasi baru untuk masukan (jika mode FUSI_DATA)
       if (mode === "FUSI_DATA" && masukanWarga.length > 0) {
         await tx.kegiatanRapatMasukan.createMany({
           data: masukanWarga.map((m) => ({
@@ -617,8 +642,6 @@ export const kegiatanRapatService = {
           skipDuplicates: true,
         });
       }
-
-      // Buat relasi baru untuk data master (selalu disimpan)
       if (dataMaster.length > 0) {
         await tx.kegiatanRapatDataMaster.createMany({
           data: dataMaster.map((d) => ({
@@ -628,8 +651,6 @@ export const kegiatanRapatService = {
           skipDuplicates: true,
         });
       }
-
-      // Update kegiatan rapat
       return tx.kegiatanRapat.update({
         where: { id: kegiatanRapatId },
         data: {
@@ -658,7 +679,6 @@ export const kegiatanRapatService = {
     };
   },
 
-  // ✅ Regenerate rekomendasi
   regenerateRekomendasi: async (args: {
     kegiatanRapatId: string;
     domainIsuId: string;
@@ -670,7 +690,6 @@ export const kegiatanRapatService = {
       where: { id: args.domainIsuId },
       select: { code: true },
     });
-
     return kegiatanRapatService.generateRekomendasi({
       ...args,
       domainIsuCode: domainIsu.code,

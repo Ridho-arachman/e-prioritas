@@ -41,6 +41,7 @@ import { AxiosError } from "axios";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import {
+  AlertCircle,
   ArrowDown,
   ArrowUp,
   Calendar,
@@ -176,6 +177,7 @@ export interface RekomendasiItem {
   lokasiRw?: string;
   fingerprint: string;
   evidence?: RekomendasiEvidence;
+  warning?: string | null; // ✅ tambahan field warning
 }
 
 export interface RekomendasiMetadata {
@@ -1239,6 +1241,17 @@ export default function ListJadwalKegiatan() {
                                               key={rec.fingerprint || idx}
                                               className="group/rec relative bg-linear-to-br from-slate-50 to-white rounded-xl p-4 border border-slate-200 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300"
                                             >
+                                              {/* Warning badge jika ada */}
+                                              {rec.warning && (
+                                                <div className="absolute top-2 right-2 z-10">
+                                                  <div
+                                                    className="bg-amber-50 border border-amber-200 rounded-full p-1"
+                                                    title={rec.warning}
+                                                  >
+                                                    <AlertCircle className="h-3 w-3 text-amber-600" />
+                                                  </div>
+                                                </div>
+                                              )}
                                               <div className="absolute top-3 right-3">
                                                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200">
                                                   <TargetIcon className="h-3.5 w-3.5 text-amber-600" />

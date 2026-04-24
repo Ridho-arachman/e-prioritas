@@ -1,45 +1,5 @@
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  CalendarIcon,
-  MapPinIcon,
-  ArrowLeftIcon,
-  EditIcon,
-  UsersIcon,
-  StarIcon,
-  TargetIcon,
-  FileTextIcon,
-  ClockIcon,
-  UserIcon,
-  SparklesIcon,
-  TrendingUpIcon,
-  CheckCircleIcon,
-  AlertCircleIcon,
-  LightbulbIcon,
-  ChevronRightIcon,
-  TrashIcon,
-  FileDownIcon,
-  Loader2Icon,
-  XIcon,
-  Filter,
-  ArrowUp,
-  ArrowDown,
-  SlidersHorizontal,
-  Eye,
-  X,
-} from "lucide-react";
-import { format } from "date-fns";
-import { id } from "date-fns/locale";
-import { useState, useEffect } from "react";
-import { useGet, useDelete, usePatch } from "@/hooks/useApi";
-import { notifier } from "@/lib/ToastNotifier";
-import { AxiosError } from "axios";
-import { Spinner } from "@/components/ui/spinner";
-import DataError from "@/components/blocks/DataError";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -50,24 +10,37 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
+import { useDelete, useGet, usePatch } from "@/hooks/useApi";
+import { notifier } from "@/lib/ToastNotifier";
+import { AxiosError } from "axios";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { useQueryState } from "nuqs";
-import { useDebounce } from "use-debounce";
+  AlertCircleIcon,
+  ArrowLeftIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  EditIcon,
+  Eye,
+  FileDownIcon,
+  FileTextIcon,
+  LightbulbIcon,
+  Loader2Icon,
+  MapPinIcon,
+  SparklesIcon,
+  StarIcon,
+  TargetIcon,
+  TrashIcon,
+  TrendingUpIcon,
+  UserIcon,
+  UsersIcon,
+} from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 // ═══════════════════════════════════════════════════════════════
 // 📦 ENUMS (Sesuai Schema Prisma)
@@ -162,6 +135,8 @@ export interface RekomendasiItem {
   evidence?: RekomendasiEvidence;
   usedMasukanIds?: string[];
   usedDataMasterIds?: string[];
+  // ✅ tambahan dari backend
+  warning?: string | null;
 }
 
 export interface RekomendasiMetadata {
@@ -530,7 +505,6 @@ export default function KegiatanRapatDetail() {
                 </p>
               </div>
             </div>
-            {/* Tombol Edit dan Hapus hanya untuk status DRAFT atau DIAJUKAN */}
             {(kegiatan.statusRekomendasi === StatusRekomendasi.DRAFT ||
               kegiatan.statusRekomendasi === StatusRekomendasi.DIAJUKAN) && (
               <div className="flex items-center gap-3">
@@ -722,7 +696,6 @@ export default function KegiatanRapatDetail() {
                 {prioritasList.map((item, idx) => {
                   const priorityBadge = getPriorityBadge(idx);
                   const priorityColor = getPriorityColor(idx);
-                  const totalMasukan = item.evidence?.masukanWargaCount || 0;
                   const isExpanded =
                     expandedPriorities[item.fingerprint] || false;
 
@@ -778,6 +751,17 @@ export default function KegiatanRapatDetail() {
                                 </div>
                               </div>
                             </div>
+
+                            {/* ✅ Tampilkan warning jika ada */}
+                            {item.warning && (
+                              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3 flex items-start gap-2">
+                                <AlertCircleIcon className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                                <p className="text-sm text-amber-800">
+                                  {item.warning}
+                                </p>
+                              </div>
+                            )}
+
                             <div className="space-y-3 mb-4">
                               <div className="flex items-start gap-2">
                                 <CheckCircleIcon className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
@@ -999,7 +983,6 @@ export default function KegiatanRapatDetail() {
                 </span>
               </div>
               <div className="flex items-center gap-3">
-                {/* Export PDF hanya muncul jika status DISETUJUI */}
                 {kegiatan.statusRekomendasi === StatusRekomendasi.DISETUJUI && (
                   <Button
                     variant="outline"

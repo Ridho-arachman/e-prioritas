@@ -1,46 +1,5 @@
-// src/app/lurah/jadwal-program/[id]/page.tsx
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  CalendarIcon,
-  MapPinIcon,
-  ArrowLeftIcon,
-  EditIcon,
-  UsersIcon,
-  StarIcon,
-  TargetIcon,
-  FileTextIcon,
-  ClockIcon,
-  UserIcon,
-  SparklesIcon,
-  TrendingUpIcon,
-  CheckCircleIcon,
-  AlertCircleIcon,
-  LightbulbIcon,
-  ChevronRightIcon,
-  TrashIcon,
-  FileDownIcon,
-  Loader2Icon,
-  XIcon,
-  Filter,
-  ArrowUp,
-  ArrowDown,
-  SlidersHorizontal,
-  Eye,
-  X,
-} from "lucide-react";
-import { format } from "date-fns";
-import { id } from "date-fns/locale";
-import { useState, useEffect } from "react";
-import { useGet, useDelete, usePatch } from "@/hooks/useApi";
-import { notifier } from "@/lib/ToastNotifier";
-import { AxiosError } from "axios";
-import { Spinner } from "@/components/ui/spinner";
-import DataError from "@/components/blocks/DataError";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -51,6 +10,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -59,6 +21,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -66,14 +29,42 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { useQueryState } from "nuqs";
-import { useDebounce } from "use-debounce";
+import { useDelete, useGet, usePatch } from "@/hooks/useApi";
 import { useUser } from "@/hooks/useUser";
+import { notifier } from "@/lib/ToastNotifier";
+import { AxiosError } from "axios";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
+import {
+  AlertCircleIcon,
+  ArrowLeftIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  Eye,
+  FileDownIcon,
+  FileTextIcon,
+  Filter,
+  LightbulbIcon,
+  Loader2Icon,
+  MapPinIcon,
+  SlidersHorizontal,
+  SparklesIcon,
+  StarIcon,
+  TargetIcon,
+  TrendingUpIcon,
+  UserIcon,
+  UsersIcon,
+  X,
+  XIcon,
+} from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
+import { useEffect, useState } from "react";
+import { useDebounce } from "use-debounce";
 
-// ═══════════════════════════════════════════════════════════════
-// 📦 ENUMS (Sesuai Schema Prisma)
-// ═══════════════════════════════════════════════════════════════
+// ================================================================
+// ENUMS
+// ================================================================
 
 export enum StatusMasukan {
   MENUNGGU = "MENUNGGU",
@@ -95,12 +86,6 @@ export enum ModeRekomendasi {
   DATA_MASTER_SAJA = "DATA_MASTER_SAJA",
 }
 
-export enum Role {
-  LURAH = "LURAH",
-  PERANGKAT_DESA = "PERANGKAT_DESA",
-  ADMIN = "ADMIN",
-}
-
 export enum NilaiKritikalitas {
   KRITIS = "KRITIS",
   TINGGI = "TINGGI",
@@ -108,9 +93,9 @@ export enum NilaiKritikalitas {
   RENDAH = "RENDAH",
 }
 
-// ═══════════════════════════════════════════════════════════════
-// 📦 BASE ENTITIES
-// ═══════════════════════════════════════════════════════════════
+// ================================================================
+// BASE ENTITIES
+// ================================================================
 
 export interface DomainIsu {
   id: string;
@@ -124,27 +109,8 @@ export interface User {
   name: string;
   email: string;
   jabatan?: string | null;
-  role: Role;
+  role: string;
 }
-
-export interface MasukanWarga {
-  id: string;
-  namaPengirim: string | null;
-  nomorHp: string | null;
-  judul: string;
-  deskripsi: string;
-  lokasiRt: string;
-  lokasiRw: string;
-  domainIsuId: string;
-  domainIsu?: DomainIsu;
-  status: StatusMasukan;
-  createdAt: Date | string;
-  updatedAt: Date | string;
-}
-
-// ═══════════════════════════════════════════════════════════════
-// 📦 REKOMENDASI (JSON STRUCTURE - Bukan Table)
-// ═══════════════════════════════════════════════════════════════
 
 export interface RekomendasiEvidence {
   masukanWargaCount?: number;
@@ -158,12 +124,12 @@ export interface RekomendasiItem {
   skorPrioritas: number;
   alasanAnalisis: string;
   domainIsuId: string;
-  lokasiRt?: string;
-  lokasiRw?: string;
+  lokasi?: string; // ✅ single field
   fingerprint: string;
   evidence?: RekomendasiEvidence;
   usedMasukanIds?: string[];
   usedDataMasterIds?: string[];
+  warning?: string | null; // ✅ tambahan
 }
 
 export interface RekomendasiMetadata {
@@ -183,8 +149,7 @@ export interface RekomendasiSnapshot {
       id: string;
       judul: string;
       deskripsi: string;
-      lokasiRt: string;
-      lokasiRw: string;
+      lokasi: string;
     }>;
     dataMaster: Array<{
       id: string;
@@ -194,10 +159,6 @@ export interface RekomendasiSnapshot {
     }>;
   };
 }
-
-// ═══════════════════════════════════════════════════════════════
-// 📦 KEGIATAN RAPAT (Main Entity)
-// ═══════════════════════════════════════════════════════════════
 
 export interface KegiatanRapat {
   id: string;
@@ -222,23 +183,19 @@ export interface KegiatanRapat {
   updatedAt: Date | string;
 }
 
-// ═══════════════════════════════════════════════════════════════
-// 🔧 HELPER FUNCTIONS
-// ═══════════════════════════════════════════════════════════════
+// ================================================================
+// HELPER FUNCTIONS
+// ================================================================
 
 const toDate = (val: Date | string): Date =>
   val instanceof Date ? val : new Date(val);
 
-const formatTanggal = (iso: string) => {
-  return format(new Date(iso), "EEEE, dd MMMM yyyy HH:mm", { locale: id });
-};
-
 const formatTanggalShort = (iso: string) => {
-  return format(new Date(iso), "dd MMM yyyy", { locale: id });
+  return format(toDate(iso), "dd MMM yyyy", { locale: id });
 };
 
-const formatJam = (iso: string) => {
-  return format(new Date(iso), "HH:mm", { locale: id });
+const formatJam = (val: Date | string) => {
+  return format(toDate(val), "HH:mm", { locale: id });
 };
 
 const getStatusColor = (status: StatusRekomendasi | string) => {
@@ -300,9 +257,9 @@ const parseRekomendasiItems = (items: any): RekomendasiSnapshot | null => {
   }
 };
 
-// ═══════════════════════════════════════════════════════════════
-// 🎯 MAIN COMPONENT
-// ═══════════════════════════════════════════════════════════════
+// ================================================================
+// MAIN COMPONENT
+// ================================================================
 
 export default function KegiatanRapatDetail() {
   const router = useRouter();
@@ -320,7 +277,6 @@ export default function KegiatanRapatDetail() {
     Record<string, boolean>
   >({});
 
-  // State untuk dialog konfirmasi Terima/Tolak
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [pendingAction, setPendingAction] = useState<"terima" | "tolak" | null>(
     null,
@@ -335,14 +291,7 @@ export default function KegiatanRapatDetail() {
     isLoading,
     mutate,
   } = useGet(`/protected/kegiatan-rapat/${id}`);
-
   const { del: deleteKegiatan } = useDelete();
-  const { patch: patchAjukan } = usePatch(
-    `/protected/kegiatan-rapat/${id}/ajukan`,
-  );
-  const { patch: patchKembaliKeDraft } = usePatch(
-    `/protected/kegiatan-rapat/${id}/kembali-ke-draft`,
-  );
   const { patch: patchTerima } = usePatch(
     `/protected/kegiatan-rapat/${id}/terima`,
   );
@@ -422,7 +371,6 @@ export default function KegiatanRapatDetail() {
     setIsMounted(true);
   }, []);
 
-  // Loading State
   if (!isMounted || isLoading || userLoading) {
     return (
       <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
@@ -436,7 +384,6 @@ export default function KegiatanRapatDetail() {
     );
   }
 
-  // Error State
   if (error || !kegiatan) {
     return (
       <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
@@ -465,7 +412,6 @@ export default function KegiatanRapatDetail() {
 
   return (
     <>
-      {/* Dialog Konfirmasi Terima/Tolak */}
       <AlertDialog open={openConfirmDialog} onOpenChange={setOpenConfirmDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -503,7 +449,6 @@ export default function KegiatanRapatDetail() {
       </AlertDialog>
 
       <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        {/* Background Effects */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-blue-100/40 via-transparent to-transparent" />
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-400/10 rounded-full blur-3xl" />
@@ -537,7 +482,6 @@ export default function KegiatanRapatDetail() {
             <CardContent className="p-0">
               <div className="p-6 sm:p-8 border-b border-slate-100">
                 <div className="flex flex-col lg:flex-row lg:items-start gap-6">
-                  {/* Date Badge */}
                   <div className="shrink-0">
                     <div className="relative">
                       <div className="absolute inset-0 bg-linear-to-br from-blue-500 to-indigo-500 rounded-2xl blur-lg opacity-20" />
@@ -555,8 +499,6 @@ export default function KegiatanRapatDetail() {
                       </div>
                     </div>
                   </div>
-
-                  {/* Content */}
                   <div className="flex-1">
                     <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
                       <div>
@@ -701,11 +643,10 @@ export default function KegiatanRapatDetail() {
               {/* Search & Filter Toolbar */}
               <div className="flex flex-wrap items-center gap-3">
                 <div className="relative group">
-                  <div className="absolute inset-0 bg-linear-to-r from-blue-500/10 to-indigo-500/10 rounded-xl blur opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none" />
                   <XIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
                   <Input
                     placeholder="Cari prioritas..."
-                    className="pl-12 pr-12 py-3 w-72 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-sm relative z-10"
+                    className="pl-12 pr-12 py-3 w-72 bg-white border border-slate-200 rounded-xl"
                     value={q}
                     onChange={(e) => setQ(e.target.value)}
                     onKeyDown={(e) => e.key === "Escape" && setQ("")}
@@ -713,9 +654,7 @@ export default function KegiatanRapatDetail() {
                   {q && (
                     <button
                       onClick={() => setQ("")}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full p-1 transition-all z-20"
-                      type="button"
-                      aria-label="Clear search"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 rounded-full p-1"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -760,10 +699,7 @@ export default function KegiatanRapatDetail() {
                       </div>
                     </div>
                     <div className="flex justify-end">
-                      <Button
-                        onClick={() => setIsFilterOpen(false)}
-                        className="cursor-pointer"
-                      >
+                      <Button onClick={() => setIsFilterOpen(false)}>
                         Terapkan
                       </Button>
                     </div>
@@ -787,7 +723,6 @@ export default function KegiatanRapatDetail() {
                   .map((item, idx) => {
                     const priorityBadge = getPriorityBadge(idx);
                     const priorityColor = getPriorityColor(idx);
-                    const totalMasukan = item.evidence?.masukanWargaCount || 0;
                     const isExpanded =
                       expandedPriorities[item.fingerprint] || false;
 
@@ -831,7 +766,7 @@ export default function KegiatanRapatDetail() {
                                       variant="outline"
                                       className="flex items-center gap-1 bg-amber-50 text-amber-700 border-amber-200 font-medium"
                                     >
-                                      <StarIcon className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+                                      <StarIcon className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />{" "}
                                       Skor: {item.skorPrioritas.toFixed(2)}
                                     </Badge>
                                     {item.evidence?.kritikalitas && (
@@ -845,6 +780,17 @@ export default function KegiatanRapatDetail() {
                                   </div>
                                 </div>
                               </div>
+
+                              {/* ✅ Tampilkan warning jika ada */}
+                              {item.warning && (
+                                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3 flex items-start gap-2">
+                                  <AlertCircleIcon className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                                  <p className="text-sm text-amber-800">
+                                    {item.warning}
+                                  </p>
+                                </div>
+                              )}
+
                               <div className="space-y-3 mb-4">
                                 <div className="flex items-start gap-2">
                                   <CheckCircleIcon className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
@@ -858,6 +804,7 @@ export default function KegiatanRapatDetail() {
                                   </div>
                                 </div>
                               </div>
+
                               {item.evidence && (
                                 <div className="mt-6 pt-6 border-t border-slate-100">
                                   <div className="flex items-center justify-between mb-4">
@@ -899,7 +846,6 @@ export default function KegiatanRapatDetail() {
                                 </div>
                               )}
 
-                              {/* Tombol Lihat Data Input */}
                               <div className="mt-4 flex justify-end">
                                 <Button
                                   variant="ghost"
@@ -907,18 +853,16 @@ export default function KegiatanRapatDetail() {
                                   onClick={() => toggleExpand(item.fingerprint)}
                                   className="text-xs gap-1"
                                 >
-                                  <Eye className="h-3 w-3" />
+                                  <Eye className="h-3 w-3" />{" "}
                                   {isExpanded
                                     ? "Sembunyikan Data"
                                     : "Lihat Data Input"}
                                 </Button>
                               </div>
 
-                              {/* Panel Preview Data Input */}
                               {isExpanded && rekomendasiData?.inputData && (
                                 <div className="mt-4 pt-4 border-t border-slate-100">
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {/* Masukan Warga */}
                                     {item.usedMasukanIds &&
                                       item.usedMasukanIds.length > 0 && (
                                         <div>
@@ -948,26 +892,13 @@ export default function KegiatanRapatDetail() {
                                                     variant="outline"
                                                     className="mt-1"
                                                   >
-                                                    RT {m.lokasiRt}/RW{" "}
-                                                    {m.lokasiRw}
+                                                    Lokasi: {m.lokasi}
                                                   </Badge>
                                                 </div>
                                               ))}
-                                            {item.usedMasukanIds.length >
-                                              rekomendasiData.inputData.masukan
-                                                .length && (
-                                              <p className="text-xs text-slate-400 italic">
-                                                *dan{" "}
-                                                {item.usedMasukanIds.length -
-                                                  rekomendasiData.inputData
-                                                    .masukan.length}{" "}
-                                                data lainnya (tidak ditampilkan)
-                                              </p>
-                                            )}
                                           </div>
                                         </div>
                                       )}
-                                    {/* Data Master */}
                                     {item.usedDataMasterIds &&
                                       item.usedDataMasterIds.length > 0 && (
                                         <div>
@@ -992,18 +923,7 @@ export default function KegiatanRapatDetail() {
                                                   </p>
                                                   <div className="flex items-center gap-2 mt-1">
                                                     <Badge
-                                                      className={`text-xs ${
-                                                        d.kritikalitas ===
-                                                        "KRITIS"
-                                                          ? "bg-red-100 text-red-700"
-                                                          : d.kritikalitas ===
-                                                              "TINGGI"
-                                                            ? "bg-orange-100 text-orange-700"
-                                                            : d.kritikalitas ===
-                                                                "SEDANG"
-                                                              ? "bg-yellow-100 text-yellow-700"
-                                                              : "bg-green-100 text-green-700"
-                                                      }`}
+                                                      className={`text-xs ${d.kritikalitas === "KRITIS" ? "bg-red-100 text-red-700" : d.kritikalitas === "TINGGI" ? "bg-orange-100 text-orange-700" : d.kritikalitas === "SEDANG" ? "bg-yellow-100 text-yellow-700" : "bg-green-100 text-green-700"}`}
                                                     >
                                                       {d.kritikalitas}
                                                     </Badge>
@@ -1015,17 +935,6 @@ export default function KegiatanRapatDetail() {
                                                   </div>
                                                 </div>
                                               ))}
-                                            {item.usedDataMasterIds.length >
-                                              rekomendasiData.inputData
-                                                .dataMaster.length && (
-                                              <p className="text-xs text-slate-400 italic">
-                                                *dan{" "}
-                                                {item.usedDataMasterIds.length -
-                                                  rekomendasiData.inputData
-                                                    .dataMaster.length}{" "}
-                                                data lainnya (tidak ditampilkan)
-                                              </p>
-                                            )}
                                           </div>
                                         </div>
                                       )}
@@ -1085,7 +994,6 @@ export default function KegiatanRapatDetail() {
                 </span>
               </div>
               <div className="flex items-center gap-3">
-                {/* Export PDF - hanya jika status DISETUJUI */}
                 {kegiatan.statusRekomendasi === StatusRekomendasi.DISETUJUI && (
                   <Button
                     variant="outline"
@@ -1095,19 +1003,16 @@ export default function KegiatanRapatDetail() {
                   >
                     {isExporting ? (
                       <>
-                        <Loader2Icon className="h-4 w-4 animate-spin" />
+                        <Loader2Icon className="h-4 w-4 animate-spin" />{" "}
                         Exporting...
                       </>
                     ) : (
                       <>
-                        <FileDownIcon className="h-4 w-4" />
-                        Export PDF
+                        <FileDownIcon className="h-4 w-4" /> Export PDF
                       </>
                     )}
                   </Button>
                 )}
-
-                {/* Lurah buttons */}
                 {user?.role === "LURAH" &&
                   kegiatan.statusRekomendasi === StatusRekomendasi.DIAJUKAN && (
                     <>
