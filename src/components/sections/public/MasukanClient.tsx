@@ -85,14 +85,13 @@ const statusRekomendasiConfig: Record<
 };
 
 // Helper untuk parse rekomendasiItems
-const parseRekomendasiItems = (items: any): { prioritas: any[] } | null => {
+const parseRekomendasiItems = (
+  items: any,
+): { prioritas: any[]; inputData?: any } | null => {
   try {
     if (!items || typeof items !== "object") return null;
     if (items.prioritas && Array.isArray(items.prioritas)) {
-      return { prioritas: items.prioritas };
-    }
-    if (Array.isArray(items)) {
-      return { prioritas: items };
+      return { prioritas: items.prioritas, inputData: items.inputData };
     }
     return null;
   } catch (e) {
@@ -106,14 +105,15 @@ export default function MasukanClient() {
     useGet("/public/agenda");
   const agendas = agendaData ?? [];
 
-  // State untuk dialog cek status
   const [open, setOpen] = useState(false);
   const [nomorHp, setNomorHp] = useState("");
-  const [statusData, setStatusData] = useState<any>(null);
+  const [statusData, setStatusData] = useState<{
+    warga: { nama: string; statusNoHp: string };
+    masukanList: any[];
+  } | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // State untuk dialog detail agenda
   const [selectedAgenda, setSelectedAgenda] = useState<any>(null);
   const [agendaDetailOpen, setAgendaDetailOpen] = useState(false);
   const [agendaDetailLoading, setAgendaDetailLoading] = useState(false);
@@ -121,7 +121,6 @@ export default function MasukanClient() {
 
   const handleCekStatus = async () => {
     const cleanNomorHp = nomorHp.trim();
-
     if (!cleanNomorHp) {
       setError("Nomor HP tidak boleh kosong.");
       setStatusData(null);
@@ -138,7 +137,6 @@ export default function MasukanClient() {
     try {
       const res = await fetch(`/api/public/cek-status/${cleanNomorHp}`);
       const result = await res.json();
-
       if (res.ok) {
         setStatusData(result.data);
         setError("");
@@ -199,6 +197,7 @@ export default function MasukanClient() {
     ? parseRekomendasiItems(selectedAgenda.rekomendasiItems)
     : null;
   const prioritasList = rekomendasiData?.prioritas || [];
+  const inputData = rekomendasiData?.inputData; // untuk data terkait
 
   return (
     <div className="relative min-h-screen bg-linear-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 overflow-hidden">
@@ -291,7 +290,7 @@ export default function MasukanClient() {
             </CardContent>
           </Card>
 
-          {/* Card Cek Status Masukan (dengan nomor HP) */}
+          {/* Card Cek Status Masukan */}
           <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl overflow-hidden group relative">
             <div className="absolute inset-0 bg-linear-to-r from-blue-600 to-cyan-600 opacity-0 group-hover:opacity-10 transition-opacity pointer-events-none" />
             <CardHeader className="flex items-center gap-3 pb-2">
@@ -304,6 +303,7 @@ export default function MasukanClient() {
             </CardHeader>
             <CardContent className="space-y-3">
               <Button
+                type="button"
                 variant="outline"
                 className="w-full gap-2 relative z-20"
                 onClick={() => setOpen(true)}
@@ -330,6 +330,7 @@ export default function MasukanClient() {
                     </div>
                     <div className="flex flex-col sm:flex-row gap-2">
                       <Button
+                        type="button"
                         onClick={handleCekStatus}
                         disabled={loading}
                         className="flex-1"
@@ -337,6 +338,7 @@ export default function MasukanClient() {
                         {loading ? "Memeriksa..." : "Cek Status"}
                       </Button>
                       <Button
+                        type="button"
                         variant="outline"
                         onClick={handleClear}
                         disabled={loading}
@@ -351,48 +353,75 @@ export default function MasukanClient() {
                       </div>
                     )}
                     {statusData && (
-                      <div className="mt-4 p-4 rounded-lg border bg-muted/30 space-y-3">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <p className="font-semibold">{statusData.judul}</p>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {statusData.deskripsi}
-                            </p>
-                            {statusData.namaPengirim && (
-                              <p className="text-xs text-muted-foreground mt-1">
-                                Pengirim: {statusData.namaPengirim}
-                              </p>
-                            )}
+                      <div className="mt-4 space-y-4">
+                        <div className="p-4 rounded-lg border bg-muted/30">
+                          <p className="font-semibold flex items-center gap-2">
+                            <User className="w-4 h-4" /> {statusData.warga.nama}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge
+                              className={cn(
+                                "text-xs",
+                                statusData.warga.statusNoHp === "TERVERIFIKASI"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-yellow-100 text-yellow-800",
+                              )}
+                            >
+                              {statusData.warga.statusNoHp === "TERVERIFIKASI"
+                                ? "Terverifikasi"
+                                : "Belum Terverifikasi"}
+                            </Badge>
                           </div>
-                          <Badge
-                            className={cn(
-                              "text-xs",
-                              statusConfig[statusData.status]?.color,
-                            )}
-                          >
-                            {statusConfig[statusData.status]?.label}
-                          </Badge>
                         </div>
-
-                        {statusData.status === "DITOLAK" &&
-                          statusData.alasanPenolakan && (
-                            <p className="text-sm text-red-600 dark:text-red-400 mt-2">
-                              <span className="font-semibold">
-                                Alasan Penolakan:
-                              </span>{" "}
-                              {statusData.alasanPenolakan}
-                            </p>
-                          )}
-
-                        <p className="text-xs text-muted-foreground">
-                          Tanggal Kirim:{" "}
-                          {new Date(statusData.createdAt).toLocaleDateString(
-                            "id-ID",
-                          )}
-                        </p>
-                        {statusData.domainIsu?.nama && (
-                          <p className="text-xs text-muted-foreground">
-                            Kategori: {statusData.domainIsu.nama}
+                        {statusData.masukanList.length > 0 ? (
+                          statusData.masukanList.map(
+                            (masukan: any, idx: number) => (
+                              <div
+                                key={idx}
+                                className="p-4 rounded-lg border bg-muted/30 space-y-2"
+                              >
+                                <div className="flex justify-between items-start">
+                                  <p className="font-semibold">
+                                    {masukan.judul}
+                                  </p>
+                                  <Badge
+                                    className={cn(
+                                      "text-xs",
+                                      statusConfig[masukan.status]?.color,
+                                    )}
+                                  >
+                                    {statusConfig[masukan.status]?.label}
+                                  </Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                  {masukan.deskripsi}
+                                </p>
+                                {masukan.status === "DITOLAK" &&
+                                  masukan.alasanPenolakan && (
+                                    <p className="text-sm text-red-600 dark:text-red-400">
+                                      <span className="font-semibold">
+                                        Alasan Penolakan:
+                                      </span>{" "}
+                                      {masukan.alasanPenolakan}
+                                    </p>
+                                  )}
+                                <p className="text-xs text-muted-foreground">
+                                  Tanggal Kirim:{" "}
+                                  {new Date(masukan.tanggal).toLocaleDateString(
+                                    "id-ID",
+                                  )}
+                                </p>
+                                {masukan.domainIsu && (
+                                  <p className="text-xs text-muted-foreground">
+                                    Kategori: {masukan.domainIsu}
+                                  </p>
+                                )}
+                              </div>
+                            ),
+                          )
+                        ) : (
+                          <p className="text-center text-muted-foreground">
+                            Belum ada masukan dari nomor ini.
                           </p>
                         )}
                       </div>
@@ -466,8 +495,7 @@ export default function MasukanClient() {
         <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl flex items-center gap-2">
-              <CalendarDays className="w-5 h-5 text-purple-600" />
-              Detail Agenda
+              <CalendarDays className="w-5 h-5 text-purple-600" /> Detail Agenda
             </DialogTitle>
             <DialogDescription>
               Informasi lengkap kegiatan dan rekomendasi.
@@ -526,11 +554,6 @@ export default function MasukanClient() {
                       <p className="text-sm text-muted-foreground">
                         {selectedAgenda.domainIsu.nama}
                       </p>
-                      {selectedAgenda.domainIsu.deskripsi && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {selectedAgenda.domainIsu.deskripsi}
-                        </p>
-                      )}
                     </div>
                   </div>
                 )}
@@ -574,24 +597,31 @@ export default function MasukanClient() {
                 </div>
               )}
 
-              {/* Rekomendasi Items */}
+              {/* Rekomendasi Prioritas */}
               {prioritasList.length > 0 && (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-5 h-5 text-yellow-500" />
                     <h4 className="font-semibold">Rekomendasi Prioritas</h4>
                   </div>
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {prioritasList.map((item: any, idx: number) => (
                       <div
                         key={item.fingerprint || idx}
                         className="p-3 rounded-lg border bg-muted/20"
                       >
-                        <p className="font-medium">
-                          {item.prioritasKe
-                            ? `Prioritas ${item.prioritasKe}`
-                            : `Rekomendasi ${idx + 1}`}
-                        </p>
+                        <div className="flex justify-between items-start">
+                          <p className="font-medium">
+                            {item.prioritasKe
+                              ? `Prioritas ${item.prioritasKe}`
+                              : `Rekomendasi ${idx + 1}`}
+                          </p>
+                          {item.skorPrioritas && (
+                            <Badge variant="outline" className="ml-2 text-xs">
+                              Skor: {item.skorPrioritas.toFixed(2)}
+                            </Badge>
+                          )}
+                        </div>
                         <p className="text-sm text-muted-foreground mt-1">
                           {item.deskripsi}
                         </p>
@@ -600,18 +630,86 @@ export default function MasukanClient() {
                             Analisis: {item.alasanAnalisis}
                           </p>
                         )}
-                        {item.skorPrioritas && (
-                          <Badge variant="outline" className="mt-2 text-xs">
-                            Skor: {item.skorPrioritas.toFixed(2)}
-                          </Badge>
+
+                        {/* Warning */}
+                        {item.warning && (
+                          <div className="bg-amber-50 border border-amber-200 rounded p-2 mt-2 text-xs text-amber-800">
+                            ⚠️ {item.warning}
+                          </div>
                         )}
+
+                        {/* Data terkait */}
+                        {(item.usedMasukanIds?.length > 0 ||
+                          item.usedDataMasterIds?.length > 0) &&
+                          inputData && (
+                            <details className="mt-2">
+                              <summary className="text-xs cursor-pointer text-blue-600 hover:underline">
+                                Lihat data terkait
+                              </summary>
+                              <div className="mt-2 space-y-2">
+                                {item.usedMasukanIds?.length > 0 &&
+                                  inputData.masukan && (
+                                    <div>
+                                      <p className="text-xs font-medium">
+                                        Masukan Warga:
+                                      </p>
+                                      {item.usedMasukanIds.map((id: string) => {
+                                        const masukan = inputData.masukan.find(
+                                          (m: any) => m.id === id,
+                                        );
+                                        return masukan ? (
+                                          <div
+                                            key={id}
+                                            className="text-xs bg-muted/30 p-2 rounded mt-1"
+                                          >
+                                            <strong>{masukan.judul}</strong> -{" "}
+                                            {masukan.deskripsi.substring(
+                                              0,
+                                              100,
+                                            )}
+                                            ...
+                                          </div>
+                                        ) : null;
+                                      })}
+                                    </div>
+                                  )}
+                                {item.usedDataMasterIds?.length > 0 &&
+                                  inputData.dataMaster && (
+                                    <div>
+                                      <p className="text-xs font-medium">
+                                        Data Master:
+                                      </p>
+                                      {item.usedDataMasterIds.map(
+                                        (id: string) => {
+                                          const dm = inputData.dataMaster.find(
+                                            (d: any) => d.id === id,
+                                          );
+                                          return dm ? (
+                                            <div
+                                              key={id}
+                                              className="text-xs bg-muted/30 p-2 rounded mt-1"
+                                            >
+                                              {dm.namaAtribut} - Kritikalitas:{" "}
+                                              {dm.kritikalitas}
+                                              {dm.jumlah
+                                                ? ` (Jml: ${dm.jumlah})`
+                                                : ""}
+                                            </div>
+                                          ) : null;
+                                        },
+                                      )}
+                                    </div>
+                                  )}
+                              </div>
+                            </details>
+                          )}
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Masukan Terkait */}
+              {/* Masukan Warga Terkait */}
               {selectedAgenda.masukan && selectedAgenda.masukan.length > 0 && (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">

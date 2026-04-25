@@ -4,16 +4,14 @@
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ClipboardList, ChevronRight, Activity } from "lucide-react";
+import { useGet } from "@/hooks/useApi";
 import { formatDistanceToNow } from "date-fns";
 import { id } from "date-fns/locale";
-import { useGet } from "@/hooks/useApi";
-import Link from "next/link";
+import { Activity, ClipboardList } from "lucide-react";
 
 export default function ActivityList() {
   const {
@@ -32,18 +30,6 @@ export default function ActivityList() {
           </CardTitle>
           <CardDescription>Riwayat aktivitas terbaru sistem</CardDescription>
         </div>
-        {activities?.length > 5 && (
-          <Button
-            variant="ghost"
-            size="sm"
-            asChild
-            className="gap-1 text-blue-600"
-          >
-            <Link href="/admin/aktivitas">
-              Lihat semua <ChevronRight className="w-4 h-4" />
-            </Link>
-          </Button>
-        )}
       </CardHeader>
 
       <CardContent className="space-y-3 text-sm text-gray-600">

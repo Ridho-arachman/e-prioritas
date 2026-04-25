@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
 import { Role } from "@/app/generated/prisma";
+import { auth } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+import { headers } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -27,14 +27,6 @@ export async function GET(req: NextRequest) {
     const data = await prisma.masukanWarga.findMany({
       orderBy: { createdAt: "desc" },
       take: limit,
-      select: {
-        id: true,
-        judul: true,
-        deskripsi: true,
-        status: true,
-        createdAt: true,
-        namaPengirim: true,
-      },
     });
 
     console.log(data);

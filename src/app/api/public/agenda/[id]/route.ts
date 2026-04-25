@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { handlePrismaError } from "@/lib/handlePrismaError";
 import { handleResponse } from "@/lib/handleResponse";
+import prisma from "@/lib/prisma";
+import { NextRequest } from "next/server";
 
 export async function GET(
   request: NextRequest,
@@ -22,7 +22,9 @@ export async function GET(
         masukanRelasi: {
           include: {
             masukan: {
-              select: { judul: true, deskripsi: true, namaPengirim: true },
+              include: {
+                warga: { select: { nama: true } }, // ambil nama dari warga
+              },
             },
           },
         },
@@ -35,6 +37,16 @@ export async function GET(
         },
       },
     });
+
+    const formattedMasukan = agenda.masukanRelasi.map((rel) => ({
+      id: rel.masukan.id,
+      judul: rel.masukan.judul,
+      deskripsi: rel.masukan.deskripsi,
+      lokasi: rel.masukan.lokasi,
+      status: rel.masukan.status,
+      namaPengirim: rel.masukan.warga?.nama || "Tidak diketahui",
+      createdAt: rel.masukan.createdAt,
+    }));
 
     const formattedAgenda = {
       id: agenda.id,
@@ -52,7 +64,7 @@ export async function GET(
       rekomendasiItems: agenda.rekomendasiItems,
       statusRekomendasi: agenda.statusRekomendasi,
       dibuatOleh: agenda.dibuatOleh?.name,
-      masukan: agenda.masukanRelasi.map((rel) => rel.masukan),
+      masukan: formattedMasukan,
       dataMaster: agenda.dataMasterRelasi.map((rel) => rel.dataMaster),
     };
 

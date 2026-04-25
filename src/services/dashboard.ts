@@ -63,7 +63,12 @@ export const dashboardService = {
           select: {
             id: true,
             updatedAt: true,
-            diverifikasiOleh: { select: { name: true } },
+            diverifikasiOleh: {
+              select: {
+                name: true,
+                jabatan: true, // ⬅️ tambah jabatan
+              },
+            },
           },
         }),
         prisma.kegiatanRapat.findMany({
@@ -72,7 +77,12 @@ export const dashboardService = {
           select: {
             id: true,
             createdAt: true,
-            diprosesOleh: { select: { name: true } },
+            diprosesOleh: {
+              select: {
+                name: true,
+                jabatan: true, // ⬅️ tambah
+              },
+            },
           },
         }),
         prisma.dataMaster.findMany({
@@ -81,37 +91,58 @@ export const dashboardService = {
           select: {
             id: true,
             namaAtribut: true,
-            diprosesOleh: { select: { name: true } },
             updatedAt: true,
+            diprosesOleh: {
+              select: {
+                name: true,
+                jabatan: true, // ⬅️ tambah
+              },
+            },
           },
         }),
         prisma.user.findMany({
           take: 3,
           orderBy: { createdAt: "desc" },
-          select: { id: true, name: true, createdAt: true },
+          select: {
+            id: true,
+            name: true,
+            jabatan: true, // ⬅️ tambah
+            createdAt: true,
+          },
         }),
       ]);
 
     const activities = [
       ...verifikasi.map((v) => ({
-        title: `Verifikasi masukan warga oleh ${v.diverifikasiOleh?.name || "Anonim"}`,
+        title: `Verifikasi masukan warga oleh ${
+          v.diverifikasiOleh
+            ? `${v.diverifikasiOleh.name}${v.diverifikasiOleh.jabatan ? ` (${v.diverifikasiOleh.jabatan})` : ""}`
+            : "Anonim"
+        }`,
         time: v.updatedAt,
       })),
       ...kegiatanRapat.map((r) => ({
-        title: `Kegiatan rapat baru diproses oleh ${r.diprosesOleh?.name || "Admin"}`,
+        title: `Kegiatan rapat baru diproses oleh ${
+          r.diprosesOleh
+            ? `${r.diprosesOleh.name}${r.diprosesOleh.jabatan ? ` (${r.diprosesOleh.jabatan})` : ""}`
+            : "Admin"
+        }`,
         time: r.createdAt,
       })),
       ...dataMaster.map((d) => ({
-        title: `Data master "${d.namaAtribut}" diperbarui oleh ${d.diprosesOleh?.name}`,
+        title: `Data master "${d.namaAtribut}" diperbarui oleh ${
+          d.diprosesOleh
+            ? `${d.diprosesOleh.name}${d.diprosesOleh.jabatan ? ` (${d.diprosesOleh.jabatan})` : ""}`
+            : "Admin"
+        }`,
         time: d.updatedAt,
       })),
       ...penggunaBaru.map((u) => ({
-        title: `Pengguna baru "${u.name}" mendaftar akun perangkat desa`,
+        title: `Pengguna baru "${u.name}"${u.jabatan ? ` (${u.jabatan})` : ""} mendaftar akun perangkat desa`,
         time: u.createdAt,
       })),
     ];
 
-    // urutkan dari terbaru
     return activities
       .sort((a, b) => b.time.getTime() - a.time.getTime())
       .slice(0, 6);
