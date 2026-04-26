@@ -5,15 +5,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGet } from "@/hooks/useApi";
 import {
-  Users,
-  MessageSquare,
-  FileText,
-  BarChart3,
-  ClipboardList,
-  Database,
-  Clock,
-  CheckCheck,
   Calendar,
+  CheckCheck,
+  ClipboardList,
+  Clock,
+  Database,
+  FileText,
+  MessageSquare,
+  UserCheck,
+  Users,
 } from "lucide-react";
 
 export default function StatsCards() {
@@ -22,17 +22,25 @@ export default function StatsCards() {
   if (isLoading) {
     return (
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 9 }).map((_, i) => (
-          <Card key={i} className="border border-gray-200 shadow-sm rounded-xl">
-            <CardHeader className="pb-2">
-              <Skeleton className="h-4 w-24" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-8 w-16" />
-              <Skeleton className="h-3 w-20 mt-2" />
-            </CardContent>
-          </Card>
-        ))}
+        {Array.from({ length: 10 }).map(
+          (
+            _,
+            i, // ubah 9 menjadi 10
+          ) => (
+            <Card
+              key={i}
+              className="border border-gray-200 shadow-sm rounded-xl"
+            >
+              <CardHeader className="pb-2">
+                <Skeleton className="h-4 w-24" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-8 w-16" />
+                <Skeleton className="h-3 w-20 mt-2" />
+              </CardContent>
+            </Card>
+          ),
+        )}
       </div>
     );
   }
@@ -42,6 +50,11 @@ export default function StatsCards() {
       title: "Total Pengguna",
       value: stats.totalUsers,
       icon: <Users className="w-5 h-5 text-blue-500" />,
+    },
+    {
+      title: "Warga Terverifikasi",
+      value: stats.wargaTerverifikasi, // data baru
+      icon: <UserCheck className="w-5 h-5 text-green-500" />,
     },
     {
       title: "Masukan Menunggu",

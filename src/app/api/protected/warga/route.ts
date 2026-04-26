@@ -91,7 +91,7 @@ export const GET = async (req: NextRequest) => {
 };
 
 export const POST = async (req: NextRequest) => {
-  const allowedRoles: Role[] = ["ADMIN", "LURAH"];
+  const allowedRoles: Role[] = ["ADMIN"];
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session)
     return handleResponse({

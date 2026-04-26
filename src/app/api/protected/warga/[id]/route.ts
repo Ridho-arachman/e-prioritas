@@ -12,7 +12,7 @@ export const GET = async (
   req: NextRequest,
   ctx: { params: Promise<{ id: string }> },
 ) => {
-  const allowedRoles: Role[] = ["ADMIN", "LURAH", "PERANGKAT_DESA"];
+  const allowedRoles: Role[] = ["ADMIN"];
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session)
     return handleResponse({
@@ -59,7 +59,7 @@ export const PUT = async (
   req: NextRequest,
   ctx: { params: Promise<{ id: string }> },
 ) => {
-  const allowedRoles: Role[] = ["ADMIN", "LURAH"];
+  const allowedRoles: Role[] = ["ADMIN"];
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session)
     return handleResponse({
@@ -113,7 +113,7 @@ export const DELETE = async (
   req: NextRequest,
   ctx: { params: Promise<{ id: string }> },
 ) => {
-  const allowedRoles: Role[] = ["ADMIN", "LURAH"];
+  const allowedRoles: Role[] = ["ADMIN"];
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session)
     return handleResponse({

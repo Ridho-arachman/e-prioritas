@@ -1,12 +1,12 @@
 // src/app/api/protected/lurah/laporan-sistem/route.ts
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { Role, StatusRekomendasi } from "@/app/generated/prisma";
 import { auth } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 import { headers } from "next/headers";
-import { Role, StatusRekomendasi, StatusMasukan } from "@/app/generated/prisma";
+import { NextRequest, NextResponse } from "next/server";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 
-// Helper untuk format tanggal Indonesia
+// ---------- Helper Functions ----------
 const formatDate = (date: Date) => {
   return date.toLocaleDateString("id-ID", {
     weekday: "long",
@@ -16,7 +16,6 @@ const formatDate = (date: Date) => {
   });
 };
 
-// Helper untuk menambahkan header di setiap halaman
 const addHeader = (
   page: any,
   helvetica: any,
@@ -26,14 +25,12 @@ const addHeader = (
 ) => {
   const { width, height } = page.getSize();
   const margin = 50;
-
   page.drawLine({
     start: { x: margin, y: height - margin + 10 },
     end: { x: width - margin, y: height - margin + 10 },
     thickness: 1.5,
     color: rgb(0.2, 0.4, 0.8),
   });
-
   page.drawText("KELURAHAN PANGGUNGJATI", {
     x: margin,
     y: height - margin,
@@ -41,7 +38,6 @@ const addHeader = (
     font: helveticaBold,
     color: rgb(0.2, 0.4, 0.8),
   });
-
   if (pageNumber && totalPages) {
     page.drawText(`Halaman ${pageNumber} dari ${totalPages}`, {
       x: width - margin - 80,
@@ -53,19 +49,16 @@ const addHeader = (
   }
 };
 
-// Helper untuk menambahkan footer
 const addFooter = (page: any, helvetica: any, date: Date) => {
   const { width, height } = page.getSize();
   const margin = 50;
   const y = margin - 10;
-
   page.drawLine({
     start: { x: margin, y: y + 5 },
     end: { x: width - margin, y: y + 5 },
     thickness: 0.5,
     color: rgb(0.8, 0.8, 0.8),
   });
-
   page.drawText(`Dicetak: ${date.toLocaleDateString("id-ID")}`, {
     x: margin,
     y,
@@ -82,7 +75,6 @@ const addFooter = (page: any, helvetica: any, date: Date) => {
   });
 };
 
-// Helper to wrap text into lines that fit within maxWidth
 const wrapText = (
   text: string,
   font: any,
@@ -107,7 +99,6 @@ const wrapText = (
   return lines;
 };
 
-// Helper untuk menggambar tabel dengan text wrapping
 const drawTable = (
   page: any,
   helvetica: any,
@@ -123,9 +114,8 @@ const drawTable = (
   const headerHeight = 24;
   const baseFontSize = 8;
   const lineHeight = 1.4;
-  const rowHeightBase = baseFontSize * lineHeight; // ~11.2
+  const rowHeightBase = baseFontSize * lineHeight;
 
-  // Hitung tinggi baris berdasarkan jumlah baris teks terbanyak dalam sel
   const getRowHeight = (row: any[]) => {
     let maxLines = 1;
     for (let i = 0; i < row.length; i++) {
@@ -137,7 +127,6 @@ const drawTable = (
     return maxLines * rowHeightBase;
   };
 
-  // Header
   if (currentY - headerHeight < 60) {
     return { newY: currentY, pageBreak: true, drawnRows: 0 };
   }
@@ -163,7 +152,6 @@ const drawTable = (
   });
 
   currentY -= headerHeight;
-
   let drawn = 0;
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
@@ -171,22 +159,18 @@ const drawTable = (
     if (currentY - rowHeight < 60) {
       return { newY: currentY, pageBreak: true, drawnRows: i };
     }
-
-    // Garis atas baris
     page.drawLine({
       start: { x, y: currentY },
       end: { x: x + colWidths.reduce((a, b) => a + b, 0), y: currentY },
       thickness: 0.5,
       color: rgb(0.8, 0.8, 0.8),
     });
-
-    // Gambar sel
     let rowX = x;
     for (let j = 0; j < row.length; j++) {
       const cellText = String(row[j] ?? "");
       const maxWidth = colWidths[j] - 10;
       const lines = wrapText(cellText, helvetica, baseFontSize, maxWidth);
-      let lineY = currentY - 6; // baseline
+      let lineY = currentY - 6;
       for (let k = lines.length - 1; k >= 0; k--) {
         page.drawText(lines[k], {
           x: rowX + 5,
@@ -203,7 +187,6 @@ const drawTable = (
     drawn++;
   }
 
-  // Garis bawah terakhir
   page.drawLine({
     start: { x, y: currentY },
     end: { x: x + colWidths.reduce((a, b) => a + b, 0), y: currentY },
@@ -214,7 +197,6 @@ const drawTable = (
   return { newY: currentY, pageBreak: false, drawnRows: drawn };
 };
 
-// Helper untuk mendapatkan rentang tahun
 const getYearRange = (
   startDate?: string,
   endDate?: string,
@@ -224,6 +206,7 @@ const getYearRange = (
   return { startYear, endYear };
 };
 
+// ---------- MAIN GET HANDLER ----------
 export async function GET(req: NextRequest) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {
@@ -263,7 +246,18 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // Fetch data (sama seperti sebelumnya)
+    // Ambil 5 masukan terbaru dengan judul
+    const masukanTerbaru = await prisma.masukanWarga.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      select: {
+        judul: true,
+        status: true,
+        createdAt: true,
+      },
+    });
+
     const [
       masukanStats,
       kegiatanStats,
@@ -314,6 +308,13 @@ export async function GET(req: NextRequest) {
         include: { domainIsu: { select: { nama: true } } },
       }),
     ]);
+
+    // --- Data Warga ---
+    const totalWarga = await prisma.warga.count();
+    const wargaTerverifikasi = await prisma.warga.count({
+      where: { statusNoHp: "TERVERIFIKASI" },
+    });
+    const wargaBelumTerverifikasi = totalWarga - wargaTerverifikasi;
 
     const domainIds = masukanPerDomainRaw.map((m) => m.domainIsuId);
     const domains = await prisma.domainIsu.findMany({
@@ -373,7 +374,6 @@ export async function GET(req: NextRequest) {
       });
     }
     currentY = coverY - titleLines.length * 24;
-
     page.drawText(
       `Periode: ${startDate || "Awal"} - ${endDate || "Sekarang"}`,
       {
@@ -393,13 +393,11 @@ export async function GET(req: NextRequest) {
     });
     y = coverY - 90;
 
-    // Helper untuk menambahkan section header
     const addSectionHeader = (title: string, startY: number) => {
       const headerHeight = 25;
       if (startY - headerHeight < 100) {
         page = pdfDoc.addPage([595.28, 841.89]);
         y = height - margin - 60;
-        addHeader(page, helvetica, helveticaBold, pdfDoc.getPageCount(), 0);
         startY = y;
       }
       page.drawText(title, {
@@ -448,7 +446,6 @@ export async function GET(req: NextRequest) {
       if (result.pageBreak) {
         page = pdfDoc.addPage([595.28, 841.89]);
         y = height - margin - 60;
-        addHeader(page, helvetica, helveticaBold, pdfDoc.getPageCount(), 0);
         y = addSectionHeader("Statistik Umum (lanjutan)", y);
         result = drawTable(
           page,
@@ -496,7 +493,6 @@ export async function GET(req: NextRequest) {
       if (result.pageBreak) {
         page = pdfDoc.addPage([595.28, 841.89]);
         y = height - margin - 60;
-        addHeader(page, helvetica, helveticaBold, pdfDoc.getPageCount(), 0);
         y = addSectionHeader("Statistik Umum (lanjutan)", y);
         result = drawTable(
           page,
@@ -516,13 +512,95 @@ export async function GET(req: NextRequest) {
       y -= 15;
     }
 
-    y -= 15; // jarak antar section
+    y -= 15; // jarak setelah statistik
+
+    // --- Data Warga (tambahan baru) ---
+    if (y < 100) {
+      page = pdfDoc.addPage([595.28, 841.89]);
+      y = height - margin - 60;
+    }
+    y = addSectionHeader("Data Warga", y);
+    page.drawText(`Total Warga Terdaftar: ${totalWarga}`, {
+      x: margin + 10,
+      y,
+      size: 10,
+      font: helvetica,
+    });
+    y -= 15;
+    page.drawText(`Nomor HP Terverifikasi: ${wargaTerverifikasi}`, {
+      x: margin + 10,
+      y,
+      size: 10,
+      font: helvetica,
+    });
+    y -= 15;
+    page.drawText(`Nomor HP Belum Terverifikasi: ${wargaBelumTerverifikasi}`, {
+      x: margin + 10,
+      y,
+      size: 10,
+      font: helvetica,
+    });
+    y -= 20;
+
+    // --- Masukan Warga Terbaru (5) ---
+    if (y < 100) {
+      page = pdfDoc.addPage([595.28, 841.89]);
+      y = height - margin - 60;
+    }
+    y = addSectionHeader("Masukan Warga Terbaru (5)", y);
+    const masukanRowsLatest = masukanTerbaru.map((m) => [
+      m.judul,
+      m.status,
+      m.createdAt.toLocaleDateString("id-ID"),
+    ]);
+    if (masukanRowsLatest.length) {
+      const colWidths = [200, 90, 80];
+      let result = drawTable(
+        page,
+        helvetica,
+        helveticaBold,
+        margin,
+        y,
+        ["Judul Masukan", "Status", "Tanggal"],
+        masukanRowsLatest,
+        colWidths,
+        y,
+      );
+      if (result.pageBreak) {
+        page = pdfDoc.addPage([595.28, 841.89]);
+        y = height - margin - 60;
+        y = addSectionHeader("Masukan Warga Terbaru (5) - lanjutan", y);
+        result = drawTable(
+          page,
+          helvetica,
+          helveticaBold,
+          margin,
+          y,
+          ["Judul Masukan", "Status", "Tanggal"],
+          masukanRowsLatest.slice(result.drawnRows),
+          colWidths,
+          y,
+        );
+        y = result.newY;
+      } else {
+        y = result.newY;
+      }
+    } else {
+      page.drawText("Belum ada masukan warga pada periode ini.", {
+        x: margin + 10,
+        y,
+        size: 10,
+        font: helvetica,
+        color: rgb(0.5, 0.5, 0.5),
+      });
+      y -= 20;
+    }
+    y -= 20;
 
     // --- Data Master ---
     if (y < 100) {
       page = pdfDoc.addPage([595.28, 841.89]);
       y = height - margin - 60;
-      addHeader(page, helvetica, helveticaBold, pdfDoc.getPageCount(), 0);
     }
     y = addSectionHeader("Data Master (10 Terbaru)", y);
     const dmRows = dataMasterList.map((d) => [
@@ -547,7 +625,6 @@ export async function GET(req: NextRequest) {
       if (result.pageBreak) {
         page = pdfDoc.addPage([595.28, 841.89]);
         y = height - margin - 60;
-        addHeader(page, helvetica, helveticaBold, pdfDoc.getPageCount(), 0);
         y = addSectionHeader("Data Master (10 Terbaru) - lanjutan", y);
         result = drawTable(
           page,
@@ -574,13 +651,12 @@ export async function GET(req: NextRequest) {
       });
       y -= 20;
     }
-    y -= 20; // jarak setelah section Data Master
+    y -= 20;
 
     // --- Masukan per Domain ---
     if (y < 100) {
       page = pdfDoc.addPage([595.28, 841.89]);
       y = height - margin - 60;
-      addHeader(page, helvetica, helveticaBold, pdfDoc.getPageCount(), 0);
     }
     y = addSectionHeader("Masukan per Domain (5 Terbanyak)", y);
     const domainRows = masukanPerDomain.map((d) => [d.nama, d.jumlah]);
@@ -600,7 +676,6 @@ export async function GET(req: NextRequest) {
       if (result.pageBreak) {
         page = pdfDoc.addPage([595.28, 841.89]);
         y = height - margin - 60;
-        addHeader(page, helvetica, helveticaBold, pdfDoc.getPageCount(), 0);
         y = addSectionHeader("Masukan per Domain (5 Terbanyak) - lanjutan", y);
         result = drawTable(
           page,
@@ -627,13 +702,12 @@ export async function GET(req: NextRequest) {
       });
       y -= 20;
     }
-    y -= 20; // jarak setelah section Masukan per Domain
+    y -= 20;
 
     // --- Kegiatan Terbaru ---
     if (y < 100) {
       page = pdfDoc.addPage([595.28, 841.89]);
       y = height - margin - 60;
-      addHeader(page, helvetica, helveticaBold, pdfDoc.getPageCount(), 0);
     }
     y = addSectionHeader("Kegiatan Rapat Terbaru (5)", y);
     const kegiatanRows2 = kegiatanTerbaru.map((k) => [
@@ -658,7 +732,6 @@ export async function GET(req: NextRequest) {
       if (result.pageBreak) {
         page = pdfDoc.addPage([595.28, 841.89]);
         y = height - margin - 60;
-        addHeader(page, helvetica, helveticaBold, pdfDoc.getPageCount(), 0);
         y = addSectionHeader("Kegiatan Rapat Terbaru (5) - lanjutan", y);
         result = drawTable(
           page,
@@ -685,13 +758,12 @@ export async function GET(req: NextRequest) {
       });
       y -= 20;
     }
-    y -= 20; // jarak setelah section Kegiatan Terbaru
+    y -= 20;
 
     // --- Prioritas ---
     if (y < 100) {
       page = pdfDoc.addPage([595.28, 841.89]);
       y = height - margin - 60;
-      addHeader(page, helvetica, helveticaBold, pdfDoc.getPageCount(), 0);
     }
     y = addSectionHeader("Prioritas Terbaru (20 yang Disetujui)", y);
     const priorityRows = prioritasList
@@ -713,7 +785,6 @@ export async function GET(req: NextRequest) {
       if (result.pageBreak) {
         page = pdfDoc.addPage([595.28, 841.89]);
         y = height - margin - 60;
-        addHeader(page, helvetica, helveticaBold, pdfDoc.getPageCount(), 0);
         y = addSectionHeader(
           "Prioritas Terbaru (20 yang Disetujui) - lanjutan",
           y,
@@ -744,11 +815,12 @@ export async function GET(req: NextRequest) {
       y -= 20;
     }
 
-    // Tambahkan header dan footer ke semua halaman
+    // Tambahkan footer ke semua halaman (header tidak ditambahkan)
     const pages = pdfDoc.getPages();
-    for (let i = 0; i < pages.length; i++) {
+    const totalPages = pages.length;
+
+    for (let i = 0; i < totalPages; i++) {
       const p = pages[i];
-      addHeader(p, helvetica, helveticaBold, i + 1, pages.length);
       addFooter(p, helvetica, currentDate);
     }
 

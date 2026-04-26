@@ -11,34 +11,29 @@ export const dashboardService = {
       masukanCompleted,
       dataMasterCount,
       kegiatanCount,
+      totalWarga, // total seluruh warga
+      wargaTerverifikasi, // warga dengan status no hp terverifikasi
     ] = await Promise.all([
       prisma.user.count({
         where: { role: { not: "ADMIN" } },
       }),
 
-      prisma.masukanWarga.count({
-        where: { status: "MENUNGGU" },
-      }),
-
-      prisma.masukanWarga.count({
-        where: { status: "DIVERIFIKASI" },
-      }),
-
-      prisma.masukanWarga.count({
-        where: { status: "DITOLAK" },
-      }),
-
-      prisma.masukanWarga.count({
-        where: { status: "DIPROSES" },
-      }),
-
-      prisma.masukanWarga.count({
-        where: { status: "DISELESAIKAN" },
-      }),
+      prisma.masukanWarga.count({ where: { status: "MENUNGGU" } }),
+      prisma.masukanWarga.count({ where: { status: "DIVERIFIKASI" } }),
+      prisma.masukanWarga.count({ where: { status: "DITOLAK" } }),
+      prisma.masukanWarga.count({ where: { status: "DIPROSES" } }),
+      prisma.masukanWarga.count({ where: { status: "DISELESAIKAN" } }),
 
       prisma.dataMaster.count(),
-
       prisma.kegiatanRapat.count(),
+
+      // Total warga di database
+      prisma.warga.count(),
+
+      // Warga dengan status no hp TERVERIFIKASI
+      prisma.warga.count({
+        where: { statusNoHp: "TERVERIFIKASI" },
+      }),
     ]);
 
     return {
@@ -50,6 +45,8 @@ export const dashboardService = {
       masukanCompleted,
       dataMasterCount,
       kegiatanCount,
+      totalWarga, // tambahan
+      wargaTerverifikasi, // tambahan
     };
   },
 

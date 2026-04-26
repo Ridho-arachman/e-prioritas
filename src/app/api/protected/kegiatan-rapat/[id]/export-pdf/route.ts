@@ -1,10 +1,10 @@
 // app/api/protected/kegiatan-rapat/[id]/export-pdf/route.ts
+import { Role } from "@/app/generated/prisma";
+import { auth } from "@/lib/auth";
+import { kegiatanRapatService } from "@/services/kegiatanRapatService";
+import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
-import { kegiatanRapatService } from "@/services/kegiatanRapatService";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { Role } from "@/app/generated/prisma";
 
 export const runtime = "nodejs";
 
@@ -25,6 +25,7 @@ interface RekomendasiItem {
   };
   usedMasukanIds?: string[];
   usedDataMasterIds?: string[];
+  warning?: string | null;
 }
 
 interface RekomendasiMetadata {
@@ -66,7 +67,7 @@ interface RekomendasiSnapshot {
 const MARGIN = 50;
 const PAGE_WIDTH = 595.28;
 const PAGE_HEIGHT = 841.89;
-const FOOTER_HEIGHT = 50; // Sedikit ditambah untuk copyright
+const FOOTER_HEIGHT = 50;
 const HEADER_HEIGHT = 60;
 const CONTENT_TOP = PAGE_HEIGHT - MARGIN - HEADER_HEIGHT;
 const CONTENT_BOTTOM = MARGIN + FOOTER_HEIGHT;
@@ -80,12 +81,19 @@ const COLORS = {
   text: rgb(0.2, 0.2, 0.2),
   textSecondary: rgb(0.4, 0.4, 0.4),
   white: rgb(1, 1, 1),
+  warningBg: rgb(1, 0.95, 0.7),
+  warningText: rgb(0.6, 0.3, 0),
 };
 
 // ==================== Utilities ====================
+/**
+ * Hapus SEMUA karakter di luar Latin‑1 (WinAnsi)
+ * dan spasi berlebih.
+ */
 const sanitizeText = (text: string): string => {
   if (!text) return "";
   return text
+    .replace(/[^\x20-\x7E\u00A0-\u00FF]/g, "") // hanya Latin‑1
     .replace(/\n/g, " ")
     .replace(/\r/g, " ")
     .replace(/\s+/g, " ")
@@ -107,6 +115,7 @@ const formatTanggalIndonesia = (date: Date | string): string => {
 // ==================== PDF Helper Functions ====================
 const drawHeader = (page: any, helvetica: any, helveticaBold: any) => {
   const headerY = PAGE_HEIGHT - MARGIN + 15;
+  // Nama Kelurahan
   page.drawText("KELURAHAN PANGGUNGJATI", {
     x: MARGIN,
     y: headerY,
@@ -114,8 +123,9 @@ const drawHeader = (page: any, helvetica: any, helveticaBold: any) => {
     font: helveticaBold,
     color: COLORS.primary,
   });
+  // Alamat (tanpa nomor telepon)
   page.drawText(
-    "Jl. Raya Panggungjati No. 1, Kota Cimahi – Telp. (022) 123456",
+    "Jl. Kibuyut Kanjeng Dalem No. 36 B, RT/RW 001/005, Kelurahan Panggungjati, Kecamatan Taktakan, Kota Serang, Banten.",
     {
       x: MARGIN,
       y: headerY - 15,
@@ -124,9 +134,18 @@ const drawHeader = (page: any, helvetica: any, helveticaBold: any) => {
       color: COLORS.textSecondary,
     },
   );
+  // Email
+  page.drawText("panggungjatikelurahan@gmail.com", {
+    x: MARGIN,
+    y: headerY - 27,
+    size: 8,
+    font: helvetica,
+    color: COLORS.textSecondary,
+  });
+  // Garis pembatas
   page.drawLine({
-    start: { x: MARGIN, y: headerY - 25 },
-    end: { x: PAGE_WIDTH - MARGIN, y: headerY - 25 },
+    start: { x: MARGIN, y: headerY - 38 },
+    end: { x: PAGE_WIDTH - MARGIN, y: headerY - 38 },
     thickness: 1.5,
     color: COLORS.primary,
   });
@@ -139,7 +158,6 @@ const drawFooter = (
   totalPages: number,
 ) => {
   const footerY = MARGIN - 10;
-  // Garis pemisah footer
   page.drawLine({
     start: { x: MARGIN, y: footerY },
     end: { x: PAGE_WIDTH - MARGIN, y: footerY },
@@ -147,7 +165,6 @@ const drawFooter = (
     color: COLORS.border,
   });
 
-  // Tanggal cetak
   const now = formatTanggalIndonesia(new Date());
   page.drawText(`Dicetak pada: ${now}`, {
     x: MARGIN,
@@ -157,7 +174,6 @@ const drawFooter = (
     color: COLORS.textSecondary,
   });
 
-  // Nomor halaman
   page.drawText(`Halaman ${pageNumber} dari ${totalPages}`, {
     x: PAGE_WIDTH - MARGIN - 80,
     y: footerY - 10,
@@ -166,7 +182,6 @@ const drawFooter = (
     color: COLORS.textSecondary,
   });
 
-  // Hak cipta dan keterangan formal
   const currentYear = new Date().getFullYear();
   page.drawText(`© ${currentYear} Kelurahan Panggungjati - Dokumen Resmi`, {
     x: MARGIN,
@@ -183,8 +198,8 @@ const measureTextLines = (
   size: number,
   maxWidth: number,
 ): string[] => {
-  const cleanText = sanitizeText(text);
-  const words = cleanText.split(" ");
+  // Asumsi teks sudah disanitasi
+  const words = text.split(" ");
   const lines: string[] = [];
   let currentLine = "";
   for (const word of words) {
@@ -234,7 +249,9 @@ const drawWrappedText = (
     lineHeight = 1.4,
   } = options;
   const actualLineHeight = size * lineHeight;
-  const lines = measureTextLines(text, font, size, maxWidth);
+  // Sanitasi di sini agar aman
+  const safeText = sanitizeText(text);
+  const lines = measureTextLines(safeText, font, size, maxWidth);
   let currentY = y;
   for (const line of lines) {
     page.drawText(line, { x, y: currentY, size, font, color });
@@ -328,33 +345,48 @@ export async function GET(
     y -= 20;
 
     const infoKiri = [
-      { label: "Judul", value: kegiatan.judul || "-" },
-      { label: "Deskripsi", value: kegiatan.deskripsi || "-" },
-      { label: "Tanggal", value: formatTanggalIndonesia(kegiatan.tanggal) },
-      { label: "Lokasi", value: kegiatan.lokasi || "-" },
+      { label: "Judul", value: sanitizeText(kegiatan.judul || "-") },
+      { label: "Deskripsi", value: sanitizeText(kegiatan.deskripsi || "-") },
+      {
+        label: "Tanggal",
+        value: sanitizeText(formatTanggalIndonesia(kegiatan.tanggal)),
+      },
+      { label: "Lokasi", value: sanitizeText(kegiatan.lokasi || "-") },
     ];
 
     const infoKanan = [
       {
         label: "Domain Isu",
-        value: `${kegiatan.domainIsu?.nama || "-"} (${kegiatan.domainIsu?.code || ""})`,
+        value: sanitizeText(
+          `${kegiatan.domainIsu?.nama || "-"} (${kegiatan.domainIsu?.code || ""})`,
+        ),
       },
       {
         label: "Dibuat Oleh",
-        value: `${kegiatan.dibuatOleh?.name || "-"} (${kegiatan.dibuatOleh?.jabatan || "-"})`,
+        value: sanitizeText(
+          `${kegiatan.dibuatOleh?.name || "-"} (${kegiatan.dibuatOleh?.jabatan || "-"})`,
+        ),
       },
-      { label: "Status", value: kegiatan.statusRekomendasi || "-" },
+      {
+        label: "Status",
+        value: sanitizeText(kegiatan.statusRekomendasi || "-"),
+      },
       {
         label: "Mode",
-        value: kegiatan.mode === "FUSI_DATA" ? "Fusi Data" : "Data Master Saja",
+        value: sanitizeText(
+          kegiatan.mode === "FUSI_DATA" ? "Fusi Data" : "Data Master Saja",
+        ),
       },
     ];
     if (kegiatan.aiModel)
-      infoKanan.push({ label: "Model AI", value: kegiatan.aiModel });
+      infoKanan.push({
+        label: "Model AI",
+        value: sanitizeText(kegiatan.aiModel),
+      });
     if (kegiatan.aiProcessedAt) {
       infoKanan.push({
         label: "Diproses AI",
-        value: formatTanggalIndonesia(kegiatan.aiProcessedAt),
+        value: sanitizeText(formatTanggalIndonesia(kegiatan.aiProcessedAt)),
       });
     }
 
@@ -450,9 +482,11 @@ export async function GET(
 
       const meta = rekomendasi.metadata;
       if (meta) {
-        const metaText = `Dihasilkan: ${formatTanggalIndonesia(meta.generatedAt)} | Model: ${meta.aiModel} | Mode: ${
-          meta.modeRekomendasi === "FUSI_DATA" ? "Fusi Data" : "Data Master"
-        } | Domain: ${meta.domainIsuCode} | Masukan: ${meta.totalMasukanDianalisis} | Data Master: ${meta.totalDataMasterDianalisis}`;
+        const metaText = sanitizeText(
+          `Dihasilkan: ${formatTanggalIndonesia(meta.generatedAt)} | Model: ${meta.aiModel} | Mode: ${
+            meta.modeRekomendasi === "FUSI_DATA" ? "Fusi Data" : "Data Master"
+          } | Domain: ${meta.domainIsuCode} | Masukan: ${meta.totalMasukanDianalisis} | Data Master: ${meta.totalDataMasterDianalisis}`,
+        );
         const result = drawWrappedText(currentPage, metaText, MARGIN, y, {
           size: 8,
           font: helvetica,
@@ -464,7 +498,7 @@ export async function GET(
 
       // Loop setiap prioritas
       for (const item of rekomendasi.prioritas) {
-        // Hitung tinggi yang dibutuhkan
+        // Perhitungan tinggi yang dibutuhkan
         const descHeight = measureTextHeight(
           sanitizeText(item.deskripsi),
           helveticaBold,
@@ -472,19 +506,34 @@ export async function GET(
           MAX_CONTENT_WIDTH - 35,
         );
         const alasanHeight = measureTextHeight(
-          item.alasanAnalisis,
+          sanitizeText(item.alasanAnalisis),
           helvetica,
           9,
           MAX_CONTENT_WIDTH - 35,
         );
 
-        let requiredHeight = 25 + descHeight + 14 + 12 + alasanHeight + 8; // badge + deskripsi + skor + label alasan + alasan + margin
-
-        if (item.evidence) {
-          requiredHeight += 12 + 18 + 18 + 8; // label + header + data + margin
+        // Tambahan tinggi untuk warning (jika ada)
+        let warningHeight = 0;
+        if (item.warning) {
+          const warningText = sanitizeText(`Peringatan: ${item.warning}`);
+          const warningLines = measureTextLines(
+            warningText,
+            helvetica,
+            8,
+            MAX_CONTENT_WIDTH - 35 - 16,
+          );
+          warningHeight = warningLines.length * 8 * 1.4 + 12;
         }
 
-        // Tambahan untuk data input (masukan dan data master)
+        let requiredHeight = 25 + descHeight + 14 + 12 + alasanHeight + 8;
+        if (item.warning) {
+          requiredHeight += warningHeight + 6;
+        }
+
+        if (item.evidence) {
+          requiredHeight += 12 + 18 + 18 + 8;
+        }
+
         const usedMasukan =
           rekomendasi.inputData?.masukan.filter((m) =>
             item.usedMasukanIds?.includes(m.id),
@@ -495,15 +544,15 @@ export async function GET(
           ) || [];
         const totalInputItems = usedMasukan.length + usedDataMaster.length;
         if (totalInputItems > 0) {
-          requiredHeight += 15; // label "Data Input Terkait"
-          const itemHeight = 12; // perkiraan tinggi per item (dengan wrap)
+          requiredHeight += 15;
+          const itemHeight = 12;
           requiredHeight += totalInputItems * itemHeight;
         }
 
         if (item.lokasiRt || item.lokasiRw) {
           requiredHeight += 15;
         }
-        requiredHeight += 10; // spasi akhir
+        requiredHeight += 10;
 
         // Cek page break
         if (y - requiredHeight < CONTENT_BOTTOM) {
@@ -518,8 +567,8 @@ export async function GET(
           y = CONTENT_TOP;
         }
 
-        // Gambar background dengan tinggi tepat
-        const cardHeight = requiredHeight + 10; // padding
+        // Gambar background kartu
+        const cardHeight = requiredHeight + 10;
         currentPage.drawRectangle({
           x: MARGIN - 5,
           y: y - cardHeight + 5,
@@ -536,7 +585,7 @@ export async function GET(
           borderWidth: 1,
         });
 
-        y -= 5; // padding atas
+        y -= 5;
 
         // Priority badge
         currentPage.drawCircle({
@@ -570,7 +619,7 @@ export async function GET(
 
         // Skor
         currentPage.drawText(
-          `Skor Prioritas: ${item.skorPrioritas.toFixed(2)}`,
+          sanitizeText(`Skor Prioritas: ${item.skorPrioritas.toFixed(2)}`),
           {
             x: MARGIN + 35,
             y,
@@ -593,12 +642,49 @@ export async function GET(
         // Alasan analisis konten
         const alasanResult = drawWrappedText(
           currentPage,
-          item.alasanAnalisis,
+          sanitizeText(item.alasanAnalisis),
           MARGIN + 35,
           y,
           { size: 9, font: helvetica, maxWidth: MAX_CONTENT_WIDTH - 35 },
         );
         y = alasanResult.newY - 8;
+
+        // ========== PERINGATAN (WARNING) ==========
+        if (item.warning) {
+          const warningText = sanitizeText(`Peringatan: ${item.warning}`);
+          const warningBoxWidth = MAX_CONTENT_WIDTH - 35;
+          const warningLines = measureTextLines(
+            warningText,
+            helvetica,
+            8,
+            warningBoxWidth - 16,
+          );
+          const warningTotalHeight = warningLines.length * 8 * 1.4 + 12;
+
+          currentPage.drawRectangle({
+            x: MARGIN + 35,
+            y: y - warningTotalHeight,
+            width: warningBoxWidth,
+            height: warningTotalHeight,
+            color: COLORS.warningBg,
+            borderColor: rgb(0.9, 0.7, 0.2),
+            borderWidth: 1,
+          });
+
+          let warningY = y - 12;
+          for (const line of warningLines) {
+            currentPage.drawText(line, {
+              x: MARGIN + 35 + 8,
+              y: warningY,
+              size: 8,
+              font: helvetica,
+              color: COLORS.warningText,
+            });
+            warningY -= 8 * 1.4;
+          }
+
+          y -= warningTotalHeight + 6;
+        }
 
         // Evidence table
         if (item.evidence) {
@@ -614,7 +700,6 @@ export async function GET(
           const colW = 80;
           const rowH = 18;
 
-          // Header
           currentPage.drawRectangle({
             x: tableX,
             y: y - rowH + 2,
@@ -638,7 +723,6 @@ export async function GET(
           });
           y -= rowH;
 
-          // Data row
           currentPage.drawRectangle({
             x: tableX,
             y: y - rowH + 2,
@@ -649,9 +733,9 @@ export async function GET(
           });
 
           const values = [
-            (item.evidence.masukanWargaCount || 0).toString(),
-            (item.evidence.dataMasterCount || 0).toString(),
-            item.evidence.kritikalitas || "-",
+            sanitizeText((item.evidence.masukanWargaCount || 0).toString()),
+            sanitizeText((item.evidence.dataMasterCount || 0).toString()),
+            sanitizeText(item.evidence.kritikalitas || "-"),
           ];
           values.forEach((val, i) => {
             const textWidth = helvetica.widthOfTextAtSize(val, 8);
@@ -667,7 +751,7 @@ export async function GET(
           y -= rowH + 8;
         }
 
-        // === Data Input Terkait dengan Label Jelas ===
+        // Data Input Terkait (masukan & data master)
         if (usedMasukan.length > 0 || usedDataMaster.length > 0) {
           currentPage.drawText("Data Input Terkait:", {
             x: MARGIN + 35,
@@ -677,9 +761,10 @@ export async function GET(
           });
           y -= 12;
 
-          // Masukan Warga
           for (const m of usedMasukan) {
-            const text = `[Masukan] ${sanitizeText(m.judul)} (RT ${m.lokasiRt}/RW ${m.lokasiRw})`;
+            const text = sanitizeText(
+              `[Masukan] ${m.judul} (RT ${m.lokasiRt}/RW ${m.lokasiRw})`,
+            );
             const result = drawWrappedText(currentPage, text, MARGIN + 45, y, {
               size: 8,
               font: helvetica,
@@ -688,9 +773,10 @@ export async function GET(
             y = result.newY - 8;
           }
 
-          // Data Master
           for (const d of usedDataMaster) {
-            const text = `[Data Master] ${sanitizeText(d.namaAtribut)} (${d.kritikalitas})${d.jumlah ? ` - Jml: ${d.jumlah}` : ""}`;
+            const text = sanitizeText(
+              `[Data Master] ${d.namaAtribut} (${d.kritikalitas})${d.jumlah ? ` - Jml: ${d.jumlah}` : ""}`,
+            );
             const result = drawWrappedText(currentPage, text, MARGIN + 45, y, {
               size: 8,
               font: helvetica,
@@ -699,7 +785,7 @@ export async function GET(
             y = result.newY - 8;
           }
 
-          y -= 4; // spasi setelah data input
+          y -= 4;
         }
 
         // Lokasi
@@ -776,49 +862,9 @@ export async function GET(
 
     const pengesahanYStart = y;
 
-    // Kolom kiri (Mengetahui)
-    const leftX = MARGIN;
-    const rightX = MARGIN + (MAX_CONTENT_WIDTH - 50) / 2 + 50;
+    // Hanya satu kolom, letakkan di kanan bawah
+    const rightX = PAGE_WIDTH - MARGIN - 160; // posisi kolom kanan
 
-    // Kolom kiri
-    currentPage.drawText("Mengetahui,", {
-      x: leftX,
-      y: pengesahanYStart,
-      size: 10,
-      font: helveticaBold,
-    });
-    currentPage.drawText("Ketua Tim Pelaksana", {
-      x: leftX,
-      y: pengesahanYStart - 15,
-      size: 10,
-      font: helvetica,
-    });
-    currentPage.drawLine({
-      start: { x: leftX, y: pengesahanYStart - 30 },
-      end: { x: leftX + 150, y: pengesahanYStart - 30 },
-      thickness: 1,
-      color: COLORS.text,
-    });
-    currentPage.drawText("( ____________________ )", {
-      x: leftX,
-      y: pengesahanYStart - 45,
-      size: 10,
-      font: helvetica,
-    });
-    currentPage.drawText("Nama Lengkap", {
-      x: leftX,
-      y: pengesahanYStart - 60,
-      size: 10,
-      font: helvetica,
-    });
-    currentPage.drawText("NIP. 1234567890", {
-      x: leftX,
-      y: pengesahanYStart - 75,
-      size: 10,
-      font: helvetica,
-    });
-
-    // Kolom kanan (Menyetujui)
     currentPage.drawText("Menyetujui,", {
       x: rightX,
       y: pengesahanYStart,
@@ -831,34 +877,26 @@ export async function GET(
       size: 10,
       font: helvetica,
     });
+
+    // Garis tanda tangan
     currentPage.drawLine({
-      start: { x: rightX, y: pengesahanYStart - 30 },
-      end: { x: rightX + 150, y: pengesahanYStart - 30 },
+      start: { x: rightX, y: pengesahanYStart - 50 }, // lebih jarak
+      end: { x: rightX + 150, y: pengesahanYStart - 50 },
       thickness: 1,
       color: COLORS.text,
     });
-    currentPage.drawText("( ____________________ )", {
+
+    // Nama di bawah garis
+    currentPage.drawText("HERUJI,S.Pd.I.M.Si", {
       x: rightX,
-      y: pengesahanYStart - 45,
-      size: 10,
-      font: helvetica,
-    });
-    currentPage.drawText("Nama Lurah", {
-      x: rightX,
-      y: pengesahanYStart - 60,
-      size: 10,
-      font: helvetica,
-    });
-    currentPage.drawText("NIP. 0987654321", {
-      x: rightX,
-      y: pengesahanYStart - 75,
+      y: pengesahanYStart - 65,
       size: 10,
       font: helvetica,
     });
 
-    y = pengesahanYStart - 120;
+    y = pengesahanYStart - 100;
 
-    // === DRAW FOOTERS PADA SEMUA HALAMAN ===
+    // === TAMBAHKAN FOOTER DI SEMUA HALAMAN ===
     const totalPages = pdfDoc.getPageCount();
     for (let i = 0; i < totalPages; i++) {
       const page = pdfDoc.getPage(i);
@@ -867,7 +905,7 @@ export async function GET(
 
     const pdfBytes = await pdfDoc.save();
     const pdfBuffer = Buffer.from(pdfBytes);
-    const filename = `kegiatan-${kegiatan.judul?.replace(/[^a-zA-Z0-9_-]/g, "_") || id}.pdf`;
+    const filename = `kegiatan-${sanitizeText(kegiatan.judul?.replace(/[^a-zA-Z0-9_-]/g, "_") || id)}.pdf`;
 
     return new NextResponse(pdfBuffer, {
       status: 200,
