@@ -17383,6 +17383,7 @@ export namespace Prisma {
   export type WargaCountAggregateOutputType = {
     id: number
     nama: number
+    noHpPrefixes: number
     noHp: number
     alamat: number
     statusNoHp: number
@@ -17415,6 +17416,7 @@ export namespace Prisma {
   export type WargaCountAggregateInputType = {
     id?: true
     nama?: true
+    noHpPrefixes?: true
     noHp?: true
     alamat?: true
     statusNoHp?: true
@@ -17498,6 +17500,7 @@ export namespace Prisma {
   export type WargaGroupByOutputType = {
     id: string
     nama: string
+    noHpPrefixes: string[]
     noHp: string
     alamat: string | null
     statusNoHp: $Enums.StatusNoHPWarga
@@ -17525,6 +17528,7 @@ export namespace Prisma {
   export type WargaSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     nama?: boolean
+    noHpPrefixes?: boolean
     noHp?: boolean
     alamat?: boolean
     statusNoHp?: boolean
@@ -17537,6 +17541,7 @@ export namespace Prisma {
   export type WargaSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     nama?: boolean
+    noHpPrefixes?: boolean
     noHp?: boolean
     alamat?: boolean
     statusNoHp?: boolean
@@ -17547,6 +17552,7 @@ export namespace Prisma {
   export type WargaSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     nama?: boolean
+    noHpPrefixes?: boolean
     noHp?: boolean
     alamat?: boolean
     statusNoHp?: boolean
@@ -17557,6 +17563,7 @@ export namespace Prisma {
   export type WargaSelectScalar = {
     id?: boolean
     nama?: boolean
+    noHpPrefixes?: boolean
     noHp?: boolean
     alamat?: boolean
     statusNoHp?: boolean
@@ -17564,7 +17571,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type WargaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nama" | "noHp" | "alamat" | "statusNoHp" | "createdAt" | "updatedAt", ExtArgs["result"]["warga"]>
+  export type WargaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nama" | "noHpPrefixes" | "noHp" | "alamat" | "statusNoHp" | "createdAt" | "updatedAt", ExtArgs["result"]["warga"]>
   export type WargaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     masukan?: boolean | Warga$masukanArgs<ExtArgs>
     _count?: boolean | WargaCountOutputTypeDefaultArgs<ExtArgs>
@@ -17580,6 +17587,7 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       nama: string
+      noHpPrefixes: string[]
       noHp: string
       alamat: string | null
       statusNoHp: $Enums.StatusNoHPWarga
@@ -18011,6 +18019,7 @@ export namespace Prisma {
   interface WargaFieldRefs {
     readonly id: FieldRef<"Warga", 'String'>
     readonly nama: FieldRef<"Warga", 'String'>
+    readonly noHpPrefixes: FieldRef<"Warga", 'String[]'>
     readonly noHp: FieldRef<"Warga", 'String'>
     readonly alamat: FieldRef<"Warga", 'String'>
     readonly statusNoHp: FieldRef<"Warga", 'StatusNoHPWarga'>
@@ -18660,6 +18669,7 @@ export namespace Prisma {
   export const WargaScalarFieldEnum: {
     id: 'id',
     nama: 'nama',
+    noHpPrefixes: 'noHpPrefixes',
     noHp: 'noHp',
     alamat: 'alamat',
     statusNoHp: 'statusNoHp',
@@ -19934,6 +19944,7 @@ export namespace Prisma {
     NOT?: WargaWhereInput | WargaWhereInput[]
     id?: StringFilter<"Warga"> | string
     nama?: StringFilter<"Warga"> | string
+    noHpPrefixes?: StringNullableListFilter<"Warga">
     noHp?: StringFilter<"Warga"> | string
     alamat?: StringNullableFilter<"Warga"> | string | null
     statusNoHp?: EnumStatusNoHPWargaFilter<"Warga"> | $Enums.StatusNoHPWarga
@@ -19945,6 +19956,7 @@ export namespace Prisma {
   export type WargaOrderByWithRelationInput = {
     id?: SortOrder
     nama?: SortOrder
+    noHpPrefixes?: SortOrder
     noHp?: SortOrder
     alamat?: SortOrderInput | SortOrder
     statusNoHp?: SortOrder
@@ -19960,6 +19972,7 @@ export namespace Prisma {
     OR?: WargaWhereInput[]
     NOT?: WargaWhereInput | WargaWhereInput[]
     nama?: StringFilter<"Warga"> | string
+    noHpPrefixes?: StringNullableListFilter<"Warga">
     alamat?: StringNullableFilter<"Warga"> | string | null
     statusNoHp?: EnumStatusNoHPWargaFilter<"Warga"> | $Enums.StatusNoHPWarga
     createdAt?: DateTimeFilter<"Warga"> | Date | string
@@ -19970,6 +19983,7 @@ export namespace Prisma {
   export type WargaOrderByWithAggregationInput = {
     id?: SortOrder
     nama?: SortOrder
+    noHpPrefixes?: SortOrder
     noHp?: SortOrder
     alamat?: SortOrderInput | SortOrder
     statusNoHp?: SortOrder
@@ -19986,6 +20000,7 @@ export namespace Prisma {
     NOT?: WargaScalarWhereWithAggregatesInput | WargaScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Warga"> | string
     nama?: StringWithAggregatesFilter<"Warga"> | string
+    noHpPrefixes?: StringNullableListFilter<"Warga">
     noHp?: StringWithAggregatesFilter<"Warga"> | string
     alamat?: StringNullableWithAggregatesFilter<"Warga"> | string | null
     statusNoHp?: EnumStatusNoHPWargaWithAggregatesFilter<"Warga"> | $Enums.StatusNoHPWarga
@@ -21111,6 +21126,7 @@ export namespace Prisma {
   export type WargaCreateInput = {
     id?: string
     nama: string
+    noHpPrefixes?: WargaCreatenoHpPrefixesInput | string[]
     noHp: string
     alamat?: string | null
     statusNoHp?: $Enums.StatusNoHPWarga
@@ -21122,6 +21138,7 @@ export namespace Prisma {
   export type WargaUncheckedCreateInput = {
     id?: string
     nama: string
+    noHpPrefixes?: WargaCreatenoHpPrefixesInput | string[]
     noHp: string
     alamat?: string | null
     statusNoHp?: $Enums.StatusNoHPWarga
@@ -21133,6 +21150,7 @@ export namespace Prisma {
   export type WargaUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     nama?: StringFieldUpdateOperationsInput | string
+    noHpPrefixes?: WargaUpdatenoHpPrefixesInput | string[]
     noHp?: StringFieldUpdateOperationsInput | string
     alamat?: NullableStringFieldUpdateOperationsInput | string | null
     statusNoHp?: EnumStatusNoHPWargaFieldUpdateOperationsInput | $Enums.StatusNoHPWarga
@@ -21144,6 +21162,7 @@ export namespace Prisma {
   export type WargaUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     nama?: StringFieldUpdateOperationsInput | string
+    noHpPrefixes?: WargaUpdatenoHpPrefixesInput | string[]
     noHp?: StringFieldUpdateOperationsInput | string
     alamat?: NullableStringFieldUpdateOperationsInput | string | null
     statusNoHp?: EnumStatusNoHPWargaFieldUpdateOperationsInput | $Enums.StatusNoHPWarga
@@ -21155,6 +21174,7 @@ export namespace Prisma {
   export type WargaCreateManyInput = {
     id?: string
     nama: string
+    noHpPrefixes?: WargaCreatenoHpPrefixesInput | string[]
     noHp: string
     alamat?: string | null
     statusNoHp?: $Enums.StatusNoHPWarga
@@ -21165,6 +21185,7 @@ export namespace Prisma {
   export type WargaUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     nama?: StringFieldUpdateOperationsInput | string
+    noHpPrefixes?: WargaUpdatenoHpPrefixesInput | string[]
     noHp?: StringFieldUpdateOperationsInput | string
     alamat?: NullableStringFieldUpdateOperationsInput | string | null
     statusNoHp?: EnumStatusNoHPWargaFieldUpdateOperationsInput | $Enums.StatusNoHPWarga
@@ -21175,6 +21196,7 @@ export namespace Prisma {
   export type WargaUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     nama?: StringFieldUpdateOperationsInput | string
+    noHpPrefixes?: WargaUpdatenoHpPrefixesInput | string[]
     noHp?: StringFieldUpdateOperationsInput | string
     alamat?: NullableStringFieldUpdateOperationsInput | string | null
     statusNoHp?: EnumStatusNoHPWargaFieldUpdateOperationsInput | $Enums.StatusNoHPWarga
@@ -22183,6 +22205,14 @@ export namespace Prisma {
     _max?: NestedEnumStatusProgramFilter<$PrismaModel>
   }
 
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
+
   export type EnumStatusNoHPWargaFilter<$PrismaModel = never> = {
     equals?: $Enums.StatusNoHPWarga | EnumStatusNoHPWargaFieldRefInput<$PrismaModel>
     in?: $Enums.StatusNoHPWarga[] | ListEnumStatusNoHPWargaFieldRefInput<$PrismaModel>
@@ -22193,6 +22223,7 @@ export namespace Prisma {
   export type WargaCountOrderByAggregateInput = {
     id?: SortOrder
     nama?: SortOrder
+    noHpPrefixes?: SortOrder
     noHp?: SortOrder
     alamat?: SortOrder
     statusNoHp?: SortOrder
@@ -23164,6 +23195,10 @@ export namespace Prisma {
     update?: XOR<XOR<DomainIsuUpdateToOneWithWhereWithoutProgramKelurahanInput, DomainIsuUpdateWithoutProgramKelurahanInput>, DomainIsuUncheckedUpdateWithoutProgramKelurahanInput>
   }
 
+  export type WargaCreatenoHpPrefixesInput = {
+    set: string[]
+  }
+
   export type MasukanWargaCreateNestedManyWithoutWargaInput = {
     create?: XOR<MasukanWargaCreateWithoutWargaInput, MasukanWargaUncheckedCreateWithoutWargaInput> | MasukanWargaCreateWithoutWargaInput[] | MasukanWargaUncheckedCreateWithoutWargaInput[]
     connectOrCreate?: MasukanWargaCreateOrConnectWithoutWargaInput | MasukanWargaCreateOrConnectWithoutWargaInput[]
@@ -23176,6 +23211,11 @@ export namespace Prisma {
     connectOrCreate?: MasukanWargaCreateOrConnectWithoutWargaInput | MasukanWargaCreateOrConnectWithoutWargaInput[]
     createMany?: MasukanWargaCreateManyWargaInputEnvelope
     connect?: MasukanWargaWhereUniqueInput | MasukanWargaWhereUniqueInput[]
+  }
+
+  export type WargaUpdatenoHpPrefixesInput = {
+    set?: string[]
+    push?: string | string[]
   }
 
   export type EnumStatusNoHPWargaFieldUpdateOperationsInput = {
@@ -24317,6 +24357,7 @@ export namespace Prisma {
   export type WargaCreateWithoutMasukanInput = {
     id?: string
     nama: string
+    noHpPrefixes?: WargaCreatenoHpPrefixesInput | string[]
     noHp: string
     alamat?: string | null
     statusNoHp?: $Enums.StatusNoHPWarga
@@ -24327,6 +24368,7 @@ export namespace Prisma {
   export type WargaUncheckedCreateWithoutMasukanInput = {
     id?: string
     nama: string
+    noHpPrefixes?: WargaCreatenoHpPrefixesInput | string[]
     noHp: string
     alamat?: string | null
     statusNoHp?: $Enums.StatusNoHPWarga
@@ -24477,6 +24519,7 @@ export namespace Prisma {
   export type WargaUpdateWithoutMasukanInput = {
     id?: StringFieldUpdateOperationsInput | string
     nama?: StringFieldUpdateOperationsInput | string
+    noHpPrefixes?: WargaUpdatenoHpPrefixesInput | string[]
     noHp?: StringFieldUpdateOperationsInput | string
     alamat?: NullableStringFieldUpdateOperationsInput | string | null
     statusNoHp?: EnumStatusNoHPWargaFieldUpdateOperationsInput | $Enums.StatusNoHPWarga
@@ -24487,6 +24530,7 @@ export namespace Prisma {
   export type WargaUncheckedUpdateWithoutMasukanInput = {
     id?: StringFieldUpdateOperationsInput | string
     nama?: StringFieldUpdateOperationsInput | string
+    noHpPrefixes?: WargaUpdatenoHpPrefixesInput | string[]
     noHp?: StringFieldUpdateOperationsInput | string
     alamat?: NullableStringFieldUpdateOperationsInput | string | null
     statusNoHp?: EnumStatusNoHPWargaFieldUpdateOperationsInput | $Enums.StatusNoHPWarga

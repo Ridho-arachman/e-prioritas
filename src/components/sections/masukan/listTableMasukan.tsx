@@ -106,7 +106,7 @@ const StatusBadge = ({ status }: { status: string }) => {
 };
 
 // ============================================================
-// USER COMBOBOX (tidak berubah)
+// USER COMBOBOX
 // ============================================================
 interface UserComboboxProps {
   value: string;
@@ -363,7 +363,7 @@ export default function MasukanListTable() {
     return domain?.nama || id;
   };
 
-  if (!isMounted) return <div className="p-4 md:p-6">Loading...</div>; // skeleton sederhana
+  if (!isMounted) return <div className="p-4 md:p-6">Loading...</div>;
 
   return (
     <>
@@ -521,7 +521,7 @@ export default function MasukanListTable() {
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Cari masukan..."
+              placeholder="Cari judul / nama pelapor / no HP..."
               className="min-w-62.5"
             />
             {q && (
@@ -586,19 +586,27 @@ export default function MasukanListTable() {
           </div>
         )}
       </CardHeader>
-      <CardContent className="max-w-full overflow-hidden p-4 md:p-6">
-        <div className="overflow-x-auto border rounded-lg">
+
+      <CardContent className="max-w-full p-4 md:p-6">
+        <div className="w-full overflow-x-auto border rounded-lg">
           <Table className="w-full">
             <TableHeader>
               <TableRow className="bg-muted/50">
-                <TableHead className="text-center font-semibold">
+                <TableHead className="text-center font-semibold w-30 max-w-30">
+                  Judul
+                </TableHead>
+                <TableHead className="text-center font-semibold w-32.5 max-w-32.5">
                   Nama
                 </TableHead>
-                <TableHead className="text-center font-semibold">
+                {/* Kolom No. HP baru */}
+                <TableHead className="text-center font-semibold w-32.5 max-w-32.5">
+                  No. HP
+                </TableHead>
+                <TableHead className="text-center font-semibold w-25 max-w-25">
                   Status
                 </TableHead>
                 <TableHead
-                  className="text-center cursor-pointer hover:bg-muted/70"
+                  className="text-center cursor-pointer hover:bg-muted/70 w-27.5 max-w-27.5"
                   onClick={() => handleSortChange("lokasi")}
                 >
                   <div className="flex justify-center items-center gap-1">
@@ -612,7 +620,7 @@ export default function MasukanListTable() {
                   </div>
                 </TableHead>
                 <TableHead
-                  className="text-center cursor-pointer hover:bg-muted/70"
+                  className="text-center cursor-pointer hover:bg-muted/70 w-27.5 max-w-27.5"
                   onClick={() => handleSortChange("createdAt")}
                 >
                   <div className="flex justify-center items-center gap-1">
@@ -625,10 +633,10 @@ export default function MasukanListTable() {
                       ))}
                   </div>
                 </TableHead>
-                <TableHead className="text-center font-semibold">
+                <TableHead className="text-center font-semibold w-30 max-w-30">
                   Domain Isu
                 </TableHead>
-                <TableHead className="text-center font-semibold">
+                <TableHead className="text-center font-semibold w-32.5 max-w-32.5">
                   Diverifikasi Oleh
                 </TableHead>
               </TableRow>
@@ -637,7 +645,7 @@ export default function MasukanListTable() {
               {isLoading && <TableSkeleton rows={5} />}
               {error && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-10">
+                  <TableCell colSpan={8} className="text-center py-10">
                     <DataError message={error.message} />
                   </TableCell>
                 </TableRow>
@@ -646,7 +654,7 @@ export default function MasukanListTable() {
                 masukanList.length === 0 &&
                 !hasSignificantFilter && (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-10">
+                    <TableCell colSpan={8} className="text-center py-10">
                       <DataKosong />
                     </TableCell>
                   </TableRow>
@@ -655,7 +663,7 @@ export default function MasukanListTable() {
                 masukanList.length === 0 &&
                 hasSignificantFilter && (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-10">
+                    <TableCell colSpan={8} className="text-center py-10">
                       <DataTidakDitemukan />
                     </TableCell>
                   </TableRow>
@@ -669,30 +677,43 @@ export default function MasukanListTable() {
                   }
                 >
                   <TableCell
-                    className="text-center truncate max-w-50"
+                    className="text-center truncate w-30 max-w-30"
+                    title={item.judul || ""}
+                  >
+                    {item.judul || "-"}
+                  </TableCell>
+                  <TableCell
+                    className="text-center truncate w-32.5 max-w-32.5"
                     title={item.warga?.nama || ""}
                   >
                     {item.warga?.nama || "-"}
                   </TableCell>
-                  <TableCell className="text-center">
+                  {/* No. HP dari item.warga.noHp (didekripsi di backend) */}
+                  <TableCell
+                    className="text-center truncate w-32.5 max-w-32.5"
+                    title={item.warga?.noHp || ""}
+                  >
+                    {item.warga?.noHp || "-"}
+                  </TableCell>
+                  <TableCell className="text-center w-25 max-w-25">
                     <StatusBadge status={item.status} />
                   </TableCell>
-                  <TableCell className="text-center">
+                  <TableCell className="text-center truncate w-27.5 max-w-27.5">
                     {item.lokasi || "-"}
                   </TableCell>
-                  <TableCell className="text-center">
+                  <TableCell className="text-center w-27.5 max-w-27.5">
                     {format(new Date(item.createdAt), "dd MMM yyyy", {
                       locale: id,
                     })}
                   </TableCell>
                   <TableCell
-                    className="text-center truncate max-w-37.5"
+                    className="text-center truncate w-30 max-w-30"
                     title={item.domainIsu?.nama || ""}
                   >
                     {item.domainIsu?.nama || "-"}
                   </TableCell>
                   <TableCell
-                    className="text-center truncate max-w-37.5"
+                    className="text-center truncate w-32.5 max-w-32.5"
                     title={item.diverifikasiOleh?.name || ""}
                   >
                     {item.diverifikasiOleh?.name || "-"}
@@ -702,6 +723,7 @@ export default function MasukanListTable() {
             </TableBody>
           </Table>
         </div>
+        {/* Pagination */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 pt-4 border-t">
           <div className="text-sm text-muted-foreground">
             Total: {paginationMeta.total}

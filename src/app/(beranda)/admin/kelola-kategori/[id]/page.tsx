@@ -14,7 +14,7 @@ export default function EditKategoriPage() {
           </h1>
         </div>
         <p className="text-muted-foreground ml-1 text-sm md:text-base">
-          Perbarui informasi kategori masukan warga sesuai kebutuhan.
+          Perbarui informasi kategori sesuai kebutuhan.
         </p>
       </div>
 

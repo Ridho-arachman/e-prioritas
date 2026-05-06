@@ -276,6 +276,7 @@ exports.Prisma.ProgramKelurahanScalarFieldEnum = {
 exports.Prisma.WargaScalarFieldEnum = {
   id: 'id',
   nama: 'nama',
+  noHpPrefixes: 'noHpPrefixes',
   noHp: 'noHp',
   alamat: 'alamat',
   statusNoHp: 'statusNoHp',

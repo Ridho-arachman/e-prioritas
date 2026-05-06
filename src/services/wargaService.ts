@@ -8,8 +8,18 @@ function normalizePhoneNumber(phone: string): string {
   return phone.replace(/\D/g, "");
 }
 
+// Helper: hasilkan array enkripsi setiap prefix (awalan) nomor HP
+function generateEncryptedPrefixes(phoneDigits: string): string[] {
+  const MIN_LENGTH = 0; // sesuai threshold pencarian
+  const prefixes: string[] = [];
+  for (let i = MIN_LENGTH; i <= phoneDigits.length; i++) {
+    prefixes.push(encrypt(phoneDigits.slice(0, i)));
+  }
+  return prefixes;
+}
+
 export type WargaGetAllParams = {
-  q?: string; // query pencarian (bisa nama, alamat, atau nomor HP)
+  q?: string;
   statusNoHp?: StatusNoHPWarga;
   page?: number;
   limit?: number;
@@ -18,7 +28,7 @@ export type WargaGetAllParams = {
 };
 
 export const wargaService = {
-  // Create (enkripsi otomatis)
+  // Create (enkripsi + simpan prefix hashes)
   create: async (data: {
     nama: string;
     noHp: string;
@@ -27,24 +37,27 @@ export const wargaService = {
   }) => {
     const normalizedNoHp = normalizePhoneNumber(data.noHp);
     const encryptedNoHp = encrypt(normalizedNoHp);
+    const encryptedPrefixes = generateEncryptedPrefixes(normalizedNoHp);
 
     const created = await prisma.warga.create({
       data: {
         nama: data.nama,
         noHp: encryptedNoHp,
+        noHpPrefixes: encryptedPrefixes,
         alamat: data.alamat ?? null,
         statusNoHp: data.statusNoHp ?? StatusNoHPWarga.BELUM_TERVERIFIKASI,
       },
     });
 
-    // Kembalikan dengan nomor HP yang sudah didekripsi (plain)
+    // Hilangkan noHpPrefixes dari response, dekripsi noHp
+    const { noHpPrefixes, ...rest } = created;
     return {
-      ...created,
-      noHp: decrypt(created.noHp),
+      ...rest,
+      noHp: decrypt(rest.noHp),
     };
   },
 
-  // Get All dengan pagination, filter, dan pencarian (termasuk nomor HP exact match)
+  // Get All dengan pagination, filter, dan pencarian (prefix + exact match)
   getAll: async (params?: WargaGetAllParams) => {
     const {
       q,
@@ -58,22 +71,23 @@ export const wargaService = {
     const where: Prisma.WargaWhereInput = {};
     if (statusNoHp) where.statusNoHp = statusNoHp;
 
-    // Pencarian: jika q diisi
     if (q && q.trim() !== "") {
       const trimmedQ = q.trim();
       const digitsOnly = normalizePhoneNumber(trimmedQ);
-      const isPhoneQuery = digitsOnly.length >= 6; // anggap nomor HP minimal 6 digit
+      const isPhoneQuery = digitsOnly.length >= 0; // threshold pencarian nomor
 
       if (isPhoneQuery) {
-        // Jika query terdeteksi sebagai nomor HP, lakukan exact match pada kolom terenkripsi
-        const encryptedQuery = encrypt(digitsOnly);
+        const encryptedPrefix = encrypt(digitsOnly);
         where.OR = [
-          { noHp: encryptedQuery }, // exact match nomor HP
+          // Pencarian prefix (awalan) melalui blind index
+          { noHpPrefixes: { has: encryptedPrefix } },
+          // Pencarian exact match (nomor lengkap)
+          { noHp: encryptedPrefix },
+          // Nama & alamat
           { nama: { contains: trimmedQ, mode: "insensitive" } },
           { alamat: { contains: trimmedQ, mode: "insensitive" } },
         ];
       } else {
-        // Pencarian biasa (nama/alamat)
         where.OR = [
           { nama: { contains: trimmedQ, mode: "insensitive" } },
           { alamat: { contains: trimmedQ, mode: "insensitive" } },
@@ -97,11 +111,14 @@ export const wargaService = {
       prisma.warga.count({ where }),
     ]);
 
-    // Dekripsi nomor HP untuk setiap data sebelum dikembalikan
-    const decryptedData = data.map((item) => ({
-      ...item,
-      noHp: item.noHp ? decrypt(item.noHp) : null,
-    }));
+    // Dekripsi noHp & hilangkan field noHpPrefixes dari setiap item
+    const decryptedData = data.map((item) => {
+      const { noHpPrefixes, ...rest } = item;
+      return {
+        ...rest,
+        noHp: rest.noHp ? decrypt(rest.noHp) : null,
+      };
+    });
 
     return {
       data: decryptedData,
@@ -112,7 +129,7 @@ export const wargaService = {
     };
   },
 
-  // Get by ID (detail)
+  // Get by ID (tidak diubah)
   getById: async (id: string) => {
     const warga = await prisma.warga.findUniqueOrThrow({
       where: { id },
@@ -125,14 +142,14 @@ export const wargaService = {
       },
     });
 
-    // Dekripsi nomor HP
+    const { noHpPrefixes, ...rest } = warga;
     return {
-      ...warga,
-      noHp: warga.noHp ? decrypt(warga.noHp) : null,
+      ...rest,
+      noHp: rest.noHp ? decrypt(rest.noHp) : null,
     };
   },
 
-  // Update
+  // Update (perbarui noHpPrefixes jika noHp berubah)
   update: async (
     id: string,
     data: {
@@ -150,6 +167,7 @@ export const wargaService = {
     if (data.noHp !== undefined) {
       const normalized = normalizePhoneNumber(data.noHp);
       updatePayload.noHp = encrypt(normalized);
+      updatePayload.noHpPrefixes = generateEncryptedPrefixes(normalized);
     }
 
     const updated = await prisma.warga.update({
@@ -157,13 +175,14 @@ export const wargaService = {
       data: updatePayload,
     });
 
+    const { noHpPrefixes, ...rest } = updated;
     return {
-      ...updated,
-      noHp: updated.noHp ? decrypt(updated.noHp) : null,
+      ...rest,
+      noHp: rest.noHp ? decrypt(rest.noHp) : null,
     };
   },
 
-  // Delete (dengan pengecekan relasi)
+  // Delete (tidak diubah)
   delete: async (id: string) => {
     return prisma.warga.delete({ where: { id } });
   },

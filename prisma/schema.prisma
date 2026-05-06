@@ -72,8 +72,8 @@ model DomainIsu {
 
 model User {
   id       String  @id @default(cuid())
-  name     String  @db.VarChar(255)
-  email    String  @unique
+  name     String  @db.VarChar(100)
+  email    String  @unique @db.VarChar(255)
   jabatan  String? @db.VarChar(100)
   role     Role    @default(PERANGKAT_DESA)
   isActive Boolean @default(true) @map("is_active")
@@ -195,10 +195,10 @@ model KegiatanRapat {
   mode              ModeRekomendasi
   judulLaporan      String            @db.VarChar(255)
   rekomendasiItems  Json
-  fingerprint       String            @unique
+  fingerprint       String            @unique @db.VarChar(32)
   statusRekomendasi StatusRekomendasi @default(DRAFT)
   // AI Metadata
-  aiModel           String?
+  aiModel           String? @db.VarChar(100)
   aiProcessedAt     DateTime?
 
   // Relasi - untuk yang diproses (approval)
@@ -359,8 +359,9 @@ enum StatusNoHPWarga {
 }
 model Warga {
   id        String   @id @default(cuid())
-  nama      String   @db.VarChar(255)
-  noHp      String   @unique @db.VarChar(255)  // Nomor HP sebagai identifier unik
+  nama      String   @db.VarChar(100)
+  noHpPrefixes  String[]  
+  noHp      String   @unique @db.VarChar(64)  // Nomor HP sebagai identifier unik
   alamat    String?  @db.Text                 // Alamat lengkap atau RT/RW
   statusNoHp StatusNoHPWarga @default(BELUM_TERVERIFIKASI) // Status verifikasi nomor HP    
 

@@ -1,7 +1,12 @@
 import { Prisma, StatusMasukan } from "@/app/generated/prisma";
-import { decrypt } from "@/lib/encryption";
+import { decrypt, encrypt } from "@/lib/encryption";
 import prisma from "@/lib/prisma";
 import { createMasukanWargaInternalSchema } from "@/schema/masukanWarga";
+
+function normalizePhoneNumber(phone: string): string {
+  return phone.replace(/\D/g, "");
+}
+
 
 export const masukanWargaService = {
   create: async (data: {
@@ -55,7 +60,6 @@ export const masukanWargaService = {
       sortOrder = "desc",
     } = params;
 
-    // Bangun array kondisi untuk AND
     const andConditions: Prisma.MasukanWargaWhereInput[] = [];
 
     if (status) andConditions.push({ status });
@@ -66,21 +70,43 @@ export const masukanWargaService = {
         lokasi: { contains: lokasi, mode: "insensitive" as Prisma.QueryMode },
       });
     }
+
     if (q) {
-      andConditions.push({
-        OR: [
-          { judul: { contains: q, mode: "insensitive" as Prisma.QueryMode } },
-          {
-            deskripsi: { contains: q, mode: "insensitive" as Prisma.QueryMode },
+      const trimmedQ = q.trim();
+      const digitsOnly = normalizePhoneNumber(trimmedQ);
+      // ✅ Threshold minimal 6 digit untuk dianggap sebagai nomor HP
+      const isPhoneQuery = digitsOnly.length >= 0;
+
+      const ORConditions: Prisma.MasukanWargaWhereInput[] = [
+        { judul: { contains: trimmedQ, mode: "insensitive" as Prisma.QueryMode } },
+        {
+          warga: {
+            nama: { contains: trimmedQ, mode: "insensitive" as Prisma.QueryMode },
           },
-          {
+        },
+      ];
+
+      if (isPhoneQuery) {
+        const encryptedPrefix = encrypt(digitsOnly);
+        ORConditions.push({
+          warga: {
+            noHpPrefixes: { has: encryptedPrefix },
+          },
+        });
+
+        // exact match hanya jika panjangnya cukup (nomor lengkap)
+        if (digitsOnly.length >= 10) {
+          ORConditions.push({
             warga: {
-              nama: { contains: q, mode: "insensitive" as Prisma.QueryMode },
+              noHp: encryptedPrefix,
             },
-          },
-        ],
-      });
+          });
+        }
+      }
+
+      andConditions.push({ OR: ORConditions });
     }
+
     if (createdAt) {
       const startDate = new Date(createdAt);
       startDate.setHours(0, 0, 0, 0);
@@ -95,14 +121,7 @@ export const masukanWargaService = {
       ? { AND: andConditions }
       : {};
 
-    // Validasi sortBy
-    const validSortFields = [
-      "createdAt",
-      "updatedAt",
-      "judul",
-      "status",
-      "lokasi",
-    ];
+    const validSortFields = ["createdAt", "updatedAt", "judul", "status", "lokasi"];
     const sortField = validSortFields.includes(sortBy) ? sortBy : "createdAt";
     const orderBy: Prisma.MasukanWargaOrderByWithRelationInput = {
       [sortField]: sortOrder,
@@ -132,14 +151,13 @@ export const masukanWargaService = {
       }),
     ]);
 
-    // Dekripsi nomor HP untuk response
     const dataWithDecrypted = data.map((item) => ({
       ...item,
       warga: item.warga
         ? {
-            ...item.warga,
-            noHp: item.warga.noHp ? decrypt(item.warga.noHp) : null,
-          }
+          ...item.warga,
+          noHp: item.warga.noHp ? decrypt(item.warga.noHp) : null,
+        }
         : null,
     }));
 
@@ -175,9 +193,9 @@ export const masukanWargaService = {
       ...masukan,
       warga: masukan.warga
         ? {
-            ...masukan.warga,
-            noHp: masukan.warga.noHp ? decrypt(masukan.warga.noHp) : null,
-          }
+          ...masukan.warga,
+          noHp: masukan.warga.noHp ? decrypt(masukan.warga.noHp) : null,
+        }
         : null,
     };
   },

@@ -14,7 +14,7 @@ export default function CreateKategoriPage() {
           </h1>
         </div>
         <p className="text-muted-foreground ml-1 text-sm md:text-base">
-          Buat kategori untuk mengelompokkan masukan warga berdasarkan tema.
+          Buat kategori untuk mengelompokkan berdasarkan tema.
         </p>
       </div>
 

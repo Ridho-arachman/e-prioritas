@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Crown,
+  ShieldCheck,
   Users,
   Shield,
   HeartHandshake,
@@ -204,8 +204,8 @@ export default function StrukturOrganisasiClient() {
                     />
                   </div>
                 </div>
-                <div className="inline-flex p-3 rounded-full bg-linear-to-r from-yellow-500 to-amber-500 text-white mb-4">
-                  <Crown className="w-8 h-8" />
+                <div className="inline-flex p-3 rounded-full bg-linear-to-r from-blue-600 to-indigo-600 text-white mb-4 shadow-lg shadow-blue-500/20">
+                  <ShieldCheck className="w-8 h-8" />
                 </div>
                 <CardTitle className="text-2xl font-bold">
                   {pemerintahan.lurah.jabatan}

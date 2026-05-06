@@ -37,7 +37,7 @@ const navLinks = [
     icon: GitBranch,
   },
   { href: "/masukan", label: "Masukan Warga", icon: MessageSquare },
-  { href: "/surat", label: "Surat Menyurat", icon: MailOpen },
+  // { href: "/surat", label: "Surat Menyurat", icon: MailOpen },
 ];
 
 export default function Navbar() {

@@ -314,7 +314,7 @@ export function WargaList({ role = "admin" }: WargaListProps) {
               <Input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Cari nama atau nomor HP..."
+                placeholder="Cari nama / alamat / nomor HP..."
                 className="pr-10"
               />
               {q && (

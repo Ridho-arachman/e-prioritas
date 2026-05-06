@@ -15,11 +15,11 @@ const page = async () => {
             <span className="text-2xl md:text-3xl">🏷️</span>
           </div>
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold bg-linear-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-            Kelola Kategori Masukan Warga
+            Kelola Kategori
           </h1>
         </div>
         <p className="text-muted-foreground mt-2 ml-1 text-sm md:text-base">
-          Kelola data kategori, tambah, edit, atau hapus kategori masukan warga.
+          Kelola data kategori, tambah, edit, atau hapus kategori.
         </p>
       </div>
 
