@@ -336,7 +336,7 @@ export default function ProgramKelurahanList({
               <Input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Cari judul atau deskripsi..."
+                placeholder="Cari judul / lokasi / PIC..."
                 className="pr-10"
               />
               {q && (

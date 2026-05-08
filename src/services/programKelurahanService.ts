@@ -66,7 +66,7 @@ export const programKelurahanService = {
     if (search) {
       where.OR = [
         { judul: { contains: search, mode: "insensitive" } },
-        { deskripsi: { contains: search, mode: "insensitive" } },
+        { pic: { contains: search, mode: "insensitive" } },
         { lokasi: { contains: search, mode: "insensitive" } }, // ✅ tambah pencarian lokasi
       ];
     }

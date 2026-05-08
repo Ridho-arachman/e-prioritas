@@ -16,6 +16,22 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { useDelete, useGet } from "@/hooks/useApi";
 import { notifier } from "@/lib/ToastNotifier";
@@ -26,6 +42,8 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import {
   AlertCircle,
+  ArrowDown,
+  ArrowUp,
   Calendar,
   Check,
   ChevronLeft,
@@ -36,12 +54,16 @@ import {
   Edit,
   Eye,
   FileText,
+  Filter,
   MapPin,
   Plus,
+  SlidersHorizontal,
   SparklesIcon,
   TargetIcon,
   Trash,
   Users,
+  X,
+  XIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
@@ -62,6 +84,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
 
 // ═══════════════════════════════════════════════════════════════
 // 📦 ENUMS (Sesuai Schema Prisma)
@@ -154,7 +177,7 @@ export interface RekomendasiItem {
   lokasiRw?: string;
   fingerprint: string;
   evidence?: RekomendasiEvidence;
-  warning?: string | null; // ✅ tambahan
+  warning?: string | null; // ✅ tambahan field warning
 }
 
 export interface RekomendasiMetadata {
@@ -474,6 +497,7 @@ export default function ListJadwalKegiatan() {
     defaultValue: "desc",
   });
 
+  // State untuk menyimpan nama user yang dipilih (untuk badge)
   const [selectedDibuatOlehName, setSelectedDibuatOlehName] = useState("");
   const [selectedDiprosesOlehName, setSelectedDiprosesOlehName] = useState("");
 
@@ -497,10 +521,12 @@ export default function ListJadwalKegiatan() {
   });
 
   const { data, meta, error, isLoading, mutate } = useGet(
-    `/protected/kegiatan-rapat/perangkat${queryString}`,
+    `/protected/perangkat/kegiatan-rapat${queryString}`,
   );
 
   const { del: deleteKegiatan, loading: deleteLoading } = useDelete();
+
+  // Fetch domain isu options
   const { data: domainIsuOptions } = useGet("/protected/kategori");
 
   const sortOptions = [
@@ -544,7 +570,7 @@ export default function ListJadwalKegiatan() {
     if (!selectedDeleteId) return;
     try {
       const res = await deleteKegiatan(
-        `/protected/kegiatan-rapat/${selectedDeleteId}`,
+        `/protected/perangkat/kegiatan-rapat/${selectedDeleteId}`,
       );
       notifier.success("Berhasil", res?.message);
       mutate();
@@ -583,17 +609,34 @@ export default function ListJadwalKegiatan() {
     sortBy !== "updatedAt" ||
     sortOrder !== "desc";
 
+  // Tampilkan loading saat belum mounted (SSR)
   if (!isMounted) {
-    // skeleton...
-    return <div className="min-h-screen..." />;
+    return (
+      <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50 py-12 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-blue-100/40 via-transparent to-transparent" />
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="animate-pulse space-y-8">
+            <div className="h-20 bg-slate-200 rounded-2xl" />
+            <div className="h-16 bg-slate-200 rounded-2xl" />
+            <div className="space-y-4">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="h-48 bg-slate-200 rounded-2xl" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
     <>
-      {/* Delete Dialog */}
+      {/* Delete Confirmation Dialog */}
       <AlertDialog
         open={!!selectedDeleteId}
-        onOpenChange={(open) => !open && setSelectedDeleteId(null)}
+        onOpenChange={(open) => {
+          if (!open) setSelectedDeleteId(null);
+        }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -626,7 +669,11 @@ export default function ListJadwalKegiatan() {
       </AlertDialog>
 
       <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50 py-12 px-4 relative overflow-hidden">
-        {/* ... background effects ... (sama seperti sebelumnya) */}
+        {/* Background Effects */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-blue-100/40 via-transparent to-transparent" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-400/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-cyan-400/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
 
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Header */}
@@ -649,7 +696,8 @@ export default function ListJadwalKegiatan() {
                 onClick={() => router.push("/perangkat/jadwal-program/add")}
                 className="gap-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl px-6 py-3 transition-all duration-300 hover:shadow-blue-500/50 hover:scale-105 font-medium"
               >
-                <Plus className="h-5 w-5" /> Tambah Kegiatan
+                <Plus className="h-5 w-5" />
+                Tambah Kegiatan
               </Button>
             </div>
 
@@ -706,8 +754,331 @@ export default function ListJadwalKegiatan() {
             </div>
           </div>
 
-          {/* Toolbar (Filter & Sort) – sama seperti kode Anda, tidak diubah */}
-          {/* ... (salin dari kode Anda bagian ini) ... */}
+          {/* Toolbar */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-10">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="relative group">
+                <div className="absolute inset-0 bg-linear-to-r from-blue-500/10 to-indigo-500/10 rounded-xl blur opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none" />
+                <XIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
+                <Input
+                  placeholder="Cari nama / lokasi / deskripsi..."
+                  className="pl-12 pr-12 py-3 w-72 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-sm relative z-10"
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") setQ("");
+                  }}
+                />
+                {q && (
+                  <button
+                    onClick={() => setQ("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full p-1 transition-all z-20"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
+              <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+                <Button
+                  variant="outline"
+                  className="cursor-pointer border-slate-200"
+                  onClick={() => setIsFilterOpen(true)}
+                >
+                  <Filter className="mr-2 h-4 w-4" />
+                  Filter & Sort
+                  {hasActiveFilters && (
+                    <Badge variant="secondary" className="ml-2">
+                      {[
+                        domainIsuId,
+                        statusRekomendasi,
+                        mode,
+                        dibuatOlehId,
+                        diprosesOlehId,
+                        tanggal,
+                        createdAt,
+                      ].filter(Boolean).length +
+                        (sortBy !== "updatedAt" || sortOrder !== "desc"
+                          ? 1
+                          : 0)}
+                    </Badge>
+                  )}
+                </Button>
+                <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>
+                      <div className="flex items-center gap-2">
+                        <SlidersHorizontal className="h-5 w-5" />
+                        Filter & Pengurutan
+                      </div>
+                    </DialogTitle>
+                    <DialogDescription>
+                      Atur filter dan urutan data kegiatan rapat
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
+                    {/* Domain Isu */}
+                    <div className="grid gap-2">
+                      <Label>Domain Isu</Label>
+                      <Select
+                        value={domainIsuId || "all"}
+                        onValueChange={(val) =>
+                          setDomainIsuId(val === "all" ? "" : val)
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih domain" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Semua Domain</SelectItem>
+                          {domainIsuOptions?.map((option: DomainIsu) => (
+                            <SelectItem key={option.id} value={option.id}>
+                              {option.nama}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Status Rekomendasi */}
+                    <div className="grid gap-2">
+                      <Label>Status Rekomendasi</Label>
+                      <Select
+                        value={statusRekomendasi || "all"}
+                        onValueChange={(val) =>
+                          setStatusRekomendasi(val === "all" ? "" : val)
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Semua</SelectItem>
+                          {Object.values(StatusRekomendasi).map((status) => (
+                            <SelectItem key={status} value={status}>
+                              {status}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Mode Rekomendasi */}
+                    <div className="grid gap-2">
+                      <Label>Mode Rekomendasi</Label>
+                      <Select
+                        value={mode || "all"}
+                        onValueChange={(val) =>
+                          setMode(val === "all" ? "" : val)
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih mode" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Semua</SelectItem>
+                          {Object.values(ModeRekomendasi).map((m) => (
+                            <SelectItem key={m} value={m}>
+                              {m === "FUSI_DATA" ? "Fusi Data" : "Data Master"}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Dibuat Oleh - hanya ADMIN & PERANGKAT_DESA */}
+                    <div className="grid gap-2">
+                      <Label>Dibuat Oleh</Label>
+                      <UserCombobox
+                        value={dibuatOlehId}
+                        onChange={(val, user) => {
+                          setDibuatOlehId(val);
+                          setSelectedDibuatOlehName(user?.name || "");
+                        }}
+                        placeholder="Pilih pembuat"
+                        allowedRoles={["ADMIN", "PERANGKAT_DESA"]}
+                      />
+                    </div>
+
+                    {/* Diproses Oleh - semua role */}
+                    <div className="grid gap-2">
+                      <Label>Diproses Oleh</Label>
+                      <UserCombobox
+                        value={diprosesOlehId}
+                        onChange={(val, user) => {
+                          setDiprosesOlehId(val);
+                          setSelectedDiprosesOlehName(user?.name || "");
+                        }}
+                        placeholder="Pilih pemroses"
+                      />
+                    </div>
+
+                    {/* Tanggal Rapat */}
+                    <div className="grid gap-2">
+                      <Label>Tanggal Rapat</Label>
+                      <Input
+                        type="date"
+                        value={tanggal}
+                        onChange={(e) => setTanggal(e.target.value)}
+                      />
+                    </div>
+
+                    {/* Tanggal Dibuat */}
+                    <div className="grid gap-2">
+                      <Label>Tanggal Dibuat</Label>
+                      <Input
+                        type="date"
+                        value={createdAt}
+                        onChange={(e) => setCreatedAt(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <Separator className="my-2" />
+
+                  {/* Sort Options */}
+                  <div className="grid gap-2 mt-4">
+                    <Label>Urutkan Berdasarkan</Label>
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih kolom" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {sortOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <div className="flex gap-2">
+                      <Button
+                        variant={sortOrder === "asc" ? "default" : "outline"}
+                        className="flex-1"
+                        onClick={() => setSortOrder("asc")}
+                      >
+                        <ArrowUp className="mr-2 h-4 w-4" />
+                        Ascending
+                      </Button>
+                      <Button
+                        variant={sortOrder === "desc" ? "default" : "outline"}
+                        className="flex-1"
+                        onClick={() => setSortOrder("desc")}
+                      >
+                        <ArrowDown className="mr-2 h-4 w-4" />
+                        Descending
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between gap-2 mt-6">
+                    <Button variant="outline" onClick={clearFilters}>
+                      Reset
+                    </Button>
+                    <Button onClick={() => setIsFilterOpen(false)}>
+                      Terapkan
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              <Badge
+                variant="outline"
+                className="bg-slate-100 border-slate-200 text-slate-600 px-4 py-2 rounded-xl font-medium"
+              >
+                {data?.length || 0} kegiatan
+              </Badge>
+            </div>
+          </div>
+
+          {/* Active Filters Badge */}
+          {hasActiveFilters && (
+            <div className="flex flex-wrap gap-2 mb-6">
+              {domainIsuId && (
+                <Badge variant="secondary" className="gap-2">
+                  Domain:{" "}
+                  {domainIsuOptions?.find(
+                    (d: DomainIsu) => d.id === domainIsuId,
+                  )?.nama || domainIsuId}
+                  <button onClick={() => setDomainIsuId("")}>
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+              {statusRekomendasi && (
+                <Badge variant="secondary" className="gap-2">
+                  Status: {statusRekomendasi}
+                  <button onClick={() => setStatusRekomendasi("")}>
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+              {mode && (
+                <Badge variant="secondary" className="gap-2">
+                  Mode: {mode === "FUSI_DATA" ? "Fusi Data" : "Data Master"}
+                  <button onClick={() => setMode("")}>
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+              {dibuatOlehId && (
+                <Badge variant="secondary" className="gap-2">
+                  Dibuat: {selectedDibuatOlehName || dibuatOlehId}
+                  <button
+                    onClick={() => {
+                      setDibuatOlehId("");
+                      setSelectedDibuatOlehName("");
+                    }}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+              {diprosesOlehId && (
+                <Badge variant="secondary" className="gap-2">
+                  Diproses: {selectedDiprosesOlehName || diprosesOlehId}
+                  <button
+                    onClick={() => {
+                      setDiprosesOlehId("");
+                      setSelectedDiprosesOlehName("");
+                    }}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+              {tanggal && (
+                <Badge variant="secondary" className="gap-2">
+                  Tgl Rapat: {format(new Date(tanggal), "dd MMM yyyy")}
+                  <button onClick={() => setTanggal("")}>
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+              {createdAt && (
+                <Badge variant="secondary" className="gap-2">
+                  Dibuat: {format(new Date(createdAt), "dd MMM yyyy")}
+                  <button onClick={() => setCreatedAt("")}>
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+              {(sortBy !== "updatedAt" || sortOrder !== "desc") && (
+                <Badge variant="secondary" className="gap-2">
+                  Sort: {sortOptions.find((o) => o.value === sortBy)?.label}{" "}
+                  {sortOrder === "asc" ? "↑" : "↓"}
+                  <button
+                    onClick={() => {
+                      setSortBy("updatedAt");
+                      setSortOrder("desc");
+                    }}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+            </div>
+          )}
 
           {/* Timeline Kegiatan */}
           <div className="space-y-8">
@@ -748,280 +1119,286 @@ export default function ListJadwalKegiatan() {
             )}
 
             {data?.length > 0 && (
-              <div className="relative pl-8">
-                <div className="absolute left-4 top-0 bottom-0 w-1 bg-linear-to-b from-blue-400 via-indigo-400 to-purple-400 rounded-full" />
-                <div className="space-y-6">
-                  {data?.map((k: KegiatanRapat) => {
-                    const gradient = getDomainGradient(k.domainIsu?.code);
-                    const rekomendasiData = parseRekomendasiItems(
-                      k.rekomendasiItems,
-                    );
-                    const prioritasCount =
-                      rekomendasiData?.prioritas?.length || 0;
+              <>
+                <div className="relative pl-8">
+                  <div className="absolute left-4 top-0 bottom-0 w-1 bg-linear-to-b from-blue-400 via-indigo-400 to-purple-400 rounded-full" />
+                  <div className="space-y-6">
+                    {data?.map((k: KegiatanRapat) => {
+                      const gradient = getDomainGradient(k.domainIsu?.code);
+                      const rekomendasiData = parseRekomendasiItems(
+                        k.rekomendasiItems,
+                      );
+                      const prioritasCount =
+                        rekomendasiData?.prioritas?.length || 0;
 
-                    return (
-                      <div key={k.id} className="relative group">
-                        <div
-                          className={`absolute -left-6.5 top-6 w-6 h-6 rounded-full bg-linear-to-br ${gradient} border-4 border-white shadow-lg z-10`}
-                        />
-                        <Card className="group/card border border-slate-200 bg-white rounded-2xl overflow-hidden hover:border-blue-400 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-500 hover:-translate-y-1">
-                          <div className={`h-2 bg-linear-to-r ${gradient}`} />
-                          <div className="p-6">
-                            <div className="flex flex-col lg:flex-row lg:items-start gap-6">
-                              <div className="shrink-0">
-                                <div className="relative">
-                                  <div
-                                    className={`absolute inset-0 bg-linear-to-br ${gradient} rounded-2xl blur-lg opacity-20 group-hover/card:opacity-40 transition-opacity`}
-                                  />
-                                  <div className="relative bg-linear-to-br from-slate-50 to-white rounded-2xl p-4 border border-slate-200 min-w-32.5 text-center shadow-sm">
-                                    <div className="flex items-center justify-center gap-1.5 text-slate-500 text-xs mb-2 font-medium">
-                                      <ClockIcon className="h-3.5 w-3.5" />
-                                      <span>
-                                        {formatTanggalShort(k.tanggal)}
-                                      </span>
-                                    </div>
-                                    <p className="text-3xl font-bold text-slate-800">
-                                      {formatJam(k.tanggal)}
-                                    </p>
-                                    <p className="text-slate-400 text-xs mt-1 font-medium">
-                                      WIB
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
-                                  <div>
-                                    <h3 className="text-xl font-bold text-slate-800 group-hover/card:text-blue-600 transition-colors">
-                                      {k.judul}
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2 mt-2">
-                                      {k.domainIsu && (
-                                        <Badge
-                                          variant="outline"
-                                          className="bg-blue-50 text-blue-700 border-blue-200 font-medium"
-                                        >
-                                          {k.domainIsu.nama}
-                                        </Badge>
-                                      )}
-                                      <Badge
-                                        variant="outline"
-                                        className={`${getModeBadgeColor(k.mode)} font-medium`}
-                                      >
-                                        {k.mode === "FUSI_DATA"
-                                          ? "Fusi Data"
-                                          : "Data Master"}
-                                      </Badge>
-                                      <Badge
-                                        variant="outline"
-                                        className={`${getStatusColor(k.statusRekomendasi)} font-medium`}
-                                      >
-                                        {k.statusRekomendasi}
-                                      </Badge>
-                                    </div>
-                                  </div>
-                                  {k.aiModel && (
-                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-50 border border-purple-200">
-                                      <SparklesIcon className="h-4 w-4 text-purple-600" />
-                                      <span className="text-xs text-purple-700 font-medium">
-                                        AI Powered
-                                      </span>
-                                    </div>
-                                  )}
-                                </div>
-                                <div className="flex flex-wrap gap-4 text-sm text-slate-500 mb-4">
-                                  <div className="flex items-center gap-2">
-                                    <div className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center">
-                                      <MapPin className="h-4 w-4 text-slate-400" />
-                                    </div>
-                                    <span className="font-medium">
-                                      {k.lokasi || "Belum ditentukan"}
-                                    </span>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <div className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center">
-                                      <Users className="h-4 w-4 text-slate-400" />
-                                    </div>
-                                    <span className="font-medium">
-                                      {k.dibuatOleh.name}
-                                    </span>
-                                  </div>
-                                </div>
-                                <p className="text-slate-600 leading-relaxed mb-5 line-clamp-2">
-                                  {k.deskripsi}
-                                </p>
-                                {rekomendasiData && prioritasCount > 0 && (
-                                  <div className="space-y-4">
-                                    <div className="flex items-center gap-2">
-                                      <div className="flex-1 h-px bg-linear-to-r from-slate-200 to-transparent" />
-                                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-50 border border-slate-200">
-                                        <FileText className="h-4 w-4 text-blue-600" />
-                                        <span className="text-xs text-slate-600 uppercase tracking-wider font-semibold">
-                                          {prioritasCount} Prioritas AI
+                      return (
+                        <div key={k.id} className="relative group">
+                          <div
+                            className={`absolute -left-6.5 top-6 w-6 h-6 rounded-full bg-linear-to-br ${gradient} border-4 border-white shadow-lg z-10`}
+                          />
+                          <Card className="group/card border border-slate-200 bg-white rounded-2xl overflow-hidden hover:border-blue-400 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-500 hover:-translate-y-1">
+                            <div className={`h-2 bg-linear-to-r ${gradient}`} />
+                            <div className="p-6">
+                              <div className="flex flex-col lg:flex-row lg:items-start gap-6">
+                                <div className="shrink-0">
+                                  <div className="relative">
+                                    <div
+                                      className={`absolute inset-0 bg-linear-to-br ${gradient} rounded-2xl blur-lg opacity-20 group-hover/card:opacity-40 transition-opacity`}
+                                    />
+                                    <div className="relative bg-linear-to-br from-slate-50 to-white rounded-2xl p-4 border border-slate-200 min-w-32.5 text-center shadow-sm">
+                                      <div className="flex items-center justify-center gap-1.5 text-slate-500 text-xs mb-2 font-medium">
+                                        <ClockIcon className="h-3.5 w-3.5" />
+                                        <span>
+                                          {formatTanggalShort(k.tanggal)}
                                         </span>
                                       </div>
-                                      <div className="flex-1 h-px bg-linear-to-l from-slate-200 to-transparent" />
-                                    </div>
-                                    <div className="grid gap-3 md:grid-cols-2">
-                                      {rekomendasiData.prioritas.map(
-                                        (rec, idx) => (
-                                          <div
-                                            key={rec.fingerprint || idx}
-                                            className="group/rec relative bg-linear-to-br from-slate-50 to-white rounded-xl p-4 border border-slate-200 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300"
-                                          >
-                                            {/* Ikon warning jika ada */}
-                                            {rec.warning && (
-                                              <div
-                                                className="absolute top-2 left-2 z-10"
-                                                title={rec.warning}
-                                              >
-                                                <AlertCircle className="h-4 w-4 text-amber-500" />
-                                              </div>
-                                            )}
-                                            <div className="absolute top-3 right-3">
-                                              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200">
-                                                <TargetIcon className="h-3.5 w-3.5 text-amber-600" />
-                                                <span className="text-xs font-bold text-amber-700">
-                                                  {rec.skorPrioritas}
-                                                </span>
-                                              </div>
-                                            </div>
-                                            <div className="flex items-center gap-2 mb-2">
-                                              <Badge
-                                                variant="outline"
-                                                className="text-xs font-medium bg-blue-50 text-blue-700 border-blue-200"
-                                              >
-                                                Prioritas #{rec.prioritasKe}
-                                              </Badge>
-                                            </div>
-                                            <p className="text-sm font-semibold text-slate-800 mb-2 line-clamp-1">
-                                              {rec.deskripsi}
-                                            </p>
-                                            <p className="text-xs text-slate-500 line-clamp-2 mb-3">
-                                              {rec.alasanAnalisis}
-                                            </p>
-                                            {rec.evidence && (
-                                              <div className="pt-3 border-t border-slate-200">
-                                                <div className="flex items-center justify-between mb-2">
-                                                  <div className="flex items-center gap-1.5">
-                                                    <Users className="h-3.5 w-3.5 text-slate-400" />
-                                                    <span className="text-xs text-slate-500 font-medium">
-                                                      {rec.evidence
-                                                        .masukanWargaCount ||
-                                                        0}{" "}
-                                                      masukan
-                                                    </span>
-                                                  </div>
-                                                  {rec.evidence
-                                                    .kritikalitas && (
-                                                    <Badge
-                                                      variant="secondary"
-                                                      className="text-xs"
-                                                    >
-                                                      {
-                                                        rec.evidence
-                                                          .kritikalitas
-                                                      }
-                                                    </Badge>
-                                                  )}
-                                                </div>
-                                              </div>
-                                            )}
-                                          </div>
-                                        ),
-                                      )}
+                                      <p className="text-3xl font-bold text-slate-800">
+                                        {formatJam(k.tanggal)}
+                                      </p>
+                                      <p className="text-slate-400 text-xs mt-1 font-medium">
+                                        WIB
+                                      </p>
                                     </div>
                                   </div>
-                                )}
-                                <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-slate-100">
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      router.push(
-                                        `/perangkat/jadwal-program/${k.id}`,
-                                      );
-                                    }}
-                                    className="cursor-pointer"
-                                  >
-                                    <Eye className="h-4 w-4 mr-1" /> Detail
-                                  </Button>
-                                  {(k.statusRekomendasi ===
-                                    StatusRekomendasi.DRAFT ||
-                                    k.statusRekomendasi ===
-                                      StatusRekomendasi.DIAJUKAN) && (
-                                    <>
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          router.push(
-                                            `/perangkat/jadwal-program/${k.id}/edit`,
-                                          );
-                                        }}
-                                        className="cursor-pointer"
-                                      >
-                                        <Edit className="h-4 w-4 mr-1" /> Edit
-                                      </Button>
-                                      <Button
-                                        size="sm"
-                                        variant="destructive"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          setSelectedDeleteId(k.id);
-                                        }}
-                                        className="cursor-pointer"
-                                      >
-                                        <Trash className="h-4 w-4" />
-                                      </Button>
-                                    </>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
+                                    <div>
+                                      <h3 className="text-xl font-bold text-slate-800 group-hover/card:text-blue-600 transition-colors">
+                                        {k.judul}
+                                      </h3>
+                                      <div className="flex flex-wrap gap-2 mt-2">
+                                        {k.domainIsu && (
+                                          <Badge
+                                            variant="outline"
+                                            className={`${getStatusColor(StatusRekomendasi.DRAFT)} font-medium`}
+                                          >
+                                            {k.domainIsu.nama}
+                                          </Badge>
+                                        )}
+                                        <Badge
+                                          variant="outline"
+                                          className={`${getModeBadgeColor(k.mode)} font-medium`}
+                                        >
+                                          {k.mode === "FUSI_DATA"
+                                            ? "Fusi Data"
+                                            : "Data Master"}
+                                        </Badge>
+                                        <Badge
+                                          variant="outline"
+                                          className={`${getStatusColor(k.statusRekomendasi)} font-medium`}
+                                        >
+                                          {k.statusRekomendasi}
+                                        </Badge>
+                                      </div>
+                                    </div>
+                                    {k.aiModel && (
+                                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-50 border border-purple-200">
+                                        <SparklesIcon className="h-4 w-4 text-purple-600" />
+                                        <span className="text-xs text-purple-700 font-medium">
+                                          AI Powered
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="flex flex-wrap gap-4 text-sm text-slate-500 mb-4">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center">
+                                        <MapPin className="h-4 w-4 text-slate-400" />
+                                      </div>
+                                      <span className="font-medium">
+                                        {k.lokasi || "Belum ditentukan"}
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center">
+                                        <Users className="h-4 w-4 text-slate-400" />
+                                      </div>
+                                      <span className="font-medium">
+                                        {k.dibuatOleh.name}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <p className="text-slate-600 leading-relaxed mb-5 line-clamp-2">
+                                    {k.deskripsi}
+                                  </p>
+                                  {rekomendasiData && prioritasCount > 0 && (
+                                    <div className="space-y-4">
+                                      <div className="flex items-center gap-2">
+                                        <div className="flex-1 h-px bg-linear-to-r from-slate-200 to-transparent" />
+                                        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-50 border border-slate-200">
+                                          <FileText className="h-4 w-4 text-blue-600" />
+                                          <span className="text-xs text-slate-600 uppercase tracking-wider font-semibold">
+                                            {prioritasCount} Prioritas AI
+                                          </span>
+                                        </div>
+                                        <div className="flex-1 h-px bg-linear-to-l from-slate-200 to-transparent" />
+                                      </div>
+                                      <div className="grid gap-3 md:grid-cols-2">
+                                        {rekomendasiData.prioritas.map(
+                                          (rec, idx) => (
+                                            <div
+                                              key={rec.fingerprint || idx}
+                                              className="group/rec relative bg-linear-to-br from-slate-50 to-white rounded-xl p-4 border border-slate-200 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300"
+                                            >
+                                              {/* Warning badge jika ada */}
+                                              {rec.warning && (
+                                                <div className="absolute top-2 right-2 z-10">
+                                                  <div
+                                                    className="bg-amber-50 border border-amber-200 rounded-full p-1"
+                                                    title={rec.warning}
+                                                  >
+                                                    <AlertCircle className="h-3 w-3 text-amber-600" />
+                                                  </div>
+                                                </div>
+                                              )}
+                                              <div className="absolute top-3 right-3">
+                                                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200">
+                                                  <TargetIcon className="h-3.5 w-3.5 text-amber-600" />
+                                                  <span className="text-xs font-bold text-amber-700">
+                                                    {rec.skorPrioritas}
+                                                  </span>
+                                                </div>
+                                              </div>
+                                              <div className="flex items-center gap-2 mb-2">
+                                                <Badge
+                                                  variant="outline"
+                                                  className="text-xs font-medium bg-blue-50 text-blue-700 border-blue-200"
+                                                >
+                                                  Prioritas #{rec.prioritasKe}
+                                                </Badge>
+                                              </div>
+                                              <p className="text-sm font-semibold text-slate-800 mb-2 line-clamp-1">
+                                                {rec.deskripsi}
+                                              </p>
+                                              <p className="text-xs text-slate-500 line-clamp-2 mb-3">
+                                                {rec.alasanAnalisis}
+                                              </p>
+                                              {rec.evidence && (
+                                                <div className="pt-3 border-t border-slate-200">
+                                                  <div className="flex items-center justify-between mb-2">
+                                                    <div className="flex items-center gap-1.5">
+                                                      <Users className="h-3.5 w-3.5 text-slate-400" />
+                                                      <span className="text-xs text-slate-500 font-medium">
+                                                        {rec.evidence
+                                                          .masukanWargaCount ||
+                                                          0}{" "}
+                                                        masukan
+                                                      </span>
+                                                    </div>
+                                                    {rec.evidence
+                                                      .kritikalitas && (
+                                                      <Badge
+                                                        variant="secondary"
+                                                        className="text-xs"
+                                                      >
+                                                        {
+                                                          rec.evidence
+                                                            .kritikalitas
+                                                        }
+                                                      </Badge>
+                                                    )}
+                                                  </div>
+                                                </div>
+                                              )}
+                                            </div>
+                                          ),
+                                        )}
+                                      </div>
+                                    </div>
                                   )}
+                                  <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-slate-100">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        router.push(
+                                          `/perangkat/jadwal-program/${k.id}`,
+                                        );
+                                      }}
+                                      className="cursor-pointer"
+                                    >
+                                      <Eye className="h-4 w-4 mr-1" />
+                                      Detail
+                                    </Button>
+                                    {(k.statusRekomendasi ===
+                                      StatusRekomendasi.DRAFT ||
+                                      k.statusRekomendasi ===
+                                        StatusRekomendasi.DIAJUKAN) && (
+                                      <>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            router.push(
+                                              `/perangkat/jadwal-program/${k.id}/edit`,
+                                            );
+                                          }}
+                                          className="cursor-pointer"
+                                        >
+                                          <Edit className="h-4 w-4 mr-1" />
+                                          Edit
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="destructive"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSelectedDeleteId(k.id);
+                                          }}
+                                          className="cursor-pointer"
+                                        >
+                                          <Trash className="h-4 w-4" />
+                                        </Button>
+                                      </>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        </Card>
-                      </div>
-                    );
-                  })}
+                          </Card>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            )}
 
-            {/* Pagination */}
-            {meta && (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 mt-8 border-t border-slate-200">
-                <p className="text-sm text-slate-500 font-medium">
-                  Menampilkan {(pageNumber - 1) * limitNumber + 1} -{" "}
-                  {Math.min(pageNumber * limitNumber, meta.total)} dari{" "}
-                  {meta.total} kegiatan
-                </p>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage(String(pageNumber - 1))}
-                    disabled={pageNumber === 1}
-                    className="border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 rounded-xl font-medium cursor-pointer"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <span className="px-4 py-2 bg-slate-100 rounded-xl font-medium text-slate-600">
-                    Halaman {pageNumber} dari {meta.totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage(String(pageNumber + 1))}
-                    disabled={pageNumber >= meta.totalPages}
-                    className="border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 rounded-xl font-medium cursor-pointer"
-                  >
-                    Next <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
+                {/* Pagination */}
+                {meta && (
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 mt-8 border-t border-slate-200">
+                    <p className="text-sm text-slate-500 font-medium">
+                      Menampilkan {(pageNumber - 1) * limitNumber + 1} -{" "}
+                      {Math.min(pageNumber * limitNumber, meta.total)} dari{" "}
+                      {meta.total} kegiatan
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage(String(pageNumber - 1))}
+                        disabled={pageNumber === 1}
+                        className="border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 rounded-xl font-medium cursor-pointer"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      <span className="px-4 py-2 bg-slate-100 rounded-xl font-medium text-slate-600">
+                        Halaman {pageNumber} dari {meta.totalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage(String(pageNumber + 1))}
+                        disabled={pageNumber >= meta.totalPages}
+                        className="border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 rounded-xl font-medium cursor-pointer"
+                      >
+                        Next <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
