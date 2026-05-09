@@ -43,7 +43,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 // ═══════════════════════════════════════════════════════════════
-// 📦 ENUMS (Sesuai Schema Prisma)
+// 📦 ENUMS (SESUAI SCHEMA PRISMA) — ModeRekomendasi dihapus
 // ═══════════════════════════════════════════════════════════════
 
 export enum StatusMasukan {
@@ -61,10 +61,7 @@ export enum StatusRekomendasi {
   DITOLAK = "DITOLAK",
 }
 
-export enum ModeRekomendasi {
-  FUSI_DATA = "FUSI_DATA",
-  DATA_MASTER_SAJA = "DATA_MASTER_SAJA",
-}
+// ModeRekomendasi sudah tidak digunakan, sistem hanya Fusi Data
 
 export enum Role {
   LURAH = "LURAH",
@@ -135,14 +132,13 @@ export interface RekomendasiItem {
   evidence?: RekomendasiEvidence;
   usedMasukanIds?: string[];
   usedDataMasterIds?: string[];
-  // ✅ tambahan dari backend
   warning?: string | null;
 }
 
 export interface RekomendasiMetadata {
   generatedAt: string;
   aiModel: string;
-  modeRekomendasi: ModeRekomendasi;
+  modeRekomendasi: string; // Selalu "FUSI_DATA", di-hardcode backend
   domainIsuCode: string;
   totalMasukanDianalisis: number;
   totalDataMasterDianalisis: number;
@@ -169,7 +165,7 @@ export interface RekomendasiSnapshot {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// 📦 KEGIATAN RAPAT (Main Entity)
+// 📦 KEGIATAN RAPAT (Main Entity) — properti 'mode' dihapus
 // ═══════════════════════════════════════════════════════════════
 
 export interface KegiatanRapat {
@@ -182,7 +178,7 @@ export interface KegiatanRapat {
   domainIsu?: DomainIsu | null;
   dibuatOlehId: string;
   dibuatOleh: User;
-  mode: ModeRekomendasi;
+  // mode tidak ada lagi
   judulLaporan: string;
   rekomendasiItems?: RekomendasiSnapshot | null;
   fingerprint: string;
@@ -229,16 +225,7 @@ const getStatusColor = (status: StatusRekomendasi | string) => {
   }
 };
 
-const getModeBadgeColor = (mode: ModeRekomendasi) => {
-  switch (mode) {
-    case ModeRekomendasi.FUSI_DATA:
-      return "bg-blue-50 text-blue-700 border-blue-200";
-    case ModeRekomendasi.DATA_MASTER_SAJA:
-      return "bg-purple-50 text-purple-700 border-purple-200";
-    default:
-      return "bg-slate-50 text-slate-700 border-slate-200";
-  }
-};
+// Helper getModeBadgeColor dihapus karena tidak digunakan
 
 const getPriorityColor = (index: number) => {
   const colors = [
@@ -565,13 +552,12 @@ export default function KegiatanRapatDetail() {
                               {kegiatan.domainIsu.nama}
                             </Badge>
                           )}
+                          {/* Badge mode statis: Fusi Data */}
                           <Badge
                             variant="outline"
-                            className={`${getModeBadgeColor(kegiatan.mode)} font-medium`}
+                            className="bg-blue-50 text-blue-700 border-blue-200 font-medium"
                           >
-                            {kegiatan.mode === "FUSI_DATA"
-                              ? "Fusi Data"
-                              : "Data Master"}
+                            Fusi Data
                           </Badge>
                           {kegiatan.aiModel && (
                             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-50 border border-purple-200">
@@ -677,7 +663,12 @@ export default function KegiatanRapatDetail() {
                     </h2>
                     <p className="text-sm text-slate-500">
                       {rekomendasiData?.metadata?.domainIsuCode} •{" "}
-                      {rekomendasiData?.metadata?.modeRekomendasi}
+                      {rekomendasiData?.metadata?.modeRekomendasi
+                        ? rekomendasiData.metadata.modeRekomendasi ===
+                          "FUSI_DATA"
+                          ? "Fusi Data"
+                          : rekomendasiData.metadata.modeRekomendasi
+                        : "Fusi Data"}
                     </p>
                   </div>
                 </div>

@@ -186,7 +186,6 @@ exports.Prisma.KegiatanRapatScalarFieldEnum = {
   lokasi: 'lokasi',
   domainIsuId: 'domainIsuId',
   dibuatOlehId: 'dibuatOlehId',
-  mode: 'mode',
   judulLaporan: 'judulLaporan',
   rekomendasiItems: 'rekomendasiItems',
   fingerprint: 'fingerprint',
@@ -327,11 +326,6 @@ exports.NilaiKritikalitas = exports.$Enums.NilaiKritikalitas = {
   TINGGI: 'TINGGI',
   SEDANG: 'SEDANG',
   RENDAH: 'RENDAH'
-};
-
-exports.ModeRekomendasi = exports.$Enums.ModeRekomendasi = {
-  FUSI_DATA: 'FUSI_DATA',
-  DATA_MASTER_SAJA: 'DATA_MASTER_SAJA'
 };
 
 exports.StatusRekomendasi = exports.$Enums.StatusRekomendasi = {

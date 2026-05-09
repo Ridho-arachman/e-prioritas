@@ -1,9 +1,5 @@
 // src/app/api/protected/kegiatan-rapat/route.ts
-import {
-  ModeRekomendasi,
-  Role,
-  StatusRekomendasi,
-} from "@/app/generated/prisma";
+import { Role, StatusRekomendasi } from "@/app/generated/prisma";
 import { auth } from "@/lib/auth";
 import { handlePrismaError } from "@/lib/handlePrismaError";
 import { handleResponse } from "@/lib/handleResponse";
@@ -20,7 +16,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 // ========================
-// GET - List Kegiatan Rapat (tidak berubah)
+// GET - List Kegiatan Rapat
 // ========================
 
 export const GET = async (req: NextRequest) => {
@@ -52,9 +48,8 @@ export const GET = async (req: NextRequest) => {
       lokasi: searchParams.get("lokasi") || undefined,
       domainIsuId: searchParams.get("domainIsuId") || undefined,
       dibuatOlehId: searchParams.get("dibuatOlehId") || undefined,
-      diprosesOlehId: searchParams.get("diprosesOlehId") || undefined, // ✅ Tambahan
+      diprosesOlehId: searchParams.get("diprosesOlehId") || undefined,
       aiModel: searchParams.get("aiModel") || undefined,
-      mode: searchParams.get("mode") || undefined,
       statusRekomendasi: searchParams.get("statusRekomendasi") || undefined,
       createdAt: searchParams.get("createdAt") || undefined,
       updatedAt: searchParams.get("updatedAt") || undefined,
@@ -84,9 +79,9 @@ export const GET = async (req: NextRequest) => {
       lokasi: data.lokasi,
       domainIsuId: data.domainIsuId,
       dibuatOlehId: data.dibuatOlehId,
-      diprosesOlehId: data.diprosesOlehId, // ✅ Tambahan
+      diprosesOlehId: data.diprosesOlehId,
       aiModel: data.aiModel,
-      mode: data.mode as ModeRekomendasi | undefined,
+      // mode dihapus dari sini
       statusRekomendasi: data.statusRekomendasi as
         | StatusRekomendasi
         | undefined,

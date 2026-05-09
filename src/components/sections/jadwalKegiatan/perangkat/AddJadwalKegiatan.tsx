@@ -1,14 +1,10 @@
-// src/app/perangkat/jadwal-program/add/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -17,38 +13,35 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import {
-  CalendarIcon,
-  MapPinIcon,
-  ArrowLeftIcon,
-  SparklesIcon,
-  SaveIcon,
-  XIcon,
-  ClockIcon,
-  FileTextIcon,
-  TargetIcon,
-  UsersIcon,
-  CheckCircleIcon,
-  AlertCircleIcon,
-  LightbulbIcon,
-  BrainIcon,
-  Loader2Icon,
-  CpuIcon,
-} from "lucide-react";
-import { format } from "date-fns";
-import { id } from "date-fns/locale";
+import { Textarea } from "@/components/ui/textarea";
 import { useGet, usePost } from "@/hooks/useApi";
 import { notifier } from "@/lib/ToastNotifier";
 import { AxiosError } from "axios";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
+import {
+  AlertCircleIcon,
+  ArrowLeftIcon,
+  BrainIcon,
+  CalendarIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  FileTextIcon,
+  LightbulbIcon,
+  Loader2Icon,
+  MapPinIcon,
+  SaveIcon,
+  SparklesIcon,
+  TargetIcon,
+  UsersIcon,
+  XIcon,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 // ========================
 // ENUM (Match Backend Prisma)
 // ========================
-
-export enum ModeRekomendasi {
-  FUSI_DATA = "FUSI_DATA",
-  DATA_MASTER_SAJA = "DATA_MASTER_SAJA",
-}
 
 export enum StatusRekomendasi {
   DRAFT = "DRAFT",
@@ -73,9 +66,8 @@ interface FormState {
   deskripsi: string;
   tanggal: string; // ISO string: YYYY-MM-DDTHH:mm:ss
   lokasi: string;
-  domainIsuId: string; // ✅ Required (tidak nullable di schema)
-  mode: ModeRekomendasi; // ✅ Required enum
-  judulLaporan: string; // ✅ Required
+  domainIsuId: string; // Required
+  judulLaporan: string; // Required
   enableAI: boolean;
   aiModel: string;
 }
@@ -86,7 +78,6 @@ const initialForm: FormState = {
   tanggal: "",
   lokasi: "",
   domainIsuId: "",
-  mode: ModeRekomendasi.FUSI_DATA, // ✅ Default value match backend
   judulLaporan: "",
   enableAI: true,
   aiModel: "gemini-2.5-flash",
@@ -97,9 +88,8 @@ interface FormErrors {
   deskripsi?: string;
   tanggal?: string;
   lokasi?: string;
-  domainIsuId?: string; // ✅ Required
-  mode?: string;
-  judulLaporan?: string; // ✅ Required
+  domainIsuId?: string;
+  judulLaporan?: string;
 }
 
 // ========================
@@ -113,13 +103,11 @@ export default function TambahKegiatanRapat() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
 
-  // ✅ FIX: Endpoint yang benar untuk domain isu (match backend)
   const { data: domainIsuList, isLoading: isLoadingDomain } = useGet(
     "/protected/kategori",
   );
-  const { post } = usePost("/protected/kegiatan-rapat");
+  const { post } = usePost("/protected/kegiatan-rapat/perangkat");
 
-  // ✅ FIX: Tambah selectedDomain variable (sebelumnya undefined)
   const selectedDomain = domainIsuList?.find(
     (d: DomainIsu) => d.id === form.domainIsuId,
   );
@@ -141,13 +129,6 @@ export default function TambahKegiatanRapat() {
     }
   };
 
-  const handleModeChange = (value: ModeRekomendasi) => {
-    setForm({ ...form, mode: value });
-    if (errors.mode) {
-      setErrors({ ...errors, mode: undefined });
-    }
-  };
-
   const handleSwitchChange = (checked: boolean) => {
     setForm({ ...form, enableAI: checked });
   };
@@ -159,7 +140,6 @@ export default function TambahKegiatanRapat() {
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
-    // ✅ Match zod: judul min 1, max 255
     if (!form.judul.trim()) {
       newErrors.judul = "Judul kegiatan wajib diisi";
     } else if (form.judul.length < 5) {
@@ -168,29 +148,20 @@ export default function TambahKegiatanRapat() {
       newErrors.judul = "Judul maksimal 255 karakter";
     }
 
-    // ✅ Match zod: deskripsi min 1
     if (!form.deskripsi.trim()) {
       newErrors.deskripsi = "Deskripsi wajib diisi";
     } else if (form.deskripsi.length < 20) {
       newErrors.deskripsi = "Deskripsi minimal 20 karakter";
     }
 
-    // ✅ Match zod: tanggal ISO 8601
     if (!form.tanggal) {
       newErrors.tanggal = "Tanggal & waktu wajib dipilih";
     }
 
-    // ✅ Match zod: domainIsuId required, cuid
     if (!form.domainIsuId) {
       newErrors.domainIsuId = "Domain isu wajib dipilih";
     }
 
-    // ✅ Match zod: mode required enum
-    if (!form.mode) {
-      newErrors.mode = "Mode rekomendasi wajib dipilih";
-    }
-
-    // ✅ Match zod: judulLaporan required, min 1, max 255
     if (!form.judulLaporan.trim()) {
       newErrors.judulLaporan = "Judul laporan wajib diisi";
     } else if (form.judulLaporan.length > 255) {
@@ -203,7 +174,6 @@ export default function TambahKegiatanRapat() {
 
   const handleSubmit = async () => {
     if (!validateForm()) {
-      // Scroll to first error
       const firstError = Object.keys(errors)[0];
       if (firstError) {
         document
@@ -216,17 +186,14 @@ export default function TambahKegiatanRapat() {
     setIsSubmitting(true);
 
     try {
-      // ✅ Prepare payload match backend CreateKegiatanRapatInput + zod schema
       const payload = {
         judul: form.judul,
         deskripsi: form.deskripsi,
-        tanggal: form.tanggal, // ISO string (match zod union)
-        lokasi: form.lokasi || null, // nullable
-        domainIsuId: form.domainIsuId, // required
-        mode: form.mode, // required enum
-        judulLaporan: form.judulLaporan, // required
-        aiModel: form.enableAI ? form.aiModel : null, // nullable
-        // fingerprint & statusRekomendasi auto-generated by backend
+        tanggal: form.tanggal,
+        lokasi: form.lokasi || null,
+        domainIsuId: form.domainIsuId,
+        judulLaporan: form.judulLaporan,
+        aiModel: form.enableAI ? form.aiModel : null,
       };
 
       const res = await post(payload);
@@ -284,11 +251,8 @@ export default function TambahKegiatanRapat() {
 
         {/* Form Card */}
         <Card className="mb-8 border-0 shadow-xl shadow-slate-200/50 bg-white/80 backdrop-blur-xl rounded-2xl overflow-hidden">
-          {/* Top Gradient Bar */}
           <div className="h-2 bg-linear-to-r from-blue-500 via-indigo-500 to-purple-500" />
-
           <CardContent className="p-0">
-            {/* Form Content */}
             <div className="p-6 sm:p-8">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Main Form */}
@@ -357,7 +321,7 @@ export default function TambahKegiatanRapat() {
                     </p>
                   </div>
 
-                  {/* Tanggal & Waktu (Combined to ISO) */}
+                  {/* Tanggal & Waktu */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label
@@ -400,7 +364,6 @@ export default function TambahKegiatanRapat() {
                         </div>
                       )}
                     </div>
-
                     <div className="space-y-2">
                       <Label
                         htmlFor="waktu"
@@ -435,7 +398,7 @@ export default function TambahKegiatanRapat() {
                     </div>
                   </div>
 
-                  {/* Lokasi (Optional - nullable di schema) */}
+                  {/* Lokasi */}
                   <div className="space-y-2">
                     <Label
                       htmlFor="lokasi"
@@ -461,7 +424,7 @@ export default function TambahKegiatanRapat() {
                     </p>
                   </div>
 
-                  {/* Domain Isu (Required - match zod cuid) */}
+                  {/* Domain Isu */}
                   <div className="space-y-2">
                     <Label
                       htmlFor="domainIsuId"
@@ -516,55 +479,7 @@ export default function TambahKegiatanRapat() {
                     )}
                   </div>
 
-                  {/* Mode Rekomendasi (Required enum - match zod) */}
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="mode"
-                      className="text-slate-700 font-semibold flex items-center gap-2"
-                    >
-                      <CpuIcon className="h-4 w-4 text-blue-600" />
-                      Mode Rekomendasi *
-                    </Label>
-                    <Select value={form.mode} onValueChange={handleModeChange}>
-                      <SelectTrigger
-                        className={`bg-white border-slate-200 rounded-xl text-slate-700 h-12 ${
-                          errors.mode
-                            ? "border-red-300 focus:border-red-500"
-                            : ""
-                        }`}
-                      >
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white border border-slate-200">
-                        <SelectItem
-                          value={ModeRekomendasi.FUSI_DATA}
-                          className="text-slate-700 focus:bg-slate-50"
-                        >
-                          Fusi Data (Masukan Warga + Data Master)
-                        </SelectItem>
-                        <SelectItem
-                          value={ModeRekomendasi.DATA_MASTER_SAJA}
-                          className="text-slate-700 focus:bg-slate-50"
-                        >
-                          Data Master Only
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                    {errors.mode && (
-                      <div className="flex items-center gap-1.5 text-sm text-red-600">
-                        <AlertCircleIcon className="h-4 w-4" />
-                        {errors.mode}
-                      </div>
-                    )}
-                    <p className="text-xs text-slate-500">
-                      • <strong>Fusi Data</strong>: Gabungkan masukan warga &
-                      data master untuk rekomendasi komprehensif
-                      <br />• <strong>Data Master Only</strong>: Hanya gunakan
-                      data master untuk rekomendasi berbasis data internal
-                    </p>
-                  </div>
-
-                  {/* Judul Laporan (Required - match zod) */}
+                  {/* Judul Laporan */}
                   <div className="space-y-2">
                     <Label
                       htmlFor="judulLaporan"
@@ -616,7 +531,6 @@ export default function TambahKegiatanRapat() {
                           </p>
                         </div>
                       </div>
-
                       <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
                           <p className="text-sm font-medium text-slate-700">
@@ -627,19 +541,18 @@ export default function TambahKegiatanRapat() {
                           </p>
                         </div>
                         <Switch
-                          checked={true} // Always enabled
-                          disabled={true} // Read-only, cannot be toggled
+                          checked={true}
+                          disabled={true}
                           className="data-[state=checked]:bg-purple-600 opacity-70"
                         />
                       </div>
-
                       <div className="space-y-2 pt-2 border-t border-purple-100">
                         <Label className="text-xs text-slate-600 font-medium">
                           AI Model
                         </Label>
                         <Select
                           value="gemini-2.5-flash"
-                          onValueChange={() => {}} // No-op, disabled
+                          onValueChange={() => {}}
                           disabled={true}
                         >
                           <SelectTrigger className="bg-white border-purple-200 rounded-lg text-slate-700 h-10 opacity-70">
@@ -679,7 +592,6 @@ export default function TambahKegiatanRapat() {
                           </p>
                         </div>
                       </div>
-
                       <div className="space-y-3">
                         <div>
                           <p className="text-xs text-slate-500 uppercase tracking-wider font-medium mb-1">
@@ -726,17 +638,7 @@ export default function TambahKegiatanRapat() {
                             </Badge>
                           </div>
                         )}
-                        <div className="flex items-center gap-2">
-                          <CpuIcon className="h-3.5 w-3.5 text-slate-400" />
-                          <Badge
-                            variant="outline"
-                            className="bg-purple-50 text-purple-700 border-purple-200 text-xs"
-                          >
-                            {form.mode === ModeRekomendasi.FUSI_DATA
-                              ? "Fusi Data"
-                              : "Data Master"}
-                          </Badge>
-                        </div>
+                        {/* Mode badge dihapus */}
                       </div>
                     </CardContent>
                   </Card>
@@ -848,7 +750,6 @@ export default function TambahKegiatanRapat() {
                     <XIcon className="h-5 w-5" />
                   </Button>
                 </div>
-
                 <div className="space-y-4">
                   <div className="p-4 rounded-xl bg-linear-to-br from-blue-50 to-indigo-50 border border-blue-100">
                     <h3 className="text-lg font-bold text-slate-800 mb-2">
@@ -873,7 +774,6 @@ export default function TambahKegiatanRapat() {
                       </div>
                     </div>
                   </div>
-
                   <div>
                     <h4 className="text-sm font-semibold text-slate-700 mb-2">
                       Judul Laporan
@@ -882,7 +782,6 @@ export default function TambahKegiatanRapat() {
                       {form.judulLaporan || "(Belum ada judul laporan)"}
                     </p>
                   </div>
-
                   <div>
                     <h4 className="text-sm font-semibold text-slate-700 mb-2">
                       Deskripsi
@@ -891,7 +790,6 @@ export default function TambahKegiatanRapat() {
                       {form.deskripsi || "(Belum ada deskripsi)"}
                     </p>
                   </div>
-
                   {selectedDomain && (
                     <div>
                       <h4 className="text-sm font-semibold text-slate-700 mb-2">
@@ -905,21 +803,7 @@ export default function TambahKegiatanRapat() {
                       </Badge>
                     </div>
                   )}
-
-                  <div>
-                    <h4 className="text-sm font-semibold text-slate-700 mb-2">
-                      Mode Rekomendasi
-                    </h4>
-                    <Badge
-                      variant="outline"
-                      className={`${form.mode === ModeRekomendasi.FUSI_DATA ? "bg-purple-50 text-purple-700 border-purple-200" : "bg-amber-50 text-amber-700 border-amber-200"}`}
-                    >
-                      {form.mode === ModeRekomendasi.FUSI_DATA
-                        ? "Fusi Data"
-                        : "Data Master Only"}
-                    </Badge>
-                  </div>
-
+                  {/* Mode Rekomendasi dihapus */}
                   {form.enableAI && (
                     <div className="p-4 rounded-xl bg-purple-50 border border-purple-100">
                       <div className="flex items-center gap-2 mb-2">
@@ -939,7 +823,6 @@ export default function TambahKegiatanRapat() {
                     </div>
                   )}
                 </div>
-
                 <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-slate-100">
                   <Button
                     variant="outline"

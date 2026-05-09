@@ -1,9 +1,5 @@
 // src/app/api/protected/kegiatan-rapat/route.ts
-import {
-  ModeRekomendasi,
-  Role,
-  StatusRekomendasi,
-} from "@/app/generated/prisma";
+import { Role, StatusRekomendasi } from "@/app/generated/prisma";
 import { auth } from "@/lib/auth";
 import { handlePrismaError } from "@/lib/handlePrismaError";
 import { handleResponse } from "@/lib/handleResponse";
@@ -53,33 +49,26 @@ export const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();
 
-    // Normalize tanggal ke Date object untuk Prisma
+    // Normalize tanggal
     const parsedTanggal = body.tanggal;
     let normalizedTanggal: Date | string = parsedTanggal;
-
     if (typeof parsedTanggal === "string") {
-      if (
-        parsedTanggal.endsWith("Z") ||
-        parsedTanggal.includes("+") ||
-        parsedTanggal.split("T")[1]?.includes("-")
-      ) {
-        normalizedTanggal = new Date(parsedTanggal);
-      } else {
-        normalizedTanggal = new Date(parsedTanggal);
-      }
+      normalizedTanggal = new Date(parsedTanggal);
     }
 
     const fullBody = {
       ...body,
       tanggal: normalizedTanggal,
       dibuatOlehId: session.user.id,
+      // Hapus field mode jika ada
     };
+    // Pastikan tidak ada field "mode" yang lolos dari body
+    delete fullBody.mode;
 
     const parsed = kegiatanRapatSchema.safeParse(fullBody);
 
     if (!parsed.success) return handleZodValidation(parsed);
 
-    // 1. Create kegiatan rapat dulu
     const data = {
       ...parsed.data,
       dibuatOlehId: session.user.id,
@@ -92,7 +81,7 @@ export const POST = async (req: NextRequest) => {
         metadata: {
           generatedAt: new Date().toISOString(),
           aiModel: parsed.data.aiModel ?? "gemini-2.5-flash",
-          modeRekomendasi: parsed.data.mode,
+          modeRekomendasi: "FUSI_DATA",
           domainIsuCode: parsed.data.domainIsuId,
           totalMasukanDianalisis: 0,
           totalDataMasterDianalisis: 0,
@@ -105,32 +94,27 @@ export const POST = async (req: NextRequest) => {
 
     const kegiatanRapat = await kegiatanRapatService.create(data);
 
-    let finalData = kegiatanRapat; // default jika AI gagal
+    let finalData = kegiatanRapat;
 
     // 2. Auto generate rekomendasi setelah create berhasil
     try {
-      // Fetch domainIsu code untuk generateRekomendasi
       const domainIsu = await prisma.domainIsu.findUnique({
         where: { id: parsed.data.domainIsuId },
         select: { code: true },
       });
 
       if (domainIsu?.code) {
-        // Trigger AI recommendation generation
         const result = await kegiatanRapatService.generateRekomendasi({
           kegiatanRapatId: kegiatanRapat.id,
           domainIsuId: parsed.data.domainIsuId,
           domainIsuCode: domainIsu.code,
-          mode: parsed.data.mode,
           userId: session.user.id,
           judulLaporan: parsed.data.judulLaporan,
         });
-        finalData = result.updated; // gunakan data yang sudah diupdate dengan rekomendasi
+        finalData = result.updated;
       }
     } catch (aiError) {
-      // ⚠️ Jangan gagalkan request jika AI generation error
       console.error("AI Recommendation Generation Error:", aiError);
-      // Tetap gunakan data awal (kegiatanRapat)
     }
 
     return handleResponse({
@@ -158,7 +142,7 @@ export const POST = async (req: NextRequest) => {
 };
 
 // ========================
-// GET - List Kegiatan Rapat (tidak berubah)
+// GET - List Kegiatan Rapat
 // ========================
 
 export const GET = async (req: NextRequest) => {
@@ -189,18 +173,13 @@ export const GET = async (req: NextRequest) => {
       judul: searchParams.get("judul") || undefined,
       lokasi: searchParams.get("lokasi") || undefined,
       domainIsuId: searchParams.get("domainIsuId") || undefined,
-      dibuatOlehId: searchParams.get("dibuatOlehId") || undefined, // ✅
-      diprosesOlehId: searchParams.get("diprosesOlehId") || undefined, // ✅
+      dibuatOlehId: searchParams.get("dibuatOlehId") || undefined,
+      diprosesOlehId: searchParams.get("diprosesOlehId") || undefined,
       aiModel: searchParams.get("aiModel") || undefined,
-      mode: searchParams.get("mode") || undefined,
       statusRekomendasi: searchParams.get("statusRekomendasi") || undefined,
       createdAt: searchParams.get("createdAt") || undefined,
       updatedAt: searchParams.get("updatedAt") || undefined,
       tanggal: searchParams.get("tanggal") || undefined,
-      page: Number(searchParams.get("page")) || 1,
-      limit: Number(searchParams.get("limit")) || 10,
-      sortBy: searchParams.get("sortBy") || "updatedAt",
-      sortOrder: (searchParams.get("sortOrder") as "asc" | "desc") || "desc",
     });
 
     if (!parsed.success) return handleZodValidation(parsed);
@@ -225,10 +204,9 @@ export const GET = async (req: NextRequest) => {
       judul: data.judul,
       lokasi: data.lokasi,
       domainIsuId: data.domainIsuId,
-      dibuatOlehId: data.dibuatOlehId, // ✅
-      diprosesOlehId: data.diprosesOlehId, // ✅
+      dibuatOlehId: data.dibuatOlehId,
+      diprosesOlehId: data.diprosesOlehId,
       aiModel: data.aiModel,
-      mode: data.mode as ModeRekomendasi | undefined,
       statusRekomendasi: data.statusRekomendasi as
         | StatusRekomendasi
         | undefined,
@@ -239,10 +217,10 @@ export const GET = async (req: NextRequest) => {
       tanggalFrom: tanggalRange.from,
       tanggalTo: tanggalRange.to,
       role: session.user.role as Role,
-      sortBy: data.sortBy,
-      sortOrder: data.sortOrder,
-      page: data.page,
-      limit: data.limit,
+      sortBy: (searchParams.get("sortBy") as any) || "updatedAt",
+      sortOrder: (searchParams.get("sortOrder") as "asc" | "desc") || "desc",
+      page: Number(searchParams.get("page")) || 1,
+      limit: Number(searchParams.get("limit")) || 10,
     });
 
     if (result.data.length === 0) {

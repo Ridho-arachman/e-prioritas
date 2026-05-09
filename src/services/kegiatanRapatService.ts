@@ -1,6 +1,5 @@
 // src/services/kegiatanRapatService.ts
 import {
-  ModeRekomendasi,
   Prisma,
   Role,
   StatusMasukan,
@@ -14,7 +13,7 @@ import {
 import { geminiAi } from "@/lib/gemini";
 import prisma from "@/lib/prisma";
 import { createHash } from "crypto";
-import * as levenshtein from "fast-levenshtein"; // ✅ tambahan
+import * as levenshtein from "fast-levenshtein";
 
 // ========================
 // TIPE INPUT
@@ -26,7 +25,6 @@ export type CreateKegiatanRapatInput = {
   tanggal: Date | string;
   domainIsuId: string;
   dibuatOlehId: string;
-  mode: ModeRekomendasi;
   judulLaporan: string;
   fingerprint?: string;
   lokasi?: string | null;
@@ -40,7 +38,7 @@ export type CreateKegiatanRapatInput = {
 export type UpdateKegiatanRapatInput = Partial<
   Omit<
     CreateKegiatanRapatInput,
-    "dibuatOlehId" | "domainIsuId" | "fingerprint" | "mode" | "judulLaporan"
+    "dibuatOlehId" | "domainIsuId" | "fingerprint" | "judulLaporan"
   >
 >;
 
@@ -51,7 +49,6 @@ interface KegiatanRapatGetAllParams {
   dibuatOlehId?: string;
   diprosesOlehId?: string;
   aiModel?: string;
-  mode?: ModeRekomendasi;
   statusRekomendasi?: StatusRekomendasi;
   createdAtFrom?: Date;
   createdAtTo?: Date;
@@ -101,7 +98,7 @@ export type RekomendasiSnapshot = {
   metadata: {
     generatedAt: string;
     aiModel: string;
-    modeRekomendasi: "FUSI_DATA" | "DATA_MASTER_SAJA";
+    modeRekomendasi: "FUSI_DATA";
     domainIsuCode: string;
     totalMasukanDianalisis: number;
     totalDataMasterDianalisis: number;
@@ -149,7 +146,7 @@ export const kegiatanRapatService = {
       metadata: {
         generatedAt: new Date().toISOString(),
         aiModel: input.aiModel ?? "gemini-2.5-flash",
-        modeRekomendasi: input.mode,
+        modeRekomendasi: "FUSI_DATA",
         domainIsuCode: input.domainIsuId,
         totalMasukanDianalisis: 0,
         totalDataMasterDianalisis: 0,
@@ -179,7 +176,6 @@ export const kegiatanRapatService = {
       dibuatOlehId,
       diprosesOlehId,
       aiModel,
-      mode,
       role,
       statusRekomendasi,
       createdAtFrom,
@@ -205,7 +201,6 @@ export const kegiatanRapatService = {
     if (lokasi) where.lokasi = { contains: lokasi, mode: "insensitive" };
     if (domainIsuId) where.domainIsuId = domainIsuId;
     if (aiModel) where.aiModel = { contains: aiModel, mode: "insensitive" };
-    if (mode) where.mode = mode;
     if (statusRekomendasi) where.statusRekomendasi = statusRekomendasi;
     if (createdAtFrom || createdAtTo) {
       where.createdAt = {};
@@ -332,7 +327,6 @@ export const kegiatanRapatService = {
     kegiatanRapatId: string;
     domainIsuId: string;
     domainIsuCode: string;
-    mode: ModeRekomendasi;
     userId: string;
     judulLaporan: string;
   }) => {
@@ -340,27 +334,23 @@ export const kegiatanRapatService = {
       kegiatanRapatId,
       domainIsuId,
       domainIsuCode,
-      mode,
       userId,
       judulLaporan,
     } = args;
 
-    // 1. Fetch data relevan
-    let masukanWarga: any[] = [];
-    if (mode === "FUSI_DATA") {
-      masukanWarga = await prisma.masukanWarga.findMany({
-        where: { domainIsuId, status: StatusMasukan.DIVERIFIKASI },
-        select: {
-          id: true,
-          judul: true,
-          deskripsi: true,
-          lokasi: true,
-          domainIsuId: true,
-          status: true,
-        },
-        take: 50,
-      });
-    }
+    // 1. Fetch data relevan (selalu FUSI_DATA)
+    const masukanWarga = await prisma.masukanWarga.findMany({
+      where: { domainIsuId, status: StatusMasukan.DIVERIFIKASI },
+      select: {
+        id: true,
+        judul: true,
+        deskripsi: true,
+        lokasi: true,
+        domainIsuId: true,
+        status: true,
+      },
+      take: 50,
+    });
 
     const dataMaster = await prisma.dataMaster.findMany({
       where: { domainIsuId, isActive: true },
@@ -496,7 +486,7 @@ export const kegiatanRapatService = {
 
     // 7. Build prompt dengan tambahan runningPrograms
     const prompt = buildPrompt({
-      mode,
+      mode: "FUSI_DATA", // tetap untuk builder
       judulLaporan,
       domainIsuCode,
       domainIsuId,
@@ -543,17 +533,14 @@ export const kegiatanRapatService = {
         .map((d) => d.id);
       dataMasterIndex += dataMasterCount;
 
-      // 🔔 Deteksi warning dengan fast-levenshtein
       // 🔔 Deteksi warning dengan fast-levenshtein + kata kunci + includes
       let warningMessage: string | null = null;
       const deskripsiLower = item.deskripsi.toLowerCase();
       for (const prog of warningPrograms) {
-        // Hitung similarity Levenshtein
         const distance = levenshtein.get(deskripsiLower, prog.judulLower);
         const maxLen = Math.max(deskripsiLower.length, prog.judulLower.length);
         const similarity = maxLen === 0 ? 1 : 1 - distance / maxLen;
 
-        // Cek kata kunci: apakah salah satu kata dari judul program (min 3 huruf) muncul di deskripsi?
         const wordsInJudul = prog.judulLower.split(/\s+/);
         const matchKeyword = wordsInJudul.some(
           (word) => word.length >= 3 && deskripsiLower.includes(word),
@@ -608,6 +595,7 @@ export const kegiatanRapatService = {
         generatedAt: new Date().toISOString(),
         totalMasukanDianalisis: masukanInput.length,
         totalDataMasterDianalisis: dataMasterInput.length,
+        modeRekomendasi: "FUSI_DATA" as const,
       },
       inputData: {
         masukan: masukanInput.slice(0, 10).map((m) => ({
@@ -633,7 +621,8 @@ export const kegiatanRapatService = {
       await tx.kegiatanRapatDataMaster.deleteMany({
         where: { kegiatanRapatId },
       });
-      if (mode === "FUSI_DATA" && masukanWarga.length > 0) {
+      // Selalu simpan relasi masukan (karena mode selalu FUSI_DATA)
+      if (masukanWarga.length > 0) {
         await tx.kegiatanRapatMasukan.createMany({
           data: masukanWarga.map((m) => ({
             kegiatanRapatId,
@@ -673,7 +662,6 @@ export const kegiatanRapatService = {
       meta: {
         masukanAnalyzed: masukanInput.length,
         dataMasterAnalyzed: dataMasterInput.length,
-        mode,
         aiModel: "gemini-2.5-flash",
       },
     };
@@ -682,7 +670,6 @@ export const kegiatanRapatService = {
   regenerateRekomendasi: async (args: {
     kegiatanRapatId: string;
     domainIsuId: string;
-    mode: ModeRekomendasi;
     userId: string;
     judulLaporan: string;
   }) => {
@@ -691,8 +678,11 @@ export const kegiatanRapatService = {
       select: { code: true },
     });
     return kegiatanRapatService.generateRekomendasi({
-      ...args,
+      kegiatanRapatId: args.kegiatanRapatId,
+      domainIsuId: args.domainIsuId,
       domainIsuCode: domainIsu.code,
+      userId: args.userId,
+      judulLaporan: args.judulLaporan,
     });
   },
 };

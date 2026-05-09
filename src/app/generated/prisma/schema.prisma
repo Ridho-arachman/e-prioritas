@@ -39,11 +39,6 @@ enum NilaiKritikalitas {
   RENDAH
 }
 
-enum ModeRekomendasi {
-  FUSI_DATA
-  DATA_MASTER_SAJA
-}
-
 //////////////////////////
 // MASTER DOMAIN ISU
 //////////////////////////
@@ -190,8 +185,6 @@ model KegiatanRapat {
   dibuatOlehId String
   dibuatOleh   User   @relation("PembuatKegiatan", fields: [dibuatOlehId], references: [id])
 
-  // REKOMENDASI
-  mode              ModeRekomendasi
   judulLaporan      String            @db.VarChar(255)
   rekomendasiItems  Json
   fingerprint       String            @unique @db.VarChar(32)

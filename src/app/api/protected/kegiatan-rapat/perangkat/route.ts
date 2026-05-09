@@ -1,9 +1,5 @@
 // src/app/api/protected/kegiatan-rapat/route.ts
-import {
-  ModeRekomendasi,
-  Role,
-  StatusRekomendasi,
-} from "@/app/generated/prisma";
+import { Role, StatusRekomendasi } from "@/app/generated/prisma";
 import { auth } from "@/lib/auth";
 import { handlePrismaError } from "@/lib/handlePrismaError";
 import { handleResponse } from "@/lib/handleResponse";
@@ -53,20 +49,15 @@ export const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();
 
+    // Hapus field mode jika dikirim dari client
+    delete body.mode;
+
     // Normalize tanggal ke Date object untuk Prisma
     const parsedTanggal = body.tanggal;
     let normalizedTanggal: Date | string = parsedTanggal;
 
     if (typeof parsedTanggal === "string") {
-      if (
-        parsedTanggal.endsWith("Z") ||
-        parsedTanggal.includes("+") ||
-        parsedTanggal.split("T")[1]?.includes("-")
-      ) {
-        normalizedTanggal = new Date(parsedTanggal);
-      } else {
-        normalizedTanggal = new Date(parsedTanggal);
-      }
+      normalizedTanggal = new Date(parsedTanggal);
     }
 
     const fullBody = {
@@ -92,7 +83,7 @@ export const POST = async (req: NextRequest) => {
         metadata: {
           generatedAt: new Date().toISOString(),
           aiModel: parsed.data.aiModel ?? "gemini-2.5-flash",
-          modeRekomendasi: parsed.data.mode,
+          modeRekomendasi: "FUSI_DATA", // selalu fusi data
           domainIsuCode: parsed.data.domainIsuId,
           totalMasukanDianalisis: 0,
           totalDataMasterDianalisis: 0,
@@ -116,21 +107,18 @@ export const POST = async (req: NextRequest) => {
       });
 
       if (domainIsu?.code) {
-        // Trigger AI recommendation generation
+        // Trigger AI recommendation generation (tanpa mode)
         const result = await kegiatanRapatService.generateRekomendasi({
           kegiatanRapatId: kegiatanRapat.id,
           domainIsuId: parsed.data.domainIsuId,
           domainIsuCode: domainIsu.code,
-          mode: parsed.data.mode,
           userId: session.user.id,
           judulLaporan: parsed.data.judulLaporan,
         });
-        finalData = result.updated; // gunakan data yang sudah diupdate dengan rekomendasi
+        finalData = result.updated;
       }
     } catch (aiError) {
-      // ⚠️ Jangan gagalkan request jika AI generation error
       console.error("AI Recommendation Generation Error:", aiError);
-      // Tetap gunakan data awal (kegiatanRapat)
     }
 
     return handleResponse({
@@ -158,7 +146,7 @@ export const POST = async (req: NextRequest) => {
 };
 
 // ========================
-// GET - List Kegiatan Rapat (tidak berubah)
+// GET - List Kegiatan Rapat
 // ========================
 
 export const GET = async (req: NextRequest) => {
@@ -189,10 +177,9 @@ export const GET = async (req: NextRequest) => {
       judul: searchParams.get("judul") || undefined,
       lokasi: searchParams.get("lokasi") || undefined,
       domainIsuId: searchParams.get("domainIsuId") || undefined,
-      dibuatOlehId: searchParams.get("dibuatOlehId") || undefined, // ✅ tambahan
-      diprosesOlehId: searchParams.get("diprosesOlehId") || undefined, // ✅ tambahan
+      dibuatOlehId: searchParams.get("dibuatOlehId") || undefined,
+      diprosesOlehId: searchParams.get("diprosesOlehId") || undefined,
       aiModel: searchParams.get("aiModel") || undefined,
-      mode: searchParams.get("mode") || undefined,
       statusRekomendasi: searchParams.get("statusRekomendasi") || undefined,
       createdAt: searchParams.get("createdAt") || undefined,
       updatedAt: searchParams.get("updatedAt") || undefined,
@@ -221,10 +208,10 @@ export const GET = async (req: NextRequest) => {
       judul: data.judul,
       lokasi: data.lokasi,
       domainIsuId: data.domainIsuId,
-      dibuatOlehId: data.dibuatOlehId, // ✅ teruskan
-      diprosesOlehId: data.diprosesOlehId, // ✅ teruskan
+      dibuatOlehId: data.dibuatOlehId,
+      diprosesOlehId: data.diprosesOlehId,
       aiModel: data.aiModel,
-      mode: data.mode as ModeRekomendasi | undefined,
+      // mode tidak lagi dikirim
       statusRekomendasi: data.statusRekomendasi as
         | StatusRekomendasi
         | undefined,
@@ -234,6 +221,7 @@ export const GET = async (req: NextRequest) => {
       updatedAtTo: updatedAtRange.to,
       tanggalFrom: tanggalRange.from,
       tanggalTo: tanggalRange.to,
+      role: session.user.role as Role,
       sortBy: (searchParams.get("sortBy") as any) || "updatedAt",
       sortOrder: (searchParams.get("sortOrder") as "asc" | "desc") || "desc",
       page: Number(searchParams.get("page")) || 1,

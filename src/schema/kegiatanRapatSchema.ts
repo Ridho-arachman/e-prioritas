@@ -1,5 +1,5 @@
 // src/schema/kegiatanRapatSchema.ts
-import { ModeRekomendasi, StatusRekomendasi } from "@/app/generated/prisma";
+import { StatusRekomendasi } from "@/app/generated/prisma";
 import { z } from "zod";
 
 // ═══════════════════════════════════════════════════════════════
@@ -25,10 +25,6 @@ export const kegiatanRapatSchema = z.object({
   domainIsuId: z.string().cuid("Domain Isu ID tidak valid"),
 
   dibuatOlehId: z.string("Id Harus String"),
-
-  mode: z.nativeEnum(ModeRekomendasi, {
-    message: "Mode rekomendasi tidak valid",
-  }),
 
   // ✅ FIX: judulLaporan REQUIRED (sesuai Prisma schema: String, bukan String?)
   judulLaporan: z.string().trim().min(1, "Judul laporan wajib diisi").max(255),
@@ -71,7 +67,6 @@ export const kegiatanRapatQuerySchema = z.object({
   dibuatOlehId: z.string().optional(),
   diprosesOlehId: z.string().optional(), // ✅ Tambahan
   aiModel: z.string().trim().optional(),
-  mode: z.nativeEnum(ModeRekomendasi).optional(),
   statusRekomendasi: z.nativeEnum(StatusRekomendasi).optional(),
 
   // Date filters (single date, akan dikonversi jadi range)

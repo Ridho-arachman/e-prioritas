@@ -105,11 +105,6 @@ export enum StatusRekomendasi {
   DITOLAK = "DITOLAK",
 }
 
-export enum ModeRekomendasi {
-  FUSI_DATA = "FUSI_DATA",
-  DATA_MASTER_SAJA = "DATA_MASTER_SAJA",
-}
-
 export enum Role {
   LURAH = "LURAH",
   PERANGKAT_DESA = "PERANGKAT_DESA",
@@ -177,13 +172,12 @@ export interface RekomendasiItem {
   lokasiRw?: string;
   fingerprint: string;
   evidence?: RekomendasiEvidence;
-  warning?: string | null; // ✅ tambahan field warning
+  warning?: string | null;
 }
 
 export interface RekomendasiMetadata {
   generatedAt: string;
   aiModel: string;
-  modeRekomendasi: ModeRekomendasi;
   domainIsuCode: string;
   totalMasukanDianalisis: number;
   totalDataMasterDianalisis: number;
@@ -208,7 +202,6 @@ export interface KegiatanRapat {
   domainIsu?: DomainIsu | null;
   dibuatOlehId: string;
   dibuatOleh: User;
-  mode: ModeRekomendasi;
   judulLaporan: string;
   rekomendasiItems?: RekomendasiSnapshot | null;
   fingerprint: string;
@@ -238,17 +231,6 @@ const getStatusColor = (status: StatusRekomendasi) => {
       return "bg-slate-50 text-slate-700 border-slate-200";
     case StatusRekomendasi.DITOLAK:
       return "bg-red-50 text-red-700 border-red-200";
-    default:
-      return "bg-slate-50 text-slate-700 border-slate-200";
-  }
-};
-
-const getModeBadgeColor = (mode: ModeRekomendasi) => {
-  switch (mode) {
-    case ModeRekomendasi.FUSI_DATA:
-      return "bg-blue-50 text-blue-700 border-blue-200";
-    case ModeRekomendasi.DATA_MASTER_SAJA:
-      return "bg-purple-50 text-purple-700 border-purple-200";
     default:
       return "bg-slate-50 text-slate-700 border-slate-200";
   }
@@ -474,7 +456,6 @@ export default function ListJadwalKegiatan() {
     "statusRekomendasi",
     { defaultValue: "" },
   );
-  const [mode, setMode] = useQueryState("mode", { defaultValue: "" });
   const [dibuatOlehId, setDibuatOlehId] = useQueryState("dibuatOlehId", {
     defaultValue: "",
   });
@@ -509,7 +490,6 @@ export default function ListJadwalKegiatan() {
     q: debouncedQ || undefined,
     domainIsuId: domainIsuId || undefined,
     statusRekomendasi: statusRekomendasi || undefined,
-    mode: mode || undefined,
     dibuatOlehId: dibuatOlehId || undefined,
     diprosesOlehId: diprosesOlehId || undefined,
     tanggal: tanggal || undefined,
@@ -541,7 +521,6 @@ export default function ListJadwalKegiatan() {
     (debouncedQ?.trim() !== "" && debouncedQ !== undefined) ||
     domainIsuId !== "" ||
     statusRekomendasi !== "" ||
-    mode !== "" ||
     dibuatOlehId !== "" ||
     diprosesOlehId !== "" ||
     tanggal !== "" ||
@@ -557,7 +536,6 @@ export default function ListJadwalKegiatan() {
     debouncedQ,
     domainIsuId,
     statusRekomendasi,
-    mode,
     dibuatOlehId,
     diprosesOlehId,
     tanggal,
@@ -585,7 +563,6 @@ export default function ListJadwalKegiatan() {
   const clearFilters = () => {
     setDomainIsuId("");
     setStatusRekomendasi("");
-    setMode("");
     setDibuatOlehId("");
     setSelectedDibuatOlehName("");
     setDiprosesOlehId("");
@@ -601,7 +578,6 @@ export default function ListJadwalKegiatan() {
   const hasActiveFilters =
     domainIsuId !== "" ||
     statusRekomendasi !== "" ||
-    mode !== "" ||
     dibuatOlehId !== "" ||
     diprosesOlehId !== "" ||
     tanggal !== "" ||
@@ -792,7 +768,6 @@ export default function ListJadwalKegiatan() {
                       {[
                         domainIsuId,
                         statusRekomendasi,
-                        mode,
                         dibuatOlehId,
                         diprosesOlehId,
                         tanggal,
@@ -863,30 +838,7 @@ export default function ListJadwalKegiatan() {
                       </Select>
                     </div>
 
-                    {/* Mode Rekomendasi */}
-                    <div className="grid gap-2">
-                      <Label>Mode Rekomendasi</Label>
-                      <Select
-                        value={mode || "all"}
-                        onValueChange={(val) =>
-                          setMode(val === "all" ? "" : val)
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih mode" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">Semua</SelectItem>
-                          {Object.values(ModeRekomendasi).map((m) => (
-                            <SelectItem key={m} value={m}>
-                              {m === "FUSI_DATA" ? "Fusi Data" : "Data Master"}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Dibuat Oleh - hanya ADMIN & PERANGKAT_DESA */}
+                    {/* Dibuat Oleh */}
                     <div className="grid gap-2">
                       <Label>Dibuat Oleh</Label>
                       <UserCombobox
@@ -900,7 +852,7 @@ export default function ListJadwalKegiatan() {
                       />
                     </div>
 
-                    {/* Diproses Oleh - semua role */}
+                    {/* Diproses Oleh */}
                     <div className="grid gap-2">
                       <Label>Diproses Oleh</Label>
                       <UserCombobox
@@ -1009,14 +961,6 @@ export default function ListJadwalKegiatan() {
                 <Badge variant="secondary" className="gap-2">
                   Status: {statusRekomendasi}
                   <button onClick={() => setStatusRekomendasi("")}>
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              )}
-              {mode && (
-                <Badge variant="secondary" className="gap-2">
-                  Mode: {mode === "FUSI_DATA" ? "Fusi Data" : "Data Master"}
-                  <button onClick={() => setMode("")}>
                     <X className="h-3 w-3" />
                   </button>
                 </Badge>
@@ -1178,14 +1122,6 @@ export default function ListJadwalKegiatan() {
                                         )}
                                         <Badge
                                           variant="outline"
-                                          className={`${getModeBadgeColor(k.mode)} font-medium`}
-                                        >
-                                          {k.mode === "FUSI_DATA"
-                                            ? "Fusi Data"
-                                            : "Data Master"}
-                                        </Badge>
-                                        <Badge
-                                          variant="outline"
                                           className={`${getStatusColor(k.statusRekomendasi)} font-medium`}
                                         >
                                           {k.statusRekomendasi}
@@ -1241,7 +1177,6 @@ export default function ListJadwalKegiatan() {
                                               key={rec.fingerprint || idx}
                                               className="group/rec relative bg-linear-to-br from-slate-50 to-white rounded-xl p-4 border border-slate-200 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300"
                                             >
-                                              {/* Warning badge jika ada */}
                                               {rec.warning && (
                                                 <div className="absolute top-2 right-2 z-10">
                                                   <div

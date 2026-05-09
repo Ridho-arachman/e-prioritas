@@ -61,10 +61,7 @@ export enum StatusRekomendasi {
   DITOLAK = "DITOLAK",
 }
 
-export enum ModeRekomendasi {
-  FUSI_DATA = "FUSI_DATA",
-  DATA_MASTER_SAJA = "DATA_MASTER_SAJA",
-}
+// ModeRekomendasi dihapus – backend sekarang hanya satu mode
 
 export enum Role {
   LURAH = "LURAH",
@@ -110,18 +107,18 @@ export interface RekomendasiItem {
   skorPrioritas: number;
   alasanAnalisis: string;
   domainIsuId: string;
-  lokasi?: string; // ✅ single field
+  lokasi?: string;
   fingerprint: string;
   evidence?: RekomendasiEvidence;
   usedMasukanIds?: string[];
   usedDataMasterIds?: string[];
-  warning?: string | null; // ✅ tambahan
+  warning?: string | null;
 }
 
 export interface RekomendasiMetadata {
   generatedAt: string;
   aiModel: string;
-  modeRekomendasi: ModeRekomendasi;
+  modeRekomendasi: string; // Selalu "FUSI_DATA" dari backend
   domainIsuCode: string;
   totalMasukanDianalisis: number;
   totalDataMasterDianalisis: number;
@@ -156,7 +153,7 @@ export interface KegiatanRapat {
   domainIsu?: DomainIsu | null;
   dibuatOlehId: string;
   dibuatOleh: User;
-  mode: ModeRekomendasi;
+  // mode dihapus – tidak ada di backend
   judulLaporan: string;
   rekomendasiItems?: RekomendasiSnapshot | null;
   fingerprint: string;
@@ -199,16 +196,7 @@ const getStatusColor = (status: StatusRekomendasi | string) => {
   }
 };
 
-const getModeBadgeColor = (mode: ModeRekomendasi) => {
-  switch (mode) {
-    case ModeRekomendasi.FUSI_DATA:
-      return "bg-blue-50 text-blue-700 border-blue-200";
-    case ModeRekomendasi.DATA_MASTER_SAJA:
-      return "bg-purple-50 text-purple-700 border-purple-200";
-    default:
-      return "bg-slate-50 text-slate-700 border-slate-200";
-  }
-};
+// getModeBadgeColor dihapus, tidak diperlukan
 
 const getPriorityColor = (index: number) => {
   const colors = [
@@ -530,13 +518,12 @@ export default function KegiatanRapatDetail() {
                               {kegiatan.domainIsu.nama}
                             </Badge>
                           )}
+                          {/* Mode statis: Fusi Data */}
                           <Badge
                             variant="outline"
-                            className={`${getModeBadgeColor(kegiatan.mode)} font-medium`}
+                            className="bg-blue-50 text-blue-700 border-blue-200 font-medium"
                           >
-                            {kegiatan.mode === "FUSI_DATA"
-                              ? "Fusi Data"
-                              : "Data Master"}
+                            Fusi Data
                           </Badge>
                           {kegiatan.aiModel && (
                             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-50 border border-purple-200">
@@ -642,7 +629,12 @@ export default function KegiatanRapatDetail() {
                     </h2>
                     <p className="text-sm text-slate-500">
                       {rekomendasiData?.metadata?.domainIsuCode} •{" "}
-                      {rekomendasiData?.metadata?.modeRekomendasi}
+                      {rekomendasiData?.metadata?.modeRekomendasi
+                        ? rekomendasiData.metadata.modeRekomendasi ===
+                          "FUSI_DATA"
+                          ? "Fusi Data"
+                          : rekomendasiData.metadata.modeRekomendasi
+                        : "Fusi Data"}
                     </p>
                   </div>
                 </div>
@@ -717,7 +709,7 @@ export default function KegiatanRapatDetail() {
                               </div>
                             </div>
 
-                            {/* ✅ Tampilkan warning jika ada */}
+                            {/* Warning */}
                             {item.warning && (
                               <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3 flex items-start gap-2">
                                 <AlertCircleIcon className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />

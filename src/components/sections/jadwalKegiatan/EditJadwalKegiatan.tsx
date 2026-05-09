@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -15,35 +13,34 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import {
-  ArrowLeftIcon,
-  SaveIcon,
-  XIcon,
-  CalendarIcon,
-  MapPinIcon,
-  FileTextIcon,
-  TargetIcon,
-  ClockIcon,
-  UserIcon,
-  CheckCircleIcon,
-  AlertCircleIcon,
-  LightbulbIcon,
-  BrainIcon,
-  Edit3Icon,
-  Trash2Icon,
-  EyeIcon,
-  Loader2Icon,
-} from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  AlertCircleIcon,
+  ArrowLeftIcon,
+  BrainIcon,
+  CalendarIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  Edit3Icon,
+  EyeIcon,
+  FileTextIcon,
+  LightbulbIcon,
+  Loader2Icon,
+  MapPinIcon,
+  SaveIcon,
+  TargetIcon,
+  Trash2Icon,
+  UserIcon,
+  XIcon,
+} from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { useGet, usePatch, useDelete, usePut } from "@/hooks/useApi";
-import { notifier } from "@/lib/ToastNotifier";
-import { AxiosError } from "axios";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -54,15 +51,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Field, FieldLabel, FieldError } from "@/components/ui/field";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { useDelete, useGet, usePut } from "@/hooks/useApi";
+import { notifier } from "@/lib/ToastNotifier";
+import { AxiosError } from "axios";
 
 // ========================
 // ENUMS & TYPES
 // ========================
-export enum ModeRekomendasi {
-  FUSI_DATA = "FUSI_DATA",
-  DATA_MASTER_SAJA = "DATA_MASTER_SAJA",
-}
 
 export enum StatusRekomendasi {
   DRAFT = "DRAFT",
@@ -90,7 +86,7 @@ export interface KegiatanRapat {
     name: string;
     jabatan?: string | null;
   };
-  mode: ModeRekomendasi;
+  // mode sudah dihapus dari backend, tidak ada lagi
   judulLaporan: string;
   statusRekomendasi: StatusRekomendasi;
   aiModel?: string | null;
@@ -176,6 +172,7 @@ export default function KegiatanRapatFormEdit() {
         ...kegiatanData,
         lokasi: data.lokasi || null,
         tanggal: tanggalISO,
+        // pastikan tidak ada field mode yang tidak sengaja terkirim
       };
 
       const res = await updateKegiatan(payload);
@@ -443,33 +440,18 @@ export default function KegiatanRapatFormEdit() {
                         )}
                       </div>
 
-                      {/* Mode Rekomendasi - Read Only */}
+                      {/* Mode Rekomendasi - Statis (Fusi Data) */}
                       <div className="space-y-2">
                         <Label className="text-slate-700 font-semibold flex items-center gap-2">
                           <TargetIcon className="h-4 w-4 text-blue-600" />
-                          Mode Rekomendasi *
+                          Mode Rekomendasi
                         </Label>
-                        <Select value={kegiatanData.mode} disabled>
-                          <SelectTrigger className="bg-slate-50 border-slate-200 rounded-xl text-slate-600 h-12">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="bg-white border border-slate-200">
-                            <SelectItem value={ModeRekomendasi.FUSI_DATA}>
-                              Fusi Data (Masukan Warga + Data Master)
-                            </SelectItem>
-                            <SelectItem
-                              value={ModeRekomendasi.DATA_MASTER_SAJA}
-                            >
-                              Data Master Only
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <p className="text-sm font-medium text-slate-700">
+                          🔀 Fusi Data (Masukan Warga + Data Master)
+                        </p>
                         <p className="text-xs text-slate-500">
-                          • <strong>Fusi Data</strong>: Gabungkan masukan warga
-                          & data master untuk rekomendasi komprehensif
-                          <br />• <strong>Data Master Only</strong>: Hanya
-                          gunakan data master untuk rekomendasi berbasis data
-                          internal
+                          Sistem menggunakan mode Fusi Data untuk menghasilkan
+                          rekomendasi terbaik.
                         </p>
                       </div>
 

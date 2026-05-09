@@ -74,7 +74,7 @@ import { useDebounce } from "use-debounce";
 
 export enum StatusMasukan {
   MENUNGGU = "MENUNGGU",
-  DIVERIFIKASI = "DVERIFIKASI",
+  DIVERIFIKASI = "DIVERIFIKASI",
   DITOLAK = "DITOLAK",
   DIPROSES = "DIPROSES",
   DISELESAIKAN = "DISELESAIKAN",
@@ -87,10 +87,7 @@ export enum StatusRekomendasi {
   DITOLAK = "DITOLAK",
 }
 
-export enum ModeRekomendasi {
-  FUSI_DATA = "FUSI_DATA",
-  DATA_MASTER_SAJA = "DATA_MASTER_SAJA",
-}
+// ModeRekomendasi dihapus – backend hanya Fusi Data
 
 export enum Role {
   LURAH = "LURAH",
@@ -149,7 +146,6 @@ export interface RekomendasiEvidence {
   kritikalitas?: NilaiKritikalitas;
 }
 
-// ✅ Tambahkan properti warning
 export interface RekomendasiItem {
   prioritasKe: number;
   deskripsi: string;
@@ -166,7 +162,7 @@ export interface RekomendasiItem {
 export interface RekomendasiMetadata {
   generatedAt: string;
   aiModel: string;
-  modeRekomendasi: ModeRekomendasi;
+  modeRekomendasi: string; // Selalu "FUSI_DATA"
   domainIsuCode: string;
   totalMasukanDianalisis: number;
   totalDataMasterDianalisis: number;
@@ -178,7 +174,7 @@ export interface RekomendasiSnapshot {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// 📦 KEGIATAN RAPAT (Main Entity)
+// 📦 KEGIATAN RAPAT (Main Entity) – mode dihapus
 // ═══════════════════════════════════════════════════════════════
 
 export interface KegiatanRapat {
@@ -191,7 +187,7 @@ export interface KegiatanRapat {
   domainIsu?: DomainIsu | null;
   dibuatOlehId: string;
   dibuatOleh: User;
-  mode: ModeRekomendasi;
+  // mode tidak ada lagi
   judulLaporan: string;
   rekomendasiItems?: RekomendasiSnapshot | null;
   fingerprint: string;
@@ -226,16 +222,7 @@ const getStatusColor = (status: StatusRekomendasi) => {
   }
 };
 
-const getModeBadgeColor = (mode: ModeRekomendasi) => {
-  switch (mode) {
-    case ModeRekomendasi.FUSI_DATA:
-      return "bg-blue-50 text-blue-700 border-blue-200";
-    case ModeRekomendasi.DATA_MASTER_SAJA:
-      return "bg-purple-50 text-purple-700 border-purple-200";
-    default:
-      return "bg-slate-50 text-slate-700 border-slate-200";
-  }
-};
+// getModeBadgeColor dihapus
 
 const getDomainGradient = (domainCode: string | null | undefined) => {
   switch (domainCode) {
@@ -451,7 +438,7 @@ export default function ListJadwalKegiatan() {
       defaultValue: "",
     },
   );
-  const [mode, setMode] = useQueryState("mode", { defaultValue: "" });
+  // mode dihapus dari query state
   const [dibuatOlehId, setDibuatOlehId] = useQueryState("dibuatOlehId", {
     defaultValue: "",
   });
@@ -486,7 +473,7 @@ export default function ListJadwalKegiatan() {
     q: debouncedQ || undefined,
     domainIsuId: domainIsuId || undefined,
     statusRekomendasi: statusRekomendasi || undefined,
-    mode: mode || undefined,
+    // mode tidak dikirim
     dibuatOlehId: dibuatOlehId || undefined,
     diprosesOlehId: diprosesOlehId || undefined,
     tanggal: tanggal || undefined,
@@ -516,7 +503,6 @@ export default function ListJadwalKegiatan() {
     (debouncedQ?.trim() !== "" && debouncedQ !== undefined) ||
     domainIsuId !== "" ||
     statusRekomendasi !== "" ||
-    mode !== "" ||
     dibuatOlehId !== "" ||
     diprosesOlehId !== "" ||
     tanggal !== "" ||
@@ -532,7 +518,6 @@ export default function ListJadwalKegiatan() {
     debouncedQ,
     domainIsuId,
     statusRekomendasi,
-    mode,
     dibuatOlehId,
     diprosesOlehId,
     tanggal,
@@ -544,7 +529,6 @@ export default function ListJadwalKegiatan() {
   const clearFilters = () => {
     setDomainIsuId("");
     setStatusRekomendasi("");
-    setMode("");
     setDibuatOlehId("");
     setSelectedDibuatOlehName("");
     setDiprosesOlehId("");
@@ -560,7 +544,6 @@ export default function ListJadwalKegiatan() {
   const hasActiveFilters =
     domainIsuId !== "" ||
     statusRekomendasi !== "" ||
-    mode !== "" ||
     dibuatOlehId !== "" ||
     diprosesOlehId !== "" ||
     tanggal !== "" ||
@@ -707,7 +690,6 @@ export default function ListJadwalKegiatan() {
                       {[
                         domainIsuId,
                         statusRekomendasi,
-                        mode,
                         dibuatOlehId,
                         diprosesOlehId,
                         tanggal,
@@ -778,28 +760,7 @@ export default function ListJadwalKegiatan() {
                       </Select>
                     </div>
 
-                    {/* Mode Rekomendasi */}
-                    <div className="grid gap-2">
-                      <Label>Mode Rekomendasi</Label>
-                      <Select
-                        value={mode || "all"}
-                        onValueChange={(val) =>
-                          setMode(val === "all" ? "" : val)
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih mode" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">Semua</SelectItem>
-                          {Object.values(ModeRekomendasi).map((m) => (
-                            <SelectItem key={m} value={m}>
-                              {m === "FUSI_DATA" ? "Fusi Data" : "Data Master"}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    {/* Mode Rekomendasi dihapus dari filter */}
 
                     {/* Dibuat Oleh - hanya ADMIN & PERANGKAT_DESA */}
                     <div className="grid gap-2">
@@ -928,14 +889,7 @@ export default function ListJadwalKegiatan() {
                   </button>
                 </Badge>
               )}
-              {mode && (
-                <Badge variant="secondary" className="gap-2">
-                  Mode: {mode === "FUSI_DATA" ? "Fusi Data" : "Data Master"}
-                  <button onClick={() => setMode("")}>
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              )}
+              {/* Mode badge dihapus */}
               {dibuatOlehId && (
                 <Badge variant="secondary" className="gap-2">
                   Dibuat: {selectedDibuatOlehName || dibuatOlehId}
@@ -1091,13 +1045,12 @@ export default function ListJadwalKegiatan() {
                                             {k.domainIsu.nama}
                                           </Badge>
                                         )}
+                                        {/* Mode statis */}
                                         <Badge
                                           variant="outline"
-                                          className={`${getModeBadgeColor(k.mode)} font-medium`}
+                                          className="bg-blue-50 text-blue-700 border-blue-200 font-medium"
                                         >
-                                          {k.mode === "FUSI_DATA"
-                                            ? "Fusi Data"
-                                            : "Data Master"}
+                                          Fusi Data
                                         </Badge>
                                         <Badge
                                           variant="outline"
@@ -1156,7 +1109,6 @@ export default function ListJadwalKegiatan() {
                                               key={rec.fingerprint || idx}
                                               className="group/rec relative bg-linear-to-br from-slate-50 to-white rounded-xl p-4 border border-slate-200 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300"
                                             >
-                                              {/* ✅ Ikon warning */}
                                               {rec.warning && (
                                                 <div
                                                   className="absolute top-2 left-2 z-10"

@@ -128,14 +128,6 @@ export const NilaiKritikalitas: {
 export type NilaiKritikalitas = (typeof NilaiKritikalitas)[keyof typeof NilaiKritikalitas]
 
 
-export const ModeRekomendasi: {
-  FUSI_DATA: 'FUSI_DATA',
-  DATA_MASTER_SAJA: 'DATA_MASTER_SAJA'
-};
-
-export type ModeRekomendasi = (typeof ModeRekomendasi)[keyof typeof ModeRekomendasi]
-
-
 export const StatusProgram: {
   BERJALAN: 'BERJALAN',
   SELESAI: 'SELESAI',
@@ -169,10 +161,6 @@ export const StatusRekomendasi: typeof $Enums.StatusRekomendasi
 export type NilaiKritikalitas = $Enums.NilaiKritikalitas
 
 export const NilaiKritikalitas: typeof $Enums.NilaiKritikalitas
-
-export type ModeRekomendasi = $Enums.ModeRekomendasi
-
-export const ModeRekomendasi: typeof $Enums.ModeRekomendasi
 
 export type StatusProgram = $Enums.StatusProgram
 
@@ -8425,7 +8413,6 @@ export namespace Prisma {
     lokasi: string | null
     domainIsuId: string | null
     dibuatOlehId: string | null
-    mode: $Enums.ModeRekomendasi | null
     judulLaporan: string | null
     fingerprint: string | null
     statusRekomendasi: $Enums.StatusRekomendasi | null
@@ -8444,7 +8431,6 @@ export namespace Prisma {
     lokasi: string | null
     domainIsuId: string | null
     dibuatOlehId: string | null
-    mode: $Enums.ModeRekomendasi | null
     judulLaporan: string | null
     fingerprint: string | null
     statusRekomendasi: $Enums.StatusRekomendasi | null
@@ -8463,7 +8449,6 @@ export namespace Prisma {
     lokasi: number
     domainIsuId: number
     dibuatOlehId: number
-    mode: number
     judulLaporan: number
     rekomendasiItems: number
     fingerprint: number
@@ -8485,7 +8470,6 @@ export namespace Prisma {
     lokasi?: true
     domainIsuId?: true
     dibuatOlehId?: true
-    mode?: true
     judulLaporan?: true
     fingerprint?: true
     statusRekomendasi?: true
@@ -8504,7 +8488,6 @@ export namespace Prisma {
     lokasi?: true
     domainIsuId?: true
     dibuatOlehId?: true
-    mode?: true
     judulLaporan?: true
     fingerprint?: true
     statusRekomendasi?: true
@@ -8523,7 +8506,6 @@ export namespace Prisma {
     lokasi?: true
     domainIsuId?: true
     dibuatOlehId?: true
-    mode?: true
     judulLaporan?: true
     rekomendasiItems?: true
     fingerprint?: true
@@ -8616,7 +8598,6 @@ export namespace Prisma {
     lokasi: string | null
     domainIsuId: string
     dibuatOlehId: string
-    mode: $Enums.ModeRekomendasi
     judulLaporan: string
     rekomendasiItems: JsonValue
     fingerprint: string
@@ -8653,7 +8634,6 @@ export namespace Prisma {
     lokasi?: boolean
     domainIsuId?: boolean
     dibuatOlehId?: boolean
-    mode?: boolean
     judulLaporan?: boolean
     rekomendasiItems?: boolean
     fingerprint?: boolean
@@ -8679,7 +8659,6 @@ export namespace Prisma {
     lokasi?: boolean
     domainIsuId?: boolean
     dibuatOlehId?: boolean
-    mode?: boolean
     judulLaporan?: boolean
     rekomendasiItems?: boolean
     fingerprint?: boolean
@@ -8702,7 +8681,6 @@ export namespace Prisma {
     lokasi?: boolean
     domainIsuId?: boolean
     dibuatOlehId?: boolean
-    mode?: boolean
     judulLaporan?: boolean
     rekomendasiItems?: boolean
     fingerprint?: boolean
@@ -8725,7 +8703,6 @@ export namespace Prisma {
     lokasi?: boolean
     domainIsuId?: boolean
     dibuatOlehId?: boolean
-    mode?: boolean
     judulLaporan?: boolean
     rekomendasiItems?: boolean
     fingerprint?: boolean
@@ -8737,7 +8714,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type KegiatanRapatOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "judul" | "deskripsi" | "tanggal" | "lokasi" | "domainIsuId" | "dibuatOlehId" | "mode" | "judulLaporan" | "rekomendasiItems" | "fingerprint" | "statusRekomendasi" | "aiModel" | "aiProcessedAt" | "diprosesOlehId" | "createdAt" | "updatedAt", ExtArgs["result"]["kegiatanRapat"]>
+  export type KegiatanRapatOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "judul" | "deskripsi" | "tanggal" | "lokasi" | "domainIsuId" | "dibuatOlehId" | "judulLaporan" | "rekomendasiItems" | "fingerprint" | "statusRekomendasi" | "aiModel" | "aiProcessedAt" | "diprosesOlehId" | "createdAt" | "updatedAt", ExtArgs["result"]["kegiatanRapat"]>
   export type KegiatanRapatInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     domainIsu?: boolean | DomainIsuDefaultArgs<ExtArgs>
     dibuatOleh?: boolean | UserDefaultArgs<ExtArgs>
@@ -8774,7 +8751,6 @@ export namespace Prisma {
       lokasi: string | null
       domainIsuId: string
       dibuatOlehId: string
-      mode: $Enums.ModeRekomendasi
       judulLaporan: string
       rekomendasiItems: Prisma.JsonValue
       fingerprint: string
@@ -9219,7 +9195,6 @@ export namespace Prisma {
     readonly lokasi: FieldRef<"KegiatanRapat", 'String'>
     readonly domainIsuId: FieldRef<"KegiatanRapat", 'String'>
     readonly dibuatOlehId: FieldRef<"KegiatanRapat", 'String'>
-    readonly mode: FieldRef<"KegiatanRapat", 'ModeRekomendasi'>
     readonly judulLaporan: FieldRef<"KegiatanRapat", 'String'>
     readonly rekomendasiItems: FieldRef<"KegiatanRapat", 'Json'>
     readonly fingerprint: FieldRef<"KegiatanRapat", 'String'>
@@ -18555,7 +18530,6 @@ export namespace Prisma {
     lokasi: 'lokasi',
     domainIsuId: 'domainIsuId',
     dibuatOlehId: 'dibuatOlehId',
-    mode: 'mode',
     judulLaporan: 'judulLaporan',
     rekomendasiItems: 'rekomendasiItems',
     fingerprint: 'fingerprint',
@@ -18813,20 +18787,6 @@ export namespace Prisma {
    * Reference to a field of type 'Int[]'
    */
   export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'ModeRekomendasi'
-   */
-  export type EnumModeRekomendasiFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ModeRekomendasi'>
-    
-
-
-  /**
-   * Reference to a field of type 'ModeRekomendasi[]'
-   */
-  export type ListEnumModeRekomendasiFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ModeRekomendasi[]'>
     
 
 
@@ -19338,7 +19298,6 @@ export namespace Prisma {
     lokasi?: StringNullableFilter<"KegiatanRapat"> | string | null
     domainIsuId?: StringFilter<"KegiatanRapat"> | string
     dibuatOlehId?: StringFilter<"KegiatanRapat"> | string
-    mode?: EnumModeRekomendasiFilter<"KegiatanRapat"> | $Enums.ModeRekomendasi
     judulLaporan?: StringFilter<"KegiatanRapat"> | string
     rekomendasiItems?: JsonFilter<"KegiatanRapat">
     fingerprint?: StringFilter<"KegiatanRapat"> | string
@@ -19363,7 +19322,6 @@ export namespace Prisma {
     lokasi?: SortOrderInput | SortOrder
     domainIsuId?: SortOrder
     dibuatOlehId?: SortOrder
-    mode?: SortOrder
     judulLaporan?: SortOrder
     rekomendasiItems?: SortOrder
     fingerprint?: SortOrder
@@ -19392,7 +19350,6 @@ export namespace Prisma {
     lokasi?: StringNullableFilter<"KegiatanRapat"> | string | null
     domainIsuId?: StringFilter<"KegiatanRapat"> | string
     dibuatOlehId?: StringFilter<"KegiatanRapat"> | string
-    mode?: EnumModeRekomendasiFilter<"KegiatanRapat"> | $Enums.ModeRekomendasi
     judulLaporan?: StringFilter<"KegiatanRapat"> | string
     rekomendasiItems?: JsonFilter<"KegiatanRapat">
     statusRekomendasi?: EnumStatusRekomendasiFilter<"KegiatanRapat"> | $Enums.StatusRekomendasi
@@ -19416,7 +19373,6 @@ export namespace Prisma {
     lokasi?: SortOrderInput | SortOrder
     domainIsuId?: SortOrder
     dibuatOlehId?: SortOrder
-    mode?: SortOrder
     judulLaporan?: SortOrder
     rekomendasiItems?: SortOrder
     fingerprint?: SortOrder
@@ -19442,7 +19398,6 @@ export namespace Prisma {
     lokasi?: StringNullableWithAggregatesFilter<"KegiatanRapat"> | string | null
     domainIsuId?: StringWithAggregatesFilter<"KegiatanRapat"> | string
     dibuatOlehId?: StringWithAggregatesFilter<"KegiatanRapat"> | string
-    mode?: EnumModeRekomendasiWithAggregatesFilter<"KegiatanRapat"> | $Enums.ModeRekomendasi
     judulLaporan?: StringWithAggregatesFilter<"KegiatanRapat"> | string
     rekomendasiItems?: JsonWithAggregatesFilter<"KegiatanRapat">
     fingerprint?: StringWithAggregatesFilter<"KegiatanRapat"> | string
@@ -20466,7 +20421,6 @@ export namespace Prisma {
     deskripsi: string
     tanggal: Date | string
     lokasi?: string | null
-    mode: $Enums.ModeRekomendasi
     judulLaporan: string
     rekomendasiItems: JsonNullValueInput | InputJsonValue
     fingerprint: string
@@ -20490,7 +20444,6 @@ export namespace Prisma {
     lokasi?: string | null
     domainIsuId: string
     dibuatOlehId: string
-    mode: $Enums.ModeRekomendasi
     judulLaporan: string
     rekomendasiItems: JsonNullValueInput | InputJsonValue
     fingerprint: string
@@ -20510,7 +20463,6 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
-    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
     judulLaporan?: StringFieldUpdateOperationsInput | string
     rekomendasiItems?: JsonNullValueInput | InputJsonValue
     fingerprint?: StringFieldUpdateOperationsInput | string
@@ -20534,7 +20486,6 @@ export namespace Prisma {
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
     domainIsuId?: StringFieldUpdateOperationsInput | string
     dibuatOlehId?: StringFieldUpdateOperationsInput | string
-    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
     judulLaporan?: StringFieldUpdateOperationsInput | string
     rekomendasiItems?: JsonNullValueInput | InputJsonValue
     fingerprint?: StringFieldUpdateOperationsInput | string
@@ -20556,7 +20507,6 @@ export namespace Prisma {
     lokasi?: string | null
     domainIsuId: string
     dibuatOlehId: string
-    mode: $Enums.ModeRekomendasi
     judulLaporan: string
     rekomendasiItems: JsonNullValueInput | InputJsonValue
     fingerprint: string
@@ -20574,7 +20524,6 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
-    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
     judulLaporan?: StringFieldUpdateOperationsInput | string
     rekomendasiItems?: JsonNullValueInput | InputJsonValue
     fingerprint?: StringFieldUpdateOperationsInput | string
@@ -20593,7 +20542,6 @@ export namespace Prisma {
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
     domainIsuId?: StringFieldUpdateOperationsInput | string
     dibuatOlehId?: StringFieldUpdateOperationsInput | string
-    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
     judulLaporan?: StringFieldUpdateOperationsInput | string
     rekomendasiItems?: JsonNullValueInput | InputJsonValue
     fingerprint?: StringFieldUpdateOperationsInput | string
@@ -21689,13 +21637,6 @@ export namespace Prisma {
     _min?: NestedIntNullableFilter<$PrismaModel>
     _max?: NestedIntNullableFilter<$PrismaModel>
   }
-
-  export type EnumModeRekomendasiFilter<$PrismaModel = never> = {
-    equals?: $Enums.ModeRekomendasi | EnumModeRekomendasiFieldRefInput<$PrismaModel>
-    in?: $Enums.ModeRekomendasi[] | ListEnumModeRekomendasiFieldRefInput<$PrismaModel>
-    notIn?: $Enums.ModeRekomendasi[] | ListEnumModeRekomendasiFieldRefInput<$PrismaModel>
-    not?: NestedEnumModeRekomendasiFilter<$PrismaModel> | $Enums.ModeRekomendasi
-  }
   export type JsonFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -21751,7 +21692,6 @@ export namespace Prisma {
     lokasi?: SortOrder
     domainIsuId?: SortOrder
     dibuatOlehId?: SortOrder
-    mode?: SortOrder
     judulLaporan?: SortOrder
     rekomendasiItems?: SortOrder
     fingerprint?: SortOrder
@@ -21771,7 +21711,6 @@ export namespace Prisma {
     lokasi?: SortOrder
     domainIsuId?: SortOrder
     dibuatOlehId?: SortOrder
-    mode?: SortOrder
     judulLaporan?: SortOrder
     fingerprint?: SortOrder
     statusRekomendasi?: SortOrder
@@ -21790,7 +21729,6 @@ export namespace Prisma {
     lokasi?: SortOrder
     domainIsuId?: SortOrder
     dibuatOlehId?: SortOrder
-    mode?: SortOrder
     judulLaporan?: SortOrder
     fingerprint?: SortOrder
     statusRekomendasi?: SortOrder
@@ -21799,16 +21737,6 @@ export namespace Prisma {
     diprosesOlehId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-  }
-
-  export type EnumModeRekomendasiWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.ModeRekomendasi | EnumModeRekomendasiFieldRefInput<$PrismaModel>
-    in?: $Enums.ModeRekomendasi[] | ListEnumModeRekomendasiFieldRefInput<$PrismaModel>
-    notIn?: $Enums.ModeRekomendasi[] | ListEnumModeRekomendasiFieldRefInput<$PrismaModel>
-    not?: NestedEnumModeRekomendasiWithAggregatesFilter<$PrismaModel> | $Enums.ModeRekomendasi
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumModeRekomendasiFilter<$PrismaModel>
-    _max?: NestedEnumModeRekomendasiFilter<$PrismaModel>
   }
   export type JsonWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -22977,10 +22905,6 @@ export namespace Prisma {
     connect?: KegiatanRapatDataMasterWhereUniqueInput | KegiatanRapatDataMasterWhereUniqueInput[]
   }
 
-  export type EnumModeRekomendasiFieldUpdateOperationsInput = {
-    set?: $Enums.ModeRekomendasi
-  }
-
   export type EnumStatusRekomendasiFieldUpdateOperationsInput = {
     set?: $Enums.StatusRekomendasi
   }
@@ -23450,13 +23374,6 @@ export namespace Prisma {
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
-  export type NestedEnumModeRekomendasiFilter<$PrismaModel = never> = {
-    equals?: $Enums.ModeRekomendasi | EnumModeRekomendasiFieldRefInput<$PrismaModel>
-    in?: $Enums.ModeRekomendasi[] | ListEnumModeRekomendasiFieldRefInput<$PrismaModel>
-    notIn?: $Enums.ModeRekomendasi[] | ListEnumModeRekomendasiFieldRefInput<$PrismaModel>
-    not?: NestedEnumModeRekomendasiFilter<$PrismaModel> | $Enums.ModeRekomendasi
-  }
-
   export type NestedEnumStatusRekomendasiFilter<$PrismaModel = never> = {
     equals?: $Enums.StatusRekomendasi | EnumStatusRekomendasiFieldRefInput<$PrismaModel>
     in?: $Enums.StatusRekomendasi[] | ListEnumStatusRekomendasiFieldRefInput<$PrismaModel>
@@ -23473,16 +23390,6 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
-  export type NestedEnumModeRekomendasiWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.ModeRekomendasi | EnumModeRekomendasiFieldRefInput<$PrismaModel>
-    in?: $Enums.ModeRekomendasi[] | ListEnumModeRekomendasiFieldRefInput<$PrismaModel>
-    notIn?: $Enums.ModeRekomendasi[] | ListEnumModeRekomendasiFieldRefInput<$PrismaModel>
-    not?: NestedEnumModeRekomendasiWithAggregatesFilter<$PrismaModel> | $Enums.ModeRekomendasi
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumModeRekomendasiFilter<$PrismaModel>
-    _max?: NestedEnumModeRekomendasiFilter<$PrismaModel>
   }
   export type NestedJsonFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -23715,7 +23622,6 @@ export namespace Prisma {
     deskripsi: string
     tanggal: Date | string
     lokasi?: string | null
-    mode: $Enums.ModeRekomendasi
     judulLaporan: string
     rekomendasiItems: JsonNullValueInput | InputJsonValue
     fingerprint: string
@@ -23737,7 +23643,6 @@ export namespace Prisma {
     tanggal: Date | string
     lokasi?: string | null
     dibuatOlehId: string
-    mode: $Enums.ModeRekomendasi
     judulLaporan: string
     rekomendasiItems: JsonNullValueInput | InputJsonValue
     fingerprint: string
@@ -23889,7 +23794,6 @@ export namespace Prisma {
     lokasi?: StringNullableFilter<"KegiatanRapat"> | string | null
     domainIsuId?: StringFilter<"KegiatanRapat"> | string
     dibuatOlehId?: StringFilter<"KegiatanRapat"> | string
-    mode?: EnumModeRekomendasiFilter<"KegiatanRapat"> | $Enums.ModeRekomendasi
     judulLaporan?: StringFilter<"KegiatanRapat"> | string
     rekomendasiItems?: JsonFilter<"KegiatanRapat">
     fingerprint?: StringFilter<"KegiatanRapat"> | string
@@ -23980,7 +23884,6 @@ export namespace Prisma {
     deskripsi: string
     tanggal: Date | string
     lokasi?: string | null
-    mode: $Enums.ModeRekomendasi
     judulLaporan: string
     rekomendasiItems: JsonNullValueInput | InputJsonValue
     fingerprint: string
@@ -24003,7 +23906,6 @@ export namespace Prisma {
     lokasi?: string | null
     domainIsuId: string
     dibuatOlehId: string
-    mode: $Enums.ModeRekomendasi
     judulLaporan: string
     rekomendasiItems: JsonNullValueInput | InputJsonValue
     fingerprint: string
@@ -24032,7 +23934,6 @@ export namespace Prisma {
     deskripsi: string
     tanggal: Date | string
     lokasi?: string | null
-    mode: $Enums.ModeRekomendasi
     judulLaporan: string
     rekomendasiItems: JsonNullValueInput | InputJsonValue
     fingerprint: string
@@ -24054,7 +23955,6 @@ export namespace Prisma {
     tanggal: Date | string
     lokasi?: string | null
     domainIsuId: string
-    mode: $Enums.ModeRekomendasi
     judulLaporan: string
     rekomendasiItems: JsonNullValueInput | InputJsonValue
     fingerprint: string
@@ -25237,7 +25137,6 @@ export namespace Prisma {
     deskripsi: string
     tanggal: Date | string
     lokasi?: string | null
-    mode: $Enums.ModeRekomendasi
     judulLaporan: string
     rekomendasiItems: JsonNullValueInput | InputJsonValue
     fingerprint: string
@@ -25260,7 +25159,6 @@ export namespace Prisma {
     lokasi?: string | null
     domainIsuId: string
     dibuatOlehId: string
-    mode: $Enums.ModeRekomendasi
     judulLaporan: string
     rekomendasiItems: JsonNullValueInput | InputJsonValue
     fingerprint: string
@@ -25330,7 +25228,6 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
-    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
     judulLaporan?: StringFieldUpdateOperationsInput | string
     rekomendasiItems?: JsonNullValueInput | InputJsonValue
     fingerprint?: StringFieldUpdateOperationsInput | string
@@ -25353,7 +25250,6 @@ export namespace Prisma {
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
     domainIsuId?: StringFieldUpdateOperationsInput | string
     dibuatOlehId?: StringFieldUpdateOperationsInput | string
-    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
     judulLaporan?: StringFieldUpdateOperationsInput | string
     rekomendasiItems?: JsonNullValueInput | InputJsonValue
     fingerprint?: StringFieldUpdateOperationsInput | string
@@ -25413,7 +25309,6 @@ export namespace Prisma {
     deskripsi: string
     tanggal: Date | string
     lokasi?: string | null
-    mode: $Enums.ModeRekomendasi
     judulLaporan: string
     rekomendasiItems: JsonNullValueInput | InputJsonValue
     fingerprint: string
@@ -25436,7 +25331,6 @@ export namespace Prisma {
     lokasi?: string | null
     domainIsuId: string
     dibuatOlehId: string
-    mode: $Enums.ModeRekomendasi
     judulLaporan: string
     rekomendasiItems: JsonNullValueInput | InputJsonValue
     fingerprint: string
@@ -25502,7 +25396,6 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
-    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
     judulLaporan?: StringFieldUpdateOperationsInput | string
     rekomendasiItems?: JsonNullValueInput | InputJsonValue
     fingerprint?: StringFieldUpdateOperationsInput | string
@@ -25525,7 +25418,6 @@ export namespace Prisma {
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
     domainIsuId?: StringFieldUpdateOperationsInput | string
     dibuatOlehId?: StringFieldUpdateOperationsInput | string
-    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
     judulLaporan?: StringFieldUpdateOperationsInput | string
     rekomendasiItems?: JsonNullValueInput | InputJsonValue
     fingerprint?: StringFieldUpdateOperationsInput | string
@@ -25903,7 +25795,6 @@ export namespace Prisma {
     tanggal: Date | string
     lokasi?: string | null
     dibuatOlehId: string
-    mode: $Enums.ModeRekomendasi
     judulLaporan: string
     rekomendasiItems: JsonNullValueInput | InputJsonValue
     fingerprint: string
@@ -26015,7 +25906,6 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
-    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
     judulLaporan?: StringFieldUpdateOperationsInput | string
     rekomendasiItems?: JsonNullValueInput | InputJsonValue
     fingerprint?: StringFieldUpdateOperationsInput | string
@@ -26037,7 +25927,6 @@ export namespace Prisma {
     tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
     dibuatOlehId?: StringFieldUpdateOperationsInput | string
-    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
     judulLaporan?: StringFieldUpdateOperationsInput | string
     rekomendasiItems?: JsonNullValueInput | InputJsonValue
     fingerprint?: StringFieldUpdateOperationsInput | string
@@ -26058,7 +25947,6 @@ export namespace Prisma {
     tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
     dibuatOlehId?: StringFieldUpdateOperationsInput | string
-    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
     judulLaporan?: StringFieldUpdateOperationsInput | string
     rekomendasiItems?: JsonNullValueInput | InputJsonValue
     fingerprint?: StringFieldUpdateOperationsInput | string
@@ -26130,7 +26018,6 @@ export namespace Prisma {
     lokasi?: string | null
     domainIsuId: string
     dibuatOlehId: string
-    mode: $Enums.ModeRekomendasi
     judulLaporan: string
     rekomendasiItems: JsonNullValueInput | InputJsonValue
     fingerprint: string
@@ -26148,7 +26035,6 @@ export namespace Prisma {
     tanggal: Date | string
     lokasi?: string | null
     domainIsuId: string
-    mode: $Enums.ModeRekomendasi
     judulLaporan: string
     rekomendasiItems: JsonNullValueInput | InputJsonValue
     fingerprint: string
@@ -26250,7 +26136,6 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
-    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
     judulLaporan?: StringFieldUpdateOperationsInput | string
     rekomendasiItems?: JsonNullValueInput | InputJsonValue
     fingerprint?: StringFieldUpdateOperationsInput | string
@@ -26273,7 +26158,6 @@ export namespace Prisma {
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
     domainIsuId?: StringFieldUpdateOperationsInput | string
     dibuatOlehId?: StringFieldUpdateOperationsInput | string
-    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
     judulLaporan?: StringFieldUpdateOperationsInput | string
     rekomendasiItems?: JsonNullValueInput | InputJsonValue
     fingerprint?: StringFieldUpdateOperationsInput | string
@@ -26294,7 +26178,6 @@ export namespace Prisma {
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
     domainIsuId?: StringFieldUpdateOperationsInput | string
     dibuatOlehId?: StringFieldUpdateOperationsInput | string
-    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
     judulLaporan?: StringFieldUpdateOperationsInput | string
     rekomendasiItems?: JsonNullValueInput | InputJsonValue
     fingerprint?: StringFieldUpdateOperationsInput | string
@@ -26311,7 +26194,6 @@ export namespace Prisma {
     deskripsi?: StringFieldUpdateOperationsInput | string
     tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
-    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
     judulLaporan?: StringFieldUpdateOperationsInput | string
     rekomendasiItems?: JsonNullValueInput | InputJsonValue
     fingerprint?: StringFieldUpdateOperationsInput | string
@@ -26333,7 +26215,6 @@ export namespace Prisma {
     tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
     domainIsuId?: StringFieldUpdateOperationsInput | string
-    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
     judulLaporan?: StringFieldUpdateOperationsInput | string
     rekomendasiItems?: JsonNullValueInput | InputJsonValue
     fingerprint?: StringFieldUpdateOperationsInput | string
@@ -26354,7 +26235,6 @@ export namespace Prisma {
     tanggal?: DateTimeFieldUpdateOperationsInput | Date | string
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
     domainIsuId?: StringFieldUpdateOperationsInput | string
-    mode?: EnumModeRekomendasiFieldUpdateOperationsInput | $Enums.ModeRekomendasi
     judulLaporan?: StringFieldUpdateOperationsInput | string
     rekomendasiItems?: JsonNullValueInput | InputJsonValue
     fingerprint?: StringFieldUpdateOperationsInput | string
