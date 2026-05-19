@@ -68,7 +68,7 @@ export default function ProgramKelurahanDetail({
   return (
     <Card className="w-full mx-auto">
       <CardHeader className="border-b">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center gap-4">
             <Button variant="outline" size="icon" onClick={() => router.back()}>
               <ArrowLeft className="h-4 w-4" />
@@ -76,7 +76,10 @@ export default function ProgramKelurahanDetail({
             <h1 className="text-2xl font-bold">Detail Program</h1>
           </div>
           {canEdit && (
-            <Button onClick={() => router.push(`${basePath}/${id}/edit`)}>
+            <Button
+              onClick={() => router.push(`${basePath}/${id}/edit`)}
+              className="w-full sm:w-auto"
+            >
               <Edit className="mr-2 h-4 w-4" /> Edit
             </Button>
           )}

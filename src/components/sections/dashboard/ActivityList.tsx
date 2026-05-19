@@ -27,68 +27,77 @@ export default function ActivityList() {
   } = useGet("/protected/dashboard/admin/activities");
 
   return (
-    <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-all rounded-xl bg-white/80 backdrop-blur-sm">
-      <CardHeader className="pb-4">
+    <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-all rounded-xl bg-white/80 backdrop-blur-sm h-full">
+      <CardHeader className="pb-3 sm:pb-4">
         <div className="flex items-center gap-2">
-          <div className="p-1.5 bg-blue-50 rounded-lg">
-            <ClipboardList className="w-5 h-5 text-blue-600" />
+          <div className="p-1.5 bg-blue-50 rounded-lg shrink-0">
+            <ClipboardList className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
           </div>
-          <div>
-            <CardTitle className="text-lg font-semibold">
+          <div className="min-w-0 flex-1">
+            <CardTitle className="text-base sm:text-lg font-semibold truncate">
               Aktivitas Terbaru
             </CardTitle>
-            <CardDescription className="text-xs mt-0.5">
+            <CardDescription className="text-xs mt-0.5 truncate">
               Riwayat aktivitas terbaru sistem
             </CardDescription>
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-2 sm:space-y-3 px-3 sm:px-6 pb-4 sm:pb-6">
         {isLoading ? (
           // Loading state
-          <>
+          <div className="space-y-3">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="flex items-center justify-between py-1">
-                <div className="flex items-center gap-3 w-full">
-                  <Skeleton className="h-2 w-2 rounded-full" />
-                  <Skeleton className="h-4 flex-1" />
+              <div
+                key={i}
+                className="flex items-center justify-between gap-2 py-1"
+              >
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <Skeleton className="h-2 w-2 rounded-full shrink-0" />
+                  <Skeleton className="h-4 w-full max-w-50 sm:max-w-none" />
                 </div>
-                <Skeleton className="h-3 w-16 ml-2" />
+                <Skeleton className="h-3 w-16 shrink-0" />
               </div>
             ))}
-          </>
+          </div>
         ) : error ? (
           // Error state
           <div className="flex justify-center py-6">
-            <p className="text-red-500 text-sm">Gagal memuat aktivitas.</p>
+            <p className="text-red-500 text-sm text-center px-4">
+              Gagal memuat aktivitas.
+            </p>
           </div>
         ) : activities && activities.length > 0 ? (
           // Data state
-          activities.slice(0, 5).map((activity: Activity, idx: number) => (
-            <div
-              key={idx}
-              className="flex flex-wrap items-start justify-between gap-x-2 gap-y-1 py-2 px-2 -mx-2 rounded-lg hover:bg-blue-50/60 transition-colors"
-            >
-              <div className="flex items-start gap-2.5 min-w-0 flex-1">
-                <Dot className="w-4 h-4 mt-0.5 text-green-500 shrink-0" />
-                <p className="text-sm text-gray-700 whitespace-normal wrap-break-words leading-relaxed">
-                  {activity.title}
-                </p>
+          <div className="space-y-1">
+            {activities.slice(0, 5).map((activity: Activity, idx: number) => (
+              <div
+                key={idx}
+                className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 py-2 px-2 -mx-2 rounded-lg hover:bg-blue-50/60 transition-colors"
+              >
+                <div className="flex items-start gap-2.5 min-w-0 flex-1">
+                  <Dot className="w-4 h-4 mt-0.5 text-green-500 shrink-0" />
+                  <p className="text-xs sm:text-sm text-gray-700 wrap-break-word leading-relaxed">
+                    {activity.title}
+                  </p>
+                </div>
+                <span className="text-xs text-gray-400 whitespace-nowrap shrink-0 sm:ml-2 pl-5 sm:pl-0">
+                  {formatDistanceToNow(new Date(activity.time), {
+                    addSuffix: true,
+                    locale: id,
+                  })}
+                </span>
               </div>
-              <span className="text-xs text-gray-400 whitespace-nowrap pt-0.5 shrink-0">
-                {formatDistanceToNow(new Date(activity.time), {
-                  addSuffix: true,
-                  locale: id,
-                })}
-              </span>
-            </div>
-          ))
+            ))}
+          </div>
         ) : (
           // Empty state
           <div className="flex flex-col items-center justify-center py-8 text-gray-400">
-            <ClipboardList className="w-12 h-12 mb-2 opacity-30" />
-            <p className="text-sm">Belum ada aktivitas.</p>
+            <ClipboardList className="w-10 h-10 sm:w-12 sm:h-12 mb-2 opacity-30" />
+            <p className="text-xs sm:text-sm text-center px-4">
+              Belum ada aktivitas.
+            </p>
           </div>
         )}
       </CardContent>

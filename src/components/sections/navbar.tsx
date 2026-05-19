@@ -17,10 +17,8 @@ import {
   Layers,
   LayoutDashboard,
   LogIn,
-  MailOpen,
   Menu,
   MessageSquare,
-  X,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -114,7 +112,7 @@ export default function Navbar() {
         </motion.div>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-1">
+        <div className="hidden lg:flex items-center space-x-1">
           {navLinks.map((link) => {
             const isActive = pathName === link.href;
             return (
@@ -178,7 +176,7 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Navigation */}
-        <div className="md:hidden">
+        <div className="lg:hidden">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
@@ -198,14 +196,6 @@ export default function Navbar() {
                   <SheetTitle className="text-xl font-bold bg-linear-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                     Menu Navigasi
                   </SheetTitle>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setIsOpen(false)}
-                    className="rounded-full"
-                  >
-                    <X className="h-5 w-5" />
-                  </Button>
                 </div>
               </SheetHeader>
               <nav className="flex flex-col py-6 px-4">

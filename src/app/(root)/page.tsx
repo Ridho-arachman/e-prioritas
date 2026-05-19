@@ -288,7 +288,7 @@ export default function LandingPage() {
   return (
     <div
       ref={containerRef}
-      className="relative min-h-screen overflow-hidden bg-linear-to-br from-slate-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-blue-950"
+      className="relative overflow-hidden bg-linear-to-br from-slate-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-blue-950"
     >
       {/* LAYER BACKGROUND PARALLAX */}
       <motion.div className="absolute inset-0 z-0" style={{ y: bgY }}>

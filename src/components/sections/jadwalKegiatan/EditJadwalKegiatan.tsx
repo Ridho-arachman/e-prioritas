@@ -676,12 +676,12 @@ export default function KegiatanRapatFormEdit() {
                         Pastikan semua data sudah benar sebelum menyimpan
                       </span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-col sm:flex-row justify-end gap-3">
                       <Button
                         type="button"
                         variant="outline"
                         onClick={() => router.back()}
-                        className="gap-2 border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl font-medium"
+                        className="gap-2 border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl font-medium w-full sm:w-auto"
                       >
                         <XIcon className="h-4 w-4" />
                         Batal
@@ -690,7 +690,7 @@ export default function KegiatanRapatFormEdit() {
                         type="button"
                         variant="destructive"
                         onClick={() => setShowDeleteDialog(true)}
-                        className="gap-2 bg-red-500 hover:bg-red-600 text-white rounded-xl font-medium"
+                        className="gap-2 bg-red-500 hover:bg-red-600 text-white rounded-xl font-medium w-full sm:w-auto"
                       >
                         <Trash2Icon className="h-4 w-4" />
                         Hapus
@@ -698,7 +698,7 @@ export default function KegiatanRapatFormEdit() {
                       <Button
                         type="submit"
                         disabled={isUpdating}
-                        className="gap-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl font-medium px-6"
+                        className="gap-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl font-medium px-6 w-full sm:w-auto"
                       >
                         {isUpdating ? (
                           <>

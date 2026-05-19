@@ -1,33 +1,27 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   Accordion,
+  AccordionContent,
   AccordionItem,
   AccordionTrigger,
-  AccordionContent,
 } from "@/components/ui/accordion";
-import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  AlertCircle,
+  BarChart3,
   BookOpen,
   CheckCircle,
-  XCircle,
-  Target,
-  Eye,
   Download,
-  BarChart3,
-  Users,
-  Calendar,
+  Eye,
+  GitMerge,
+  HelpCircle,
   Send,
   Settings,
-  Sparkles,
-  Layers,
-  HelpCircle,
-  GitMerge,
-  AlertCircle,
+  Target,
 } from "lucide-react";
+import React, { useEffect, useState } from "react";
 
 // Komponen untuk mencegah hidrasi error
 const ClientOnly = ({ children }: { children: React.ReactNode }) => {
@@ -61,7 +55,7 @@ const LurahHelpPage = () => {
           </div>
         </div>
 
-        {/* Ringkasan peran lurah */}
+        {/* Ringkasan peran lurah (sesuai wewenang) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:shadow-xl transition-shadow">
             <CardContent className="pt-6">
@@ -72,8 +66,12 @@ const LurahHelpPage = () => {
                 Setujui / Tolak Kegiatan
               </h3>
               <p className="text-sm text-slate-600">
-                Terima atau tolak usulan kegiatan yang diajukan oleh perangkat
-                desa. Berikan catatan penolakan sebagai bahan perbaikan.
+                Hanya menampilkan kegiatan dengan status{" "}
+                <strong>DIAJUKAN</strong>. Setuju → status{" "}
+                <strong>DISETUJUI</strong> (masukan terkait otomatis menjadi{" "}
+                <strong>DISELESAIKAN</strong>). Tolak → status{" "}
+                <strong>DITOLAK</strong>
+                (wajib memberi alasan).
               </p>
             </CardContent>
           </Card>
@@ -87,8 +85,9 @@ const LurahHelpPage = () => {
                 Pantau Prioritas Program
               </h3>
               <p className="text-sm text-slate-600">
-                Lihat 5 prioritas utama hasil analisis AI, lengkap dengan skor,
-                alasan, dan data pendukung.
+                Lihat 5 prioritas utama hasil AI lengkap dengan skor, alasan
+                analisis, evidence, dan snapshot data input (masukan & data
+                master yang digunakan).
               </p>
             </CardContent>
           </Card>
@@ -98,18 +97,17 @@ const LurahHelpPage = () => {
               <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center mb-4">
                 <Download className="h-6 w-6 text-purple-600" />
               </div>
-              <h3 className="font-semibold text-lg mb-2">
-                Ekspor Laporan & Evaluasi
-              </h3>
+              <h3 className="font-semibold text-lg mb-2">Ekspor Laporan PDF</h3>
               <p className="text-sm text-slate-600">
-                Unduh laporan kegiatan sebagai PDF untuk arsip, rapat, atau
-                pelaporan ke kecamatan.
+                Setiap kegiatan (DIAJUKAN, DISETUJUI, DITOLAK) dapat diekspor ke
+                PDF berisi informasi kegiatan, 5 prioritas, evidence, dan
+                snapshot data.
               </p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Diagram alur kerja lurah */}
+        {/* Diagram alur kerja lurah (sesuai dokumen usulan) */}
         <Card className="border-0 shadow-lg bg-white rounded-2xl mb-10 overflow-hidden">
           <CardHeader className="bg-linear-to-r from-emerald-50 to-teal-50 border-b">
             <CardTitle className="flex items-center gap-2 text-xl text-emerald-800">
@@ -118,7 +116,6 @@ const LurahHelpPage = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
-            {/* Desktop version */}
             <div className="hidden md:grid md:grid-cols-2 md:gap-y-8 md:gap-x-16 relative">
               <div className="flex flex-col items-center text-center relative">
                 <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mb-2 shadow-md border-2 border-amber-200 z-10">
@@ -184,7 +181,6 @@ const LurahHelpPage = () => {
                 </p>
               </div>
             </div>
-
             {/* Mobile version */}
             <div className="md:hidden space-y-4">
               {[
@@ -245,7 +241,6 @@ const LurahHelpPage = () => {
 
         <ClientOnly>
           <Accordion type="single" collapsible className="space-y-3 mb-10">
-            {/* 1. Daftar Kegiatan Diajukan */}
             <AccordionItem
               value="list-kegiatan"
               className="border rounded-lg overflow-hidden shadow-sm"
@@ -261,19 +256,20 @@ const LurahHelpPage = () => {
               <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
                 <p className="text-slate-700">
                   Setelah perangkat desa mengajukan kegiatan, kegiatan tersebut
-                  akan muncul di halaman utama lurah dengan status{" "}
-                  <strong>DIAJUKAN</strong>. Anda dapat melihat daftar semua
-                  kegiatan yang menunggu keputusan.
+                  muncul di halaman utama lurah dengan status{" "}
+                  <strong>DIAJUKAN</strong>. Anda hanya dapat melihat kegiatan
+                  berstatus <strong>DIAJUKAN</strong> – tidak untuk draft atau
+                  lainnya.
                 </p>
                 <div className="bg-slate-50 p-4 rounded-lg">
-                  <p className="text-sm">
-                    Setiap kegiatan menampilkan informasi:
-                  </p>
+                  <p className="text-sm">Setiap kegiatan menampilkan:</p>
                   <ul className="list-disc list-inside text-sm mt-1">
                     <li>Judul & domain isu</li>
                     <li>Tanggal dibuat</li>
                     <li>Jumlah prioritas (5 rekomendasi utama)</li>
-                    <li>Status saat ini</li>
+                    <li>
+                      Status saat ini (hanya DIAJUKAN, DISETUJUI, DITOLAK)
+                    </li>
                   </ul>
                 </div>
                 <p className="text-sm text-slate-500">
@@ -282,7 +278,6 @@ const LurahHelpPage = () => {
               </AccordionContent>
             </AccordionItem>
 
-            {/* 2. Tinjau Prioritas & Data Pendukung */}
             <AccordionItem
               value="tinjau-prioritas"
               className="border rounded-lg overflow-hidden shadow-sm"
@@ -298,7 +293,7 @@ const LurahHelpPage = () => {
               <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
                 <p className="text-slate-700">
                   Setiap kegiatan yang diajukan berisi 5 rekomendasi prioritas
-                  yang dihasilkan oleh AI Gemini. Anda dapat melihat:
+                  hasil AI Gemini. Anda dapat melihat:
                 </p>
                 <ul className="list-disc list-inside space-y-1">
                   <li>
@@ -309,7 +304,7 @@ const LurahHelpPage = () => {
                     urgensi.
                   </li>
                   <li>
-                    <strong>Alasan analisis</strong> – penjelasan mengapa
+                    <strong>Alasan analisis</strong> – penjelasan AI mengapa
                     prioritas ini dipilih.
                   </li>
                   <li>
@@ -322,16 +317,14 @@ const LurahHelpPage = () => {
                     <Eye className="h-4 w-4" /> Lihat Data Input
                   </p>
                   <p className="text-sm mt-1">
-                    Klik tombol "Lihat Data Input" pada setiap prioritas untuk
-                    melihat snapshot data spesifik (masukan warga dan/atau data
-                    master) yang menjadi dasar rekomendasi. Data ditampilkan
-                    dalam bentuk tabel.
+                    Klik "Lihat Data Input" pada setiap prioritas untuk melihat
+                    snapshot data spesifik (masukan warga dan/atau data master)
+                    yang menjadi dasar rekomendasi.
                   </p>
                 </div>
               </AccordionContent>
             </AccordionItem>
 
-            {/* 3. Menyetujui atau Menolak Kegiatan */}
             <AccordionItem
               value="approve-reject"
               className="border rounded-lg overflow-hidden shadow-sm"
@@ -352,18 +345,19 @@ const LurahHelpPage = () => {
                   <div className="bg-green-50 p-4 rounded-lg border border-green-200">
                     <Badge className="bg-green-600">Setujui</Badge>
                     <p className="text-sm mt-2">
-                      Klik tombol "Setujui" untuk menyetujui kegiatan. Status
-                      akan berubah menjadi <strong>DISETUJUI</strong> dan semua
-                      prioritas terkait akan otomatis ditandai sebagai{" "}
+                      Klik "Setujui" → status menjadi <strong>DISETUJUI</strong>
+                      . Semua masukan warga yang digunakan dalam prioritas
+                      otomatis berubah dari <strong>DIPROSES</strong> menjadi{" "}
                       <strong>DISELESAIKAN</strong>.
                     </p>
                   </div>
                   <div className="bg-red-50 p-4 rounded-lg border border-red-200">
                     <Badge className="bg-red-600">Tolak</Badge>
                     <p className="text-sm mt-2">
-                      Klik "Tolak", Anda akan diminta mengisi alasan penolakan.
-                      Status menjadi <strong>DITOLAK</strong>. Perangkat desa
-                      dapat melihat alasan untuk perbaikan.
+                      Klik "Tolak" → wajib mengisi alasan penolakan. Status
+                      menjadi <strong>DITOLAK</strong>. Masukan terkait kembali
+                      ke status <strong>DIVERIFIKASI</strong> (dapat digunakan
+                      ulang).
                     </p>
                   </div>
                 </div>
@@ -374,7 +368,6 @@ const LurahHelpPage = () => {
               </AccordionContent>
             </AccordionItem>
 
-            {/* 4. Ekspor Laporan PDF */}
             <AccordionItem
               value="export-pdf"
               className="border rounded-lg overflow-hidden shadow-sm"
@@ -389,8 +382,8 @@ const LurahHelpPage = () => {
               </AccordionTrigger>
               <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
                 <p className="text-slate-700">
-                  Setiap kegiatan (baik yang masih DIAJUKAN, DISETUJUI, maupun
-                  DITOLAK) dapat diekspor ke dalam format PDF.
+                  Setiap kegiatan (baik DIAJUKAN, DISETUJUI, maupun DITOLAK)
+                  dapat diekspor ke PDF.
                 </p>
                 <div className="bg-slate-50 p-4 rounded-lg">
                   <p className="font-semibold">Isi dokumen PDF:</p>
@@ -398,7 +391,7 @@ const LurahHelpPage = () => {
                     <li>Informasi kegiatan (judul, domain, tanggal)</li>
                     <li>5 prioritas dengan skor, analisis, dan evidence</li>
                     <li>Snapshot data input terkait</li>
-                    <li>Status keputusan dan catatan (jika ada)</li>
+                    <li>Status keputusan dan catatan (jika ditolak)</li>
                     <li>Bagian pengesahan dan footer resmi</li>
                   </ul>
                 </div>
@@ -409,34 +402,6 @@ const LurahHelpPage = () => {
               </AccordionContent>
             </AccordionItem>
 
-            {/* 5. Data Master (opsional) */}
-            <AccordionItem
-              value="master-data"
-              className="border rounded-lg overflow-hidden shadow-sm"
-            >
-              <AccordionTrigger className="px-6 py-4 hover:bg-slate-50 hover:no-underline">
-                <span className="flex items-center gap-3 text-lg font-medium">
-                  <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
-                    <Settings className="h-4 w-4 text-indigo-600" />
-                  </div>
-                  <span>5. Melihat Data Master</span>
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
-                <p className="text-slate-700">
-                  Data master berisi aturan penilaian (kritikalitas) yang
-                  digunakan AI. Anda dapat melihat daftar data master yang
-                  dikelola oleh perangkat desa, namun tidak dapat mengubahnya.
-                </p>
-                <p className="text-sm text-slate-500">
-                  Untuk menjaga konsistensi, pengelolaan data master dilakukan
-                  oleh perangkat desa. Jika ada perubahan yang diperlukan,
-                  koordinasikan dengan perangkat.
-                </p>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* 6. Statistik & Laporan Evaluasi */}
             <AccordionItem
               value="statistik"
               className="border rounded-lg overflow-hidden shadow-sm"
@@ -446,12 +411,12 @@ const LurahHelpPage = () => {
                   <div className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center">
                     <BarChart3 className="h-4 w-4 text-rose-600" />
                   </div>
-                  <span>6. Statistik & Laporan Evaluasi</span>
+                  <span>5. Statistik & Laporan Evaluasi</span>
                 </span>
               </AccordionTrigger>
               <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
                 <p className="text-slate-700">
-                  Halaman dashboard lurah menyediakan ringkasan statistik:
+                  Dashboard lurah menyediakan ringkasan:
                 </p>
                 <ul className="list-disc list-inside">
                   <li>Jumlah kegiatan DIAJUKAN, DISETUJUI, DITOLAK</li>
@@ -460,15 +425,37 @@ const LurahHelpPage = () => {
                   <li>Top 5 prioritas paling sering diusulkan</li>
                 </ul>
                 <p>
-                  Data ini membantu Anda memantau kinerja program dan
-                  mengidentifikasi isu yang paling mendesak.
+                  Data ini membantu memantau kinerja program dan
+                  mengidentifikasi isu mendesak.
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Catatan: Lurah tidak memiliki akses ke Data Master (hanya baca) */}
+            <AccordionItem
+              value="data-master"
+              className="border rounded-lg overflow-hidden shadow-sm"
+            >
+              <AccordionTrigger className="px-6 py-4 hover:bg-slate-50 hover:no-underline">
+                <span className="flex items-center gap-3 text-lg font-medium">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
+                    <Settings className="h-4 w-4 text-indigo-600" />
+                  </div>
+                  <span>6. Data Master (Hanya Lihat)</span>
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
+                <p className="text-slate-700">
+                  Anda dapat melihat data master (indikator, kritikalitas) yang
+                  dikelola perangkat desa, tetapi tidak dapat mengubahnya. Jika
+                  ada perubahan diperlukan, koordinasikan dengan perangkat desa.
                 </p>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
         </ClientOnly>
 
-        {/* FAQ untuk Lurah */}
+        {/* FAQ Lurah */}
         <Card className="border-0 shadow-lg bg-white rounded-2xl overflow-hidden mb-8">
           <CardHeader className="bg-linear-to-r from-slate-100 to-white border-b">
             <CardTitle className="flex items-center gap-2 text-xl">
@@ -480,29 +467,29 @@ const LurahHelpPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <p className="font-semibold flex items-center gap-1">
-                  <AlertCircle className="h-4 w-4 text-amber-500" />
-                  Apakah saya bisa mengubah prioritas setelah disetujui?
+                  <AlertCircle className="h-4 w-4 text-amber-500" /> Apakah saya
+                  bisa mengubah prioritas setelah disetujui?
                 </p>
                 <p className="text-sm text-slate-600">
-                  Tidak. Setelah disetujui, kegiatan menjadi final. Jika ada
-                  perubahan, perangkat desa perlu membuat kegiatan baru.
+                  Tidak. Setelah disetujui, kegiatan menjadi final. Perangkat
+                  desa perlu membuat kegiatan baru jika ada perubahan.
                 </p>
               </div>
               <div className="space-y-2">
                 <p className="font-semibold flex items-center gap-1">
-                  <AlertCircle className="h-4 w-4 text-amber-500" />
-                  Bagaimana jika saya salah menolak kegiatan?
+                  <AlertCircle className="h-4 w-4 text-amber-500" /> Bagaimana
+                  jika saya salah menolak kegiatan?
                 </p>
                 <p className="text-sm text-slate-600">
-                  Keputusan tidak dapat diubah. Namun perangkat desa dapat
-                  mengajukan ulang dengan perbaikan berdasarkan alasan penolakan
-                  yang Anda berikan.
+                  Keputusan tidak dapat diubah. Perangkat desa dapat mengajukan
+                  ulang dengan perbaikan berdasarkan alasan penolakan yang Anda
+                  berikan.
                 </p>
               </div>
               <div className="space-y-2">
                 <p className="font-semibold flex items-center gap-1">
-                  <AlertCircle className="h-4 w-4 text-amber-500" />
-                  Apakah AI bisa memberikan rekomendasi yang tidak sesuai?
+                  <AlertCircle className="h-4 w-4 text-amber-500" /> Apakah AI
+                  bisa memberikan rekomendasi yang tidak sesuai?
                 </p>
                 <p className="text-sm text-slate-600">
                   AI bekerja berdasarkan data master dan masukan warga yang
@@ -513,27 +500,15 @@ const LurahHelpPage = () => {
               </div>
               <div className="space-y-2">
                 <p className="font-semibold flex items-center gap-1">
-                  <AlertCircle className="h-4 w-4 text-amber-500" />
-                  Bisakah saya melihat laporan tahunan?
+                  <AlertCircle className="h-4 w-4 text-amber-500" /> Bisakah
+                  saya melihat semua masukan warga?
                 </p>
                 <p className="text-sm text-slate-600">
-                  Ya. Pada halaman laporan, Anda dapat memfilter berdasarkan
-                  rentang tanggal dan mengekspor laporan lengkap beserta
-                  ringkasan statistik.
-                </p>
-              </div>
-              {/* Tambahan FAQ untuk akses masukan */}
-              <div className="space-y-2">
-                <p className="font-semibold flex items-center gap-1">
-                  <AlertCircle className="h-4 w-4 text-amber-500" />
-                  Apakah saya bisa melihat semua masukan warga?
-                </p>
-                <p className="text-sm text-slate-600">
-                  Untuk menjaga fokus, lurah melihat masukan warga yang sudah
-                  terintegrasi dalam rekomendasi prioritas melalui fitur "Lihat
-                  Data Input". Statistik umum masukan (jumlah diverifikasi,
-                  ditolak, dll.) tersedia di dashboard lurah. Untuk detail
-                  setiap masukan, koordinasikan dengan perangkat desa.
+                  Anda dapat melihat masukan yang terintegrasi dalam rekomendasi
+                  melalui fitur "Lihat Data Input". Statistik umum masukan
+                  (jumlah diverifikasi, ditolak, dll.) tersedia di dashboard.
+                  Untuk detail setiap masukan, koordinasikan dengan perangkat
+                  desa.
                 </p>
               </div>
             </div>

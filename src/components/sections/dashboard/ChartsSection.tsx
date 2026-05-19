@@ -30,7 +30,7 @@ export default function ChartsSection() {
 
   if (isLoading) {
     return (
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {[...Array(2)].map((_, i) => (
           <Card
             key={i}
@@ -41,7 +41,7 @@ export default function ChartsSection() {
               <Skeleton className="h-4 w-1/2" />
             </CardHeader>
             <CardContent>
-              <Skeleton className="h-64 w-full" />
+              <Skeleton className="h-64 sm:h-80 w-full" />
             </CardContent>
           </Card>
         ))}
@@ -59,27 +59,26 @@ export default function ChartsSection() {
 
   const { monthlyData, dataMasterCategory } = data;
 
-  // Pastikan data berupa array untuk menghindari error
   const safeMonthlyData = Array.isArray(monthlyData) ? monthlyData : [];
   const safeCategoryData = Array.isArray(dataMasterCategory)
     ? dataMasterCategory
     : [];
 
   return (
-    <div className="grid lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Line Chart Card */}
       <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-all rounded-xl bg-white/80 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold">
+          <CardTitle className="text-base sm:text-lg font-semibold">
             Tren Masukan Warga (12 Bulan)
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs sm:text-sm">
             Visualisasi data masukan diterima, menunggu, ditolak, diproses, dan
             selesai per bulan.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="h-64">
+        <CardContent className="px-2 sm:px-6">
+          <div className="h-64 sm:h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={safeMonthlyData}>
                 <defs>
@@ -128,8 +127,7 @@ export default function ChartsSection() {
                     <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />{" "}
-                {/* Warna abu-abu normal */}
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} />
                 <Tooltip
@@ -138,6 +136,7 @@ export default function ChartsSection() {
                     border: "1px solid #e2e8f0",
                     borderRadius: "8px",
                     boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                    fontSize: "12px",
                   }}
                   formatter={(value: any, name: any) => {
                     const val = typeof value === "number" ? value : 0;
@@ -145,15 +144,24 @@ export default function ChartsSection() {
                     return [`${val} masukan`, label];
                   }}
                 />
-                <Legend wrapperStyle={{ fontSize: 12, paddingTop: 10 }} />
+                <Legend
+                  wrapperStyle={{
+                    fontSize: "10px",
+                    paddingTop: "8px",
+                  }}
+                  iconSize={8}
+                  verticalAlign="bottom"
+                  align="center"
+                  layout="horizontal"
+                />
                 <Line
                   type="monotone"
                   dataKey="accepted"
                   name="Diterima"
                   stroke="#16a34a"
-                  strokeWidth={3}
-                  dot={{ r: 4, fill: "#16a34a" }}
-                  activeDot={{ r: 6 }}
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 5 }}
                   fill="url(#colorAccepted)"
                 />
                 <Line
@@ -161,9 +169,9 @@ export default function ChartsSection() {
                   dataKey="waiting"
                   name="Menunggu"
                   stroke="#facc15"
-                  strokeWidth={3}
-                  dot={{ r: 4, fill: "#facc15" }}
-                  activeDot={{ r: 6 }}
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 5 }}
                   fill="url(#colorWaiting)"
                 />
                 <Line
@@ -171,9 +179,9 @@ export default function ChartsSection() {
                   dataKey="rejected"
                   name="Ditolak"
                   stroke="#ef4444"
-                  strokeWidth={3}
-                  dot={{ r: 4, fill: "#ef4444" }}
-                  activeDot={{ r: 6 }}
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 5 }}
                   fill="url(#colorRejected)"
                 />
                 <Line
@@ -181,9 +189,9 @@ export default function ChartsSection() {
                   dataKey="onProcess"
                   name="Diproses"
                   stroke="#3b82f6"
-                  strokeWidth={3}
-                  dot={{ r: 4, fill: "#3b82f6" }}
-                  activeDot={{ r: 6 }}
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 5 }}
                   fill="url(#colorOnProcess)"
                 />
                 <Line
@@ -191,9 +199,9 @@ export default function ChartsSection() {
                   dataKey="completed"
                   name="Selesai"
                   stroke="#a855f7"
-                  strokeWidth={3}
-                  dot={{ r: 4, fill: "#a855f7" }}
-                  activeDot={{ r: 6 }}
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 5 }}
                   fill="url(#colorCompleted)"
                 />
               </LineChart>
@@ -205,15 +213,15 @@ export default function ChartsSection() {
       {/* Bar Chart Card */}
       <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-all rounded-xl bg-white/80 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold">
+          <CardTitle className="text-base sm:text-lg font-semibold">
             Distribusi Data Master
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs sm:text-sm">
             Jumlah data master berdasarkan kategori.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="h-64">
+        <CardContent className="px-2 sm:px-6">
+          <div className="h-64 sm:h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={safeCategoryData}>
                 <defs>
@@ -223,7 +231,14 @@ export default function ChartsSection() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                <XAxis
+                  dataKey="name"
+                  tick={{ fontSize: 12 }}
+                  interval={0}
+                  angle={-20}
+                  textAnchor="end"
+                  height={60}
+                />
                 <YAxis tick={{ fontSize: 12 }} />
                 <Tooltip
                   contentStyle={{
@@ -231,14 +246,22 @@ export default function ChartsSection() {
                     border: "1px solid #e2e8f0",
                     borderRadius: "8px",
                     boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                    fontSize: "12px",
                   }}
                   formatter={(value: any, name: any) => {
                     const val = typeof value === "number" ? value : 0;
-                    const label = name ?? "";
-                    return [`${val} data`, label];
+                    return [`${val} data`, name];
                   }}
                 />
-                <Legend wrapperStyle={{ fontSize: 12, paddingTop: 10 }} />
+                <Legend
+                  wrapperStyle={{
+                    fontSize: "10px",
+                    paddingTop: "8px",
+                  }}
+                  iconSize={8}
+                  verticalAlign="bottom"
+                  align="center"
+                />
                 <Bar
                   dataKey="value"
                   name="Jumlah"

@@ -1,36 +1,33 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   Accordion,
+  AccordionContent,
   AccordionItem,
   AccordionTrigger,
-  AccordionContent,
 } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { motion } from "framer-motion";
 import {
-  BookOpen,
-  Settings,
-  Users,
-  Brain,
-  FileText,
-  CheckCircle,
-  XCircle,
   AlertCircle,
-  HelpCircle,
-  GitMerge,
-  Database,
-  MessageSquare,
+  BookOpen,
+  Brain,
   Calendar,
+  CheckCircle,
+  Database,
   Download,
+  Edit,
   Eye,
-  Target,
-  Sparkles,
+  GitMerge,
+  HelpCircle,
   Layers,
+  MessageSquare,
   Send,
+  Sparkles,
+  Target,
 } from "lucide-react";
+import React, { useEffect, useState } from "react";
 
 const ClientOnly = ({ children }: { children: React.ReactNode }) => {
   const [hasMounted, setHasMounted] = useState(false);
@@ -43,7 +40,6 @@ export default function PerangkatHelpPage() {
   return (
     <div className="min-h-screen bg-linear-to-b from-slate-50 via-white to-amber-50 dark:from-gray-950 dark:via-gray-900 dark:to-amber-950 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
-        {/* Header with amber linear */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -66,63 +62,88 @@ export default function PerangkatHelpPage() {
           </div>
         </motion.div>
 
-        {/* Role summary cards with amber/orange theme */}
+        {/* Ringkasan peran perangkat desa (sesuai dokumen usulan) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          {[
-            {
-              icon: CheckCircle,
-              title: "Verifikasi Masukan",
-              desc: "Periksa dan verifikasi masukan warga. Status dapat diubah menjadi DIVERIFIKASI, DITOLAK, atau dibiarkan MENUNGGU.",
-              iconBg: "bg-amber-100 dark:bg-amber-900/30",
-              iconColor: "text-amber-600 dark:text-amber-400",
-            },
-            {
-              icon: Database,
-              title: "Kelola Data Master",
-              desc: "Input dan kelola data master (indikator, kritikalitas) yang akan digunakan AI sebagai bobot penilaian.",
-              iconBg: "bg-orange-100 dark:bg-orange-900/30",
-              iconColor: "text-orange-600 dark:text-orange-400",
-            },
-            {
-              icon: Send,
-              title: "Buat & Ajukan Kegiatan",
-              desc: "Buat kegiatan rapat, jalankan AI untuk menghasilkan rekomendasi, lalu ajukan ke lurah untuk disetujui.",
-              iconBg: "bg-yellow-100 dark:bg-yellow-900/30",
-              iconColor: "text-yellow-600 dark:text-yellow-400",
-            },
-          ].map((item, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.1 }}
-              whileHover={{ scale: 1.02 }}
-              className="group"
-            >
-              <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300">
-                <CardContent className="pt-6">
-                  <div
-                    className={`w-12 h-12 rounded-xl ${item.iconBg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}
-                  >
-                    <item.icon className={`h-6 w-6 ${item.iconColor}`} />
-                  </div>
-                  <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white">
-                    {item.title}
-                  </h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    {item.desc}
-                  </p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            whileHover={{ scale: 1.02 }}
+            className="group"
+          >
+            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300">
+              <CardContent className="pt-6">
+                <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <CheckCircle className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white">
+                  Verifikasi Masukan Warga
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  Ubah status masukan: <strong>MENUNGGU</strong> →{" "}
+                  <strong>DIVERIFIKASI</strong> (layak AI) atau{" "}
+                  <strong>DITOLAK</strong> (wajib alasan). Status{" "}
+                  <strong>DIPROSES</strong>/<strong>DISELESAIKAN</strong> diatur
+                  otomatis sistem.
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            whileHover={{ scale: 1.02 }}
+            className="group"
+          >
+            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300">
+              <CardContent className="pt-6">
+                <div className="w-12 h-12 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <Database className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white">
+                  Kelola Data Master
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  Tambah, edit, hapus, atau impor Excel data master (indikator,
+                  kritikalitas). Hanya data aktif yang digunakan AI sebagai
+                  bobot penilaian.
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            whileHover={{ scale: 1.02 }}
+            className="group"
+          >
+            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300">
+              <CardContent className="pt-6">
+                <div className="w-12 h-12 rounded-xl bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <Send className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white">
+                  Buat & Ajukan Kegiatan
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  Buat kegiatan rapat → sistem otomatis panggil AI (FUSI_DATA)
+                  hasilkan 5 prioritas (status DRAFT). Anda dapat edit/hapus
+                  selama DRAFT, lalu ajukan ke lurah.
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
 
-        {/* Flow diagram - header with amber linear */}
+        {/* Diagram alur perangkat desa (disesuaikan) */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.4 }}
         >
           <Card className="border-0 shadow-lg bg-white rounded-2xl mb-10 overflow-hidden">
             <CardHeader className="bg-linear-to-r from-amber-50 to-orange-50 border-b">
@@ -132,114 +153,92 @@ export default function PerangkatHelpPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              {/* Desktop version - unchanged steps, just the header color changed */}
               <div className="hidden md:grid md:grid-cols-3 md:gap-y-8 md:gap-x-4 relative">
-                {/* Step 1 */}
                 <div className="flex flex-col items-center text-center relative">
-                  <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mb-2 shadow-md border-2 border-amber-200 z-10">
+                  <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mb-2 shadow-md border-2 border-amber-200">
                     <MessageSquare className="h-8 w-8 text-amber-600" />
                   </div>
                   <Badge
                     variant="outline"
-                    className="bg-amber-50 border-amber-200 text-amber-700 font-medium px-3 py-1"
+                    className="bg-amber-50 border-amber-200 text-amber-700"
                   >
                     Masukan Warga
                   </Badge>
-                  <p className="text-xs mt-1 text-slate-500">MENUNGGU</p>
-                  <div className="absolute -right-4 top-1/2 transform -translate-y-1/2 text-2xl text-slate-300 hidden lg:block">
+                  <p className="text-xs mt-1">MENUNGGU</p>
+                  <div className="absolute -right-4 top-1/2 text-2xl text-slate-300 hidden lg:block">
                     →
                   </div>
                 </div>
-
-                {/* Step 2 */}
                 <div className="flex flex-col items-center text-center relative">
                   <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-2 shadow-md border-2 border-green-200">
                     <CheckCircle className="h-8 w-8 text-green-600" />
                   </div>
                   <Badge
                     variant="outline"
-                    className="bg-green-50 border-green-200 text-green-700 font-medium px-3 py-1"
+                    className="bg-green-50 border-green-200 text-green-700"
                   >
-                    Verifikasi Perangkat
+                    Verifikasi
                   </Badge>
-                  <p className="text-xs mt-1 text-slate-500">
-                    DIVERIFIKASI / DITOLAK
-                  </p>
-                  <div className="absolute -right-4 top-1/2 transform -translate-y-1/2 text-2xl text-slate-300 hidden lg:block">
+                  <p className="text-xs mt-1">DIVERIFIKASI / DITOLAK</p>
+                  <div className="absolute -right-4 top-1/2 text-2xl text-slate-300 hidden lg:block">
                     →
                   </div>
                 </div>
-
-                {/* Step 3 */}
                 <div className="flex flex-col items-center text-center relative">
                   <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-2 shadow-md border-2 border-blue-200">
                     <Database className="h-8 w-8 text-blue-600" />
                   </div>
                   <Badge
                     variant="outline"
-                    className="bg-blue-50 border-blue-200 text-blue-700 font-medium px-3 py-1"
+                    className="bg-blue-50 border-blue-200 text-blue-700"
                   >
                     Data Master
                   </Badge>
-                  <p className="text-xs mt-1 text-slate-500">
-                    Aturan & kriteria
-                  </p>
+                  <p className="text-xs mt-1">Aturan & kriteria</p>
                 </div>
-
-                {/* Step 4 */}
                 <div className="flex flex-col items-center text-center relative">
                   <div className="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mb-2 shadow-md border-2 border-purple-200">
                     <Brain className="h-8 w-8 text-purple-600" />
                   </div>
                   <Badge
                     variant="outline"
-                    className="bg-purple-50 border-purple-200 text-purple-700 font-medium px-3 py-1"
+                    className="bg-purple-50 border-purple-200 text-purple-700"
                   >
                     AI Gemini
                   </Badge>
-                  <p className="text-xs mt-1 text-slate-500">
-                    Generate rekomendasi
-                  </p>
-                  <div className="absolute -right-4 top-1/2 transform -translate-y-1/2 text-2xl text-slate-300 hidden lg:block">
+                  <p className="text-xs mt-1">Generate rekomendasi</p>
+                  <div className="absolute -right-4 top-1/2 text-2xl text-slate-300 hidden lg:block">
                     →
                   </div>
                 </div>
-
-                {/* Step 5 */}
                 <div className="flex flex-col items-center text-center relative">
                   <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center mb-2 shadow-md border-2 border-indigo-200">
                     <Layers className="h-8 w-8 text-indigo-600" />
                   </div>
                   <Badge
                     variant="outline"
-                    className="bg-indigo-50 border-indigo-200 text-indigo-700 font-medium px-3 py-1"
+                    className="bg-indigo-50 border-indigo-200 text-indigo-700"
                   >
                     5 Prioritas
                   </Badge>
-                  <p className="text-xs mt-1 text-slate-500">DIAJUKAN</p>
-                  <div className="absolute -right-4 top-1/2 transform -translate-y-1/2 text-2xl text-slate-300 hidden lg:block">
+                  <p className="text-xs mt-1">DRAFT → DIAJUKAN</p>
+                  <div className="absolute -right-4 top-1/2 text-2xl text-slate-300 hidden lg:block">
                     →
                   </div>
                 </div>
-
-                {/* Step 6 */}
                 <div className="flex flex-col items-center text-center relative">
                   <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-2 shadow-md border-2 border-emerald-200">
                     <Target className="h-8 w-8 text-emerald-600" />
                   </div>
                   <Badge
                     variant="outline"
-                    className="bg-emerald-50 border-emerald-200 text-emerald-700 font-medium px-3 py-1"
+                    className="bg-emerald-50 border-emerald-200 text-emerald-700"
                   >
                     Persetujuan Lurah
                   </Badge>
-                  <p className="text-xs mt-1 text-slate-500">
-                    DISETUJUI / DITOLAK
-                  </p>
+                  <p className="text-xs mt-1">DISETUJUI / DITOLAK</p>
                 </div>
               </div>
-
-              {/* Mobile version (unchanged) */}
               <div className="md:hidden space-y-4">
                 {[
                   {
@@ -255,7 +254,7 @@ export default function PerangkatHelpPage() {
                     bg: "bg-green-100",
                     border: "border-green-200",
                     textColor: "text-green-600",
-                    label: "Verifikasi Perangkat",
+                    label: "Verifikasi",
                     status: "DIVERIFIKASI / DITOLAK",
                   },
                   {
@@ -280,7 +279,7 @@ export default function PerangkatHelpPage() {
                     border: "border-indigo-200",
                     textColor: "text-indigo-600",
                     label: "5 Prioritas",
-                    status: "DIAJUKAN",
+                    status: "DRAFT → DIAJUKAN",
                   },
                   {
                     icon: Target,
@@ -312,325 +311,348 @@ export default function PerangkatHelpPage() {
           </Card>
         </motion.div>
 
-        {/* Accordion guide with amber/orange accents */}
+        {/* Panduan fungsional perangkat desa */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.5 }}
           className="mb-8"
         >
           <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-            <HelpCircle className="h-6 w-6 text-amber-600" />
-            Panduan Fungsional Perangkat Desa
+            <HelpCircle className="h-6 w-6 text-amber-600" /> Panduan Fungsional
+            Perangkat Desa
           </h2>
-
           <ClientOnly>
             <Accordion type="single" collapsible className="space-y-3">
-              {[
-                {
-                  value: "master-data",
-                  icon: Settings,
-                  bg: "bg-amber-100 dark:bg-amber-900/30",
-                  color: "text-amber-600 dark:text-amber-400",
-                  title: "1. Pengelolaan Data Master",
-                  content: (
-                    <>
-                      <p className="text-slate-700 dark:text-slate-300">
-                        Data master berisi <strong>aturan penilaian AI</strong>{" "}
-                        seperti kritikalitas (KRITIS, TINGGI, SEDANG, RENDAH).
-                        Data ini menjadi bobot dalam perhitungan skor prioritas.
+              {/* 1. Verifikasi Masukan */}
+              <AccordionItem
+                value="verifikasi"
+                className="border rounded-lg overflow-hidden shadow-sm"
+              >
+                <AccordionTrigger className="px-6 py-4 hover:bg-slate-50 dark:hover:bg-gray-800 hover:no-underline">
+                  <span className="flex items-center gap-3 text-lg font-medium">
+                    <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                      <MessageSquare className="h-4 w-4 text-amber-600" />
+                    </div>
+                    <span>1. Verifikasi Masukan Warga</span>
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
+                  <p className="text-slate-700 dark:text-slate-300">
+                    Setiap masukan warga diawali status{" "}
+                    <strong>MENUNGGU</strong>. Anda dapat:
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="bg-green-50 dark:bg-green-950/30 p-3 rounded-lg border border-green-200">
+                      <Badge className="bg-green-600">DIVERIFIKASI</Badge>
+                      <p className="text-sm mt-1">
+                        Masukan layak, siap dianalisis AI.
                       </p>
-                      <div className="bg-slate-50 dark:bg-gray-800/50 p-4 rounded-lg">
-                        <h4 className="font-semibold mb-2">
-                          Struktur Data Master:
-                        </h4>
-                        <ul className="list-disc list-inside space-y-1 text-sm">
-                          <li>
-                            <code>namaAtribut</code> : Nama indikator (misal:
-                            "Jumlah Rumah Tidak Layak Huni")
-                          </li>
-                          <li>
-                            <code>kritikalitas</code> : Nilai bobot (KRITIS=1.0,
-                            TINGGI=0.75, SEDANG=0.5, RENDAH=0.25)
-                          </li>
-                          <li>
-                            <code>jumlah</code> : Data statistik pendukung
-                            (opsional)
-                          </li>
-                          <li>
-                            <code>isActive</code> : Status aktif
-                          </li>
-                        </ul>
-                      </div>
-                      <p className="text-slate-700 dark:text-slate-300">
-                        Data master digunakan oleh AI untuk menyesuaikan
-                        rekomendasi dengan kondisi aktual kelurahan.
+                    </div>
+                    <div className="bg-red-50 dark:bg-red-950/30 p-3 rounded-lg border border-red-200">
+                      <Badge className="bg-red-600">DITOLAK</Badge>
+                      <p className="text-sm mt-1">
+                        Tidak layak, wajib mengisi alasan penolakan.
                       </p>
-                    </>
-                  ),
-                },
-                {
-                  value: "masukan",
-                  icon: Users,
-                  bg: "bg-amber-100 dark:bg-amber-900/30",
-                  color: "text-amber-600 dark:text-amber-400",
-                  title: "2. Verifikasi Masukan Warga",
-                  content: (
-                    <>
-                      <p className="text-slate-700 dark:text-slate-300">
-                        Perangkat desa bertugas memverifikasi setiap masukan
-                        warga. Status yang dapat diubah:
-                      </p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div className="bg-yellow-50 dark:bg-yellow-950/30 p-3 rounded-lg border border-yellow-200 dark:border-yellow-800">
-                          <Badge className="bg-yellow-500">MENUNGGU</Badge>
-                          <p className="text-sm mt-1">
-                            Masukan baru, belum diproses.
-                          </p>
-                        </div>
-                        <div className="bg-green-50 dark:bg-green-950/30 p-3 rounded-lg border border-green-200 dark:border-green-800">
-                          <Badge className="bg-green-600">DIVERIFIKASI</Badge>
-                          <p className="text-sm mt-1">
-                            Layak, siap dianalisis AI.
-                          </p>
-                        </div>
-                        <div className="bg-red-50 dark:bg-red-950/30 p-3 rounded-lg border border-red-200 dark:border-red-800">
-                          <Badge className="bg-red-600">DITOLAK</Badge>
-                          <p className="text-sm mt-1">
-                            Tidak layak, wajib memberi alasan.
-                          </p>
-                        </div>
-                        <div className="bg-blue-50 dark:bg-blue-950/30 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
-                          <Badge className="bg-blue-500">DIPROSES</Badge>
-                          <p className="text-sm mt-1">
-                            (Otomatis) Sedang digunakan dalam rekomendasi.
-                          </p>
-                        </div>
-                        <div className="bg-purple-50 dark:bg-purple-950/30 p-3 rounded-lg border border-purple-200 dark:border-purple-800 sm:col-span-2">
-                          <Badge className="bg-purple-600">DISELESAIKAN</Badge>
-                          <p className="text-sm mt-1">
-                            (Otomatis) Rekomendasi terkait telah disetujui
-                            lurah.
-                          </p>
-                        </div>
-                      </div>
-                      <p className="text-sm text-slate-500 dark:text-slate-400 italic">
-                        ⚠️ Status DIPROSES dan DISELESAIKAN diatur otomatis oleh
-                        sistem.
-                      </p>
-                    </>
-                  ),
-                },
-                {
-                  value: "kegiatan",
-                  icon: Calendar,
-                  bg: "bg-orange-100 dark:bg-orange-900/30",
-                  color: "text-orange-600 dark:text-orange-400",
-                  title: "3. Kegiatan Rapat & Generate Rekomendasi",
-                  content: (
-                    <>
-                      <p className="text-slate-700 dark:text-slate-300">
-                        Buat kegiatan rapat, pilih domain isu, dan jalankan AI
-                        untuk mendapatkan 5 rekomendasi prioritas. Hasilnya akan
-                        tersimpan sebagai <strong>DRAFT</strong>.
-                      </p>
-                      <div className="bg-amber-50 dark:bg-amber-950/30 p-4 rounded-lg">
-                        <h4 className="font-semibold mb-2 flex items-center gap-1">
-                          <Sparkles className="h-4 w-4" /> Mode Rekomendasi:
-                        </h4>
-                        <ul className="list-disc list-inside space-y-1">
-                          <li>
-                            <strong>FUSI_DATA</strong> : Menggabungkan masukan
-                            warga dan data master.
-                          </li>
-                          <li>
-                            <strong>DATA_MASTER_SAJA</strong> : Hanya
-                            berdasarkan data master (jika masukan tidak
-                            tersedia).
-                          </li>
-                        </ul>
-                      </div>
-                      <p className="text-slate-700 dark:text-slate-300">
-                        Setelah generate, setiap prioritas akan memiliki:
-                      </p>
-                      <ul className="list-disc list-inside text-sm">
-                        <li>
-                          <code>deskripsi</code> : Rencana aksi konkret
-                        </li>
-                        <li>
-                          <code>skorPrioritas</code> : Nilai 0.00 - 1.00
-                        </li>
-                        <li>
-                          <code>alasanAnalisis</code> : Penjelasan AI
-                        </li>
-                        <li>
-                          <code>evidence</code> : Jumlah data pendukung
-                        </li>
-                        <li>
-                          <code>usedMasukanIds / usedDataMasterIds</code> : ID
-                          data yang digunakan
-                        </li>
-                      </ul>
-                    </>
-                  ),
-                },
-                {
-                  value: "preview",
-                  icon: Eye,
-                  bg: "bg-yellow-100 dark:bg-yellow-900/30",
-                  color: "text-yellow-600 dark:text-yellow-400",
-                  title: "4. Preview Data Input (Snapshot)",
-                  content: (
-                    <>
-                      <p className="text-slate-700 dark:text-slate-300">
-                        Saat generate, sistem menyimpan snapshot 10 data pertama
-                        dari masukan warga dan data master yang dianalisis. Ini
-                        berguna untuk melihat contoh data yang mendasari
-                        rekomendasi.
-                      </p>
-                      <div className="bg-slate-50 dark:bg-gray-800/50 p-4 rounded-lg">
-                        <p className="font-mono text-sm">
-                          <code>rekomendasiItems.inputData</code> berisi array{" "}
-                          <code>masukan</code> und <code>dataMaster</code>.
-                        </p>
-                      </div>
-                      <p className="text-slate-700 dark:text-slate-300">
-                        Di halaman detail kegiatan, Anda dapat mengklik "Lihat
-                        Data Input" pada setiap prioritas untuk menampilkan data
-                        spesifik yang terkait (berdasarkan{" "}
-                        <code>usedMasukanIds</code>).
-                      </p>
-                    </>
-                  ),
-                },
-                {
-                  value: "pengajuan",
-                  icon: Send,
-                  bg: "bg-amber-100 dark:bg-amber-900/30",
-                  color: "text-amber-600 dark:text-amber-400",
-                  title: "5. Mengajukan Rekomendasi ke Lurah",
-                  content: (
-                    <>
-                      <p className="text-slate-700 dark:text-slate-300">
-                        Setelah rekomendasi dihasilkan dan Anda yakin, ajukan
-                        kegiatan tersebut ke lurah. Dengan mengklik tombol
-                        "Ajukan", status kegiatan berubah dari{" "}
-                        <strong>DRAFT</strong> menjadi <strong>DIAJUKAN</strong>
-                        . Lurah kemudian akan menyetujui atau menolaknya.
-                      </p>
-                      <p className="text-sm text-slate-500 dark:text-slate-400 italic">
-                        ⚡ Kegiatan yang sudah diajukan tidak dapat diubah lagi.
-                      </p>
-                    </>
-                  ),
-                },
-                {
-                  value: "export",
-                  icon: Download,
-                  bg: "bg-rose-100 dark:bg-rose-900/30",
-                  color: "text-rose-600 dark:text-rose-400",
-                  title: "6. Ekspor Laporan PDF",
-                  content: (
-                    <>
-                      <p className="text-slate-700 dark:text-slate-300">
-                        Setiap kegiatan rapat dapat diekspor ke PDF. Dokumen
-                        mencakup:
-                      </p>
-                      <ul className="list-disc list-inside">
-                        <li>Informasi kegiatan</li>
-                        <li>
-                          5 rekomendasi prioritas dengan skor, analisis, dan
-                          evidence
-                        </li>
-                        <li>
-                          Preview data input terkait (dengan label [Masukan] /
-                          [Data Master])
-                        </li>
-                        <li>Bagian pengesahan formal</li>
-                        <li>Footer dengan hak cipta</li>
-                      </ul>
-                    </>
-                  ),
-                },
-              ].map((item, idx) => (
-                <AccordionItem
-                  key={item.value}
-                  value={item.value}
-                  className="border rounded-lg overflow-hidden shadow-sm"
-                >
-                  <AccordionTrigger className="px-6 py-4 hover:bg-slate-50 dark:hover:bg-gray-800 hover:no-underline">
-                    <span className="flex items-center gap-3 text-lg font-medium">
-                      <div
-                        className={`w-8 h-8 rounded-lg ${item.bg} flex items-center justify-center`}
-                      >
-                        <item.icon className={`h-4 w-4 ${item.color}`} />
-                      </div>
-                      <span>{item.title}</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 italic">
+                    ⚠️ Status <strong>DIPROSES</strong> (sedang digunakan AI)
+                    dan <strong>DISELESAIKAN</strong> (rekomendasi disetujui)
+                    diatur otomatis sistem.
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* 2. Kelola Data Master */}
+              <AccordionItem
+                value="master-data"
+                className="border rounded-lg overflow-hidden shadow-sm"
+              >
+                <AccordionTrigger className="px-6 py-4 hover:bg-slate-50 dark:hover:bg-gray-800 hover:no-underline">
+                  <span className="flex items-center gap-3 text-lg font-medium">
+                    <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                      <Database className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <span>2. Kelola Data Master</span>
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
+                  <p className="text-slate-700 dark:text-slate-300">
+                    Data master berisi indikator dengan kritikalitas
+                    (KRITIS=1.0, TINGGI=0.75, SEDANG=0.5, RENDAH=0.25).
+                  </p>
+                  <div className="bg-slate-50 dark:bg-gray-800/50 p-4 rounded-lg">
+                    <h4 className="font-semibold mb-2">Fitur:</h4>
+                    <ul className="list-disc list-inside space-y-1 text-sm">
+                      <li>Tambah, edit, hapus data master</li>
+                      <li>Impor data via Excel (template tersedia)</li>
+                      <li>Aktif/nonaktifkan data (hanya aktif digunakan AI)</li>
+                    </ul>
+                  </div>
+                  <p className="text-sm text-slate-500">
+                    Data master menjadi bobot dalam perhitungan skor prioritas
+                    AI.
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* 3. Buat Kegiatan Rapat & Generate Rekomendasi */}
+              <AccordionItem
+                value="buat-kegiatan"
+                className="border rounded-lg overflow-hidden shadow-sm"
+              >
+                <AccordionTrigger className="px-6 py-4 hover:bg-slate-50 dark:hover:bg-gray-800 hover:no-underline">
+                  <span className="flex items-center gap-3 text-lg font-medium">
+                    <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                      <Calendar className="h-4 w-4 text-purple-600" />
+                    </div>
+                    <span>
+                      3. Buat Kegiatan Rapat & Generate Rekomendasi AI
                     </span>
-                  </AccordionTrigger>
-                  <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
-                    {item.content}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
+                  <p className="text-slate-700 dark:text-slate-300">
+                    Pilih menu "Atur Jadwal Program Mendatang" → "Buat Baru".
+                    Isi data (judul, deskripsi, tanggal, lokasi, domain isu,
+                    judul laporan).
+                  </p>
+                  <div className="bg-amber-50 dark:bg-amber-950/30 p-4 rounded-lg">
+                    <h4 className="font-semibold flex items-center gap-1">
+                      <Sparkles className="h-4 w-4" /> Proses AI (FUSI_DATA):
+                    </h4>
+                    <ul className="list-disc list-inside text-sm">
+                      <li>
+                        Mengambil max 50 masukan warga berstatus DIVERIFIKASI
+                        sesuai domain isu
+                      </li>
+                      <li>Mengambil semua data master aktif</li>
+                      <li>
+                        Menyertakan konteks program kelurahan berjalan & selesai
+                        21 hari (hindari duplikasi)
+                      </li>
+                      <li>
+                        Gemini AI menghasilkan 5 prioritas dengan deskripsi,
+                        skor (0-1), alasan analisis, evidence, fingerprint
+                      </li>
+                    </ul>
+                  </div>
+                  <p>
+                    Hasil disimpan dengan status <strong>DRAFT</strong>. Anda
+                    dapat mengedit kegiatan (judul, deskripsi, dll.) selama
+                    status masih DRAFT.
+                  </p>
+                  <p className="text-sm italic">
+                    Jika AI gagal, kegiatan tetap tersimpan tapi tanpa
+                    rekomendasi. Coba generate ulang nanti.
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* 4. Lihat Snapshot Data Input */}
+              <AccordionItem
+                value="snapshot"
+                className="border rounded-lg overflow-hidden shadow-sm"
+              >
+                <AccordionTrigger className="px-6 py-4 hover:bg-slate-50 dark:hover:bg-gray-800 hover:no-underline">
+                  <span className="flex items-center gap-3 text-lg font-medium">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                      <Eye className="h-4 w-4 text-emerald-600" />
+                    </div>
+                    <span>4. Lihat Snapshot Data Input (Evidence)</span>
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
+                  <p className="text-slate-700 dark:text-slate-300">
+                    Di halaman detail kegiatan, setiap prioritas memiliki tombol{" "}
+                    <strong>"Lihat Data Input"</strong> (hanya muncul jika ada
+                    data terkait).
+                  </p>
+                  <p>Anda dapat melihat:</p>
+                  <ul className="list-disc list-inside">
+                    <li>
+                      Masukan warga spesifik (judul, deskripsi, lokasi) yang
+                      digunakan
+                    </li>
+                    <li>
+                      Data master spesifik (nama atribut, kritikalitas, jumlah)
+                      yang digunakan
+                    </li>
+                  </ul>
+                  <p>
+                    Data ini diambil dari snapshot <code>inputData</code> saat
+                    generate, sehingga tetap akurat meski data asli berubah.
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* 5. Edit / Hapus Kegiatan (hanya DRAFT) */}
+              <AccordionItem
+                value="edit-hapus"
+                className="border rounded-lg overflow-hidden shadow-sm"
+              >
+                <AccordionTrigger className="px-6 py-4 hover:bg-slate-50 dark:hover:bg-gray-800 hover:no-underline">
+                  <span className="flex items-center gap-3 text-lg font-medium">
+                    <div className="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center">
+                      <Edit className="h-4 w-4 text-rose-600" />
+                    </div>
+                    <span>5. Edit / Hapus Kegiatan (Hanya Status DRAFT)</span>
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
+                  <p className="text-slate-700 dark:text-slate-300">
+                    Selama kegiatan berstatus <strong>DRAFT</strong>, Anda dapat
+                    mengedit data kegiatan (judul, deskripsi, tanggal, lokasi).
+                    Admin dapat menghapus kegiatan, perangkat desa hanya edit.
+                  </p>
+                  <div className="bg-red-50 dark:bg-red-950/30 p-3 rounded-lg">
+                    <p className="font-medium">
+                      ⚠️ Setelah kegiatan diajukan (status DIAJUKAN), edit &
+                      hapus tidak tersedia lagi.
+                    </p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* 6. Ajukan ke Lurah */}
+              <AccordionItem
+                value="ajukan"
+                className="border rounded-lg overflow-hidden shadow-sm"
+              >
+                <AccordionTrigger className="px-6 py-4 hover:bg-slate-50 dark:hover:bg-gray-800 hover:no-underline">
+                  <span className="flex items-center gap-3 text-lg font-medium">
+                    <div className="w-8 h-8 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                      <Send className="h-4 w-4 text-orange-600" />
+                    </div>
+                    <span>6. Mengajukan Rekomendasi ke Lurah</span>
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
+                  <p>
+                    Jika Anda yakin dengan rekomendasi, klik tombol{" "}
+                    <strong>"Ajukan ke Lurah"</strong>. Status berubah menjadi{" "}
+                    <strong>DIAJUKAN</strong>.
+                  </p>
+                  <p>
+                    Lurah kemudian akan menyetujui atau menolak. Setelah
+                    diajukan, kegiatan tidak dapat diubah lagi.
+                  </p>
+                  <p>
+                    Jika ditolak, Anda dapat melihat alasan penolakan dari
+                    lurah, memperbaiki data (misalnya perbarui data master),
+                    lalu buat kegiatan baru.
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* 7. Ekspor Laporan PDF */}
+              <AccordionItem
+                value="export"
+                className="border rounded-lg overflow-hidden shadow-sm"
+              >
+                <AccordionTrigger className="px-6 py-4 hover:bg-slate-50 dark:hover:bg-gray-800 hover:no-underline">
+                  <span className="flex items-center gap-3 text-lg font-medium">
+                    <div className="w-8 h-8 rounded-lg bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center">
+                      <Download className="h-4 w-4 text-teal-600" />
+                    </div>
+                    <span>7. Ekspor Laporan PDF</span>
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4 pt-2 space-y-4">
+                  <p>
+                    Setiap kegiatan (DRAFT, DIAJUKAN, DISETUJUI, DITOLAK) dapat
+                    diekspor ke PDF. Laporan memuat:
+                  </p>
+                  <ul className="list-disc list-inside">
+                    <li>Informasi kegiatan</li>
+                    <li>5 prioritas dengan skor, analisis, evidence</li>
+                    <li>Snapshot data input terkait</li>
+                    <li>Bagian pengesahan dan footer resmi</li>
+                  </ul>
+                  <p>Gunakan PDF untuk arsip, rapat, atau bahan koordinasi.</p>
+                </AccordionContent>
+              </AccordionItem>
             </Accordion>
           </ClientOnly>
         </motion.div>
 
-        {/* FAQ */}
+        {/* FAQ Perangkat Desa */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.6 }}
         >
           <Card className="border-0 shadow-lg bg-white rounded-2xl overflow-hidden mb-8">
             <CardHeader className="bg-linear-to-r from-amber-50 to-orange-50 border-b">
               <CardTitle className="flex items-center gap-2 text-xl text-amber-800">
-                <HelpCircle className="h-5 w-5 text-amber-600" />
-                Pertanyaan yang Sering Diajukan
+                <HelpCircle className="h-5 w-5 text-amber-600" /> Pertanyaan
+                yang Sering Diajukan
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <p className="font-semibold flex items-center gap-1">
-                    <AlertCircle className="h-4 w-4 text-amber-500" />
-                    Apa yang harus saya lakukan jika masukan tidak layak?
+                    <AlertCircle className="h-4 w-4 text-amber-500" /> Apa yang
+                    harus saya lakukan jika masukan tidak layak?
                   </p>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
                     Gunakan status <strong>DITOLAK</strong> dan isi alasan
-                    penolakan. Alasan ini akan terlihat oleh pengirim.
+                    penolakan. Alasan akan terlihat oleh warga pengirim.
                   </p>
                 </div>
                 <div className="space-y-2">
                   <p className="font-semibold flex items-center gap-1">
-                    <AlertCircle className="h-4 w-4 text-amber-500" />
-                    Bagaimana cara mengubah bobot kritikalitas?
+                    <AlertCircle className="h-4 w-4 text-amber-500" /> Bagaimana
+                    cara mengubah bobot kritikalitas?
                   </p>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Ubah melalui modul <strong>Data Master</strong>. Efeknya
-                    langsung diterapkan pada prompt AI.
+                    Edit data master pada menu "Kelola Data Master". Efeknya
+                    langsung pada prompt AI saat generate ulang.
                   </p>
                 </div>
                 <div className="space-y-2">
                   <p className="font-semibold flex items-center gap-1">
-                    <AlertCircle className="h-4 w-4 text-amber-500" />
-                    Apakah saya bisa mengedit kegiatan yang sudah diajukan?
+                    <AlertCircle className="h-4 w-4 text-amber-500" /> Apakah
+                    saya bisa mengedit kegiatan yang sudah diajukan?
                   </p>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Tidak. Setelah diajukan, kegiatan hanya bisa dilihat; tidak
-                    dapat diubah. Pastikan data sudah benar sebelum mengajukan.
+                    Tidak. Setelah diajukan, kegiatan hanya bisa dilihat.
+                    Pastikan data sudah benar sebelum mengajukan.
                   </p>
                 </div>
                 <div className="space-y-2">
                   <p className="font-semibold flex items-center gap-1">
-                    <AlertCircle className="h-4 w-4 text-amber-500" />
-                    Bagaimana cara melihat data yang digunakan AI?
+                    <AlertCircle className="h-4 w-4 text-amber-500" /> Bagaimana
+                    cara melihat data mentah yang digunakan AI?
                   </p>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
                     Di halaman detail kegiatan, klik "Lihat Data Input" pada
                     setiap prioritas. Data diambil dari snapshot{" "}
                     <code>inputData</code>.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="font-semibold flex items-center gap-1">
+                    <AlertCircle className="h-4 w-4 text-amber-500" /> Bisakah
+                    saya mengimpor data master dari Excel?
+                  </p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Ya, tersedia fitur import. Pastikan format kolom sesuai
+                    template (namaAtribut, kritikalitas, jumlah, tahunData,
+                    dll.).
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="font-semibold flex items-center gap-1">
+                    <AlertCircle className="h-4 w-4 text-amber-500" /> Apa yang
+                    terjadi jika AI gagal menghasilkan rekomendasi?
+                  </p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Kegiatan tetap tersimpan tanpa rekomendasi. Anda dapat
+                    mengedit kegiatan (selama DRAFT) dan memicu generate ulang
+                    melalui tombol "Generate Ulang" (jika ada).
                   </p>
                 </div>
               </div>

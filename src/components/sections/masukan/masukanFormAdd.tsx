@@ -297,7 +297,7 @@ export default function MasukanWargaFormAdd() {
   // Render step 1
   if (step === "cek") {
     return (
-      <div className="max-w-md mx-auto bg-white p-6 rounded-2xl shadow">
+      <div className="max-w-md mx-auto bg-white dark:bg-gray-800 p-6 rounded-2xl shadow">
         <h2 className="text-xl font-semibold text-center mb-4">
           Verifikasi Nomor HP
         </h2>
@@ -330,7 +330,7 @@ export default function MasukanWargaFormAdd() {
   // Render step 2
   if (step === "daftar") {
     return (
-      <div className="max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow">
+      <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-6 rounded-2xl shadow">
         <h2 className="text-xl font-semibold mb-4">
           Lengkapi Data & Verifikasi
         </h2>
@@ -405,7 +405,7 @@ export default function MasukanWargaFormAdd() {
   // Render step 3 (masukan)
   if (step === "masukan" && domainLoading) {
     return (
-      <div className="space-y-6 bg-white p-6 rounded-2xl">
+      <div className="space-y-6 bg-white dark:bg-gray-800 p-6 rounded-2xl">
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-10 w-full" />
         <Skeleton className="h-24 w-full" />
@@ -421,7 +421,7 @@ export default function MasukanWargaFormAdd() {
   return (
     <form
       onSubmit={masukanForm.handleSubmit(onSubmitMasukan)}
-      className="space-y-6 bg-white p-6 rounded-2xl"
+      className="space-y-6 bg-white dark:bg-gray-800 p-6 rounded-2xl"
     >
       <div className="bg-green-50 p-3 rounded-lg text-sm text-green-800 flex justify-between items-center">
         <span>
@@ -586,16 +586,17 @@ export default function MasukanWargaFormAdd() {
         </div>
       </div>
 
-      <div className="flex justify-end gap-2">
+      <div className="flex flex-col sm:flex-row justify-end gap-2">
         <Button
           type="button"
           variant="outline"
           onClick={() => setStep("cek")}
           disabled={isSubmitting}
+          className="w-full sm:w-auto"
         >
           Ganti Nomor
         </Button>
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto">
           {isSubmitting ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (

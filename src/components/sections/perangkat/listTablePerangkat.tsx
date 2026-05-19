@@ -85,7 +85,7 @@ const getInitials = (name: string): string => {
   );
 };
 
-// ✅ Opsi role yang tersedia untuk filter (tanpa string kosong)
+// Opsi role yang tersedia untuk filter (tanpa string kosong)
 const roleOptions = [
   { value: "all", label: "Semua Perangkat" },
   { value: "LURAH", label: "Lurah" },
@@ -103,7 +103,7 @@ export default function ListTablePerangkat() {
   const [active, setActive] = useQueryState("isActive", { defaultValue: "" });
   const [page, setPage] = useQueryState("page", { defaultValue: "1" });
   const [perPage] = useQueryState("perPage", { defaultValue: "10" });
-  const [role, setRole] = useQueryState("role", { defaultValue: "all" }); // ✅ default "all"
+  const [role, setRole] = useQueryState("role", { defaultValue: "all" });
 
   // Sorting states
   const [sortBy, setSortBy] = useQueryState("sortBy", { defaultValue: "name" });
@@ -123,7 +123,7 @@ export default function ListTablePerangkat() {
     perPage: perPageNumber,
     sortBy,
     sortOrder,
-    role: role !== "all" ? role : undefined, // ✅ hanya kirim jika bukan "all"
+    role: role !== "all" ? role : undefined,
   });
 
   const { data, meta, error, isLoading, mutate } = useGet(
@@ -143,7 +143,6 @@ export default function ListTablePerangkat() {
     { value: "createdAt", label: "Tanggal Dibuat" },
   ];
 
-  // ✅ Filter signifikan jika role bukan "all"
   const hasSignificantFilter =
     (debouncedQ?.trim() !== "" && debouncedQ !== undefined) ||
     active !== "" ||
@@ -197,7 +196,7 @@ export default function ListTablePerangkat() {
 
   const clearFilters = () => {
     setActive("");
-    setRole("all"); // ✅ reset ke "all"
+    setRole("all");
     setSortBy("name");
     setSortOrder("asc");
     setIsFilterOpen(false);
@@ -292,9 +291,14 @@ export default function ListTablePerangkat() {
       </AlertDialog>
 
       <CardHeader className="space-y-4">
-        <div className="mb-4 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
-          <div className="flex flex-col lg:flex-row gap-4">
-            <Link href="/admin/kelola-perangkat/add">
+        {/* Baris tombol dan filter */}
+        <div className="flex flex-col gap-4">
+          {/* Baris pertama: Tombol Tambah dan Filter */}
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href="/admin/kelola-perangkat/add"
+              className="flex-1 sm:flex-none"
+            >
               <Button className="cursor-pointer w-full sm:w-auto">
                 <Plus className="mr-2 h-4 w-4" /> Tambah Perangkat
               </Button>
@@ -303,7 +307,7 @@ export default function ListTablePerangkat() {
             <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
               <Button
                 variant="outline"
-                className="cursor-pointer w-full sm:w-auto"
+                className="cursor-pointer flex-1 sm:flex-none"
                 onClick={() => setIsFilterOpen(true)}
               >
                 <Filter className="mr-2 h-4 w-4" />
@@ -319,7 +323,8 @@ export default function ListTablePerangkat() {
                 )}
               </Button>
 
-              <DialogContent className="sm:max-w-106.25">
+              {/* Dialog Filter Responsif */}
+              <DialogContent className="sm:max-w-125 md:max-w-137.5 w-[calc(100%-2rem)] max-h-[90vh] overflow-y-auto rounded-lg">
                 <DialogHeader>
                   <DialogTitle>
                     <div className="flex items-center gap-2">
@@ -332,7 +337,7 @@ export default function ListTablePerangkat() {
                   </DialogDescription>
                 </DialogHeader>
 
-                <div className="grid gap-6 py-4">
+                <div className="grid gap-5 py-3">
                   <div className="grid gap-2">
                     <Label>Role</Label>
                     <Select value={role} onValueChange={setRole}>
@@ -419,7 +424,7 @@ export default function ListTablePerangkat() {
                   </div>
                 </div>
 
-                <div className="flex flex-col-reverse sm:flex-row justify-between gap-2">
+                <div className="flex flex-col-reverse sm:flex-row justify-between gap-2 mt-2">
                   <Button
                     variant="outline"
                     onClick={clearFilters}
@@ -438,12 +443,13 @@ export default function ListTablePerangkat() {
             </Dialog>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          {/* Baris kedua: Search input */}
+          <div className="flex flex-wrap items-center gap-2">
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Cari Nama / Jabatan / Email..."
-              className="cursor-pointer min-w-62.5 max-w-full flex-1"
+              className="flex-1 min-w-45"
             />
             {q && (
               <Button
@@ -457,6 +463,7 @@ export default function ListTablePerangkat() {
           </div>
         </div>
 
+        {/* Badge filter aktif */}
         {hasActiveFilters && (
           <div className="flex flex-wrap gap-2">
             {role !== "all" && (
@@ -650,7 +657,7 @@ export default function ListTablePerangkat() {
                       })}
                     </TableCell>
                     <TableCell onClick={(e) => e.stopPropagation()}>
-                      <div className="flex justify-center gap-1 sm:gap-2">
+                      <div className="flex justify-center gap-1 sm:gap-2 flex-wrap">
                         <Button
                           size="sm"
                           onClick={(e) => {
@@ -694,11 +701,11 @@ export default function ListTablePerangkat() {
           </Table>
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mt-4">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mt-4">
           <div className="text-sm text-muted-foreground order-2 sm:order-1">
             Total: {meta?.total || 0} User
           </div>
-          <div className="flex gap-2 order-1 sm:order-2">
+          <div className="flex gap-2 order-1 sm:order-2 justify-between sm:justify-end w-full sm:w-auto">
             <Button
               size="sm"
               variant="outline"
@@ -708,7 +715,7 @@ export default function ListTablePerangkat() {
             >
               <ChevronLeft className="h-4 w-4" /> Prev
             </Button>
-            <span className="px-4 py-2 bg-muted rounded-md whitespace-nowrap">
+            <span className="px-4 py-2 bg-muted rounded-md whitespace-nowrap text-sm">
               Halaman {pageNumber} dari {meta?.totalPages || 1}
             </span>
             <Button

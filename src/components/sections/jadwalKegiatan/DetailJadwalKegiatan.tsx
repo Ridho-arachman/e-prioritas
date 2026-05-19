@@ -61,8 +61,6 @@ export enum StatusRekomendasi {
   DITOLAK = "DITOLAK",
 }
 
-// ModeRekomendasi sudah tidak digunakan, sistem hanya Fusi Data
-
 export enum Role {
   LURAH = "LURAH",
   PERANGKAT_DESA = "PERANGKAT_DESA",
@@ -138,7 +136,7 @@ export interface RekomendasiItem {
 export interface RekomendasiMetadata {
   generatedAt: string;
   aiModel: string;
-  modeRekomendasi: string; // Selalu "FUSI_DATA", di-hardcode backend
+  modeRekomendasi: string;
   domainIsuCode: string;
   totalMasukanDianalisis: number;
   totalDataMasterDianalisis: number;
@@ -165,7 +163,7 @@ export interface RekomendasiSnapshot {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// 📦 KEGIATAN RAPAT (Main Entity) — properti 'mode' dihapus
+// 📦 KEGIATAN RAPAT (Main Entity)
 // ═══════════════════════════════════════════════════════════════
 
 export interface KegiatanRapat {
@@ -178,7 +176,6 @@ export interface KegiatanRapat {
   domainIsu?: DomainIsu | null;
   dibuatOlehId: string;
   dibuatOleh: User;
-  // mode tidak ada lagi
   judulLaporan: string;
   rekomendasiItems?: RekomendasiSnapshot | null;
   fingerprint: string;
@@ -224,8 +221,6 @@ const getStatusColor = (status: StatusRekomendasi | string) => {
       return "bg-slate-50 text-slate-700 border-slate-200";
   }
 };
-
-// Helper getModeBadgeColor dihapus karena tidak digunakan
 
 const getPriorityColor = (index: number) => {
   const colors = [
@@ -552,7 +547,6 @@ export default function KegiatanRapatDetail() {
                               {kegiatan.domainIsu.nama}
                             </Badge>
                           )}
-                          {/* Badge mode statis: Fusi Data */}
                           <Badge
                             variant="outline"
                             className="bg-blue-50 text-blue-700 border-blue-200 font-medium"
@@ -690,6 +684,12 @@ export default function KegiatanRapatDetail() {
                   const isExpanded =
                     expandedPriorities[item.fingerprint] || false;
 
+                  // Cek apakah ada data input yang digunakan
+                  const hasInputData =
+                    (item.usedMasukanIds && item.usedMasukanIds.length > 0) ||
+                    (item.usedDataMasterIds &&
+                      item.usedDataMasterIds.length > 0);
+
                   return (
                     <Card
                       key={item.fingerprint || idx}
@@ -743,7 +743,6 @@ export default function KegiatanRapatDetail() {
                               </div>
                             </div>
 
-                            {/* ✅ Tampilkan warning jika ada */}
                             {item.warning && (
                               <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3 flex items-start gap-2">
                                 <AlertCircleIcon className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
@@ -766,6 +765,7 @@ export default function KegiatanRapatDetail() {
                                 </div>
                               </div>
                             </div>
+
                             {item.evidence && (
                               <div className="mt-6 pt-6 border-t border-slate-100">
                                 <div className="flex items-center justify-between mb-4">
@@ -807,137 +807,143 @@ export default function KegiatanRapatDetail() {
                               </div>
                             )}
 
-                            {/* Tombol Lihat Data Input */}
-                            <div className="mt-4 flex justify-end">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => toggleExpand(item.fingerprint)}
-                                className="text-xs gap-1"
-                              >
-                                <Eye className="h-3 w-3" />
-                                {isExpanded
-                                  ? "Sembunyikan Data"
-                                  : "Lihat Data Input"}
-                              </Button>
-                            </div>
-
-                            {/* Panel Preview Data Input */}
-                            {isExpanded && rekomendasiData?.inputData && (
-                              <div className="mt-4 pt-4 border-t border-slate-100">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  {/* Masukan Warga */}
-                                  {item.usedMasukanIds &&
-                                    item.usedMasukanIds.length > 0 && (
-                                      <div>
-                                        <h5 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
-                                          <UsersIcon className="h-4 w-4" />{" "}
-                                          Masukan Warga Terkait
-                                        </h5>
-                                        <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
-                                          {rekomendasiData.inputData.masukan
-                                            .filter((m) =>
-                                              item.usedMasukanIds?.includes(
-                                                m.id,
-                                              ),
-                                            )
-                                            .map((m, i) => (
-                                              <div
-                                                key={i}
-                                                className="text-xs bg-slate-50 p-2 rounded border border-slate-100"
-                                              >
-                                                <p className="font-medium">
-                                                  {m.judul}
-                                                </p>
-                                                <p className="text-slate-600 line-clamp-2">
-                                                  {m.deskripsi}
-                                                </p>
-                                                <Badge
-                                                  variant="outline"
-                                                  className="mt-1"
-                                                >
-                                                  RT {m.lokasiRt}/RW{" "}
-                                                  {m.lokasiRw}
-                                                </Badge>
-                                              </div>
-                                            ))}
-                                          {item.usedMasukanIds.length >
-                                            rekomendasiData.inputData.masukan
-                                              .length && (
-                                            <p className="text-xs text-slate-400 italic">
-                                              *dan{" "}
-                                              {item.usedMasukanIds.length -
-                                                rekomendasiData.inputData
-                                                  .masukan.length}{" "}
-                                              data lainnya (tidak ditampilkan)
-                                            </p>
-                                          )}
-                                        </div>
-                                      </div>
-                                    )}
-                                  {/* Data Master */}
-                                  {item.usedDataMasterIds &&
-                                    item.usedDataMasterIds.length > 0 && (
-                                      <div>
-                                        <h5 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
-                                          <TargetIcon className="h-4 w-4" />{" "}
-                                          Data Master Terkait
-                                        </h5>
-                                        <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
-                                          {rekomendasiData.inputData.dataMaster
-                                            .filter((d) =>
-                                              item.usedDataMasterIds?.includes(
-                                                d.id,
-                                              ),
-                                            )
-                                            .map((d, i) => (
-                                              <div
-                                                key={i}
-                                                className="text-xs bg-slate-50 p-2 rounded border border-slate-100"
-                                              >
-                                                <p className="font-medium">
-                                                  {d.namaAtribut}
-                                                </p>
-                                                <div className="flex items-center gap-2 mt-1">
-                                                  <Badge
-                                                    className={`text-xs ${
-                                                      d.kritikalitas ===
-                                                      "KRITIS"
-                                                        ? "bg-red-100 text-red-700"
-                                                        : d.kritikalitas ===
-                                                            "TINGGI"
-                                                          ? "bg-orange-100 text-orange-700"
-                                                          : d.kritikalitas ===
-                                                              "SEDANG"
-                                                            ? "bg-yellow-100 text-yellow-700"
-                                                            : "bg-green-100 text-green-700"
-                                                    }`}
-                                                  >
-                                                    {d.kritikalitas}
-                                                  </Badge>
-                                                  {d.jumlah !== null && (
-                                                    <span>Jml: {d.jumlah}</span>
-                                                  )}
-                                                </div>
-                                              </div>
-                                            ))}
-                                          {item.usedDataMasterIds.length >
-                                            rekomendasiData.inputData.dataMaster
-                                              .length && (
-                                            <p className="text-xs text-slate-400 italic">
-                                              *dan{" "}
-                                              {item.usedDataMasterIds.length -
-                                                rekomendasiData.inputData
-                                                  .dataMaster.length}{" "}
-                                              data lainnya (tidak ditampilkan)
-                                            </p>
-                                          )}
-                                        </div>
-                                      </div>
-                                    )}
-                                </div>
+                            {/* Tombol Lihat Data Input - HANYA jika ada data input */}
+                            {hasInputData && (
+                              <div className="mt-4 flex justify-end">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => toggleExpand(item.fingerprint)}
+                                  className="text-xs gap-1"
+                                >
+                                  <Eye className="h-3 w-3" />
+                                  {isExpanded
+                                    ? "Sembunyikan Data"
+                                    : "Lihat Data Input"}
+                                </Button>
                               </div>
                             )}
+
+                            {/* Panel Preview Data Input (hanya tampil jika ada data input) */}
+                            {isExpanded &&
+                              hasInputData &&
+                              rekomendasiData?.inputData && (
+                                <div className="mt-4 pt-4 border-t border-slate-100">
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {/* Masukan Warga */}
+                                    {item.usedMasukanIds &&
+                                      item.usedMasukanIds.length > 0 && (
+                                        <div>
+                                          <h5 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
+                                            <UsersIcon className="h-4 w-4" />{" "}
+                                            Masukan Warga Terkait
+                                          </h5>
+                                          <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
+                                            {rekomendasiData.inputData.masukan
+                                              .filter((m) =>
+                                                item.usedMasukanIds?.includes(
+                                                  m.id,
+                                                ),
+                                              )
+                                              .map((m, i) => (
+                                                <div
+                                                  key={i}
+                                                  className="text-xs bg-slate-50 p-2 rounded border border-slate-100"
+                                                >
+                                                  <p className="font-medium">
+                                                    {m.judul}
+                                                  </p>
+                                                  <p className="text-slate-600 line-clamp-2">
+                                                    {m.deskripsi}
+                                                  </p>
+                                                  <Badge
+                                                    variant="outline"
+                                                    className="mt-1"
+                                                  >
+                                                    RT {m.lokasiRt}/RW{" "}
+                                                    {m.lokasiRw}
+                                                  </Badge>
+                                                </div>
+                                              ))}
+                                            {item.usedMasukanIds.length >
+                                              rekomendasiData.inputData.masukan
+                                                .length && (
+                                              <p className="text-xs text-slate-400 italic">
+                                                *dan{" "}
+                                                {item.usedMasukanIds.length -
+                                                  rekomendasiData.inputData
+                                                    .masukan.length}{" "}
+                                                data lainnya (tidak ditampilkan)
+                                              </p>
+                                            )}
+                                          </div>
+                                        </div>
+                                      )}
+                                    {/* Data Master */}
+                                    {item.usedDataMasterIds &&
+                                      item.usedDataMasterIds.length > 0 && (
+                                        <div>
+                                          <h5 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
+                                            <TargetIcon className="h-4 w-4" />{" "}
+                                            Data Master Terkait
+                                          </h5>
+                                          <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
+                                            {rekomendasiData.inputData.dataMaster
+                                              .filter((d) =>
+                                                item.usedDataMasterIds?.includes(
+                                                  d.id,
+                                                ),
+                                              )
+                                              .map((d, i) => (
+                                                <div
+                                                  key={i}
+                                                  className="text-xs bg-slate-50 p-2 rounded border border-slate-100"
+                                                >
+                                                  <p className="font-medium">
+                                                    {d.namaAtribut}
+                                                  </p>
+                                                  <div className="flex items-center gap-2 mt-1">
+                                                    <Badge
+                                                      className={`text-xs ${
+                                                        d.kritikalitas ===
+                                                        "KRITIS"
+                                                          ? "bg-red-100 text-red-700"
+                                                          : d.kritikalitas ===
+                                                              "TINGGI"
+                                                            ? "bg-orange-100 text-orange-700"
+                                                            : d.kritikalitas ===
+                                                                "SEDANG"
+                                                              ? "bg-yellow-100 text-yellow-700"
+                                                              : "bg-green-100 text-green-700"
+                                                      }`}
+                                                    >
+                                                      {d.kritikalitas}
+                                                    </Badge>
+                                                    {d.jumlah !== null && (
+                                                      <span>
+                                                        Jml: {d.jumlah}
+                                                      </span>
+                                                    )}
+                                                  </div>
+                                                </div>
+                                              ))}
+                                            {item.usedDataMasterIds.length >
+                                              rekomendasiData.inputData
+                                                .dataMaster.length && (
+                                              <p className="text-xs text-slate-400 italic">
+                                                *dan{" "}
+                                                {item.usedDataMasterIds.length -
+                                                  rekomendasiData.inputData
+                                                    .dataMaster.length}{" "}
+                                                data lainnya (tidak ditampilkan)
+                                              </p>
+                                            )}
+                                          </div>
+                                        </div>
+                                      )}
+                                  </div>
+                                </div>
+                              )}
                           </div>
                         </div>
                       </CardContent>

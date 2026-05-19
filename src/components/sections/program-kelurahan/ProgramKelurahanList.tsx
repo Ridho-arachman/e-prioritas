@@ -1,4 +1,3 @@
-// components/sections/program-kelurahan/ProgramKelurahanList.tsx
 "use client";
 
 import { format } from "date-fns";
@@ -192,7 +191,7 @@ export default function ProgramKelurahanList({
         open={!!selectedDeleteId}
         onOpenChange={(open) => !open && setSelectedDeleteId(null)}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="w-[calc(100%-2rem)] max-w-md rounded-lg">
           <AlertDialogHeader>
             <AlertDialogTitle>Hapus program?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -200,7 +199,7 @@ export default function ProgramKelurahanList({
               dibatalkan.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="flex flex-col-reverse sm:flex-row gap-2">
             <AlertDialogCancel>Batal</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
@@ -219,18 +218,25 @@ export default function ProgramKelurahanList({
         </AlertDialogContent>
       </AlertDialog>
 
-      <Card className="w-full mx-auto">
-        <CardHeader className="space-y-4 p-4 md:p-6 border-b">
-          <div className="flex flex-col lg:flex-row lg:justify-between gap-4">
+      <Card className="w-full mx-auto border-0 shadow-lg">
+        <CardHeader className="space-y-4 p-4 sm:p-6 border-b bg-white/50">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-2">
               {canEdit && (
-                <Button onClick={() => router.push(`${basePath}/add`)}>
+                <Button
+                  onClick={() => router.push(`${basePath}/add`)}
+                  className="w-full sm:w-auto"
+                >
                   <Plus className="mr-2 h-4 w-4" /> Tambah Program
                 </Button>
               )}
 
               <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-                <Button variant="outline" onClick={() => setIsFilterOpen(true)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsFilterOpen(true)}
+                  className="w-full sm:w-auto"
+                >
                   <Filter className="mr-2 h-4 w-4" /> Filter & Sort
                   {hasActiveFilters && (
                     <Badge variant="secondary" className="ml-2">
@@ -238,7 +244,7 @@ export default function ProgramKelurahanList({
                     </Badge>
                   )}
                 </Button>
-                <DialogContent className="sm:max-w-md">
+                <DialogContent className="w-[calc(100%-2rem)] max-w-md rounded-lg p-4 sm:p-6">
                   <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                       <SlidersHorizontal className="h-5 w-5" /> Filter &
@@ -302,7 +308,7 @@ export default function ProgramKelurahanList({
                           ))}
                         </SelectContent>
                       </Select>
-                      <div className="flex gap-2">
+                      <div className="flex flex-col sm:flex-row gap-2">
                         <Button
                           variant={sortOrder === "asc" ? "default" : "outline"}
                           className="flex-1"
@@ -320,7 +326,7 @@ export default function ProgramKelurahanList({
                       </div>
                     </div>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex flex-col-reverse sm:flex-row justify-between gap-2">
                     <Button variant="outline" onClick={clearFilters}>
                       Reset
                     </Button>
@@ -332,12 +338,12 @@ export default function ProgramKelurahanList({
               </Dialog>
             </div>
 
-            <div className="relative flex-1 max-w-md">
+            <div className="relative flex-1 w-full sm:max-w-md">
               <Input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Cari judul / lokasi / PIC..."
-                className="pr-10"
+                className="pr-10 w-full"
               />
               {q && (
                 <button
@@ -350,7 +356,6 @@ export default function ProgramKelurahanList({
             </div>
           </div>
 
-          {/* Filter badges */}
           {hasActiveFilters && (
             <div className="flex flex-wrap gap-2">
               {status && (
@@ -393,15 +398,15 @@ export default function ProgramKelurahanList({
 
         <CardContent className="p-0 md:p-4">
           <div className="overflow-x-auto">
-            <Table>
+            <Table className="min-w-200">
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-12 text-center">No</TableHead>
-                  <TableHead>Judul</TableHead>
+                  <TableHead className="min-w-37.5">Judul</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>PIC</TableHead>
                   <TableHead>Domain Isu</TableHead>
-                  <TableHead>Lokasi</TableHead>
+                  <TableHead className="min-w-30">Lokasi</TableHead>
                   <TableHead>Tgl Mulai</TableHead>
                   <TableHead className="text-center">Aksi</TableHead>
                 </TableRow>
@@ -445,29 +450,38 @@ export default function ProgramKelurahanList({
                       <TableCell className="text-center">
                         {(pageNumber - 1) * limitNumber + idx + 1}
                       </TableCell>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium truncate max-w-50">
                         {item.judul}
                       </TableCell>
                       <TableCell>
                         <Badge
                           className={cn(
-                            "border",
+                            "border whitespace-nowrap",
                             statusBadgeMap[statusKey]?.color,
                           )}
                         >
                           {statusBadgeMap[statusKey]?.label}
                         </Badge>
                       </TableCell>
-                      <TableCell>{item.pic || "-"}</TableCell>
+                      <TableCell className="truncate max-w-30">
+                        {item.pic || "-"}
+                      </TableCell>
                       <TableCell>
                         {item.domainIsu ? (
-                          <Badge variant="outline">{item.domainIsu.nama}</Badge>
+                          <Badge
+                            variant="outline"
+                            className="whitespace-nowrap"
+                          >
+                            {item.domainIsu.nama}
+                          </Badge>
                         ) : (
                           "-"
                         )}
                       </TableCell>
-                      <TableCell>{item.lokasi || "-"}</TableCell>
-                      <TableCell>
+                      <TableCell className="truncate max-w-37.5">
+                        {item.lokasi || "-"}
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap">
                         {item.tanggalMulai
                           ? format(new Date(item.tanggalMulai), "dd MMM yyyy", {
                               locale: id,
@@ -475,13 +489,14 @@ export default function ProgramKelurahanList({
                           : "-"}
                       </TableCell>
                       <TableCell onClick={(e) => e.stopPropagation()}>
-                        <div className="flex justify-center gap-2">
+                        <div className="flex justify-center gap-1 sm:gap-2 flex-wrap">
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() =>
                               router.push(`${basePath}/${item.id}`)
                             }
+                            className="h-8 w-8 p-0"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -493,6 +508,7 @@ export default function ProgramKelurahanList({
                                 onClick={() =>
                                   router.push(`${basePath}/${item.id}/edit`)
                                 }
+                                className="h-8 w-8 p-0"
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
@@ -500,6 +516,7 @@ export default function ProgramKelurahanList({
                                 size="sm"
                                 variant="destructive"
                                 onClick={() => setSelectedDeleteId(item.id)}
+                                className="h-8 w-8 p-0"
                               >
                                 <Trash className="h-4 w-4" />
                               </Button>
@@ -514,15 +531,14 @@ export default function ProgramKelurahanList({
             </Table>
           </div>
 
-          {/* Pagination */}
           {meta && programList.length > 0 && (
-            <div className="flex items-center justify-between mt-4 py-2">
-              <div className="text-sm text-muted-foreground">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-4 py-2 px-2 sm:px-4">
+              <div className="text-xs sm:text-sm text-muted-foreground text-center sm:text-left">
                 Menampilkan {(pageNumber - 1) * limitNumber + 1} -{" "}
                 {Math.min(pageNumber * limitNumber, meta.total)} dari{" "}
                 {meta.total}
               </div>
-              <div className="flex gap-2">
+              <div className="flex items-center justify-center gap-2">
                 <Button
                   size="sm"
                   variant="outline"
@@ -531,8 +547,9 @@ export default function ProgramKelurahanList({
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <span className="px-3 py-1 bg-muted rounded-md text-sm">
-                  Halaman {pageNumber} dari {meta.totalPages}
+                <span className="px-2 sm:px-3 py-1 bg-muted rounded-md text-xs sm:text-sm whitespace-nowrap">
+                  <span className="hidden sm:inline">Halaman </span>
+                  {pageNumber} / {meta.totalPages}
                 </span>
                 <Button
                   size="sm"

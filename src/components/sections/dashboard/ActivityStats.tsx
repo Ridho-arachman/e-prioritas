@@ -20,7 +20,6 @@ import {
   Tooltip,
 } from "recharts";
 
-// Tambahkan enum StatusMasukan (sesuai schema)
 export enum StatusMasukan {
   MENUNGGU = "MENUNGGU",
   DIVERIFIKASI = "DIVERIFIKASI",
@@ -29,7 +28,6 @@ export enum StatusMasukan {
   DISELESAIKAN = "DISELESAIKAN",
 }
 
-// Warna untuk setiap status: hijau (diterima), merah (ditolak), kuning (menunggu), biru (diproses), ungu (diselesaikan)
 const COLORS = ["#16a34a", "#ef4444", "#facc15", "#3b82f6", "#a855f7"];
 
 export default function ActivityStats() {
@@ -39,17 +37,19 @@ export default function ActivityStats() {
 
   if (isLoading) {
     return (
-      <Card className="border border-gray-200 shadow-sm rounded-xl bg-white/80 backdrop-blur-sm">
+      <Card className="border border-gray-200 shadow-sm rounded-xl bg-white/80 backdrop-blur-sm h-full">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold flex items-center gap-2">
-            <PieChartIcon className="w-5 h-5 text-green-500" />
+          <CardTitle className="text-base sm:text-lg font-semibold flex items-center gap-2">
+            <PieChartIcon className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
             Statistik Aktivitas
           </CardTitle>
-          <CardDescription>Perbandingan jumlah masukan warga</CardDescription>
+          <CardDescription className="text-xs sm:text-sm">
+            Perbandingan jumlah masukan warga
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center justify-center h-64">
-            <Skeleton className="w-32 h-32 rounded-full mb-4" />
+          <div className="flex flex-col items-center justify-center h-48 sm:h-64">
+            <Skeleton className="w-24 h-24 sm:w-32 sm:h-32 rounded-full mb-4" />
             <Skeleton className="w-3/4 h-4 mb-2" />
             <Skeleton className="w-1/2 h-4" />
           </div>
@@ -60,10 +60,12 @@ export default function ActivityStats() {
 
   if (error) {
     return (
-      <Card className="border border-gray-200 shadow-sm rounded-xl bg-white/80 backdrop-blur-sm text-center text-red-600 p-6">
-        <div className="flex flex-col items-center justify-center h-64 gap-3">
-          <AlertCircle className="w-8 h-8" />
-          <p className="font-medium">Gagal memuat data statistik</p>
+      <Card className="border border-gray-200 shadow-sm rounded-xl bg-white/80 backdrop-blur-sm h-full">
+        <div className="flex flex-col items-center justify-center h-48 sm:h-64 gap-3 p-4 text-center">
+          <AlertCircle className="w-6 h-6 sm:w-8 sm:h-8 text-red-500" />
+          <p className="text-sm sm:text-base font-medium text-red-600">
+            Gagal memuat data statistik
+          </p>
         </div>
       </Card>
     );
@@ -71,16 +73,16 @@ export default function ActivityStats() {
 
   if (!data) {
     return (
-      <Card className="border border-gray-200 shadow-sm rounded-xl bg-white/80 backdrop-blur-sm text-center p-6">
-        <div className="flex flex-col items-center justify-center h-64 gap-3">
-          <p className="text-gray-500">Tidak ada data statistik tersedia</p>
+      <Card className="border border-gray-200 shadow-sm rounded-xl bg-white/80 backdrop-blur-sm h-full">
+        <div className="flex flex-col items-center justify-center h-48 sm:h-64 gap-3 p-4 text-center">
+          <p className="text-xs sm:text-sm text-gray-500">
+            Tidak ada data statistik tersedia
+          </p>
         </div>
       </Card>
     );
   }
 
-  // Data chart untuk semua status (asumsikan API mengembalikan properti yang sesuai)
-  // Jika properti untuk Diproses dan Diselesaikan belum ada, beri nilai 0
   const chartData = [
     { name: "Diterima", value: data.masukanAccepted ?? 0 },
     { name: "Ditolak", value: data.masukanRejected ?? 0 },
@@ -92,17 +94,19 @@ export default function ActivityStats() {
   const total = chartData.reduce((acc, cur) => acc + cur.value, 0);
 
   return (
-    <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-all rounded-xl bg-white/80 backdrop-blur-sm">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold flex items-center gap-2">
-          <PieChartIcon className="w-5 h-5 text-green-500" />
+    <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-all rounded-xl bg-white/80 backdrop-blur-sm h-full">
+      <CardHeader className="pb-2 sm:pb-4">
+        <CardTitle className="text-base sm:text-lg font-semibold flex items-center gap-2">
+          <PieChartIcon className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
           Statistik Aktivitas
         </CardTitle>
-        <CardDescription>Perbandingan jumlah masukan warga</CardDescription>
+        <CardDescription className="text-xs sm:text-sm">
+          Perbandingan jumlah masukan warga
+        </CardDescription>
       </CardHeader>
 
-      <CardContent>
-        <div className="h-64 relative">
+      <CardContent className="pt-0 sm:pt-4 px-2 sm:px-6">
+        <div className="relative h-64 sm:h-80 md:h-96 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -111,13 +115,10 @@ export default function ActivityStats() {
                 nameKey="name"
                 cx="50%"
                 cy="50%"
-                innerRadius={60}
-                outerRadius={80}
-                label={{
-                  position: "outside",
-                  offset: 10,
-                }}
-                labelLine={{ stroke: "#888", strokeWidth: 1 }}
+                innerRadius={50}
+                outerRadius={70}
+                label={false}
+                paddingAngle={2}
               >
                 {chartData.map((entry, index) => (
                   <Cell
@@ -129,26 +130,32 @@ export default function ActivityStats() {
               </Pie>
               <Tooltip
                 formatter={(value: any, name: any) => {
-                  const numericValue = Array.isArray(value)
-                    ? value.reduce(
-                        (sum: number, v: any) => sum + (Number(v) || 0),
-                        0,
-                      )
-                    : Number(value) || 0;
+                  const numericValue = Number(value) || 0;
                   const persen =
                     total > 0 ? ((numericValue / total) * 100).toFixed(1) : "0";
-                  const label = name ?? "";
-                  return [`${numericValue} (${persen}%)`, label];
+                  return [`${numericValue} (${persen}%)`, name];
                 }}
+                contentStyle={{ fontSize: "12px" }}
               />
-              <Legend verticalAlign="bottom" height={36} />
+              <Legend
+                verticalAlign="bottom"
+                align="center"
+                layout="horizontal"
+                wrapperStyle={{
+                  fontSize: "12px",
+                  paddingTop: "8px",
+                }}
+                iconSize={10}
+              />
             </PieChart>
           </ResponsiveContainer>
           {/* Total di tengah */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="text-center">
-              <span className="text-2xl font-bold text-gray-800">{total}</span>
-              <p className="text-xs text-gray-500">Total</p>
+              <span className="text-xl sm:text-2xl font-bold text-gray-800">
+                {total}
+              </span>
+              <p className="text-[10px] sm:text-xs text-gray-500">Total</p>
             </div>
           </div>
         </div>

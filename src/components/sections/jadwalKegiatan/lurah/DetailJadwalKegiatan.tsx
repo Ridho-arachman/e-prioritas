@@ -13,22 +13,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useDelete, useGet, usePatch } from "@/hooks/useApi";
 import { useUser } from "@/hooks/useUser";
 import { notifier } from "@/lib/ToastNotifier";
@@ -43,24 +27,18 @@ import {
   Eye,
   FileDownIcon,
   FileTextIcon,
-  Filter,
   LightbulbIcon,
   Loader2Icon,
   MapPinIcon,
-  SlidersHorizontal,
   SparklesIcon,
   StarIcon,
   TargetIcon,
   TrendingUpIcon,
   UserIcon,
   UsersIcon,
-  X,
-  XIcon,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
-import { useDebounce } from "use-debounce";
 
 // ================================================================
 // ENUMS
@@ -80,8 +58,6 @@ export enum StatusRekomendasi {
   DISETUJUI = "DISETUJUI",
   DITOLAK = "DITOLAK",
 }
-
-// ModeRekomendasi dihapus – backend hanya satu mode
 
 export enum NilaiKritikalitas {
   KRITIS = "KRITIS",
@@ -132,7 +108,7 @@ export interface RekomendasiItem {
 export interface RekomendasiMetadata {
   generatedAt: string;
   aiModel: string;
-  modeRekomendasi: string; // Selalu "FUSI_DATA"
+  modeRekomendasi: string;
   domainIsuCode: string;
   totalMasukanDianalisis: number;
   totalDataMasterDianalisis: number;
@@ -167,7 +143,6 @@ export interface KegiatanRapat {
   domainIsu?: DomainIsu | null;
   dibuatOlehId: string;
   dibuatOleh: User;
-  // mode dihapus
   judulLaporan: string;
   rekomendasiItems?: RekomendasiSnapshot | null;
   fingerprint: string;
@@ -209,8 +184,6 @@ const getStatusColor = (status: StatusRekomendasi | string) => {
       return "bg-slate-50 text-slate-700 border-slate-200";
   }
 };
-
-// getModeBadgeColor dihapus
 
 const getPriorityColor = (index: number) => {
   const colors = [
@@ -259,7 +232,6 @@ export default function KegiatanRapatDetail() {
   const [selectedDeleteId, setSelectedDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [expandedPriorities, setExpandedPriorities] = useState<
     Record<string, boolean>
@@ -269,9 +241,6 @@ export default function KegiatanRapatDetail() {
   const [pendingAction, setPendingAction] = useState<"terima" | "tolak" | null>(
     null,
   );
-
-  const [q, setQ] = useQueryState("q", { defaultValue: "" });
-  const [debouncedQ] = useDebounce(q, 500);
 
   const {
     data: kegiatan,
@@ -454,10 +423,10 @@ export default function KegiatanRapatDetail() {
                 <span className="hidden sm:inline">Kembali</span>
               </Button>
               <div>
-                <h1 className="text-3xl font-bold bg-linear-to-r from-slate-800 via-blue-700 to-indigo-700 bg-clip-text text-transparent">
+                <h1 className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-slate-800 via-blue-700 to-indigo-700 bg-clip-text text-transparent">
                   Detail Kegiatan
                 </h1>
-                <p className="text-sm text-slate-500 mt-1">
+                <p className="text-xs sm:text-sm text-slate-500 mt-1">
                   Informasi lengkap kegiatan dan rekomendasi prioritas
                 </p>
               </div>
@@ -468,7 +437,7 @@ export default function KegiatanRapatDetail() {
           <Card className="mb-8 border-0 shadow-xl shadow-slate-200/50 bg-white/80 backdrop-blur-xl rounded-2xl overflow-hidden">
             <div className="h-2 bg-linear-to-r from-blue-500 via-indigo-500 to-purple-500" />
             <CardContent className="p-0">
-              <div className="p-6 sm:p-8 border-b border-slate-100">
+              <div className="p-4 sm:p-8 border-b border-slate-100">
                 <div className="flex flex-col lg:flex-row lg:items-start gap-6">
                   <div className="shrink-0">
                     <div className="relative">
@@ -490,29 +459,28 @@ export default function KegiatanRapatDetail() {
                   <div className="flex-1">
                     <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
                       <div>
-                        <h2 className="text-2xl font-bold text-slate-800 mb-2">
+                        <h2 className="text-xl sm:text-2xl font-bold text-slate-800 mb-2 wrap-break-word">
                           {kegiatan.judul}
                         </h2>
-                        <div className="flex flex-wrap items-center gap-3">
+                        <div className="flex flex-wrap items-center gap-2">
                           {kegiatan.domainIsu && (
                             <Badge
                               variant="outline"
-                              className="bg-blue-50 text-blue-700 border-blue-200 font-medium"
+                              className="bg-blue-50 text-blue-700 border-blue-200 font-medium text-xs sm:text-sm"
                             >
                               {kegiatan.domainIsu.nama}
                             </Badge>
                           )}
-                          {/* Mode statis */}
                           <Badge
                             variant="outline"
-                            className="bg-blue-50 text-blue-700 border-blue-200 font-medium"
+                            className="bg-blue-50 text-blue-700 border-blue-200 font-medium text-xs sm:text-sm"
                           >
                             Fusi Data
                           </Badge>
                           {kegiatan.aiModel && (
                             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-50 border border-purple-200">
-                              <SparklesIcon className="h-3.5 w-3.5 text-purple-600" />
-                              <span className="text-xs text-purple-700 font-medium">
+                              <SparklesIcon className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-purple-600" />
+                              <span className="text-[10px] sm:text-xs text-purple-700 font-medium">
                                 AI Powered
                               </span>
                             </div>
@@ -520,75 +488,75 @@ export default function KegiatanRapatDetail() {
                         </div>
                       </div>
                       <Badge
-                        className={`${getStatusColor(kegiatan.statusRekomendasi)} font-medium px-4 py-2`}
+                        className={`${getStatusColor(kegiatan.statusRekomendasi)} font-medium px-3 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm`}
                       >
                         {kegiatan.statusRekomendasi}
                       </Badge>
                     </div>
-                    <div className="flex flex-wrap gap-4 text-sm text-slate-500 mb-4">
+                    <div className="flex flex-wrap gap-3 sm:gap-4 text-sm text-slate-500 mb-4">
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center">
-                          <MapPinIcon className="h-4 w-4 text-slate-400" />
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-50 flex items-center justify-center">
+                          <MapPinIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-400" />
                         </div>
-                        <span className="font-medium">
+                        <span className="font-medium text-xs sm:text-sm wrap-break-word">
                           {kegiatan.lokasi || "Belum ditentukan"}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center">
-                          <UserIcon className="h-4 w-4 text-slate-400" />
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-50 flex items-center justify-center">
+                          <UserIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-400" />
                         </div>
                         <div>
-                          <p className="font-medium text-slate-700">
+                          <p className="font-medium text-slate-700 text-xs sm:text-sm">
                             {kegiatan.dibuatOleh.name}
                           </p>
-                          <p className="text-xs text-slate-400">
+                          <p className="text-[10px] sm:text-xs text-slate-400">
                             {kegiatan.dibuatOleh.jabatan || "-"}
                           </p>
                         </div>
                       </div>
                     </div>
                     <div className="prose prose-slate max-w-none">
-                      <p className="text-slate-600 leading-relaxed whitespace-pre-line">
+                      <p className="text-slate-600 leading-relaxed whitespace-pre-line text-sm sm:text-base">
                         {kegiatan.deskripsi}
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="px-6 sm:px-8 py-4 bg-slate-50/50 border-t border-slate-100">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="px-4 sm:px-8 py-4 bg-slate-50/50 border-t border-slate-100">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
                   <div>
-                    <p className="text-xs text-slate-500 uppercase tracking-wider font-medium mb-1">
+                    <p className="text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider font-medium mb-1">
                       Tanggal Dibuat
                     </p>
-                    <p className="text-sm font-semibold text-slate-800">
+                    <p className="text-xs sm:text-sm font-semibold text-slate-800">
                       {formatTanggalShort(kegiatan.createdAt)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-slate-500 uppercase tracking-wider font-medium mb-1">
+                    <p className="text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider font-medium mb-1">
                       Terakhir Update
                     </p>
-                    <p className="text-sm font-semibold text-slate-800">
+                    <p className="text-xs sm:text-sm font-semibold text-slate-800">
                       {formatTanggalShort(kegiatan.updatedAt)}
                     </p>
                   </div>
                   {kegiatan.aiProcessedAt && (
                     <>
                       <div>
-                        <p className="text-xs text-slate-500 uppercase tracking-wider font-medium mb-1">
+                        <p className="text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider font-medium mb-1">
                           AI Diproses
                         </p>
-                        <p className="text-sm font-semibold text-slate-800">
+                        <p className="text-xs sm:text-sm font-semibold text-slate-800">
                           {formatTanggalShort(kegiatan.aiProcessedAt)}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-slate-500 uppercase tracking-wider font-medium mb-1">
+                        <p className="text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider font-medium mb-1">
                           Model AI
                         </p>
-                        <p className="text-sm font-semibold text-slate-800">
+                        <p className="text-xs sm:text-sm font-semibold text-slate-800">
                           {kegiatan.aiModel}
                         </p>
                       </div>
@@ -604,240 +572,159 @@ export default function KegiatanRapatDetail() {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
-                    <LightbulbIcon className="h-5 w-5 text-white" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                    <LightbulbIcon className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-slate-800">
+                    <h2 className="text-xl sm:text-2xl font-bold text-slate-800">
                       Rekomendasi Prioritas AI
                     </h2>
-                    <p className="text-sm text-slate-500">
-                      {rekomendasiData?.metadata?.domainIsuCode} •{" "}
-                      {rekomendasiData?.metadata?.modeRekomendasi
-                        ? rekomendasiData.metadata.modeRekomendasi ===
-                          "FUSI_DATA"
-                          ? "Fusi Data"
-                          : rekomendasiData.metadata.modeRekomendasi
-                        : "Fusi Data"}
+                    <p className="text-xs sm:text-sm text-slate-500">
+                      {rekomendasiData?.metadata?.domainIsuCode} • Fusi Data
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge
                     variant="outline"
-                    className="bg-slate-50 text-slate-600 border-slate-200"
+                    className="bg-slate-50 text-slate-600 border-slate-200 text-xs sm:text-sm"
                   >
                     {prioritasList.length} Prioritas
                   </Badge>
                 </div>
               </div>
 
-              {/* Search & Filter Toolbar */}
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="relative group">
-                  <XIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
-                  <Input
-                    placeholder="Cari prioritas..."
-                    className="pl-12 pr-12 py-3 w-72 bg-white border border-slate-200 rounded-xl"
-                    value={q}
-                    onChange={(e) => setQ(e.target.value)}
-                    onKeyDown={(e) => e.key === "Escape" && setQ("")}
-                  />
-                  {q && (
-                    <button
-                      onClick={() => setQ("")}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 rounded-full p-1"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  )}
-                </div>
-
-                <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-                  <Button
-                    variant="outline"
-                    className="cursor-pointer border-slate-200"
-                    onClick={() => setIsFilterOpen(true)}
-                  >
-                    <Filter className="mr-2 h-4 w-4" /> Filter
-                  </Button>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>
-                        <div className="flex items-center gap-2">
-                          <SlidersHorizontal className="h-5 w-5" /> Filter
-                          Prioritas
-                        </div>
-                      </DialogTitle>
-                      <DialogDescription>
-                        Filter rekomendasi berdasarkan kritikalitas
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-6 py-4">
-                      <div className="grid gap-2">
-                        <Label>Kritikalitas</Label>
-                        <Select>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Semua" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">Semua</SelectItem>
-                            <SelectItem value="KRITIS">Kritis</SelectItem>
-                            <SelectItem value="TINGGI">Tinggi</SelectItem>
-                            <SelectItem value="SEDANG">Sedang</SelectItem>
-                            <SelectItem value="RENDAH">Rendah</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <div className="flex justify-end">
-                      <Button onClick={() => setIsFilterOpen(false)}>
-                        Terapkan
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
-
               {/* Prioritas List */}
               <div className="space-y-4">
-                {prioritasList
-                  .filter(
-                    (item) =>
-                      !debouncedQ ||
-                      item.deskripsi
-                        .toLowerCase()
-                        .includes(debouncedQ.toLowerCase()) ||
-                      item.alasanAnalisis
-                        .toLowerCase()
-                        .includes(debouncedQ.toLowerCase()),
-                  )
-                  .map((item, idx) => {
-                    const priorityBadge = getPriorityBadge(idx);
-                    const priorityColor = getPriorityColor(idx);
-                    const isExpanded =
-                      expandedPriorities[item.fingerprint] || false;
+                {prioritasList.map((item, idx) => {
+                  const priorityBadge = getPriorityBadge(idx);
+                  const priorityColor = getPriorityColor(idx);
+                  const isExpanded =
+                    expandedPriorities[item.fingerprint] || false;
 
-                    return (
-                      <Card
-                        key={item.fingerprint || idx}
-                        className="group border-0 shadow-lg shadow-slate-200/50 bg-white rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-500 hover:-translate-y-1"
-                      >
-                        <div
-                          className={`h-2 bg-linear-to-r ${priorityColor}`}
-                        />
-                        <CardContent className="p-6 sm:p-8">
-                          <div className="flex flex-col lg:flex-row gap-6">
-                            <div className="shrink-0">
-                              <div className="relative">
-                                <div
-                                  className={`absolute inset-0 bg-linear-to-br ${priorityColor} rounded-2xl blur-lg opacity-20 group-hover:opacity-40 transition-opacity`}
-                                />
-                                <div className="relative w-20 h-20 rounded-2xl bg-linear-to-br from-slate-50 to-white border border-slate-200 flex items-center justify-center shadow-sm">
-                                  <span className="text-4xl font-bold bg-linear-to-br from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                                    {item.prioritasKe}
-                                  </span>
+                  const hasInputData =
+                    (item.usedMasukanIds && item.usedMasukanIds.length > 0) ||
+                    (item.usedDataMasterIds &&
+                      item.usedDataMasterIds.length > 0);
+
+                  return (
+                    <Card
+                      key={item.fingerprint || idx}
+                      className="group border-0 shadow-lg shadow-slate-200/50 bg-white rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-500 hover:-translate-y-1"
+                    >
+                      <div className={`h-2 bg-linear-to-r ${priorityColor}`} />
+                      <CardContent className="p-4 sm:p-8">
+                        <div className="flex flex-col lg:flex-row gap-6">
+                          <div className="shrink-0">
+                            <div className="relative">
+                              <div
+                                className={`absolute inset-0 bg-linear-to-br ${priorityColor} rounded-2xl blur-lg opacity-20 group-hover:opacity-40 transition-opacity`}
+                              />
+                              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-linear-to-br from-slate-50 to-white border border-slate-200 flex items-center justify-center shadow-sm">
+                                <span className="text-3xl sm:text-4xl font-bold bg-linear-to-br from-slate-800 to-slate-600 bg-clip-text text-transparent">
+                                  {item.prioritasKe}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+                              <div className="space-y-2">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <h3 className="text-lg sm:text-xl font-bold text-slate-800 wrap-break-word">
+                                    {item.deskripsi}
+                                  </h3>
+                                </div>
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <Badge
+                                    className={`${priorityBadge.color} text-white text-[10px] sm:text-xs font-medium px-2 py-0.5 sm:px-3 sm:py-1`}
+                                  >
+                                    {priorityBadge.label}
+                                  </Badge>
+                                  <Badge
+                                    variant="outline"
+                                    className="flex items-center gap-1 bg-amber-50 text-amber-700 border-amber-200 font-medium text-[10px] sm:text-xs"
+                                  >
+                                    <StarIcon className="h-3 w-3 fill-amber-500 text-amber-500" />{" "}
+                                    Skor: {item.skorPrioritas.toFixed(2)}
+                                  </Badge>
+                                  {item.evidence?.kritikalitas && (
+                                    <Badge
+                                      variant="secondary"
+                                      className="text-[10px] sm:text-xs"
+                                    >
+                                      {item.evidence.kritikalitas}
+                                    </Badge>
+                                  )}
                                 </div>
                               </div>
                             </div>
-                            <div className="flex-1">
-                              <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
-                                <div className="space-y-2">
-                                  <div className="flex flex-wrap items-center gap-3">
-                                    <h3 className="text-xl font-bold text-slate-800">
-                                      {item.deskripsi}
-                                    </h3>
-                                  </div>
-                                  <div className="flex flex-wrap items-center gap-2">
-                                    <Badge
-                                      className={`${priorityBadge.color} text-white text-xs font-medium px-3 py-1`}
-                                    >
-                                      {priorityBadge.label}
-                                    </Badge>
-                                    <Badge
-                                      variant="outline"
-                                      className="flex items-center gap-1 bg-amber-50 text-amber-700 border-amber-200 font-medium"
-                                    >
-                                      <StarIcon className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />{" "}
-                                      Skor: {item.skorPrioritas.toFixed(2)}
-                                    </Badge>
-                                    {item.evidence?.kritikalitas && (
-                                      <Badge
-                                        variant="secondary"
-                                        className="text-xs"
-                                      >
-                                        {item.evidence.kritikalitas}
-                                      </Badge>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
 
-                              {/* Warning */}
-                              {item.warning && (
-                                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3 flex items-start gap-2">
-                                  <AlertCircleIcon className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
-                                  <p className="text-sm text-amber-800">
-                                    {item.warning}
+                            {item.warning && (
+                              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3 flex items-start gap-2">
+                                <AlertCircleIcon className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600 shrink-0 mt-0.5" />
+                                <p className="text-xs sm:text-sm text-amber-800">
+                                  {item.warning}
+                                </p>
+                              </div>
+                            )}
+
+                            <div className="space-y-3 mb-4">
+                              <div className="flex items-start gap-2">
+                                <CheckCircleIcon className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-500 shrink-0 mt-0.5" />
+                                <div>
+                                  <p className="text-xs sm:text-sm font-medium text-slate-700">
+                                    Analisis
+                                  </p>
+                                  <p className="text-slate-600 text-sm sm:text-base">
+                                    {item.alasanAnalisis}
                                   </p>
                                 </div>
-                              )}
+                              </div>
+                            </div>
 
-                              <div className="space-y-3 mb-4">
-                                <div className="flex items-start gap-2">
-                                  <CheckCircleIcon className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
-                                  <div>
-                                    <p className="text-sm font-medium text-slate-700">
-                                      Analisis
+                            {item.evidence && (
+                              <div className="mt-6 pt-6 border-t border-slate-100">
+                                <div className="flex items-center justify-between mb-4">
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-amber-50 flex items-center justify-center">
+                                      <UsersIcon className="h-3 w-3 sm:h-4 sm:w-4 text-amber-600" />
+                                    </div>
+                                    <h4 className="text-xs sm:text-sm font-semibold text-slate-700">
+                                      Evidence Data
+                                    </h4>
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                                  <div className="bg-slate-50 rounded-lg p-2 sm:p-3 text-center">
+                                    <p className="text-lg sm:text-2xl font-bold text-slate-800">
+                                      {item.evidence.masukanWargaCount || 0}
                                     </p>
-                                    <p className="text-slate-600">
-                                      {item.alasanAnalisis}
+                                    <p className="text-[10px] sm:text-xs text-slate-500">
+                                      Masukan Warga
+                                    </p>
+                                  </div>
+                                  <div className="bg-slate-50 rounded-lg p-2 sm:p-3 text-center">
+                                    <p className="text-lg sm:text-2xl font-bold text-slate-800">
+                                      {item.evidence.dataMasterCount || 0}
+                                    </p>
+                                    <p className="text-[10px] sm:text-xs text-slate-500">
+                                      Data Master
+                                    </p>
+                                  </div>
+                                  <div className="bg-slate-50 rounded-lg p-2 sm:p-3 text-center">
+                                    <p className="text-lg sm:text-2xl font-bold text-slate-800">
+                                      {item.evidence.kritikalitas || "-"}
+                                    </p>
+                                    <p className="text-[10px] sm:text-xs text-slate-500">
+                                      Kritikalitas
                                     </p>
                                   </div>
                                 </div>
                               </div>
+                            )}
 
-                              {item.evidence && (
-                                <div className="mt-6 pt-6 border-t border-slate-100">
-                                  <div className="flex items-center justify-between mb-4">
-                                    <div className="flex items-center gap-2">
-                                      <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
-                                        <UsersIcon className="h-4 w-4 text-amber-600" />
-                                      </div>
-                                      <h4 className="text-sm font-semibold text-slate-700">
-                                        Evidence Data
-                                      </h4>
-                                    </div>
-                                  </div>
-                                  <div className="grid gap-3 sm:grid-cols-3">
-                                    <div className="bg-slate-50 rounded-lg p-3 text-center">
-                                      <p className="text-2xl font-bold text-slate-800">
-                                        {item.evidence.masukanWargaCount || 0}
-                                      </p>
-                                      <p className="text-xs text-slate-500">
-                                        Masukan Warga
-                                      </p>
-                                    </div>
-                                    <div className="bg-slate-50 rounded-lg p-3 text-center">
-                                      <p className="text-2xl font-bold text-slate-800">
-                                        {item.evidence.dataMasterCount || 0}
-                                      </p>
-                                      <p className="text-xs text-slate-500">
-                                        Data Master
-                                      </p>
-                                    </div>
-                                    <div className="bg-slate-50 rounded-lg p-3 text-center">
-                                      <p className="text-2xl font-bold text-slate-800">
-                                        {item.evidence.kritikalitas || "-"}
-                                      </p>
-                                      <p className="text-xs text-slate-500">
-                                        Kritikalitas
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-
+                            {hasInputData && (
                               <div className="mt-4 flex justify-end">
                                 <Button
                                   variant="ghost"
@@ -851,14 +738,17 @@ export default function KegiatanRapatDetail() {
                                     : "Lihat Data Input"}
                                 </Button>
                               </div>
+                            )}
 
-                              {isExpanded && rekomendasiData?.inputData && (
+                            {isExpanded &&
+                              hasInputData &&
+                              rekomendasiData?.inputData && (
                                 <div className="mt-4 pt-4 border-t border-slate-100">
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {item.usedMasukanIds &&
                                       item.usedMasukanIds.length > 0 && (
                                         <div>
-                                          <h5 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
+                                          <h5 className="text-xs sm:text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
                                             <UsersIcon className="h-4 w-4" />{" "}
                                             Masukan Warga Terkait
                                           </h5>
@@ -882,7 +772,7 @@ export default function KegiatanRapatDetail() {
                                                   </p>
                                                   <Badge
                                                     variant="outline"
-                                                    className="mt-1"
+                                                    className="mt-1 text-[10px]"
                                                   >
                                                     Lokasi: {m.lokasi}
                                                   </Badge>
@@ -894,7 +784,7 @@ export default function KegiatanRapatDetail() {
                                     {item.usedDataMasterIds &&
                                       item.usedDataMasterIds.length > 0 && (
                                         <div>
-                                          <h5 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
+                                          <h5 className="text-xs sm:text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
                                             <TargetIcon className="h-4 w-4" />{" "}
                                             Data Master Terkait
                                           </h5>
@@ -913,14 +803,25 @@ export default function KegiatanRapatDetail() {
                                                   <p className="font-medium">
                                                     {d.namaAtribut}
                                                   </p>
-                                                  <div className="flex items-center gap-2 mt-1">
+                                                  <div className="flex items-center gap-2 mt-1 flex-wrap">
                                                     <Badge
-                                                      className={`text-xs ${d.kritikalitas === "KRITIS" ? "bg-red-100 text-red-700" : d.kritikalitas === "TINGGI" ? "bg-orange-100 text-orange-700" : d.kritikalitas === "SEDANG" ? "bg-yellow-100 text-yellow-700" : "bg-green-100 text-green-700"}`}
+                                                      className={`text-[10px] ${
+                                                        d.kritikalitas ===
+                                                        "KRITIS"
+                                                          ? "bg-red-100 text-red-700"
+                                                          : d.kritikalitas ===
+                                                              "TINGGI"
+                                                            ? "bg-orange-100 text-orange-700"
+                                                            : d.kritikalitas ===
+                                                                "SEDANG"
+                                                              ? "bg-yellow-100 text-yellow-700"
+                                                              : "bg-green-100 text-green-700"
+                                                      }`}
                                                     >
                                                       {d.kritikalitas}
                                                     </Badge>
                                                     {d.jumlah !== null && (
-                                                      <span>
+                                                      <span className="text-[10px]">
                                                         Jml: {d.jumlah}
                                                       </span>
                                                     )}
@@ -933,42 +834,25 @@ export default function KegiatanRapatDetail() {
                                   </div>
                                 </div>
                               )}
-                            </div>
                           </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
-
-              {debouncedQ &&
-                prioritasList.filter(
-                  (item) =>
-                    item.deskripsi
-                      .toLowerCase()
-                      .includes(debouncedQ.toLowerCase()) ||
-                    item.alasanAnalisis
-                      .toLowerCase()
-                      .includes(debouncedQ.toLowerCase()),
-                ).length === 0 && (
-                  <Card className="border-0 bg-white rounded-2xl p-8 text-center">
-                    <p className="text-slate-500">
-                      Tidak ada prioritas yang cocok dengan "{debouncedQ}"
-                    </p>
-                  </Card>
-                )}
             </div>
           )}
 
           {prioritasList.length === 0 && (
-            <Card className="border-0 bg-white rounded-2xl p-12 text-center shadow-lg">
-              <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-slate-50 flex items-center justify-center">
-                <FileTextIcon className="h-10 w-10 text-slate-400" />
+            <Card className="border-0 bg-white rounded-2xl p-8 sm:p-12 text-center shadow-lg">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-2xl bg-slate-50 flex items-center justify-center">
+                <FileTextIcon className="h-8 w-8 sm:h-10 sm:w-10 text-slate-400" />
               </div>
-              <p className="text-slate-500 text-lg font-medium">
+              <p className="text-slate-500 text-base sm:text-lg font-medium">
                 Belum ada rekomendasi prioritas untuk kegiatan ini
               </p>
-              <p className="text-slate-400 text-sm mt-2">
+              <p className="text-slate-400 text-xs sm:text-sm mt-2">
                 Generate rekomendasi AI untuk mendapatkan prioritas berbasis
                 data
               </p>
@@ -978,20 +862,20 @@ export default function KegiatanRapatDetail() {
           {/* Footer Actions */}
           <div className="mt-10 pt-8 border-t border-slate-200">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-2 text-sm text-slate-500">
+              <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 text-center sm:text-left">
                 <TrendingUpIcon className="h-4 w-4" />
                 <span>
                   Dokumen ini dihasilkan oleh sistem AI dan memerlukan
                   verifikasi manual
                 </span>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 {kegiatan.statusRekomendasi === StatusRekomendasi.DISETUJUI && (
                   <Button
                     variant="outline"
                     onClick={handleExportPDF}
                     disabled={isExporting}
-                    className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl gap-2"
+                    className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl gap-2 text-xs sm:text-sm"
                   >
                     {isExporting ? (
                       <>
@@ -1013,7 +897,7 @@ export default function KegiatanRapatDetail() {
                           setPendingAction("terima");
                           setOpenConfirmDialog(true);
                         }}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/30 rounded-xl"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/30 rounded-xl text-xs sm:text-sm"
                       >
                         Terima
                       </Button>
@@ -1023,7 +907,7 @@ export default function KegiatanRapatDetail() {
                           setOpenConfirmDialog(true);
                         }}
                         variant="destructive"
-                        className="bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-500/30 rounded-xl"
+                        className="bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-500/30 rounded-xl text-xs sm:text-sm"
                       >
                         Tolak
                       </Button>

@@ -29,7 +29,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 interface WargaFormProps {
-  id?: string; // jika ada -> mode edit
+  id?: string;
   role?: "admin" | "lurah" | "perangkat";
 }
 
@@ -141,7 +141,11 @@ export function WargaForm({ id, role = "admin" }: WargaFormProps) {
                 <Label htmlFor="nama">
                   Nama Lengkap <span className="text-red-500">*</span>
                 </Label>
-                <Input id="nama" {...form.register("nama")} />
+                <Input
+                  id="nama"
+                  placeholder="Masukkan nama lengkap"
+                  {...form.register("nama")}
+                />
                 {form.formState.errors.nama && (
                   <p className="text-sm text-red-500">
                     {form.formState.errors.nama.message}
@@ -152,7 +156,11 @@ export function WargaForm({ id, role = "admin" }: WargaFormProps) {
                 <Label htmlFor="noHp">
                   Nomor HP <span className="text-red-500">*</span>
                 </Label>
-                <Input id="noHp" {...form.register("noHp")} />
+                <Input
+                  id="noHp"
+                  placeholder="Contoh: 08123456789"
+                  {...form.register("noHp")}
+                />
                 {form.formState.errors.noHp && (
                   <p className="text-sm text-red-500">
                     {form.formState.errors.noHp.message}
@@ -162,7 +170,12 @@ export function WargaForm({ id, role = "admin" }: WargaFormProps) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="alamat">Alamat</Label>
-              <Textarea id="alamat" rows={3} {...form.register("alamat")} />
+              <Textarea
+                id="alamat"
+                rows={3}
+                placeholder="Masukkan alamat lengkap"
+                {...form.register("alamat")}
+              />
             </div>
 
             <div className="flex justify-end gap-3 pt-4">

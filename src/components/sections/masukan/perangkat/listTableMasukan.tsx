@@ -517,12 +517,12 @@ export default function MasukanListTable() {
               </div>
             </DialogContent>
           </Dialog>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-1 min-w-0">
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Cari judul / nama pelapor / no HP..."
-              className="min-w-62.5"
+              className="w-full min-w-0"
             />
             {q && (
               <Button variant="outline" onClick={() => setQ("")}>

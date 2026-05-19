@@ -654,7 +654,7 @@ export default function ListJadwalKegiatan() {
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Header */}
           <div className="mb-12">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-xl shadow-blue-500/30">
                   <Calendar className="h-7 w-7 text-white" />
@@ -670,7 +670,7 @@ export default function ListJadwalKegiatan() {
               </div>
               <Button
                 onClick={() => router.push("/admin/jadwal-program/add")}
-                className="gap-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl px-6 py-3 transition-all duration-300 hover:shadow-blue-500/50 hover:scale-105 font-medium"
+                className="gap-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 rounded-xl px-6 py-3 transition-all duration-300 hover:shadow-blue-500/50 hover:scale-105 font-medium w-full sm:w-auto"
               >
                 <Plus className="h-5 w-5" />
                 Tambah Kegiatan
@@ -731,14 +731,16 @@ export default function ListJadwalKegiatan() {
           </div>
 
           {/* Toolbar */}
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-10">
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="relative group">
+          <div className="flex flex-col gap-4 mb-10">
+            {/* Baris pertama: Search + Badge count */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+              {/* Search input - mengambil ruang fleksibel */}
+              <div className="relative group flex-1">
                 <div className="absolute inset-0 bg-linear-to-r from-blue-500/10 to-indigo-500/10 rounded-xl blur opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none" />
-                <XIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
+                <XIcon className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-slate-400 pointer-events-none" />
                 <Input
                   placeholder="Cari nama / lokasi / deskripsi..."
-                  className="pl-12 pr-12 py-3 w-72 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-sm relative z-10"
+                  className="pl-8 sm:pl-12 pr-8 sm:pr-12 py-2 sm:py-3 w-full bg-white border border-slate-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-sm relative z-10 text-sm sm:text-base"
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   onKeyDown={(e) => {
@@ -748,17 +750,28 @@ export default function ListJadwalKegiatan() {
                 {q && (
                   <button
                     onClick={() => setQ("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full p-1 transition-all z-20"
+                    className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full p-1 transition-all z-20"
                   >
-                    <X className="h-4 w-4" />
+                    <X className="h-3 w-3 sm:h-4 sm:w-4" />
                   </button>
                 )}
               </div>
 
+              {/* Badge jumlah kegiatan */}
+              <Badge
+                variant="outline"
+                className="bg-slate-100 border-slate-200 text-slate-600 px-3 py-1 sm:px-4 sm:py-2 rounded-xl font-medium text-sm sm:text-base whitespace-nowrap self-start sm:self-center"
+              >
+                {data?.length || 0} kegiatan
+              </Badge>
+            </div>
+
+            {/* Baris kedua: Tombol filter */}
+            <div className="flex justify-start">
               <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
                 <Button
                   variant="outline"
-                  className="cursor-pointer border-slate-200"
+                  className="cursor-pointer border-slate-200 w-full sm:w-auto"
                   onClick={() => setIsFilterOpen(true)}
                 >
                   <Filter className="mr-2 h-4 w-4" />
@@ -779,7 +792,8 @@ export default function ListJadwalKegiatan() {
                     </Badge>
                   )}
                 </Button>
-                <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+
+                <DialogContent className="w-[calc(100%-2rem)] max-w-lg sm:max-w-2xl rounded-lg max-h-[90vh] overflow-y-auto p-4 sm:p-6">
                   <DialogHeader>
                     <DialogTitle>
                       <div className="flex items-center gap-2">
@@ -791,7 +805,8 @@ export default function ListJadwalKegiatan() {
                       Atur filter dan urutan data kegiatan rapat
                     </DialogDescription>
                   </DialogHeader>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 py-4">
                     {/* Domain Isu */}
                     <div className="grid gap-2">
                       <Label>Domain Isu</Label>
@@ -903,7 +918,7 @@ export default function ListJadwalKegiatan() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <Button
                         variant={sortOrder === "asc" ? "default" : "outline"}
                         className="flex-1"
@@ -923,23 +938,23 @@ export default function ListJadwalKegiatan() {
                     </div>
                   </div>
 
-                  <div className="flex justify-between gap-2 mt-6">
-                    <Button variant="outline" onClick={clearFilters}>
+                  <div className="flex flex-col-reverse sm:flex-row justify-between gap-2 mt-6">
+                    <Button
+                      variant="outline"
+                      onClick={clearFilters}
+                      className="sm:w-auto"
+                    >
                       Reset
                     </Button>
-                    <Button onClick={() => setIsFilterOpen(false)}>
+                    <Button
+                      onClick={() => setIsFilterOpen(false)}
+                      className="sm:w-auto"
+                    >
                       Terapkan
                     </Button>
                   </div>
                 </DialogContent>
               </Dialog>
-
-              <Badge
-                variant="outline"
-                className="bg-slate-100 border-slate-200 text-slate-600 px-4 py-2 rounded-xl font-medium"
-              >
-                {data?.length || 0} kegiatan
-              </Badge>
             </div>
           </div>
 
@@ -1242,7 +1257,7 @@ export default function ListJadwalKegiatan() {
                                       </div>
                                     </div>
                                   )}
-                                  <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-slate-100">
+                                  <div className="flex flex-wrap justify-end gap-2 mt-4 pt-4 border-t border-slate-100">
                                     <Button
                                       size="sm"
                                       variant="outline"
@@ -1252,11 +1267,12 @@ export default function ListJadwalKegiatan() {
                                           `/admin/jadwal-program/${k.id}`,
                                         );
                                       }}
-                                      className="cursor-pointer"
+                                      className="cursor-pointer flex-1 sm:flex-none"
                                     >
                                       <Eye className="h-4 w-4 mr-1" />
                                       Detail
                                     </Button>
+
                                     {(k.statusRekomendasi ===
                                       StatusRekomendasi.DRAFT ||
                                       k.statusRekomendasi ===
@@ -1271,7 +1287,7 @@ export default function ListJadwalKegiatan() {
                                               `/admin/jadwal-program/${k.id}/edit`,
                                             );
                                           }}
-                                          className="cursor-pointer"
+                                          className="cursor-pointer flex-1 sm:flex-none"
                                         >
                                           <Edit className="h-4 w-4 mr-1" />
                                           Edit
@@ -1283,7 +1299,7 @@ export default function ListJadwalKegiatan() {
                                             e.stopPropagation();
                                             setSelectedDeleteId(k.id);
                                           }}
-                                          className="cursor-pointer"
+                                          className="cursor-pointer flex-1 sm:flex-none"
                                         >
                                           <Trash className="h-4 w-4" />
                                         </Button>
@@ -1318,7 +1334,7 @@ export default function ListJadwalKegiatan() {
                       >
                         <ChevronLeft className="h-4 w-4" />
                       </Button>
-                      <span className="px-4 py-2 bg-slate-100 rounded-xl font-medium text-slate-600">
+                      <span className="px-3 sm:px-4 py-1.5 sm:py-2 bg-slate-100 rounded-xl font-medium text-slate-600 text-xs sm:text-sm whitespace-nowrap">
                         Halaman {pageNumber} dari {meta.totalPages}
                       </span>
                       <Button

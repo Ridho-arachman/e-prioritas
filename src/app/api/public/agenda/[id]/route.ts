@@ -23,7 +23,7 @@ export async function GET(
           include: {
             masukan: {
               include: {
-                warga: { select: { nama: true } }, // ambil nama dari warga
+                warga: { select: { nama: true } },
               },
             },
           },
@@ -59,7 +59,7 @@ export async function GET(
       }),
       lokasi: agenda.lokasi,
       domainIsu: agenda.domainIsu,
-      mode: agenda.mode,
+      // ❌ hapus mode: agenda.mode,
       judulLaporan: agenda.judulLaporan,
       rekomendasiItems: agenda.rekomendasiItems,
       statusRekomendasi: agenda.statusRekomendasi,

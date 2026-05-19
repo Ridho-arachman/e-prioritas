@@ -284,7 +284,7 @@ export default function ListTableDataMaster() {
   });
 
   const [page, setPage] = useQueryState("page", { defaultValue: "1" });
-  const [limit] = useQueryState("limit", { defaultValue: "2" });
+  const [limit] = useQueryState("limit", { defaultValue: "10" });
 
   const [sortBy, setSortBy] = useQueryState("sortBy", {
     defaultValue: "updatedAt",
@@ -911,8 +911,9 @@ export default function ListTableDataMaster() {
               >
                 <ChevronLeft className="h-4 w-4" /> Prev
               </Button>
-              <span className="px-4 py-2 bg-muted rounded-md text-sm whitespace-nowrap">
-                Halaman {pageNumber} dari {meta?.totalPages || 1}
+              <span className="px-2 sm:px-4 py-1 sm:py-2 bg-muted rounded-md text-xs sm:text-sm whitespace-nowrap">
+                <span className="hidden sm:inline">Halaman </span>
+                {pageNumber} / {meta?.totalPages || 1}
               </span>
               <Button
                 size="sm"

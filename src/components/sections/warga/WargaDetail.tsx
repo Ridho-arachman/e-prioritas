@@ -119,7 +119,7 @@ export function WargaDetail({ id, role = "admin" }: WargaDetailProps) {
 
       <Card className="w-full mx-auto">
         <CardHeader className="border-b">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex items-center gap-4">
               <Button
                 variant="outline"
@@ -136,12 +136,14 @@ export function WargaDetail({ id, role = "admin" }: WargaDetailProps) {
                 onClick={() =>
                   router.push(`/${role}/kelola-warga/${data.id}/edit`)
                 }
+                className="flex-1 sm:flex-none"
               >
                 <Edit className="h-4 w-4 mr-2" /> Edit
               </Button>
               <Button
                 variant="destructive"
                 onClick={() => setShowDeleteDialog(true)}
+                className="flex-1 sm:flex-none"
               >
                 <Trash className="h-4 w-4 mr-2" /> Hapus
               </Button>

@@ -602,7 +602,7 @@ export default function MasukanListTable() {
                 <TableHead className="text-center font-semibold w-32.5 max-w-32.5">
                   No. HP
                 </TableHead>
-                <TableHead className="text-center font-semibold w-[100px] max-w-[100px]">
+                <TableHead className="text-center font-semibold w-25 max-w-25">
                   Status
                 </TableHead>
                 <TableHead
@@ -737,8 +737,9 @@ export default function MasukanListTable() {
             >
               <ChevronLeft className="h-4 w-4" /> Prev
             </Button>
-            <span className="px-4 py-2 bg-muted rounded-md">
-              Halaman {pageNumber} dari {paginationMeta.totalPages}
+            <span className="px-2 sm:px-4 py-1 sm:py-2 bg-muted rounded-md text-xs sm:text-sm whitespace-nowrap">
+              <span className="hidden sm:inline">Halaman </span>
+              {pageNumber} / {paginationMeta.totalPages}
             </span>
             <Button
               size="sm"
