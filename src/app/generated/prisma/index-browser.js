@@ -283,6 +283,18 @@ exports.Prisma.WargaScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.SuratScalarFieldEnum = {
+  id: 'id',
+  nama: 'nama',
+  deskripsi: 'deskripsi',
+  ikon: 'ikon',
+  persyaratan: 'persyaratan',
+  linkForm: 'linkForm',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -360,7 +372,8 @@ exports.Prisma.ModelName = {
   Verification: 'Verification',
   RateLimit: 'RateLimit',
   ProgramKelurahan: 'ProgramKelurahan',
-  Warga: 'Warga'
+  Warga: 'Warga',
+  Surat: 'Surat'
 };
 
 /**

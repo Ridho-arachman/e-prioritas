@@ -369,3 +369,17 @@ model Warga {
   @@index([noHp])
   @@map("warga")
 }
+
+model Surat {
+  id          String   @id @default(cuid())
+  nama        String   @db.VarChar(255)
+  deskripsi   String   @db.Text
+  ikon        String   @db.VarChar(50)
+  persyaratan String[] // atau Json jika pakai MySQL
+  linkForm    String   @db.Text
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("surat")
+}
