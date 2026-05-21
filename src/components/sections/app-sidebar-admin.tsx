@@ -5,7 +5,6 @@ import {
   ClipboardList,
   Database,
   LayoutDashboard,
-  MailOpen,
   MessageCircleMore,
   MessageCircleQuestion,
   Settings2,
@@ -33,11 +32,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: "/admin",
         icon: LayoutDashboard,
       },
-      {
-        title: "Kelola Surat Menyurat",
-        url: "/admin/kelola-surat",
-        icon: MailOpen,
-      },
+      // {
+      //   title: "Kelola Surat Menyurat",
+      //   url: "/admin/kelola-surat",
+      //   icon: MailOpen,
+      // },
       {
         title: "Kelola Perangkat",
         url: "/admin/kelola-perangkat",
