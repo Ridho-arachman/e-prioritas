@@ -6,6 +6,10 @@ import prisma from "./prisma";
 import { sendEmail } from "./sendEmail";
 
 export const auth = betterAuth({
+  trustedOrigins: [
+    "https://panggungjati.my.id",
+    "https://www.panggungjati.my.id",
+  ],
   rateLimit: {
     enabled: true,
     window: 1, // time window in seconds
@@ -32,6 +36,7 @@ export const auth = betterAuth({
       disableSignUp: true,
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      redirectURI: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback/google`,
       // disableImplicitSignUp: false,
     },
   },

@@ -1,4 +1,5 @@
 import { Role } from "@/app/generated/prisma";
+import { config } from "@/config";
 import { auth } from "@/lib/auth";
 import { handleBetterAuthError } from "@/lib/handleBetterAuthError";
 import { handleResponse } from "@/lib/handleResponse";
@@ -38,7 +39,7 @@ export const PATCH = async (req: NextRequest) => {
     const res = await auth.api.changeEmail({
       body: {
         newEmail: email,
-        callbackURL: "http://localhost:3000/verify-success",
+        callbackURL: `${config.appUrl}/verify-success`,
       },
       headers: await headers(),
     });
