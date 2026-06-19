@@ -30,7 +30,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // ✅ Dekripsi nomor HP (sebaiknya tambahkan try‑catch)
     const decryptedNoHp = decrypt(warga.noHp);
+
     const expiresAt = Date.now() + 24 * 60 * 60 * 1000;
     const payload = `${warga.id}:${expiresAt}`;
     const secret = process.env.NEXTAUTH_SECRET || "fallback-secret-change-me";
@@ -48,14 +50,50 @@ export async function POST(req: NextRequest) {
 
     const message = `Halo Kak, ini dari tim administrasi.\n\nKlik link berikut untuk verifikasi nomor WhatsApp Anda:\n${verifyUrl}\n\n⚠️ Link berlaku 24 jam.\nTerima kasih 🙏`;
 
+    // ✅ Format nomor untuk Fonnte (628xxxxxxxxxx)
     const phone = decryptedNoHp.replace(/\D/g, "").replace(/^0/, "62");
-    const waLink = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 
-    return NextResponse.json({ waLink, verifyUrl });
+    // ✅ Kirim langsung melalui Fonnte API
+    const fonnteToken = process.env.FONNTE_API_KEY;
+    if (!fonnteToken) {
+      console.error("FONNTE_API_KEY tidak diatur");
+      return NextResponse.json(
+        { error: "Konfigurasi layanan pesan belum siap" },
+        { status: 500 },
+      );
+    }
+
+    const fonnteResponse = await fetch("https://api.fonnte.com/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: fonnteToken,
+      },
+      body: JSON.stringify({
+        target: phone,
+        message: message,
+      }),
+    });
+
+    if (!fonnteResponse.ok) {
+      const errorText = await fonnteResponse.text();
+      console.error("Fonnte API error:", fonnteResponse.status, errorText);
+      return NextResponse.json(
+        { error: "Gagal mengirim pesan WhatsApp" },
+        { status: 502 },
+      );
+    }
+
+    // ✅ Kembalikan verifyUrl untuk referensi admin (opsional)
+    return NextResponse.json({
+      success: true,
+      message: "Pesan verifikasi telah dikirim via WhatsApp",
+      verifyUrl,
+    });
   } catch (error) {
     console.error("send-verification error:", error);
     return NextResponse.json(
-      { error: "Gagal membuat link verifikasi" },
+      { error: "Gagal membuat atau mengirim link verifikasi" },
       { status: 500 },
     );
   }

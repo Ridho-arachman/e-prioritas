@@ -1,12 +1,12 @@
+import { Role } from "@/app/generated/prisma";
 import { auth } from "@/lib/auth";
 import { handlePrismaError } from "@/lib/handlePrismaError";
-import { handleZodValidation } from "@/lib/handleZodValidation";
 import { handleResponse } from "@/lib/handleResponse";
+import { handleZodValidation } from "@/lib/handleZodValidation";
+import prisma from "@/lib/prisma";
 import { dataMasterArraySchema } from "@/schema/dataMasterSchema";
-import { dataMasterService } from "@/services/dataMasterService";
-import { NextRequest } from "next/server";
-import { Role } from "@/app/generated/prisma";
 import { headers } from "next/headers";
+import { NextRequest } from "next/server";
 
 export const POST = async (req: NextRequest) => {
   const allowedRoles: Role[] = ["ADMIN", "PERANGKAT_DESA"];
@@ -31,7 +31,6 @@ export const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();
 
-    // Menerima format: langsung array atau { data: [...] }
     let items = body;
     if (
       body &&
@@ -59,15 +58,79 @@ export const POST = async (req: NextRequest) => {
       diprosesOlehId: session.user.id,
     }));
 
-    const result = await dataMasterService.createMany(data);
+    // --- PROSES SATU PER SATU TANPA TRANSAKSI ---
+    const successCount = { value: 0 };
+    const errors: { row: number; message: string }[] = [];
+
+    for (let i = 0; i < data.length; i++) {
+      try {
+        await prisma.dataMaster.create({ data: data[i] });
+        successCount.value++;
+      } catch (err: any) {
+        if (err && typeof err === "object" && "code" in err) {
+          const code = err.code as string;
+          let message = "";
+          switch (code) {
+            case "P2002": {
+              let fields = "";
+              const meta = (err as any).meta;
+              if (meta?.target) {
+                fields = Array.isArray(meta.target)
+                  ? meta.target.join(", ")
+                  : String(meta.target);
+              } else {
+                const msg: string = err.message || "";
+                const match = msg.match(/fields:\s*\(([^)]+)\)/i);
+                if (match) {
+                  fields = match[1]
+                    .split(",")
+                    .map((f: string) => f.trim().replace(/[`'"]/g, ""))
+                    .join(", ");
+                }
+              }
+              if (!fields) fields = "unknown";
+              message = `Duplikat pada kolom: ${fields}`;
+              break;
+            }
+            case "P2003":
+              message = "Relasi foreign key tidak valid";
+              break;
+            case "P2000":
+              message = "Nilai field terlalu panjang";
+              break;
+            default:
+              message = `Error database (${code})`;
+          }
+          errors.push({ row: i + 1, message });
+        } else {
+          errors.push({
+            row: i + 1,
+            message: err.message || "Gagal menyimpan",
+          });
+        }
+      }
+    }
+
+    // --- RESPONS ---
+    if (errors.length > 0) {
+      return handleResponse({
+        success: successCount.value > 0,
+        message:
+          successCount.value > 0
+            ? `${successCount.value} data berhasil, ${errors.length} gagal.`
+            : "Semua data gagal diimport.",
+        data: { count: successCount.value, errors },
+        status: successCount.value > 0 ? 201 : 409,
+      });
+    }
 
     return handleResponse({
       success: true,
-      message: `${result.count} data berhasil ditambahkan`,
-      data: { count: result.count },
+      message: `${successCount.value} data berhasil ditambahkan`,
+      data: { count: successCount.value },
       status: 201,
     });
-  } catch (err) {
+  } catch (err: any) {
     console.error("[IMPORT_DATA_MASTER_POST]", err);
     const prismaResponse = handlePrismaError(err);
     if (prismaResponse) {

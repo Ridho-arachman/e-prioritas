@@ -61,7 +61,7 @@ export default function VerifyPage() {
               <p className="text-muted-foreground">{message}</p>
               {/* ✅ Tombol Kembali */}
               <Button
-                onClick={() => router.back()}
+                onClick={() => router.push("/masukan")}
                 variant="outline"
                 className="mt-2"
               >

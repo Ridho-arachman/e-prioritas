@@ -1,9 +1,5 @@
 // src/lib/buildPrompt.ts
 
-// ═══════════════════════════════════════════════════════════════
-// 📦 TYPE DEFINITIONS (Sesuai dengan query Prisma)
-// ═══════════════════════════════════════════════════════════════
-
 export type MasukanWargaInput = {
   id: string;
   judul: string;
@@ -38,10 +34,6 @@ export type PromptArgs = {
   runningPrograms?: RunningProgram[];
 };
 
-// ═══════════════════════════════════════════════════════════════
-// 🔧 HELPER: Truncate data untuk hindari token limit
-// ═══════════════════════════════════════════════════════════════
-
 function truncateData<T extends Record<string, any>>(
   items: T[],
   maxItems: number,
@@ -59,10 +51,6 @@ function truncateData<T extends Record<string, any>>(
     return truncated as T;
   });
 }
-
-// ═══════════════════════════════════════════════════════════════
-// 🎯 MAIN FUNCTION: Build Prompt
-// ═══════════════════════════════════════════════════════════════
 
 export function buildPrompt(args: PromptArgs): string {
   const {
@@ -98,7 +86,9 @@ ATURAN WAJIB:
 2. Fokus analisis pada domain isu: "${domainIsuCode}".
 3. Hindari duplikasi dengan judul yang ada di daftar pengecualian.
 4. Semua field string wajib diisi (gunakan "" jika tidak ada data), jangan null.
-5. skorPrioritas harus angka 0.00 - 1.00 dengan 2 desimal.
+5. Setiap rekomendasi DAPAT dan SEBAIKNYA didukung oleh LEBIH DARI SATU data master dan/atau LEBIH DARI SATU masukan warga jika relevan. 
+   Jangan membuat rekomendasi terpisah untuk setiap item data; gabungkan data yang saling terkait dalam satu rekomendasi.
+6. skorPrioritas harus angka 0.00 - 1.00 dengan 2 desimal.
 
 DATA MASTER (Referensi Bobot Kritikalitas):
 ${dataMasterJsonString}
@@ -180,9 +170,9 @@ ${runningProgramsList}
       "lokasi": "RT 001 RW 002",
       "fingerprint": "",
       "evidence": {
-        "masukanWargaCount": 0,
-        "dataMasterCount": 0,
-        "kritikalitas": "KRITIS"
+        "masukanWargaCount": 2,
+        "dataMasterCount": 3,
+        "kritikalitas": "TINGGI"
       }
     },
     {
@@ -193,7 +183,7 @@ ${runningProgramsList}
       "domainIsuId": "${domainIsuId}",
       "lokasi": "...",
       "fingerprint": "",
-      "evidence": { "masukanWargaCount": 0, "dataMasterCount": 0, "kritikalitas": "TINGGI" }
+      "evidence": { "masukanWargaCount": 1, "dataMasterCount": 2, "kritikalitas": "TINGGI" }
     },
     {
       "prioritasKe": 3,
@@ -203,7 +193,7 @@ ${runningProgramsList}
       "domainIsuId": "${domainIsuId}",
       "lokasi": "...",
       "fingerprint": "",
-      "evidence": { "masukanWargaCount": 0, "dataMasterCount": 0, "kritikalitas": "SEDANG" }
+      "evidence": { "masukanWargaCount": 0, "dataMasterCount": 1, "kritikalitas": "SEDANG" }
     },
     {
       "prioritasKe": 4,
@@ -213,7 +203,7 @@ ${runningProgramsList}
       "domainIsuId": "${domainIsuId}",
       "lokasi": "...",
       "fingerprint": "",
-      "evidence": { "masukanWargaCount": 0, "dataMasterCount": 0, "kritikalitas": "SEDANG" }
+      "evidence": { "masukanWargaCount": 0, "dataMasterCount": 2, "kritikalitas": "SEDANG" }
     },
     {
       "prioritasKe": 5,
@@ -223,7 +213,7 @@ ${runningProgramsList}
       "domainIsuId": "${domainIsuId}",
       "lokasi": "...",
       "fingerprint": "",
-      "evidence": { "masukanWargaCount": 0, "dataMasterCount": 0, "kritikalitas": "RENDAH" }
+      "evidence": { "masukanWargaCount": 0, "dataMasterCount": 1, "kritikalitas": "RENDAH" }
     }
   ]
 }`;
@@ -254,6 +244,9 @@ INSTRUKSI FINAL:
 - evidence.dataMasterCount harus diisi dengan jumlah data master yang mendukung rekomendasi tersebut (dari data yang diberikan).
 - evidence.kritikalitas harus diisi berdasarkan data master yang paling relevan.
 - PENTING: Rekomendasi prioritas harus didasarkan pada data yang tersedia (masukan warga atau data master). Jangan merekomendasikan isu yang sama sekali tidak memiliki evidence, kecuali jika sama sekali tidak ada data untuk domain isu tersebut. Jika terpaksa merekomendasikan tanpa evidence, beri skor maksimal 0.20 dan kritikalitas SEDANG atau RENDAH.
+- Gabungkan data master yang saling berkaitan (misal: jumlah penduduk dan jumlah KK) dalam satu rekomendasi, jangan dipisah.
+- Manfaatkan beberapa masukan warga yang relevan untuk memperkuat satu rekomendasi.
+- evidence.dataMasterCount dan evidence.masukanWargaCount harus mencerminkan jumlah sebenarnya yang mendukung.
 
 Sekarang, hasilkan rekomendasi berdasarkan data di atas. Output HANYA JSON.`;
 }

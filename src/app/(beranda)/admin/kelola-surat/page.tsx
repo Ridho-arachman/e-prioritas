@@ -1,8 +1,10 @@
 import AdminSuratPage from "@/components/sections/surat/ListSurat";
 import { Loader2 } from "lucide-react";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
-export default function KelolaSuratPage() {
+export default async function KelolaSuratPage() {
+  await connection();
   return (
     <Suspense
       fallback={

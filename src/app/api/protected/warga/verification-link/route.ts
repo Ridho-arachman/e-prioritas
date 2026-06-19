@@ -1,7 +1,7 @@
 // app/api/protected/warga/verification-link/route.ts
 import { Role } from "@/app/generated/prisma";
 import { auth } from "@/lib/auth";
-import { decrypt } from "@/lib/encryption"; // ✅ import fungsi decrypt
+import { decrypt } from "@/lib/encryption";
 import { handleResponse } from "@/lib/handleResponse";
 import prisma from "@/lib/prisma";
 import crypto from "crypto";
@@ -11,12 +11,14 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   const allowedRoles: Role[] = ["ADMIN"];
   const session = await auth.api.getSession({ headers: await headers() });
+
   if (!session)
     return handleResponse({
       success: false,
       message: "User belum login",
       status: 401,
     });
+
   if (!allowedRoles.includes(session.user.role as Role))
     return handleResponse({
       success: false,
@@ -36,11 +38,13 @@ export async function POST(request: Request) {
       where: { id: wargaId },
       select: { id: true, noHp: true, statusNoHp: true },
     });
+
     if (!warga)
       return NextResponse.json(
         { error: "Warga tidak ditemukan" },
         { status: 404 },
       );
+
     if (warga.statusNoHp === "TERVERIFIKASI")
       return NextResponse.json(
         { error: "Nomor sudah terverifikasi" },
@@ -77,13 +81,49 @@ export async function POST(request: Request) {
       process.env.NEXT_PUBLIC_BASE_URL || request.headers.get("origin");
     const verifyUrl = `${baseUrl}/verify?token=${token}`;
 
+    // Pesan verifikasi
     const message = `Halo Kak, ini dari tim administrasi.\n\nKlik link berikut untuk verifikasi nomor WhatsApp Anda:\n${verifyUrl}\n\n⚠️ Link berlaku 24 jam.\nTerima kasih 🙏`;
 
-    // ✅ Gunakan nomor yang sudah didekripsi
+    // ✅ Format nomor untuk Fonnte (628xxxxxxxxxx)
     const phone = decryptedNoHp.replace(/\D/g, "").replace(/^0/, "62");
-    const waLink = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 
-    return NextResponse.json({ waLink, verifyUrl });
+    // ✅ Kirim pesan melalui Fonnte
+    const fonnteToken = process.env.FONNTE_API_KEY;
+    if (!fonnteToken) {
+      console.error("FONNTE_API_KEY tidak diatur");
+      return NextResponse.json(
+        { error: "Konfigurasi layanan pesan belum siap" },
+        { status: 500 },
+      );
+    }
+
+    const fonnteResponse = await fetch("https://api.fonnte.com/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: fonnteToken,
+      },
+      body: JSON.stringify({
+        target: phone,
+        message: message,
+      }),
+    });
+
+    if (!fonnteResponse.ok) {
+      const errorText = await fonnteResponse.text();
+      console.error("Fonnte API error:", fonnteResponse.status, errorText);
+      return NextResponse.json(
+        { error: "Gagal mengirim pesan WhatsApp" },
+        { status: 502 },
+      );
+    }
+
+    // Opsional: kembalikan verifyUrl untuk referensi admin
+    return NextResponse.json({
+      success: true,
+      message: "Pesan verifikasi telah dikirim via WhatsApp",
+      verifyUrl, // masih disertakan jika perlu
+    });
   } catch (error) {
     console.error("[VerificationLink] Error:", error);
     return NextResponse.json({ error: "Gagal membuat link" }, { status: 500 });

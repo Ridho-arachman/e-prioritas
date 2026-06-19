@@ -55,7 +55,7 @@ export const dataMasterService = {
   createMany: async (inputs: DataMasterCreateInput[]) => {
     return prisma.dataMaster.createMany({
       data: inputs,
-      skipDuplicates: true,
+      // skipDuplicates: true,
     });
   },
 

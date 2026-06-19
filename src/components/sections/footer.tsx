@@ -183,7 +183,7 @@ export default function Footer() {
               <span>Hak Kekayaan Intelektual telah didaftarkan</span>
               <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-gray-500 mx-1" />
               <span className="block sm:inline">
-                No. Pencatatan: EC00202512345
+                No. Pencatatan: EC002026072060,
               </span>
             </p>
           </div>

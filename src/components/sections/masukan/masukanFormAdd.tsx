@@ -167,7 +167,6 @@ export default function MasukanWargaFormAdd() {
       });
       const linkData = await linkRes.json();
       if (!linkRes.ok) throw new Error(linkData.error);
-      window.open(linkData.waLink, "_blank");
       notifier.success("Link Verifikasi Dikirim", "Cek WhatsApp Anda.");
     } catch (err: any) {
       notifier.error("Gagal", err.message);
@@ -187,7 +186,6 @@ export default function MasukanWargaFormAdd() {
       });
       const linkData = await linkRes.json();
       if (!linkRes.ok) throw new Error(linkData.error);
-      window.open(linkData.waLink, "_blank");
       notifier.success("Link Dikirim Ulang", "Cek WhatsApp Anda.");
     } catch (err: any) {
       notifier.error("Gagal", err.message);
@@ -596,7 +594,11 @@ export default function MasukanWargaFormAdd() {
         >
           Ganti Nomor
         </Button>
-        <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto">
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full sm:w-auto"
+        >
           {isSubmitting ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (

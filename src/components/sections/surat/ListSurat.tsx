@@ -54,7 +54,6 @@ import { notifier } from "@/lib/ToastNotifier";
 import { ApiError } from "@/types/ApiError";
 import { buildQuery } from "@/utils/query";
 import * as Icons from "lucide-react";
-import { connection } from "next/server";
 import { useState } from "react";
 
 const getIcon = (iconName: string) => {
@@ -66,7 +65,7 @@ const getIcon = (iconName: string) => {
   );
 };
 
-export default async function AdminSuratPage() {
+export default function AdminSuratPage() {
   const [itemToDelete, setItemToDelete] = useState<{
     id: string;
     nama: string;
@@ -115,8 +114,6 @@ export default async function AdminSuratPage() {
     setItemToDelete({ id, nama });
     setOpenDeleteDialog(true);
   };
-
-  await connection();
 
   return (
     <>
