@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { handleBetterAuthError } from "@/lib/handleBetterAuthError";
 import { handleResponse } from "@/lib/handleResponse";
 import { handleZodValidation } from "@/lib/handleZodValidation";
+import prisma from "@/lib/prisma";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { PasswordResetSchema } from "@/schema/authSchema";
 import { NextRequest } from "next/server";
@@ -58,6 +59,11 @@ export const POST = async (req: NextRequest) => {
         newPassword,
       },
     });
+
+    await prisma.verification.deleteMany({
+      where: { identifier: `reset-password:${token}` },
+    });
+
     return handleResponse({
       success: true,
       message: "Password berhasil direset",

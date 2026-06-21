@@ -113,6 +113,16 @@ const VALID_SORT_FIELDS = [
 ] as const;
 type ValidSortField = (typeof VALID_SORT_FIELDS)[number];
 
+// Mapping field database ke kolom Excel
+const FIELD_TO_COLUMN: Record<string, string> = {
+  domainIsuId: "A",
+  namaAtribut: "B",
+  jumlah: "C",
+  tahunData: "D",
+  kritikalitas: "E",
+  isActive: "G",
+};
+
 // ============================================================
 // USER COMBOBOX
 // ============================================================
@@ -154,7 +164,6 @@ const UserCombobox = ({
       if (debouncedSearch) params.append("q", debouncedSearch);
       params.append("page", String(page));
       params.append("perPage", "10");
-      // Kirim roles jika ada
       if (allowedRoles && allowedRoles.length > 0) {
         params.append("roles", allowedRoles.join(","));
       }
@@ -282,6 +291,9 @@ const UserCombobox = ({
 // ============================================================
 export default function ListTableDataMaster() {
   const router = useRouter();
+  const [importErrorDetails, setImportErrorDetails] = useState<string[] | null>(
+    null,
+  );
   const [selectedDeleteId, setSelectedDeleteId] = useState<string | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
@@ -390,7 +402,7 @@ export default function ListTableDataMaster() {
     if (!selectedDeleteId) return;
     try {
       const res = await deleteDataMaster(
-        `/api/data-master/${selectedDeleteId}`,
+        `/protected/data-master/${selectedDeleteId}`,
       );
       notifier.success("Berhasil", res?.message || "Data berhasil dihapus");
       mutate();
@@ -453,7 +465,7 @@ export default function ListTableDataMaster() {
     sortOrder !== "desc";
 
   // ─────────────────────────────────────────────────────────────
-  // Import Excel (tidak berubah)
+  // Import Excel
   // ─────────────────────────────────────────────────────────────
   const readExcelFile = (
     file: File,
@@ -542,10 +554,14 @@ export default function ListTableDataMaster() {
       const rawData = await readExcelFile(importFile);
       const parsed = dataMasterArraySchema.safeParse(rawData);
       if (!parsed.success) {
-        const errors = parsed.error.issues
-          .map((e) => `${e.path.join(".")}: ${e.message}`)
-          .join("; ");
-        notifier.error("Format file tidak valid", errors);
+        // Error validasi Zod → tampilkan di dialog
+        const errorList = parsed.error.issues.map((issue) => {
+          const rowNum = issue.path[0] ? Number(issue.path[0]) + 2 : "?";
+          const field = issue.path[issue.path.length - 1] as string;
+          const col = FIELD_TO_COLUMN[field] || field;
+          return `Baris ${rowNum} - ${col}: ${issue.message}`;
+        });
+        setImportErrorDetails(errorList);
         return;
       }
 
@@ -556,17 +572,56 @@ export default function ListTableDataMaster() {
       });
 
       const result = await res.json();
-      if (!res.ok) {
-        throw new Error(result.message || "Gagal import data");
+
+      // Jika respons gagal atau ada errors[]
+      if (!res.ok || (result.data && result.data.errors?.length > 0)) {
+        if (result.data && result.data.errors) {
+          const errorList = result.data.errors.map(
+            (e: { row: number; message: string }) => {
+              const match = e.message.match(/Duplikat pada kolom:\s*(.+)/);
+              if (match) {
+                const fields = match[1].split(",").map((f) => f.trim());
+                const columns = fields
+                  .map((f) => {
+                    const col = FIELD_TO_COLUMN[f];
+                    return col ? `Kolom ${col} (${f})` : f;
+                  })
+                  .join(", ");
+                return `Baris ${e.row}: Duplikat pada ${columns}`;
+              }
+              return `Baris ${e.row}: ${e.message}`;
+            },
+          );
+          setImportErrorDetails(errorList);
+        } else {
+          setImportErrorDetails([result.message || "Gagal import data"]);
+        }
+
+        // Jika ada yang berhasil, beri notifikasi sukses sebagian & refresh data
+        if (result.data && result.data.count > 0) {
+          notifier.success(
+            "Import Sebagian",
+            `${result.data.count} data berhasil, ${result.data.errors.length} gagal.`,
+          );
+          mutate();
+          setIsImportOpen(false);
+          setImportFile(null);
+        }
+        return;
       }
 
+      // Sukses total
       notifier.success("Berhasil", result.message);
       mutate();
       setIsImportOpen(false);
       setImportFile(null);
     } catch (error) {
       const err = error as Error;
-      notifier.error("Gagal import", err.message);
+      // Untuk exception, tetap tampilkan di dialog + notifier
+      setImportErrorDetails([
+        err.message || "Terjadi kesalahan tidak diketahui",
+      ]);
+      notifier.error("Gagal import", err.message || "Terjadi kesalahan");
     } finally {
       setImportLoading(false);
     }
@@ -693,6 +748,45 @@ export default function ListTableDataMaster() {
                 <Spinner className="mr-2 h-4 w-4 animate-spin" />
               )}
               {importLoading ? "Mengimport..." : "Import"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Error Import */}
+      <Dialog
+        open={importErrorDetails !== null}
+        onOpenChange={(open) => !open && setImportErrorDetails(null)}
+      >
+        <DialogContent className="sm:max-w-xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-destructive flex items-center gap-2">
+              <XIcon className="h-5 w-5" /> Kesalahan Import
+            </DialogTitle>
+            <DialogDescription>
+              Silakan perbaiki file Excel Anda sesuai daftar error di bawah ini.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 max-h-96 overflow-auto">
+            {importErrorDetails?.map((msg, idx) => (
+              <div
+                key={idx}
+                className="text-sm p-3 bg-muted rounded-md wrap-break-word border border-muted-foreground/20"
+              >
+                <span className="font-mono text-xs text-muted-foreground">
+                  #{idx + 1}
+                </span>{" "}
+                {msg}
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-end mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setImportErrorDetails(null)}
+              className="cursor-pointer"
+            >
+              Tutup
             </Button>
           </div>
         </DialogContent>

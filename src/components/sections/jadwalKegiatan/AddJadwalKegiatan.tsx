@@ -37,7 +37,7 @@ import {
   XIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // ========================
 // ENUM (Match Backend Prisma)
@@ -103,6 +103,17 @@ export default function TambahKegiatanRapat() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
 
+  // State waktu sekarang yang diperbarui setiap menit
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const todayStr = now.toISOString().split("T")[0];
+  const nowTimeStr = now.toTimeString().slice(0, 5);
+
   const { data: domainIsuList, isLoading: isLoadingDomain } = useGet(
     "/protected/kategori",
   );
@@ -111,6 +122,8 @@ export default function TambahKegiatanRapat() {
   const selectedDomain = domainIsuList?.find(
     (d: DomainIsu) => d.id === form.domainIsuId,
   );
+
+  const selectedDateStr = form.tanggal ? form.tanggal.split("T")[0] : "";
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -127,14 +140,6 @@ export default function TambahKegiatanRapat() {
     if (errors.domainIsuId) {
       setErrors({ ...errors, domainIsuId: undefined });
     }
-  };
-
-  const handleSwitchChange = (checked: boolean) => {
-    setForm({ ...form, enableAI: checked });
-  };
-
-  const handleAiModelChange = (value: string) => {
-    setForm({ ...form, aiModel: value });
   };
 
   const validateForm = (): boolean => {
@@ -155,7 +160,13 @@ export default function TambahKegiatanRapat() {
     }
 
     if (!form.tanggal) {
-      newErrors.tanggal = "Tanggal & waktu wajib dipilih";
+      newErrors.tanggal = "Tanggal dan waktu kegiatan wajib dipilih";
+    } else {
+      const selectedDate = new Date(form.tanggal);
+      if (selectedDate < new Date()) {
+        newErrors.tanggal =
+          "Tanggal dan waktu tidak boleh kurang dari waktu saat ini";
+      }
     }
 
     if (!form.domainIsuId) {
@@ -219,9 +230,59 @@ export default function TambahKegiatanRapat() {
     router.back();
   };
 
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const date = e.target.value;
+    if (date < todayStr) {
+      setErrors({
+        ...errors,
+        tanggal: "Tanggal tidak boleh kurang dari hari ini",
+      });
+      return;
+    }
+
+    const time = form.tanggal
+      ? form.tanggal.split("T")[1]?.slice(0, 5) || "09:00"
+      : "09:00";
+    const newTanggal = `${date}T${time}:00`;
+    const selected = new Date(newTanggal);
+
+    if (date === todayStr && selected < now) {
+      setErrors({
+        ...errors,
+        tanggal: "Waktu tidak boleh kurang dari jam saat ini",
+      });
+      setForm({ ...form, tanggal: newTanggal });
+      return;
+    }
+
+    setForm({ ...form, tanggal: newTanggal });
+    if (errors.tanggal) {
+      setErrors({ ...errors, tanggal: undefined });
+    }
+  };
+
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const time = e.target.value;
+    const date = selectedDateStr || todayStr;
+    const newTanggal = `${date}T${time}:00`;
+    const selected = new Date(newTanggal);
+
+    if (date === todayStr && selected < now) {
+      setErrors({
+        ...errors,
+        tanggal: "Waktu tidak boleh kurang dari jam saat ini",
+      });
+      return;
+    }
+
+    setForm({ ...form, tanggal: newTanggal });
+    if (errors.tanggal) {
+      setErrors({ ...errors, tanggal: undefined });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Background Effects */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-blue-100/40 via-transparent to-transparent" />
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl" />
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-400/10 rounded-full blur-3xl" />
@@ -255,7 +316,6 @@ export default function TambahKegiatanRapat() {
           <CardContent className="p-0">
             <div className="p-6 sm:p-8">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Main Form */}
                 <div className="lg:col-span-2 space-y-6">
                   {/* Judul */}
                   <div className="space-y-2">
@@ -334,35 +394,15 @@ export default function TambahKegiatanRapat() {
                       <Input
                         id="tanggal"
                         type="date"
-                        value={form.tanggal ? form.tanggal.split("T")[0] : ""}
-                        onChange={(e) => {
-                          const date = e.target.value;
-                          const time = form.tanggal
-                            ? form.tanggal
-                                .split("T")[1]
-                                ?.split(":")
-                                .slice(0, 2)
-                                .join(":")
-                            : "09:00";
-                          setForm({
-                            ...form,
-                            tanggal: `${date}T${time || "09:00"}:00`,
-                          });
-                          if (errors.tanggal)
-                            setErrors({ ...errors, tanggal: undefined });
-                        }}
+                        min={todayStr}
+                        value={selectedDateStr}
+                        onChange={handleDateChange}
                         className={`bg-white border-slate-200 rounded-xl text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 h-12 ${
                           errors.tanggal
                             ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
                             : ""
                         }`}
                       />
-                      {errors.tanggal && (
-                        <div className="flex items-center gap-1.5 text-sm text-red-600">
-                          <AlertCircleIcon className="h-4 w-4" />
-                          {errors.tanggal}
-                        </div>
-                      )}
                     </div>
                     <div className="space-y-2">
                       <Label
@@ -375,26 +415,28 @@ export default function TambahKegiatanRapat() {
                       <Input
                         id="waktu"
                         type="time"
+                        // Batasan waktu minimum hanya jika tanggal = hari ini
+                        min={
+                          selectedDateStr === todayStr ? nowTimeStr : undefined
+                        }
                         value={
                           form.tanggal
                             ? form.tanggal.split("T")[1]?.slice(0, 5)
                             : ""
                         }
-                        onChange={(e) => {
-                          const time = e.target.value;
-                          const date = form.tanggal
-                            ? form.tanggal.split("T")[0]
-                            : new Date().toISOString().split("T")[0];
-                          setForm({ ...form, tanggal: `${date}T${time}:00` });
-                          if (errors.tanggal)
-                            setErrors({ ...errors, tanggal: undefined });
-                        }}
+                        onChange={handleTimeChange}
                         className={`bg-white border-slate-200 rounded-xl text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 h-12 ${
                           errors.tanggal
                             ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
                             : ""
                         }`}
                       />
+                      {errors.tanggal && (
+                        <div className="flex items-center gap-1.5 text-sm text-red-600">
+                          <AlertCircleIcon className="h-4 w-4" />
+                          {errors.tanggal}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -638,7 +680,6 @@ export default function TambahKegiatanRapat() {
                             </Badge>
                           </div>
                         )}
-                        {/* Mode badge dihapus */}
                       </div>
                     </CardContent>
                   </Card>
@@ -803,7 +844,6 @@ export default function TambahKegiatanRapat() {
                       </Badge>
                     </div>
                   )}
-                  {/* Mode Rekomendasi dihapus */}
                   {form.enableAI && (
                     <div className="p-4 rounded-xl bg-purple-50 border border-purple-100">
                       <div className="flex items-center gap-2 mb-2">

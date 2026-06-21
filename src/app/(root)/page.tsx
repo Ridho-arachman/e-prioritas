@@ -227,29 +227,29 @@ export default function LandingPage() {
     },
   ];
 
-  const testimonials = [
-    {
-      name: "Warga",
-      role: "Panggungjati",
-      content:
-        "Saya senang bisa memberikan masukan langsung. Jalan di lingkungan saya sekarang sudah diperbaiki.",
-      avatar: "👨",
-    },
-    {
-      name: "Warga",
-      role: "Panggungjati",
-      content:
-        "Aplikasinya mudah digunakan. Aspirasi kami tentang posyandu akhirnya didengar.",
-      avatar: "👩",
-    },
-    {
-      name: "Warga",
-      role: "Panggungjati",
-      content:
-        "Transparan dan cepat. Prioritas pembangunan jadi jelas dan tidak asal-asalan.",
-      avatar: "👴",
-    },
-  ];
+  // const testimonials = [
+  //   {
+  //     name: "Warga",
+  //     role: "Panggungjati",
+  //     content:
+  //       "Saya senang bisa memberikan masukan langsung. Jalan di lingkungan saya sekarang sudah diperbaiki.",
+  //     avatar: "👨",
+  //   },
+  //   {
+  //     name: "Warga",
+  //     role: "Panggungjati",
+  //     content:
+  //       "Aplikasinya mudah digunakan. Aspirasi kami tentang posyandu akhirnya didengar.",
+  //     avatar: "👩",
+  //   },
+  //   {
+  //     name: "Warga",
+  //     role: "Panggungjati",
+  //     content:
+  //       "Transparan dan cepat. Prioritas pembangunan jadi jelas dan tidak asal-asalan.",
+  //     avatar: "👴",
+  //   },
+  // ];
 
   const totalMasukan = statsData?.totalMasukan ?? 0;
   const totalKegiatan = statsData?.totalKegiatan ?? 0;
@@ -496,7 +496,7 @@ export default function LandingPage() {
         </motion.div>
 
         {/* Testimonials Section dengan efek masuk/keluar */}
-        <motion.div
+        {/* <motion.div
           className="mt-32"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -526,7 +526,6 @@ export default function LandingPage() {
                   <CardContent className="p-0 flex-1 flex flex-col justify-between">
                     <div className="space-y-4">
                       <div className="flex items-center gap-3">
-                        {/* Avatar dengan gradien tema utama (biru ke cyan) */}
                         <div className="w-12 h-12 rounded-full bg-linear-to-r from-blue-600 to-cyan-600 flex items-center justify-center text-white font-bold shadow-md">
                           {testimonial.avatar || testimonial.name.charAt(0)}
                         </div>
@@ -543,7 +542,6 @@ export default function LandingPage() {
                         "{testimonial.content}"
                       </p>
                     </div>
-                    {/* Garis pemisah dan rating */}
                     <div className="flex text-yellow-400 mt-4 pt-2 border-t border-gray-200 dark:border-gray-700">
                       {[...Array(5)].map((_, i) => (
                         <Star key={i} className="w-4 h-4 fill-current" />
@@ -554,7 +552,7 @@ export default function LandingPage() {
               </motion.div>
             ))}
           </div>
-        </motion.div>
+        </motion.div> */}
 
         {/* Call to Action dengan efek masuk/keluar */}
         <motion.div

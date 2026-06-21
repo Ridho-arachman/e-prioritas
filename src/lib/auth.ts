@@ -47,6 +47,7 @@ export const auth = betterAuth({
     enabled: true,
     autoSignIn: false,
     requireEmailVerification: true,
+    resetPasswordTokenExpiresIn: 60 * 15, // 15 minutes
     sendResetPassword: async ({ user, url }) => {
       const html = `
 <!DOCTYPE html>

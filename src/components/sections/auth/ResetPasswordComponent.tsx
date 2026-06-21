@@ -2,21 +2,21 @@
 
 export const dynamic = "force-dynamic";
 
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { useSearchParams, useRouter } from "next/navigation";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Field, FieldLabel, FieldError } from "@/components/ui/field";
-import { Eye, EyeOff, ArrowLeft } from "lucide-react";
-import { useState } from "react";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { usePost } from "@/hooks/useApi";
 import { notifier } from "@/lib/ToastNotifier";
-import { AxiosError } from "axios";
-import { ApiError } from "@/types/ApiError";
 import { PasswordResetSchema } from "@/schema/authSchema";
+import { ApiError } from "@/types/ApiError";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Turnstile } from "@marsidev/react-turnstile";
+import axios, { AxiosError } from "axios";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import * as z from "zod";
 
 type ResetPasswordForm = z.infer<typeof PasswordResetSchema>;
 
@@ -27,6 +27,7 @@ export default function ResetPasswordComponent() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [isTokenValid, setIsTokenValid] = useState<boolean | null>(null); // null = loading
 
   const { post, loading } = usePost(`/auth/reset-password?token=${token}`);
 
@@ -38,6 +39,27 @@ export default function ResetPasswordComponent() {
       turnstileToken: "",
     },
   });
+
+  // Cek validitas token saat halaman dimuat
+  useEffect(() => {
+    if (!token) {
+      setIsTokenValid(false);
+      return;
+    }
+
+    const verifyToken = async () => {
+      try {
+        const res = await axios.get(
+          `/api/auth/verify-reset-token?token=${token}`,
+        );
+        setIsTokenValid(res.data.valid);
+      } catch {
+        setIsTokenValid(false);
+      }
+    };
+
+    verifyToken();
+  }, [token]);
 
   const onSubmit = async (values: ResetPasswordForm) => {
     if (!values.turnstileToken) {
@@ -71,6 +93,38 @@ export default function ResetPasswordComponent() {
     }
   };
 
+  // Tampilan loading saat mengecek token
+  if (isTokenValid === null) {
+    return (
+      <div className="flex items-center justify-center min-h-50">
+        <p className="text-muted-foreground">Memverifikasi token...</p>
+      </div>
+    );
+  }
+
+  // Token tidak valid / tidak ada
+  if (!isTokenValid || !token) {
+    return (
+      <div className="flex items-center justify-center">
+        <div className="w-full text-center">
+          <h1 className="text-2xl font-bold text-red-500 mb-2">
+            Token Tidak Valid
+          </h1>
+          <p className="text-muted-foreground mb-6">
+            Link reset password sudah tidak berlaku atau sudah digunakan.
+          </p>
+          <Button
+            onClick={() => router.push("/forgot-password")}
+            className="w-full"
+          >
+            Minta Link Baru
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Token valid → tampilkan form
   return (
     <div className="flex items-center justify-center">
       <div className="w-full">
