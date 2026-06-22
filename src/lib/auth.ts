@@ -213,7 +213,7 @@ export const auth = betterAuth({
 
         <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;" />
         <p style="font-size: 0.8rem; color: #999; text-align: center;">
-          &copy; ${new Date().getFullYear()} Kominfo Kabupaten Serang. All rights reserved.
+          &copy; ${new Date().getFullYear()} Kelurahan Panggungjati, Kecamatan Taktakan Kota Serang. All rights reserved.
         </p>
       </div>
       `;
@@ -228,7 +228,6 @@ export const auth = betterAuth({
     sendOnSignIn: true,
     sendOnSignUp: true,
   },
-
   user: {
     additionalFields: {
       role: {
