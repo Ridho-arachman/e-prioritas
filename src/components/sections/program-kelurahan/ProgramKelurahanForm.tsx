@@ -69,9 +69,22 @@ export default function ProgramKelurahanForm({
   const isEdit = !!id;
   const basePath = `/${role}/program-kelurahan`;
 
+  // Check if user has permission to access this form
+  const hasPermission = role === "admin" || role === "lurah";
+
+  useEffect(() => {
+    if (!hasPermission) {
+      router.push(basePath);
+    }
+  }, [hasPermission, basePath, router]);
+
+  if (!hasPermission) {
+    return null;
+  }
+
   const [form, setForm] = useState<FormState>(initialForm);
   const [errors, setErrors] = useState<
-    Partial<Record<keyof FormState, string>>
+    Partial<Record<keyof FormState | "status", string>>
   >({});
   const [loading, setLoading] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -117,7 +130,7 @@ export default function ProgramKelurahanForm({
   };
 
   const validate = (): boolean => {
-    const newErrors: Partial<Record<keyof FormState, string>> = {};
+    const newErrors: Partial<Record<keyof FormState | "status", string>> = {};
 
     if (!form.judul.trim()) {
       newErrors.judul = "Judul wajib diisi";
@@ -129,12 +142,63 @@ export default function ProgramKelurahanForm({
       newErrors.deskripsi = "Deskripsi wajib diisi";
     }
 
-    if (form.pic && form.pic.length > 100) {
+    if (!form.pic.trim()) {
+      newErrors.pic = "PIC wajib diisi";
+    } else if (form.pic.length > 100) {
       newErrors.pic = "PIC maksimal 100 karakter";
+    }
+
+    if (!form.domainIsuId.trim()) {
+      newErrors.domainIsuId = "Domain Isu wajib diisi";
     }
 
     if (form.lokasi && form.lokasi.length > 255) {
       newErrors.lokasi = "Lokasi maksimal 255 karakter";
+    }
+
+    // Check if tanggalMulai is after tanggalSelesai
+    if (form.tanggalMulai && form.tanggalSelesai) {
+      if (new Date(form.tanggalMulai) > new Date(form.tanggalSelesai)) {
+        newErrors.tanggalMulai = "Tanggal mulai tidak boleh setelah tanggal selesai";
+      }
+    }
+
+    // Validate based on status
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (form.status === StatusProgram.BERJALAN && form.tanggalMulai) {
+      const tanggalMulai = new Date(form.tanggalMulai);
+      tanggalMulai.setHours(0, 0, 0, 0);
+      if (tanggalMulai > today) {
+        newErrors.tanggalMulai = "Tanggal mulai tidak boleh lewat hari ini untuk status berjalan";
+      }
+    }
+
+    if (form.status === StatusProgram.SELESAI && form.tanggalSelesai) {
+      const tanggalSelesai = new Date(form.tanggalSelesai);
+      tanggalSelesai.setHours(0, 0, 0, 0);
+      if (tanggalSelesai > today) {
+        newErrors.tanggalSelesai = "Tanggal selesai tidak boleh lewat hari ini untuk status selesai";
+      }
+    }
+
+
+
+    if (form.status === StatusProgram.DITUNDA && form.tanggalMulai) {
+      const tanggalMulai = new Date(form.tanggalMulai);
+      tanggalMulai.setHours(0, 0, 0, 0);
+      if (tanggalMulai < today) {
+        newErrors.tanggalMulai = "Tanggal mulai tidak boleh sebelum hari ini untuk status ditunda";
+      }
+    }
+
+    if (form.status === StatusProgram.BERJALAN && form.tanggalSelesai) {
+      const tanggalSelesai = new Date(form.tanggalSelesai);
+      tanggalSelesai.setHours(0, 0, 0, 0);
+      if (tanggalSelesai < today) {
+        newErrors.status = "Tanggal selesai sudah lewat hari ini, status tidak boleh berjalan";
+      }
     }
 
     setErrors(newErrors);
@@ -157,8 +221,8 @@ export default function ProgramKelurahanForm({
         status: form.status,
         tanggalMulai: form.tanggalMulai || null,
         tanggalSelesai: form.tanggalSelesai || null,
-        pic: form.pic || null,
-        domainIsuId: form.domainIsuId || null,
+        pic: form.pic,
+        domainIsuId: form.domainIsuId,
         lokasi: form.lokasi || null,
       };
 
@@ -281,11 +345,16 @@ export default function ProgramKelurahanForm({
                     </SelectItem>
                   </SelectContent>
                 </Select>
+                {errors.status && (
+                  <p className="text-sm text-red-500">{errors.status}</p>
+                )}
               </div>
 
               {/* PIC */}
               <div className="space-y-2">
-                <Label htmlFor="pic">Penanggung Jawab (PIC)</Label>
+                <Label htmlFor="pic">
+                  Penanggung Jawab (PIC) <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   id="pic"
                   value={form.pic}
@@ -301,7 +370,9 @@ export default function ProgramKelurahanForm({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Domain Isu */}
               <div className="space-y-2">
-                <Label htmlFor="domainIsuId">Domain Isu</Label>
+                <Label htmlFor="domainIsuId">
+                  Domain Isu <span className="text-red-500">*</span>
+                </Label>
                 <Select
                   value={form.domainIsuId || "none"}
                   onValueChange={(val) =>
@@ -309,10 +380,10 @@ export default function ProgramKelurahanForm({
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Pilih domain (opsional)" />
+                    <SelectValue placeholder="Pilih domain" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">Tidak ada</SelectItem>
+                    <SelectItem value="none">Pilih Domain Isu</SelectItem>
                     {domainIsuOptions?.map((d: DomainIsu) => (
                       <SelectItem key={d.id} value={d.id}>
                         {d.nama}
@@ -320,6 +391,9 @@ export default function ProgramKelurahanForm({
                     ))}
                   </SelectContent>
                 </Select>
+                {errors.domainIsuId && (
+                  <p className="text-sm text-red-500">{errors.domainIsuId}</p>
+                )}
               </div>
 
               {/* Lokasi */}
@@ -351,6 +425,9 @@ export default function ProgramKelurahanForm({
                   value={form.tanggalMulai}
                   onChange={(e) => handleChange("tanggalMulai", e.target.value)}
                 />
+                {errors.tanggalMulai && (
+                  <p className="text-sm text-red-500">{errors.tanggalMulai}</p>
+                )}
               </div>
               {/* Tanggal Selesai */}
               <div className="space-y-2">
@@ -363,6 +440,9 @@ export default function ProgramKelurahanForm({
                     handleChange("tanggalSelesai", e.target.value)
                   }
                 />
+                {errors.tanggalSelesai && (
+                  <p className="text-sm text-red-500">{errors.tanggalSelesai}</p>
+                )}
               </div>
             </div>
 

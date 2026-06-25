@@ -7,8 +7,8 @@ export type ProgramKelurahanCreateInput = {
   status?: StatusProgram;
   tanggalMulai?: Date | null;
   tanggalSelesai?: Date | null;
-  pic?: string | null;
-  domainIsuId?: string | null;
+  pic: string;
+  domainIsuId: string;
   lokasi?: string | null; // ✅ single field
 };
 

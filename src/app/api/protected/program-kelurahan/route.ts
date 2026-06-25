@@ -3,7 +3,10 @@ import { auth } from "@/lib/auth";
 import { handlePrismaError } from "@/lib/handlePrismaError";
 import { handleResponse } from "@/lib/handleResponse";
 import { handleZodValidation } from "@/lib/handleZodValidation";
-import { programKelurahanQuerySchema } from "@/schema/programKelurahanSchema";
+import {
+  programKelurahanCreateSchema,
+  programKelurahanQuerySchema,
+} from "@/schema/programKelurahanSchema";
 import { programKelurahanService } from "@/services/programKelurahanService";
 import { headers } from "next/headers";
 import { NextRequest } from "next/server";
@@ -108,13 +111,18 @@ export const POST = async (req: NextRequest) => {
 
   try {
     const body = await req.json();
+    const parsed = programKelurahanCreateSchema.safeParse(body);
+
+    if (!parsed.success) return handleZodValidation(parsed);
 
     // Konversi string date ke Date object
     const payload = {
-      ...body,
-      tanggalMulai: body.tanggalMulai ? new Date(body.tanggalMulai) : null,
-      tanggalSelesai: body.tanggalSelesai
-        ? new Date(body.tanggalSelesai)
+      ...parsed.data,
+      tanggalMulai: parsed.data.tanggalMulai
+        ? new Date(parsed.data.tanggalMulai)
+        : null,
+      tanggalSelesai: parsed.data.tanggalSelesai
+        ? new Date(parsed.data.tanggalSelesai)
         : null,
     };
 
