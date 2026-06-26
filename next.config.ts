@@ -14,8 +14,8 @@ const nextConfig: NextConfig = {
     removeConsole: true,
   },
 
-  allowedDevOrigins: ["aromatically-dreamiest-delia.ngrok-free.dev"],
-  // allowedDevOrigins: ["panggungjati.my.id"],
+  // allowedDevOrigins: ["aromatically-dreamiest-delia.ngrok-free.dev"],
+  allowedDevOrigins: ["panggungjati.my.id"],
 
   images: {
     remotePatterns: [
