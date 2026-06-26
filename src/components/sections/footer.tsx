@@ -144,10 +144,10 @@ export default function Footer() {
               >
                 <Phone className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
                 <a
-                  href="tel:+622112345678"
+                  href="tel:+62895321167847"
                   className="hover:text-white transition-colors"
                 >
-                  (021) 1234-5678
+                  (+62)895321167847
                 </a>
               </motion.li>
               <motion.li
