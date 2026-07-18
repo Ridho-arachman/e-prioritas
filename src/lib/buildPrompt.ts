@@ -86,8 +86,50 @@ KONTEKS PENTING - KAPASITAS DAN ANGGARAN KELURAHAN (UNIVERSAL):
   1. **Biaya rendah** atau dapat didanai melalui swadaya masyarakat/anggaran kecil.
   2. **Melibatkan partisipasi warga** (gotong royong, sosialisasi, edukasi, pelatihan sederhana).
   3. **Sederhana dan terukur**, misalnya: perbaikan fasilitas umum skala kecil, penyuluhan, pembentukan kelompok masyarakat, koordinasi dengan dinas terkait.
-  4. **Menghindari** usulan yang berskala besar, membutuhkan anggaran tinggi, atau di luar kewenangan kelurahan (contoh: pembangunan infrastruktur besar, program rehabilitasi ekosistem luas, pengadaan alat berat, pembangunan gedung baru).
-- Jika ada data master yang menunjukkan angka atau luas (misal: jumlah penduduk, luas wilayah, jumlah sarana), jangan serta-merta menjadikannya prioritas besar. Pertimbangkan apakah kelurahan mampu mengelola isu tersebut dengan cara sederhana (misal: pendataan ulang, koordinasi, sosialisasi, atau perbaikan kecil).
+  4. **Menghindari** usulan yang berskala besar, membutuhkan anggaran tinggi, atau di luar kewenangan kelurahan.
+- Jika ada data master yang menunjukkan angka atau luas, jangan serta-merta menjadikannya prioritas besar. Pertimbangkan apakah kelurahan mampu mengelola isu tersebut dengan cara sederhana.
+`;
+
+  // ======== RELEVANSI TEMATIK ========
+  const relevansiTematik = `
+**ATURAN RELEVANSI TEMATIK - WAJIB DITERAPKAN UNTUK SEMUA DOMAIN**
+
+Sebelum menggunakan suatu data master atau masukan warga sebagai evidence untuk sebuah rekomendasi, pastikan data tersebut SECARA TEMATIK RELEVAN dengan usulan kegiatan dan KONTEKS RAPAT. Jangan hanya karena data berada di domain isu yang sama, lalu digunakan secara otomatis.
+
+**PANDUAN RELEVANSI PER DOMAIN:**
+
+1. **Infrastruktur** → Data yang relevan: luas pemukiman, fasilitas umum, sumur, jalan, drainase, penerangan, dll. 
+   ❌ Data yang tidak relevan: data agama, jumlah penduduk (kecuali terkait kepadatan), data peternakan, data UMKM.
+
+2. **Ekonomi & UMKM** → Data yang relevan: jumlah pedagang, buruh, kelompok simpan pinjam, kelompok tani, peternakan, UKM, dll.
+   ❌ Data yang tidak relevan: data agama, data kesehatan, data pendidikan.
+
+3. **Kesehatan** → Data yang relevan: balita, gizi buruk, imunisasi, posyandu, ibu melahirkan, dll.
+   ❌ Data yang tidak relevan: data agama, data ekonomi, data pendidikan.
+
+4. **Pendidikan** → Data yang relevan: putus sekolah, buta huruf, sarana pendidikan, tingkat pendidikan, dll.
+   ❌ Data yang tidak relevan: data agama, data kesehatan (kecuali terkait stunting untuk PAUD).
+
+5. **Lingkungan** → Data yang relevan: luas pertanian, perkebunan, kehutanan, bank sampah, gotong royong, dll.
+   ❌ Data yang tidak relevan: data agama, data ekonomi (kecuali terkait perikanan).
+
+6. **Sosial & Kesejahteraan** → Data yang relevan: KK, penduduk, DTKS, lansia, difabel, bansos, dll.
+   ⚠️ **ATURAN KHUSUS DATA AGAMA UNTUK DOMAIN SOSIAL:**
+   - Data agama (jumlah pemeluk, tempat ibadah) HANYA boleh digunakan jika rekomendasi secara spesifik membahas:
+     * Kerukunan umat beragama
+     * Bantuan sosial lintas agama
+     * Pemeliharaan tempat ibadah
+     * Kegiatan keagamaan bersama
+   - Jika konteks rapat adalah kegiatan umum (misal: HUT RI, musdes, kegiatan sosial lainnya yang tidak berfokus pada agama), maka data agama HARUS DIABAIKAN karena tidak relevan dengan tema kegiatan.
+   - Contoh: Rapat HUT RI → jangan gunakan data agama untuk rekomendasi. Fokus pada lomba, gotong royong, kebersihan, dekorasi, dll.
+   - Contoh: Rapat kerukunan umat beragama → data agama boleh digunakan.
+
+7. **Keamanan & Ketertiban** → Data yang relevan: pos kamling, angka kriminalitas, siskamling, dll.
+
+8. **Administrasi** → Data yang relevan: aparat, RT/RW, lembaga kemasyarakatan, ormas, dll.
+
+**PRINSIP UTAMA:** 
+Data yang digunakan sebagai evidence HARUS memiliki hubungan langsung dengan isu yang dibahas dan KONTEKS RAPAT. Jika tidak ada data yang relevan, biarkan evidence kosong (count = 0) daripada memaksakan data yang tidak nyambung.
 `;
 
   const baseInstruction = `Anda adalah asisten AI ahli untuk menetukan prioritas pembantu pengambilan keputusan kegiatan kelurahan. Tugas Anda adalah menganalisis data dan menghasilkan 5 rekomendasi prioritas yang dapat ditindaklanjuti.
@@ -115,19 +157,21 @@ SKALA KRITIKALITAS:
 
 ANALISIS DATA:
 - Data master dan masukan warga di atas adalah satu-satunya sumber informasi yang valid.
-- Jumlah data yang digunakan dalam evidence HARUS sesuai dengan data yang tersedia. Misalnya, jika hanya ada 4 masukan warga, maka masukanWargaCount maksimal 4.
-- Jangan menciptakan data baru atau mengasumsikan jumlah yang tidak ada.`;
+- Jumlah data yang digunakan dalam evidence HARUS sesuai dengan data yang tersedia.
+- Jangan menciptakan data baru atau mengasumsikan jumlah yang tidak ada.
+
+${relevansiTematik}`;
 
   let modeInstruction = "";
   let masukanSection = "";
 
   if (mode === "FUSI_DATA") {
     modeInstruction = `MODE: FUSI DATA
-Strategi: Gabungkan frekuensi masukan warga dengan kritikalitas data master, tetapi **WAJIB mempertimbangkan kapasitas dan anggaran kelurahan** (lihat konteks di bawah).
+Strategi: Gabungkan frekuensi masukan warga dengan kritikalitas data master, tetapi **WAJIB mempertimbangkan kapasitas dan anggaran kelurahan**.
 
 - Prioritaskan isu yang sering muncul di masukan warga DAN memiliki kritikalitas tinggi di data master.
 - WAJIB: Setiap prioritas harus berusaha memanfaatkan KEDUA jenis data (masukan warga DAN data master) jika keduanya relevan dengan topik yang sama.
-- Jika suatu rekomendasi hanya didukung oleh satu jenis data (misal hanya masukan warga), itu diperbolehkan ASAL tidak ada data master yang relevan untuk digabung. Jangan memaksakan penggabungan jika tidak ada keterkaitan.
+- Jika suatu rekomendasi hanya didukung oleh satu jenis data, itu diperbolehkan ASAL tidak ada data master yang relevan untuk digabung. Jangan memaksakan penggabungan jika tidak ada keterkaitan.
 - Rumus perhitungan skor:
   * Jika ada evidence (masukanWargaCount > 0 atau dataMasterCount > 0):
     skorPrioritas = (frekuensiMasukan/10 * 0.4) + (bobotKritikalitas * 0.6)
@@ -138,31 +182,9 @@ Strategi: Gabungkan frekuensi masukan warga dengan kritikalitas data master, tet
 - Berikan prioritas lebih tinggi pada rekomendasi yang didukung oleh data master aktual atau masukan warga.
 
 **ATURAN PENGURUTAN PRIORITAS (WAJIB):**
-- Rekomendasi dengan EVIDENCE (masukanWargaCount > 0 atau dataMasterCount > 0) HARUS ditempatkan di atas rekomendasi TANPA EVIDENCE (masukanWargaCount = 0 dan dataMasterCount = 0).
+- Rekomendasi dengan EVIDENCE (masukanWargaCount > 0 atau dataMasterCount > 0) HARUS ditempatkan di atas rekomendasi TANPA EVIDENCE.
 - Di antara rekomendasi yang memiliki evidence, urutkan berdasarkan skorPrioritas (semakin tinggi skor, semakin tinggi prioritasKe).
-- Di antara rekomendasi tanpa evidence, urutkan berdasarkan skorPrioritas (maksimal 0.20), dengan yang memiliki skor lebih tinggi ditempatkan lebih tinggi, tetapi tetap di bawah semua rekomendasi yang memiliki evidence.
-- Contoh urutan yang benar: Prioritas 1 (evidence), 2 (evidence), 3 (evidence), 4 (tanpa evidence, skor 0.20), 5 (tanpa evidence, skor 0.15).
-
-**KRITERIA KELAYAKAN REKOMENDASI (WAJIB DITERAPKAN UNTUK SEMUA DOMAIN):**
-Sebelum menetapkan suatu rekomendasi, tanyakan pada diri sendiri:
-- Apakah kegiatan ini dapat dibiayai dengan anggaran kelurahan + swadaya warga? (Hindari usulan yang membutuhkan dana besar)
-- Apakah perangkat kelurahan dan warga mampu melaksanakannya? (Pilih yang berbasis gotong royong, edukasi, koordinasi, atau pelatihan sederhana)
-- Apakah kegiatan ini memberikan manfaat langsung bagi warga?
-- Jika rekomendasi terkait data master dengan angka besar (misal: luas lahan, jumlah penduduk, jumlah sarana), apakah tindakan yang diusulkan cukup sederhana (misal: pendataan, koordinasi, sosialisasi, perbaikan kecil) dan tidak memerlukan program besar yang tidak mungkin dilaksanakan kelurahan?
-- Jika usulan terkesan terlalu besar atau tidak realistis, ubah menjadi kegiatan yang lebih kecil namun tetap berdampak (misal: dari "pembangunan jalan baru" menjadi "perbaikan jalan rusak dengan gotong royong", atau dari "rehabilitasi hutan" menjadi "sosialisasi bahaya sampah di area hutan dan koordinasi dengan dinas terkait").
-
-**CONTOH REKOMENDASI YANG BAIK (UNIVERSAL):**
-- Sosialisasi, edukasi, atau pelatihan untuk warga.
-- Kerja bakti atau gotong royong rutin.
-- Penambahan atau perbaikan fasilitas publik skala kecil.
-- Pembentukan atau pengaktifan kelompok masyarakat (misal: bank sampah, posyandu, kelompok tani).
-- Koordinasi dengan dinas terkait untuk penanganan lebih lanjut.
-
-**CONTOH REKOMENDASI YANG KURANG TEPAT (HARUS DIHINDARI):**
-- Pembangunan infrastruktur berskala besar (jalan baru, jembatan, gedung).
-- Program yang membutuhkan anggaran tinggi dan teknologi canggih.
-- Kegiatan yang memerlukan kewenangan di luar kelurahan (misal: penetapan kebijakan kabupaten/kota).
-- Rehabilitasi atau pengelolaan aset dalam skala luas yang tidak mungkin dikelola kelurahan.
+- Di antara rekomendasi tanpa evidence, urutkan berdasarkan skorPrioritas (maksimal 0.20).
 
 ${kapasitasKelurahan}`;
 
@@ -175,12 +197,12 @@ Strategi: Analisis murni berdasarkan data master karena masukan warga tidak ters
 - Jika field 'jumlah' ada, bobotkan isu dengan jumlah lebih besar.
 - evidence.masukanWargaCount WAJIB diisi 0.
 - alasanAnalisis WAJIB menyebutkan "Analisis berbasis Data Master".
-- TETAP perhatikan kapasitas kelurahan: jangan buat rekomendasi yang tidak realistis secara anggaran dan sumber daya.`;
+- TETAP perhatikan kapasitas kelurahan: jangan buat rekomendasi yang tidak realistis secara anggaran dan sumber daya.
+- TETAP terapkan aturan relevansi tematik (lihat di atas).`;
 
     masukanSection = `MASUKAN WARGA: Tidak tersedia (mode cadangan)`;
   }
 
-  // Buat daftar program berjalan
   const runningProgramsList =
     runningPrograms.length > 0
       ? runningPrograms
@@ -193,7 +215,7 @@ Strategi: Analisis murni berdasarkan data master karena masukan warga tidak ters
 
   const runningInstruction = `
 INFORMASI PENTING - PROGRAM YANG SEDANG BERJALAN:
-Berikut adalah daftar program kelurahan yang statusnya "BERJALAN" (sedang dikerjakan). Anda WAJIB menghindari menghasilkan rekomendasi prioritas yang serupa dengan program-program ini, baik dari segi judul, deskripsi, maupun lokasi. Jangan merekomendasikan kegiatan yang sudah sedang berjalan.
+Berikut adalah daftar program kelurahan yang statusnya "BERJALAN" (sedang dikerjakan). Anda WAJIB menghindari menghasilkan rekomendasi prioritas yang serupa dengan program-program ini, baik dari segi judul, deskripsi, maupun lokasi.
 
 DAFTAR PROGRAM BERJALAN:
 ${runningProgramsList}
@@ -293,11 +315,7 @@ ${outputSchema}
 
 INSTRUKSI FINAL:
 - Hasilkan tepat 5 item prioritas, diurutkan dari prioritasKe 1 (tertinggi) hingga 5.
-- **WAJIB**: Pastikan semua rekomendasi yang memiliki evidence (masukanWargaCount > 0 atau dataMasterCount > 0) ditempatkan di atas rekomendasi tanpa evidence sama sekali (masukanWargaCount = 0 dan dataMasterCount = 0).
-- **CARA PENGURUTAN**: 
-  1. Kelompokkan rekomendasi menjadi dua kelompok: "ber-evidence" dan "tanpa-evidence".
-  2. Urutkan kelompok "ber-evidence" berdasarkan skorPrioritas (tertinggi ke terendah), beri prioritasKe 1, 2, 3, ...
-  3. Setelah semua rekomendasi ber-evidence selesai, lanjutkan dengan kelompok "tanpa-evidence" yang diurutkan berdasarkan skorPrioritas (tertinggi ke terendah), beri prioritasKe berikutnya.
+- **WAJIB**: Pastikan semua rekomendasi yang memiliki evidence ditempatkan di atas rekomendasi tanpa evidence.
 - Jangan tambahkan field baru atau hapus field wajib.
 - Jangan gunakan komentar atau teks di luar JSON.
 - Pastikan JSON dapat di-parse oleh JSON.parse().
@@ -306,53 +324,36 @@ INSTRUKSI FINAL:
 - evidence.masukanWargaCount harus diisi dengan jumlah masukan warga yang mendukung rekomendasi tersebut (dari data yang diberikan).
 - evidence.dataMasterCount harus diisi dengan jumlah data master yang mendukung rekomendasi tersebut (dari data yang diberikan).
 - evidence.kritikalitas harus diisi berdasarkan data master yang paling relevan.
-- PENTING: Rekomendasi prioritas harus didasarkan pada data yang tersedia (masukan warga atau data master). Jangan merekomendasikan isu yang sama sekali tidak memiliki evidence, kecuali jika sama sekali tidak ada data untuk domain isu tersebut. Jika terpaksa merekomendasikan tanpa evidence, beri skor maksimal 0.20 dan kritikalitas SEDANG atau RENDAH.
-- Gabungkan data master yang saling berkaitan (misal: jumlah penduduk dan jumlah KK) dalam satu rekomendasi, jangan dipisah.
+- PENTING: Rekomendasi prioritas harus didasarkan pada data yang tersedia. Jangan merekomendasikan isu yang sama sekali tidak memiliki evidence, kecuali jika sama sekali tidak ada data untuk domain isu tersebut. Jika terpaksa merekomendasikan tanpa evidence, beri skor maksimal 0.20.
+- Gabungkan data master yang saling berkaitan dalam satu rekomendasi, jangan dipisah.
 - Manfaatkan beberapa masukan warga yang relevan untuk memperkuat satu rekomendasi.
-- evidence.dataMasterCount dan evidence.masukanWargaCount harus mencerminkan jumlah sebenarnya yang mendukung.
+
+**WAJIB - RELEVANSI DATA DI FINAL OUTPUT:**
+- Sebelum menetapkan evidence untuk suatu rekomendasi, periksa kembali apakah data tersebut benar-benar relevan secara tematik dan sesuai dengan KONTEKS RAPAT.
+- Untuk rapat HUT RI, kegiatan yang relevan: lomba, gotong royong, kebersihan, dekorasi, jalan santai, bakti sosial, dll.
+- JANGAN gunakan data agama untuk rekomendasi HUT RI kecuali jika rapat secara spesifik membahas kegiatan keagamaan bersama.
+- Jika Anda ragu apakah suatu data relevan dengan konteks rapat, lebih baik tidak digunakan.
 
 **PENTING - KONSISTENSI ID (WAJIB):**
-- Setiap prioritas WAJIB memiliki field "usedMasukanIds" (array of string) dan "usedDataMasterIds" (array of string).
+- Setiap prioritas WAJIB memiliki field "usedMasukanIds" dan "usedDataMasterIds".
 - usedMasukanIds harus berisi ID dari masukan warga yang digunakan sebagai evidence, dan jumlah elemennya HARUS sama dengan evidence.masukanWargaCount.
 - usedDataMasterIds harus berisi ID dari data master yang digunakan sebagai evidence, dan jumlah elemennya HARUS sama dengan evidence.dataMasterCount.
 - ID yang dicantumkan HARUS berasal dari data yang diberikan (jangan buat ID fiktif).
 - Jika evidence.masukanWargaCount = 0, maka usedMasukanIds harus berupa array kosong [].
 - Jika evidence.dataMasterCount = 0, maka usedDataMasterIds harus berupa array kosong [].
-- Deskripsi dan alasanAnalisis harus konsisten dengan ID yang dipilih (misalnya, jika usedDataMasterIds berisi ID "cmpjbu0aa...", deskripsi harus merujuk pada atribut yang sesuai).
-- Jangan memasukkan ID data master ke dalam usedDataMasterIds jika tidak relevan dengan deskripsi rekomendasi.
-
-**PERINGATAN KHUSUS - KONSISTENSI DESKRIPSI DENGAN ID DATA MASTER:**
-- Jika Anda menyebutkan nama atribut tertentu di deskripsi (misal: "pertanian sawah", "perikanan", "kehutanan", "perkebunan"), maka usedDataMasterIds HARUS berisi ID dari data master yang memiliki namaAtribut yang sesuai.
-- Contoh:
-  * Deskripsi menyebut "pertanian sawah" → usedDataMasterIds harus berisi ID dengan namaAtribut "Luas pertanian sawah (ha)"
-  * Deskripsi menyebut "perikanan" → usedDataMasterIds harus berisi ID dengan namaAtribut "Luas perikanan"
-  * Deskripsi menyebut "kehutanan" → usedDataMasterIds harus berisi ID dengan namaAtribut "Luas kehutanan (ha)"
-  * Deskripsi menyebut "perkebunan" → usedDataMasterIds harus berisi ID dengan namaAtribut "Luas perkebunan (ha)"
-- Jangan menukar ID antar rekomendasi. Setiap ID hanya boleh digunakan pada rekomendasi yang relevan dengan deskripsinya.
-- Periksa kembali setiap pasangan (deskripsi, usedDataMasterIds) sebelum output. Jika tidak cocok, PERBAIKI.
+- Deskripsi dan alasanAnalisis harus konsisten dengan ID yang dipilih.
 
 **VALIDASI KONSISTENSI (WAJIB DIPERIKSA SEBELUM OUTPUT):**
-- Sebelum menghasilkan output, periksa kembali setiap prioritas:
-  * Panjang array usedMasukanIds HARUS sama dengan evidence.masukanWargaCount
-  * Panjang array usedDataMasterIds HARUS sama dengan evidence.dataMasterCount
-  * Jika tidak sama, PERBAIKI dengan menambahkan atau menghapus ID yang sesuai.
-- Contoh BENAR:
-  * evidence.masukanWargaCount = 2 → usedMasukanIds = ["id1", "id2"] (panjang 2)
-  * evidence.dataMasterCount = 1 → usedDataMasterIds = ["id3"] (panjang 1)
-  * evidence.dataMasterCount = 0 → usedDataMasterIds = [] (panjang 0)
-- Contoh SALAH (JANGAN DIBUAT):
-  * evidence.dataMasterCount = 1 → usedDataMasterIds = [] (panjang 0) ❌
-  * evidence.masukanWargaCount = 2 → usedMasukanIds = ["id1"] (panjang 1) ❌
-- Jika Anda menyebutkan data master di alasanAnalisis, PASTIKAN ID-nya dicantumkan di usedDataMasterIds.
+- Panjang array usedMasukanIds HARUS sama dengan evidence.masukanWargaCount
+- Panjang array usedDataMasterIds HARUS sama dengan evidence.dataMasterCount
+- Jika tidak sama, PERBAIKI dengan menambahkan atau menghapus ID yang sesuai.
 
-**INSTRUKSI PENGGABUNGAN DATA (WAJIB UNTUK MODE FUSI_DATA):**
-- Dalam mode FUSI_DATA, setiap prioritas HARUS berusaha memanfaatkan KEDUA jenis data (masukan warga dan data master) jika terdapat keterkaitan tematik.
-- Contoh: Jika ada masukan "sampah di RT 03" dan data master "luas pertanian 52 ha", maka satu rekomendasi bisa menjadi "Pembersihan sampah di area pertanian dan permukiman RT 03".
+**INSTRUKSI PENGGABUNGAN DATA:**
+- Dalam mode FUSI_DATA, setiap prioritas HARUS berusaha memanfaatkan KEDUA jenis data jika terdapat keterkaitan tematik.
 - Jangan membuat rekomendasi terpisah untuk masukan dan data master jika topiknya bisa digabung.
 - Jika memang tidak ada data master yang relevan dengan suatu masukan, barulah gunakan hanya masukan saja (dan sebaliknya).
-- Prioritas dengan kombinasi evidence (masukanWargaCount > 0 DAN dataMasterCount > 0) akan mendapat bobot tambahan dalam skor (lihat rumus scoring).
 
-**TERAKHIR: SETIAP REKOMENDASI HARUS REALISTIS DAN SESUAI KAPASITAS KELURAHAN** - Jika suatu usulan terkesan terlalu besar atau mahal, ubah menjadi kegiatan sederhana yang tetap berdampak.
+**TERAKHIR: SETIAP REKOMENDASI HARUS REALISTIS DAN SESUAI KAPASITAS KELURAHAN**
 
 Sekarang, hasilkan rekomendasi berdasarkan data di atas. Output HANYA JSON.`;
 }
