@@ -40,7 +40,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -339,12 +338,12 @@ export default function ProgramKelurahanList({
             </div>
 
             <div className="relative flex-1 w-full sm:max-w-md">
-              <Input
+              {/* <Input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Cari judul / lokasi / PIC..."
                 className="pr-10 w-full"
-              />
+              /> */}
               {q && (
                 <button
                   onClick={() => setQ("")}
@@ -404,7 +403,7 @@ export default function ProgramKelurahanList({
                   <TableHead className="w-12 text-center">No</TableHead>
                   <TableHead className="min-w-37.5">Judul</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>PIC</TableHead>
+                  {/* <TableHead>PIC</TableHead> */}
                   <TableHead>Domain Isu</TableHead>
                   <TableHead className="min-w-30">Lokasi</TableHead>
                   <TableHead>Tgl Mulai</TableHead>
@@ -463,9 +462,9 @@ export default function ProgramKelurahanList({
                           {statusBadgeMap[statusKey]?.label}
                         </Badge>
                       </TableCell>
-                      <TableCell className="truncate max-w-30">
+                      {/* <TableCell className="truncate max-w-30">
                         {item.pic || "-"}
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell>
                         {item.domainIsu ? (
                           <Badge

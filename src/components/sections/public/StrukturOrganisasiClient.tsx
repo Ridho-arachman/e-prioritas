@@ -1,7 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
-import Image from "next/image";
 import {
   Card,
   CardContent,
@@ -9,24 +7,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { motion } from "framer-motion";
 import {
-  ShieldCheck,
-  Users,
-  Shield,
-  HeartHandshake,
-  BookOpen,
-  Users2,
-  Handshake,
-  Building2,
   Briefcase,
-  ChevronRight,
-  Star,
-  MapPin,
-  Database,
-  TrendingUp,
-  Award,
+  Building2,
   Calendar,
+  ChevronRight,
+  Database,
+  MapPin,
+  ShieldCheck,
+  Star,
+  Users,
 } from "lucide-react";
+import Image from "next/image";
 
 export default function StrukturOrganisasiClient() {
   // Data Struktur Pemerintahan (berdasarkan dokumen tahun 2026)
@@ -56,77 +49,77 @@ export default function StrukturOrganisasiClient() {
   };
 
   // Data LPM (Lembaga Pemberdayaan Masyarakat)
-  const lpm = {
-    ketua: "Bahrun",
-    bendahara: "Saiman",
-    sekretaris: "Rosyid, ST",
-    anggota: [
-      "Eri Supriyadi",
-      "H. Mistar",
-      "Sanari",
-      "Sutrisno",
-      "Udin",
-      "Abdullah",
-    ],
-  };
+  // const lpm = {
+  //   ketua: "Bahrun",
+  //   bendahara: "Saiman",
+  //   sekretaris: "Rosyid, ST",
+  //   anggota: [
+  //     "Eri Supriyadi",
+  //     "H. Mistar",
+  //     "Sanari",
+  //     "Sutrisno",
+  //     "Udin",
+  //     "Abdullah",
+  //   ],
+  // };
 
   // Data Lembaga Kemasyarakatan Lainnya (berdasarkan dokumen)
-  const lembagaKemasyarakatan = [
-    {
-      nama: "LPM",
-      jumlah: 3,
-      icon: Handshake,
-      desc: "Lembaga Pemberdayaan Masyarakat",
-    },
-    {
-      nama: "PKK",
-      jumlah: 7,
-      icon: BookOpen,
-      desc: "Pembinaan Kesejahteraan Keluarga",
-    },
-    {
-      nama: "Posyandu",
-      jumlah: 33,
-      icon: HeartHandshake,
-      desc: "Pelayanan Kesehatan Ibu dan Anak",
-    },
-    {
-      nama: "Karang Taruna",
-      jumlah: 1,
-      icon: Users2,
-      desc: "Organisasi Kepemudaan",
-    },
-    {
-      nama: "Kelompok Pengajian",
-      jumlah: 15,
-      icon: Users,
-      desc: "Kegiatan Keagamaan",
-    },
-    {
-      nama: "Kelompok Arisan",
-      jumlah: 17,
-      icon: Users,
-      desc: "Simpan Pinjam Sosial",
-    },
-    {
-      nama: "Simpan Pinjam",
-      jumlah: 81,
-      icon: TrendingUp,
-      desc: "Lembaga Keuangan Mikro",
-    },
-    {
-      nama: "Kelompok Tani / Gapoktan",
-      jumlah: 6,
-      icon: Award,
-      desc: "Kelompok Tani dan Gapoktan",
-    },
-    {
-      nama: "Ormas/LSM",
-      jumlah: 4,
-      icon: Shield,
-      desc: "Organisasi Masyarakat",
-    },
-  ];
+  // const lembagaKemasyarakatan = [
+  //   {
+  //     nama: "LPM",
+  //     jumlah: 3,
+  //     icon: Handshake,
+  //     desc: "Lembaga Pemberdayaan Masyarakat",
+  //   },
+  //   {
+  //     nama: "PKK",
+  //     jumlah: 7,
+  //     icon: BookOpen,
+  //     desc: "Pembinaan Kesejahteraan Keluarga",
+  //   },
+  //   {
+  //     nama: "Posyandu",
+  //     jumlah: 33,
+  //     icon: HeartHandshake,
+  //     desc: "Pelayanan Kesehatan Ibu dan Anak",
+  //   },
+  //   {
+  //     nama: "Karang Taruna",
+  //     jumlah: 1,
+  //     icon: Users2,
+  //     desc: "Organisasi Kepemudaan",
+  //   },
+  //   {
+  //     nama: "Kelompok Pengajian",
+  //     jumlah: 15,
+  //     icon: Users,
+  //     desc: "Kegiatan Keagamaan",
+  //   },
+  //   {
+  //     nama: "Kelompok Arisan",
+  //     jumlah: 17,
+  //     icon: Users,
+  //     desc: "Simpan Pinjam Sosial",
+  //   },
+  //   {
+  //     nama: "Simpan Pinjam",
+  //     jumlah: 81,
+  //     icon: TrendingUp,
+  //     desc: "Lembaga Keuangan Mikro",
+  //   },
+  //   {
+  //     nama: "Kelompok Tani / Gapoktan",
+  //     jumlah: 6,
+  //     icon: Award,
+  //     desc: "Kelompok Tani dan Gapoktan",
+  //   },
+  //   {
+  //     nama: "Ormas/LSM",
+  //     jumlah: 4,
+  //     icon: Shield,
+  //     desc: "Organisasi Masyarakat",
+  //   },
+  // ];
 
   // Data Rukun Kampung (RW)
   const rwList = [
@@ -348,7 +341,7 @@ export default function StrukturOrganisasiClient() {
       </section>
 
       {/* LPM (Lembaga Pemberdayaan Masyarakat) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      {/* <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -406,10 +399,10 @@ export default function StrukturOrganisasiClient() {
             </CardContent>
           </Card>
         </motion.div>
-      </section>
+      </section> */}
 
       {/* Lembaga Kemasyarakatan Lainnya */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      {/* <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -445,7 +438,7 @@ export default function StrukturOrganisasiClient() {
             </motion.div>
           ))}
         </div>
-      </section>
+      </section> */}
 
       {/* Pembagian Wilayah (Rukun Kampung) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

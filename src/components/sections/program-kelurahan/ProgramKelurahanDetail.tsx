@@ -108,12 +108,12 @@ export default function ProgramKelurahanDetail({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-start gap-3">
               <User className="h-5 w-5 text-slate-400 mt-0.5" />
-              <div>
+              {/* <div>
                 <p className="text-sm font-medium text-slate-500">
                   Penanggung Jawab (PIC)
                 </p>
                 <p className="text-slate-700">{data?.pic || "-"}</p>
-              </div>
+              </div> */}
             </div>
             <div className="flex items-start gap-3">
               <Tag className="h-5 w-5 text-slate-400 mt-0.5" />

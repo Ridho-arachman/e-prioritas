@@ -7,7 +7,7 @@ export type ProgramKelurahanCreateInput = {
   status?: StatusProgram;
   tanggalMulai?: Date | null;
   tanggalSelesai?: Date | null;
-  pic: string;
+  // pic: string;
   domainIsuId: string;
   lokasi?: string | null; // ✅ single field
 };
@@ -39,7 +39,7 @@ export const programKelurahanService = {
         status: data.status ?? StatusProgram.BERJALAN,
         tanggalMulai: data.tanggalMulai,
         tanggalSelesai: data.tanggalSelesai,
-        pic: data.pic,
+        // pic: data.pic,
         domainIsuId: data.domainIsuId,
         lokasi: data.lokasi, // ✅
       },
@@ -119,7 +119,7 @@ export const programKelurahanService = {
         status: data.status,
         tanggalMulai: data.tanggalMulai,
         tanggalSelesai: data.tanggalSelesai,
-        pic: data.pic,
+        // pic: data.pic,
         domainIsuId: data.domainIsuId,
         lokasi: data.lokasi, // ✅
       },

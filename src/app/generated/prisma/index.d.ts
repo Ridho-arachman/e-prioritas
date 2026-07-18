@@ -16184,7 +16184,6 @@ export namespace Prisma {
     tanggalSelesai: Date | null
     lokasi: string | null
     domainIsuId: string | null
-    pic: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -16198,7 +16197,6 @@ export namespace Prisma {
     tanggalSelesai: Date | null
     lokasi: string | null
     domainIsuId: string | null
-    pic: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -16212,7 +16210,6 @@ export namespace Prisma {
     tanggalSelesai: number
     lokasi: number
     domainIsuId: number
-    pic: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -16228,7 +16225,6 @@ export namespace Prisma {
     tanggalSelesai?: true
     lokasi?: true
     domainIsuId?: true
-    pic?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -16242,7 +16238,6 @@ export namespace Prisma {
     tanggalSelesai?: true
     lokasi?: true
     domainIsuId?: true
-    pic?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -16256,7 +16251,6 @@ export namespace Prisma {
     tanggalSelesai?: true
     lokasi?: true
     domainIsuId?: true
-    pic?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -16343,7 +16337,6 @@ export namespace Prisma {
     tanggalSelesai: Date | null
     lokasi: string | null
     domainIsuId: string | null
-    pic: string | null
     createdAt: Date
     updatedAt: Date
     _count: ProgramKelurahanCountAggregateOutputType | null
@@ -16374,7 +16367,6 @@ export namespace Prisma {
     tanggalSelesai?: boolean
     lokasi?: boolean
     domainIsuId?: boolean
-    pic?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     domainIsu?: boolean | ProgramKelurahan$domainIsuArgs<ExtArgs>
@@ -16389,7 +16381,6 @@ export namespace Prisma {
     tanggalSelesai?: boolean
     lokasi?: boolean
     domainIsuId?: boolean
-    pic?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     domainIsu?: boolean | ProgramKelurahan$domainIsuArgs<ExtArgs>
@@ -16404,7 +16395,6 @@ export namespace Prisma {
     tanggalSelesai?: boolean
     lokasi?: boolean
     domainIsuId?: boolean
-    pic?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     domainIsu?: boolean | ProgramKelurahan$domainIsuArgs<ExtArgs>
@@ -16419,12 +16409,11 @@ export namespace Prisma {
     tanggalSelesai?: boolean
     lokasi?: boolean
     domainIsuId?: boolean
-    pic?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ProgramKelurahanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "judul" | "deskripsi" | "status" | "tanggalMulai" | "tanggalSelesai" | "lokasi" | "domainIsuId" | "pic" | "createdAt" | "updatedAt", ExtArgs["result"]["programKelurahan"]>
+  export type ProgramKelurahanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "judul" | "deskripsi" | "status" | "tanggalMulai" | "tanggalSelesai" | "lokasi" | "domainIsuId" | "createdAt" | "updatedAt", ExtArgs["result"]["programKelurahan"]>
   export type ProgramKelurahanInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     domainIsu?: boolean | ProgramKelurahan$domainIsuArgs<ExtArgs>
   }
@@ -16449,7 +16438,6 @@ export namespace Prisma {
       tanggalSelesai: Date | null
       lokasi: string | null
       domainIsuId: string | null
-      pic: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["programKelurahan"]>
@@ -16884,7 +16872,6 @@ export namespace Prisma {
     readonly tanggalSelesai: FieldRef<"ProgramKelurahan", 'DateTime'>
     readonly lokasi: FieldRef<"ProgramKelurahan", 'String'>
     readonly domainIsuId: FieldRef<"ProgramKelurahan", 'String'>
-    readonly pic: FieldRef<"ProgramKelurahan", 'String'>
     readonly createdAt: FieldRef<"ProgramKelurahan", 'DateTime'>
     readonly updatedAt: FieldRef<"ProgramKelurahan", 'DateTime'>
   }
@@ -18632,7 +18619,6 @@ export namespace Prisma {
     tanggalSelesai: 'tanggalSelesai',
     lokasi: 'lokasi',
     domainIsuId: 'domainIsuId',
-    pic: 'pic',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -19820,7 +19806,6 @@ export namespace Prisma {
     tanggalSelesai?: DateTimeNullableFilter<"ProgramKelurahan"> | Date | string | null
     lokasi?: StringNullableFilter<"ProgramKelurahan"> | string | null
     domainIsuId?: StringNullableFilter<"ProgramKelurahan"> | string | null
-    pic?: StringNullableFilter<"ProgramKelurahan"> | string | null
     createdAt?: DateTimeFilter<"ProgramKelurahan"> | Date | string
     updatedAt?: DateTimeFilter<"ProgramKelurahan"> | Date | string
     domainIsu?: XOR<DomainIsuNullableScalarRelationFilter, DomainIsuWhereInput> | null
@@ -19835,7 +19820,6 @@ export namespace Prisma {
     tanggalSelesai?: SortOrderInput | SortOrder
     lokasi?: SortOrderInput | SortOrder
     domainIsuId?: SortOrderInput | SortOrder
-    pic?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     domainIsu?: DomainIsuOrderByWithRelationInput
@@ -19853,7 +19837,6 @@ export namespace Prisma {
     tanggalSelesai?: DateTimeNullableFilter<"ProgramKelurahan"> | Date | string | null
     lokasi?: StringNullableFilter<"ProgramKelurahan"> | string | null
     domainIsuId?: StringNullableFilter<"ProgramKelurahan"> | string | null
-    pic?: StringNullableFilter<"ProgramKelurahan"> | string | null
     createdAt?: DateTimeFilter<"ProgramKelurahan"> | Date | string
     updatedAt?: DateTimeFilter<"ProgramKelurahan"> | Date | string
     domainIsu?: XOR<DomainIsuNullableScalarRelationFilter, DomainIsuWhereInput> | null
@@ -19868,7 +19851,6 @@ export namespace Prisma {
     tanggalSelesai?: SortOrderInput | SortOrder
     lokasi?: SortOrderInput | SortOrder
     domainIsuId?: SortOrderInput | SortOrder
-    pic?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ProgramKelurahanCountOrderByAggregateInput
@@ -19888,7 +19870,6 @@ export namespace Prisma {
     tanggalSelesai?: DateTimeNullableWithAggregatesFilter<"ProgramKelurahan"> | Date | string | null
     lokasi?: StringNullableWithAggregatesFilter<"ProgramKelurahan"> | string | null
     domainIsuId?: StringNullableWithAggregatesFilter<"ProgramKelurahan"> | string | null
-    pic?: StringNullableWithAggregatesFilter<"ProgramKelurahan"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"ProgramKelurahan"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"ProgramKelurahan"> | Date | string
   }
@@ -20982,7 +20963,6 @@ export namespace Prisma {
     tanggalMulai?: Date | string | null
     tanggalSelesai?: Date | string | null
     lokasi?: string | null
-    pic?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     domainIsu?: DomainIsuCreateNestedOneWithoutProgramKelurahanInput
@@ -20997,7 +20977,6 @@ export namespace Prisma {
     tanggalSelesai?: Date | string | null
     lokasi?: string | null
     domainIsuId?: string | null
-    pic?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -21010,7 +20989,6 @@ export namespace Prisma {
     tanggalMulai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tanggalSelesai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
-    pic?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     domainIsu?: DomainIsuUpdateOneWithoutProgramKelurahanNestedInput
@@ -21025,7 +21003,6 @@ export namespace Prisma {
     tanggalSelesai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
     domainIsuId?: NullableStringFieldUpdateOperationsInput | string | null
-    pic?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -21039,7 +21016,6 @@ export namespace Prisma {
     tanggalSelesai?: Date | string | null
     lokasi?: string | null
     domainIsuId?: string | null
-    pic?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -21052,7 +21028,6 @@ export namespace Prisma {
     tanggalMulai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tanggalSelesai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
-    pic?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -21066,7 +21041,6 @@ export namespace Prisma {
     tanggalSelesai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
     domainIsuId?: NullableStringFieldUpdateOperationsInput | string | null
-    pic?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -22090,7 +22064,6 @@ export namespace Prisma {
     tanggalSelesai?: SortOrder
     lokasi?: SortOrder
     domainIsuId?: SortOrder
-    pic?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -22104,7 +22077,6 @@ export namespace Prisma {
     tanggalSelesai?: SortOrder
     lokasi?: SortOrder
     domainIsuId?: SortOrder
-    pic?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -22118,7 +22090,6 @@ export namespace Prisma {
     tanggalSelesai?: SortOrder
     lokasi?: SortOrder
     domainIsuId?: SortOrder
-    pic?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -23674,7 +23645,6 @@ export namespace Prisma {
     tanggalMulai?: Date | string | null
     tanggalSelesai?: Date | string | null
     lokasi?: string | null
-    pic?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -23687,7 +23657,6 @@ export namespace Prisma {
     tanggalMulai?: Date | string | null
     tanggalSelesai?: Date | string | null
     lokasi?: string | null
-    pic?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -23833,7 +23802,6 @@ export namespace Prisma {
     tanggalSelesai?: DateTimeNullableFilter<"ProgramKelurahan"> | Date | string | null
     lokasi?: StringNullableFilter<"ProgramKelurahan"> | string | null
     domainIsuId?: StringNullableFilter<"ProgramKelurahan"> | string | null
-    pic?: StringNullableFilter<"ProgramKelurahan"> | string | null
     createdAt?: DateTimeFilter<"ProgramKelurahan"> | Date | string
     updatedAt?: DateTimeFilter<"ProgramKelurahan"> | Date | string
   }
@@ -25814,7 +25782,6 @@ export namespace Prisma {
     tanggalMulai?: Date | string | null
     tanggalSelesai?: Date | string | null
     lokasi?: string | null
-    pic?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -25966,7 +25933,6 @@ export namespace Prisma {
     tanggalMulai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tanggalSelesai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
-    pic?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -25979,7 +25945,6 @@ export namespace Prisma {
     tanggalMulai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tanggalSelesai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
-    pic?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -25992,7 +25957,6 @@ export namespace Prisma {
     tanggalMulai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tanggalSelesai?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lokasi?: NullableStringFieldUpdateOperationsInput | string | null
-    pic?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

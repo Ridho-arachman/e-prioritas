@@ -12,7 +12,6 @@ const baseProgramKelurahanSchema = z.object({
   status: z.nativeEnum(StatusProgram).default(StatusProgram.BERJALAN),
   tanggalMulai: z.string().optional().nullable(),
   tanggalSelesai: z.string().optional().nullable(),
-  pic: z.string().min(1, "PIC wajib diisi").max(100),
   domainIsuId: z.string().min(1, "Domain Isu wajib diisi"),
   lokasi: z.string().optional().nullable(), // ✅ single field
 });
@@ -34,7 +33,7 @@ export const programKelurahanCreateSchema = baseProgramKelurahanSchema
     (data) => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       if (data.status === StatusProgram.BERJALAN && data.tanggalMulai) {
         const tanggalMulai = new Date(data.tanggalMulai);
         tanggalMulai.setHours(0, 0, 0, 0);
@@ -51,7 +50,7 @@ export const programKelurahanCreateSchema = baseProgramKelurahanSchema
     (data) => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       if (data.status === StatusProgram.SELESAI && data.tanggalSelesai) {
         const tanggalSelesai = new Date(data.tanggalSelesai);
         tanggalSelesai.setHours(0, 0, 0, 0);
@@ -60,7 +59,8 @@ export const programKelurahanCreateSchema = baseProgramKelurahanSchema
       return true;
     },
     {
-      message: "Tanggal selesai tidak boleh lewat hari ini untuk status selesai",
+      message:
+        "Tanggal selesai tidak boleh lewat hari ini untuk status selesai",
       path: ["tanggalSelesai"],
     },
   )
@@ -69,7 +69,7 @@ export const programKelurahanCreateSchema = baseProgramKelurahanSchema
     (data) => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       if (data.status === StatusProgram.DITUNDA && data.tanggalMulai) {
         const tanggalMulai = new Date(data.tanggalMulai);
         tanggalMulai.setHours(0, 0, 0, 0);
@@ -78,7 +78,8 @@ export const programKelurahanCreateSchema = baseProgramKelurahanSchema
       return true;
     },
     {
-      message: "Tanggal mulai tidak boleh sebelum hari ini untuk status ditunda",
+      message:
+        "Tanggal mulai tidak boleh sebelum hari ini untuk status ditunda",
       path: ["tanggalMulai"],
     },
   )
@@ -86,7 +87,7 @@ export const programKelurahanCreateSchema = baseProgramKelurahanSchema
     (data) => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       if (data.status === StatusProgram.DITUNDA && data.tanggalMulai) {
         const tanggalMulai = new Date(data.tanggalMulai);
         tanggalMulai.setHours(0, 0, 0, 0);
@@ -95,7 +96,8 @@ export const programKelurahanCreateSchema = baseProgramKelurahanSchema
       return true;
     },
     {
-      message: "Tanggal mulai tidak boleh sebelum hari ini untuk status ditunda",
+      message:
+        "Tanggal mulai tidak boleh sebelum hari ini untuk status ditunda",
       path: ["tanggalMulai"],
     },
   )
@@ -103,7 +105,7 @@ export const programKelurahanCreateSchema = baseProgramKelurahanSchema
     (data) => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       if (data.status === StatusProgram.BERJALAN && data.tanggalSelesai) {
         const tanggalSelesai = new Date(data.tanggalSelesai);
         tanggalSelesai.setHours(0, 0, 0, 0);
@@ -112,7 +114,8 @@ export const programKelurahanCreateSchema = baseProgramKelurahanSchema
       return true;
     },
     {
-      message: "Tanggal selesai sudah lewat hari ini, status tidak boleh berjalan",
+      message:
+        "Tanggal selesai sudah lewat hari ini, status tidak boleh berjalan",
       path: ["status"],
     },
   );
@@ -143,7 +146,7 @@ export const programKelurahanUpdateSchema = partialBaseSchema
     (data) => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       if (data.status === StatusProgram.BERJALAN && data.tanggalMulai) {
         const tanggalMulai = new Date(data.tanggalMulai);
         tanggalMulai.setHours(0, 0, 0, 0);
@@ -160,7 +163,7 @@ export const programKelurahanUpdateSchema = partialBaseSchema
     (data) => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       if (data.status === StatusProgram.SELESAI && data.tanggalSelesai) {
         const tanggalSelesai = new Date(data.tanggalSelesai);
         tanggalSelesai.setHours(0, 0, 0, 0);
@@ -169,7 +172,8 @@ export const programKelurahanUpdateSchema = partialBaseSchema
       return true;
     },
     {
-      message: "Tanggal selesai tidak boleh lewat hari ini untuk status selesai",
+      message:
+        "Tanggal selesai tidak boleh lewat hari ini untuk status selesai",
       path: ["tanggalSelesai"],
     },
   )
@@ -178,7 +182,7 @@ export const programKelurahanUpdateSchema = partialBaseSchema
     (data) => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       if (data.status === StatusProgram.BERJALAN && data.tanggalSelesai) {
         const tanggalSelesai = new Date(data.tanggalSelesai);
         tanggalSelesai.setHours(0, 0, 0, 0);
@@ -187,7 +191,8 @@ export const programKelurahanUpdateSchema = partialBaseSchema
       return true;
     },
     {
-      message: "Tanggal selesai sudah lewat hari ini, status tidak boleh berjalan",
+      message:
+        "Tanggal selesai sudah lewat hari ini, status tidak boleh berjalan",
       path: ["status"],
     },
   );

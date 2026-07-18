@@ -1,10 +1,11 @@
 // app/api/protected/kegiatan-rapat/[id]/export-pdf/route.ts
 import { Role } from "@/app/generated/prisma";
 import { auth } from "@/lib/auth";
+import prisma from "@/lib/prisma"; // <-- IMPORT PRISMA
 import { kegiatanRapatService } from "@/services/kegiatanRapatService";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { PDFDocument, rgb, StandardFonts, PDFPage } from "pdf-lib";
+import { PDFDocument, PDFPage, rgb, StandardFonts } from "pdf-lib";
 
 export const runtime = "nodejs";
 
@@ -137,7 +138,7 @@ const formatTanggalIndonesia = (date: Date | string): string => {
 // ==================== PDF Helper Functions ====================
 const drawHeader = (page: PDFPage, { helvetica, helveticaBold }: Fonts) => {
   const headerY = PAGE_HEIGHT - MARGIN + 15;
-  
+
   page.drawText("KELURAHAN PANGGUNGJATI", {
     x: MARGIN,
     y: headerY,
@@ -180,7 +181,7 @@ const drawFooter = (
   totalPages: number,
 ) => {
   const footerY = MARGIN - 10;
-  
+
   page.drawLine({
     start: { x: MARGIN, y: footerY },
     end: { x: PAGE_WIDTH - MARGIN, y: footerY },
@@ -272,7 +273,7 @@ const drawWrappedText = (
     maxWidth,
     lineHeight = 1.4,
   } = options;
-  
+
   const actualLineHeight = size * lineHeight;
   const safeText = sanitizeText(text);
   const lines = measureTextLines(safeText, font, size, maxWidth);
@@ -298,7 +299,10 @@ const createNewPage = (state: PDFState): PDFState => {
   };
 };
 
-const checkAndAddNewPage = (state: PDFState, requiredHeight: number): PDFState => {
+const checkAndAddNewPage = (
+  state: PDFState,
+  requiredHeight: number,
+): PDFState => {
   if (state.y - requiredHeight < CONTENT_BOTTOM) {
     return createNewPage(state);
   }
@@ -328,7 +332,9 @@ const getKegiatan = async (id: string) => {
   return kegiatan as unknown as KegiatanRapat;
 };
 
-const parseRekomendasi = (kegiatan: KegiatanRapat): RekomendasiSnapshot | null => {
+const parseRekomendasi = (
+  kegiatan: KegiatanRapat,
+): RekomendasiSnapshot | null => {
   if (!kegiatan.rekomendasiItems) return null;
 
   try {
@@ -347,10 +353,30 @@ const parseRekomendasi = (kegiatan: KegiatanRapat): RekomendasiSnapshot | null =
   return null;
 };
 
+// ==================== Ambil Lurah Aktif dari Database ====================
+const getLurahAktif = async () => {
+  const lurah = await prisma.user.findFirst({
+    where: {
+      role: "LURAH",
+      isActive: true,
+    },
+    select: {
+      name: true,
+      jabatan: true,
+    },
+  });
+
+  return lurah;
+};
+
 // ==================== PDF Content Drawers ====================
 const drawTitle = (state: PDFState): PDFState => {
-  const { currentPage, y, fonts: { helveticaBold } } = state;
-  
+  const {
+    currentPage,
+    y,
+    fonts: { helveticaBold },
+  } = state;
+
   currentPage.drawText("LAPORAN KEGIATAN RAPAT", {
     x: MARGIN,
     y,
@@ -362,7 +388,10 @@ const drawTitle = (state: PDFState): PDFState => {
   return { ...state, y: y - 24 };
 };
 
-const drawInfoKegiatan = (state: PDFState, kegiatan: KegiatanRapat): PDFState => {
+const drawInfoKegiatan = (
+  state: PDFState,
+  kegiatan: KegiatanRapat,
+): PDFState => {
   let currentState = state;
   const { helvetica, helveticaBold } = currentState.fonts;
 
@@ -379,7 +408,10 @@ const drawInfoKegiatan = (state: PDFState, kegiatan: KegiatanRapat): PDFState =>
   const infoKiri = [
     { label: "Judul", value: sanitizeText(kegiatan.judul || "-") },
     { label: "Deskripsi", value: sanitizeText(kegiatan.deskripsi || "-") },
-    { label: "Tanggal", value: sanitizeText(formatTanggalIndonesia(kegiatan.tanggal)) },
+    {
+      label: "Tanggal",
+      value: sanitizeText(formatTanggalIndonesia(kegiatan.tanggal)),
+    },
     { label: "Lokasi", value: sanitizeText(kegiatan.lokasi || "-") },
   ];
 
@@ -400,7 +432,10 @@ const drawInfoKegiatan = (state: PDFState, kegiatan: KegiatanRapat): PDFState =>
   ];
 
   if (kegiatan.aiModel) {
-    infoKanan.push({ label: "Model AI", value: sanitizeText(kegiatan.aiModel) });
+    infoKanan.push({
+      label: "Model AI",
+      value: sanitizeText(kegiatan.aiModel),
+    });
   }
 
   if (kegiatan.aiProcessedAt) {
@@ -435,7 +470,7 @@ const drawInfoKegiatan = (state: PDFState, kegiatan: KegiatanRapat): PDFState =>
         size: 9,
         font: helveticaBold,
       });
-      
+
       const { newY: textNewY } = drawWrappedText(
         currentState.currentPage,
         row.kiri.value,
@@ -447,8 +482,8 @@ const drawInfoKegiatan = (state: PDFState, kegiatan: KegiatanRapat): PDFState =>
           maxWidth: colWidth - labelWidth,
         },
       );
-      
-      maxRowHeight = Math.max(maxRowHeight, (tempY - textNewY) + 5);
+
+      maxRowHeight = Math.max(maxRowHeight, tempY - textNewY + 5);
     }
 
     // Draw right column item
@@ -459,7 +494,7 @@ const drawInfoKegiatan = (state: PDFState, kegiatan: KegiatanRapat): PDFState =>
         size: 9,
         font: helveticaBold,
       });
-      
+
       const { newY: textNewY } = drawWrappedText(
         currentState.currentPage,
         row.kanan.value,
@@ -467,8 +502,8 @@ const drawInfoKegiatan = (state: PDFState, kegiatan: KegiatanRapat): PDFState =>
         tempY,
         { size: 9, font: helvetica, maxWidth: colWidth - labelWidth },
       );
-      
-      maxRowHeight = Math.max(maxRowHeight, (tempY - textNewY) + 5);
+
+      maxRowHeight = Math.max(maxRowHeight, tempY - textNewY + 5);
     }
 
     currentY -= maxRowHeight;
@@ -507,7 +542,7 @@ const drawDetail = (
     size: 9,
     font: helveticaBold,
   });
-  
+
   const { newY: textNewY } = drawWrappedText(
     page,
     sanitizeText(value),
@@ -519,10 +554,56 @@ const drawDetail = (
       maxWidth: MAX_CONTENT_WIDTH - 80,
     },
   );
-  
+
   return Math.min(currentYPos - 12, textNewY);
 };
 
+// ==================== Fungsi untuk mendapatkan detail evidence ====================
+const getEvidenceDetails = (
+  item: RekomendasiItem,
+  inputData?: InputData,
+): { masukanDetail: string; dataMasterDetail: string } => {
+  let masukanDetail = "-";
+  let dataMasterDetail = "-";
+
+  if (
+    item.usedMasukanIds &&
+    item.usedMasukanIds.length > 0 &&
+    inputData?.masukan
+  ) {
+    const judulList: string[] = [];
+    for (const id of item.usedMasukanIds) {
+      const found = inputData.masukan.find((m) => m.id === id);
+      if (found) {
+        judulList.push(found.judul);
+      }
+    }
+    if (judulList.length > 0) {
+      masukanDetail = judulList.join("; ");
+    }
+  }
+
+  if (
+    item.usedDataMasterIds &&
+    item.usedDataMasterIds.length > 0 &&
+    inputData?.dataMaster
+  ) {
+    const namaList: string[] = [];
+    for (const id of item.usedDataMasterIds) {
+      const found = inputData.dataMaster.find((dm) => dm.id === id);
+      if (found) {
+        namaList.push(`${found.namaAtribut} (${found.kritikalitas})`);
+      }
+    }
+    if (namaList.length > 0) {
+      dataMasterDetail = namaList.join("; ");
+    }
+  }
+
+  return { masukanDetail, dataMasterDetail };
+};
+
+// ==================== Draw Rekomendasi Prioritas ====================
 const drawRekomendasiPrioritas = (
   state: PDFState,
   rekomendasi: RekomendasiSnapshot | null,
@@ -560,13 +641,19 @@ const drawRekomendasiPrioritas = (
     const metaText = sanitizeText(
       `Dihasilkan: ${formatTanggalIndonesia(meta.generatedAt)} | Model: ${meta.aiModel} | Mode: Fusi Data | Domain: ${meta.domainIsuCode} | Masukan: ${meta.totalMasukanDianalisis} | Data Master: ${meta.totalDataMasterDianalisis}`,
     );
-    
-    const result = drawWrappedText(currentState.currentPage, metaText, MARGIN, currentState.y, {
-      size: 8,
-      font: helvetica,
-      color: COLORS.textSecondary,
-      maxWidth: MAX_CONTENT_WIDTH,
-    });
+
+    const result = drawWrappedText(
+      currentState.currentPage,
+      metaText,
+      MARGIN,
+      currentState.y,
+      {
+        size: 8,
+        font: helvetica,
+        color: COLORS.textSecondary,
+        maxWidth: MAX_CONTENT_WIDTH,
+      },
+    );
     currentState = { ...currentState, y: result.newY - 10 };
   }
 
@@ -574,12 +661,14 @@ const drawRekomendasiPrioritas = (
   for (const item of rekomendasi.prioritas) {
     // Draw the item title (wrapped)
     const itemTitle = `Prioritas ke-${item.prioritasKe}: ${sanitizeText(item.deskripsi)}`;
-    const itemTitleHeight = measureTextHeight(itemTitle, helveticaBold, 11, MAX_CONTENT_WIDTH);
-    
-    // Check if title fits
+    const itemTitleHeight = measureTextHeight(
+      itemTitle,
+      helveticaBold,
+      11,
+      MAX_CONTENT_WIDTH,
+    );
+
     currentState = checkAndAddNewPage(currentState, itemTitleHeight + 5);
-    
-    // Draw wrapped title
     const { newY: titleNewY } = drawWrappedText(
       currentState.currentPage,
       itemTitle,
@@ -590,98 +679,219 @@ const drawRekomendasiPrioritas = (
         font: helveticaBold,
         color: COLORS.primary,
         maxWidth: MAX_CONTENT_WIDTH,
-      }
+      },
     );
     currentState = { ...currentState, y: titleNewY - 5 };
 
     // Draw Skor Prioritas
-    const skorText = `Skor Prioritas: ${item.skorPrioritas}`;
-    const skorHeight = measureTextHeight(skorText, helvetica, 9, MAX_CONTENT_WIDTH - 80);
-    currentState = checkAndAddNewPage(currentState, skorHeight + 12);
+    currentState = checkAndAddNewPage(currentState, 20);
     currentState = {
       ...currentState,
-      y: drawDetail(currentState.currentPage, "Skor Prioritas", item.skorPrioritas.toString(), currentState.y, fonts)
+      y: drawDetail(
+        currentState.currentPage,
+        "Skor Prioritas",
+        item.skorPrioritas.toString(),
+        currentState.y,
+        fonts,
+      ),
     };
 
     // Draw Alasan Analisis
-    const alasanText = `Alasan Analisis: ${item.alasanAnalisis}`;
-    const alasanHeight = measureTextHeight(alasanText, helvetica, 9, MAX_CONTENT_WIDTH - 80);
+    const alasanHeight = measureTextHeight(
+      item.alasanAnalisis,
+      helvetica,
+      9,
+      MAX_CONTENT_WIDTH - 80,
+    );
     currentState = checkAndAddNewPage(currentState, alasanHeight + 12);
     currentState = {
       ...currentState,
-      y: drawDetail(currentState.currentPage, "Alasan Analisis", item.alasanAnalisis, currentState.y, fonts)
+      y: drawDetail(
+        currentState.currentPage,
+        "Alasan Analisis",
+        item.alasanAnalisis,
+        currentState.y,
+        fonts,
+      ),
     };
 
     // Draw Domain Isu
-    const domainText = `Domain Isu: ${item.domainIsuId}`;
-    const domainHeight = measureTextHeight(domainText, helvetica, 9, MAX_CONTENT_WIDTH - 80);
-    currentState = checkAndAddNewPage(currentState, domainHeight + 12);
+    currentState = checkAndAddNewPage(currentState, 20);
     currentState = {
       ...currentState,
-      y: drawDetail(currentState.currentPage, "Domain Isu", item.domainIsuId, currentState.y, fonts)
+      y: drawDetail(
+        currentState.currentPage,
+        "Domain Isu",
+        item.domainIsuId,
+        currentState.y,
+        fonts,
+      ),
     };
 
     // Draw Lokasi if exists
     if (item.lokasiRt || item.lokasiRw) {
-      const lokasiText = `Lokasi: RT ${item.lokasiRt || '-'} / RW ${item.lokasiRw || '-'}`;
-      const lokasiHeight = measureTextHeight(lokasiText, helvetica, 9, MAX_CONTENT_WIDTH - 80);
-      currentState = checkAndAddNewPage(currentState, lokasiHeight + 12);
+      const lokasiText = `RT ${item.lokasiRt || "-"} / RW ${item.lokasiRw || "-"}`;
+      currentState = checkAndAddNewPage(currentState, 20);
       currentState = {
         ...currentState,
-        y: drawDetail(currentState.currentPage, "Lokasi", lokasiText, currentState.y, fonts)
+        y: drawDetail(
+          currentState.currentPage,
+          "Lokasi",
+          lokasiText,
+          currentState.y,
+          fonts,
+        ),
       };
     }
 
-    // Draw Evidence
+    // ==================== Tampilkan Evidence hanya jika ada data ====================
     if (item.evidence) {
-      currentState = checkAndAddNewPage(currentState, 20); // Space for "Evidence:" label
-      currentState.currentPage.drawText("Evidence:", {
-        x: MARGIN + 10,
-        y: currentState.y,
-        size: 9,
-        font: helveticaBold,
-      });
-      currentState = { ...currentState, y: currentState.y - 12 };
-      
-      if (item.evidence.masukanWargaCount) {
-        const masukanText = `  Masukan Warga: ${item.evidence.masukanWargaCount}`;
-        const masukanHeight = measureTextHeight(masukanText, helvetica, 9, MAX_CONTENT_WIDTH - 80);
-        currentState = checkAndAddNewPage(currentState, masukanHeight + 12);
-        currentState = {
-          ...currentState,
-          y: drawDetail(currentState.currentPage, "  Masukan Warga", item.evidence.masukanWargaCount.toString(), currentState.y, fonts)
-        };
-      }
-      
-      if (item.evidence.dataMasterCount) {
-        const dataMasterText = `  Data Master: ${item.evidence.dataMasterCount}`;
-        const dataMasterHeight = measureTextHeight(dataMasterText, helvetica, 9, MAX_CONTENT_WIDTH - 80);
-        currentState = checkAndAddNewPage(currentState, dataMasterHeight + 12);
-        currentState = {
-          ...currentState,
-          y: drawDetail(currentState.currentPage, "  Data Master", item.evidence.dataMasterCount.toString(), currentState.y, fonts)
-        };
-      }
-      
-      if (item.evidence.kritikalitas) {
-        const kritikalitasText = `  Kritikalitas: ${item.evidence.kritikalitas}`;
-        const kritikalitasHeight = measureTextHeight(kritikalitasText, helvetica, 9, MAX_CONTENT_WIDTH - 80);
-        currentState = checkAndAddNewPage(currentState, kritikalitasHeight + 12);
-        currentState = {
-          ...currentState,
-          y: drawDetail(currentState.currentPage, "  Kritikalitas", item.evidence.kritikalitas, currentState.y, fonts)
-        };
+      const hasEvidence =
+        (item.evidence.masukanWargaCount ?? 0) > 0 ||
+        (item.evidence.dataMasterCount ?? 0) > 0;
+
+      if (hasEvidence) {
+        currentState = checkAndAddNewPage(currentState, 30);
+        currentState.currentPage.drawText("Evidence:", {
+          x: MARGIN + 10,
+          y: currentState.y,
+          size: 9,
+          font: helveticaBold,
+        });
+        currentState = { ...currentState, y: currentState.y - 12 };
+
+        // Tampilkan detail dari usedMasukanIds dan usedDataMasterIds
+        const { masukanDetail, dataMasterDetail } = getEvidenceDetails(
+          item,
+          rekomendasi.inputData,
+        );
+
+        // Masukan Warga
+        if (
+          item.evidence.masukanWargaCount !== undefined &&
+          item.evidence.masukanWargaCount > 0
+        ) {
+          currentState = checkAndAddNewPage(currentState, 20);
+          const masukanLabel = `  Masukan Warga (${item.evidence.masukanWargaCount}):`;
+          currentState.currentPage.drawText(masukanLabel, {
+            x: MARGIN + 15,
+            y: currentState.y,
+            size: 9,
+            font: helveticaBold,
+          });
+          currentState = { ...currentState, y: currentState.y - 12 };
+
+          // Detail masukan
+          if (masukanDetail !== "-") {
+            const detailHeight = measureTextHeight(
+              masukanDetail,
+              helvetica,
+              8,
+              MAX_CONTENT_WIDTH - 30,
+            );
+            currentState = checkAndAddNewPage(currentState, detailHeight + 10);
+            const result = drawWrappedText(
+              currentState.currentPage,
+              masukanDetail,
+              MARGIN + 20,
+              currentState.y,
+              {
+                size: 8,
+                font: helvetica,
+                color: COLORS.textSecondary,
+                maxWidth: MAX_CONTENT_WIDTH - 30,
+              },
+            );
+            currentState = { ...currentState, y: result.newY - 8 };
+          } else {
+            currentState.currentPage.drawText("  (detail tidak tersedia)", {
+              x: MARGIN + 20,
+              y: currentState.y,
+              size: 8,
+              font: helvetica,
+              color: COLORS.textSecondary,
+            });
+            currentState = { ...currentState, y: currentState.y - 12 };
+          }
+        }
+
+        // Data Master
+        if (
+          item.evidence.dataMasterCount !== undefined &&
+          item.evidence.dataMasterCount > 0
+        ) {
+          currentState = checkAndAddNewPage(currentState, 20);
+          const dataMasterLabel = `  Data Master (${item.evidence.dataMasterCount}):`;
+          currentState.currentPage.drawText(dataMasterLabel, {
+            x: MARGIN + 15,
+            y: currentState.y,
+            size: 9,
+            font: helveticaBold,
+          });
+          currentState = { ...currentState, y: currentState.y - 12 };
+
+          if (dataMasterDetail !== "-") {
+            const detailHeight = measureTextHeight(
+              dataMasterDetail,
+              helvetica,
+              8,
+              MAX_CONTENT_WIDTH - 30,
+            );
+            currentState = checkAndAddNewPage(currentState, detailHeight + 10);
+            const result = drawWrappedText(
+              currentState.currentPage,
+              dataMasterDetail,
+              MARGIN + 20,
+              currentState.y,
+              {
+                size: 8,
+                font: helvetica,
+                color: COLORS.textSecondary,
+                maxWidth: MAX_CONTENT_WIDTH - 30,
+              },
+            );
+            currentState = { ...currentState, y: result.newY - 8 };
+          } else {
+            currentState.currentPage.drawText("  (detail tidak tersedia)", {
+              x: MARGIN + 20,
+              y: currentState.y,
+              size: 8,
+              font: helvetica,
+              color: COLORS.textSecondary,
+            });
+            currentState = { ...currentState, y: currentState.y - 12 };
+          }
+        }
+
+        // Kritikalitas
+        if (item.evidence.kritikalitas) {
+          currentState = checkAndAddNewPage(currentState, 20);
+          currentState = {
+            ...currentState,
+            y: drawDetail(
+              currentState.currentPage,
+              "  Kritikalitas",
+              item.evidence.kritikalitas,
+              currentState.y,
+              fonts,
+            ),
+          };
+        }
       }
     }
 
     // Draw Warning
     if (item.warning) {
       const warningText = `Peringatan: ${sanitizeText(item.warning)}`;
-      const warningHeight = measureTextHeight(warningText, helvetica, 9, MAX_CONTENT_WIDTH - 20);
-      
-      // Check if warning box fits
+      const warningHeight = measureTextHeight(
+        warningText,
+        helvetica,
+        9,
+        MAX_CONTENT_WIDTH - 20,
+      );
+
       currentState = checkAndAddNewPage(currentState, warningHeight + 30);
-      
+
       currentState.currentPage.drawRectangle({
         x: MARGIN + 5,
         y: currentState.y - warningHeight - 5,
@@ -691,7 +901,7 @@ const drawRekomendasiPrioritas = (
         borderColor: COLORS.warningText,
         borderWidth: 1,
       });
-      
+
       const { newY: warningNewY } = drawWrappedText(
         currentState.currentPage,
         warningText,
@@ -704,7 +914,7 @@ const drawRekomendasiPrioritas = (
           maxWidth: MAX_CONTENT_WIDTH - 20,
         },
       );
-      
+
       currentState = { ...currentState, y: warningNewY - 5 };
     }
 
@@ -715,10 +925,19 @@ const drawRekomendasiPrioritas = (
   return currentState;
 };
 
-const drawPengesahan = (state: PDFState): PDFState => {
+// ==================== Draw Pengesahan dengan Data Lurah Dinamis ====================
+const drawPengesahan = (
+  state: PDFState,
+  lurahName: string,
+  lurahJabatan: string,
+): PDFState => {
   const pengesahanHeight = 120;
   let newState = checkAndAddNewPage(state, pengesahanHeight);
-  let { currentPage, y, fonts: { helvetica, helveticaBold } } = newState;
+  let {
+    currentPage,
+    y,
+    fonts: { helvetica, helveticaBold },
+  } = newState;
 
   currentPage.drawLine({
     start: { x: MARGIN, y: y + 5 },
@@ -747,7 +966,8 @@ const drawPengesahan = (state: PDFState): PDFState => {
     font: helveticaBold,
   });
 
-  currentPage.drawText("Lurah Panggungjati", {
+  // === Tampilkan jabatan Lurah (misal "Lurah Panggungjati") ===
+  currentPage.drawText(sanitizeText(lurahJabatan || "Lurah Panggungjati"), {
     x: rightX,
     y: pengesahanYStart - 15,
     size: 10,
@@ -761,7 +981,8 @@ const drawPengesahan = (state: PDFState): PDFState => {
     color: COLORS.text,
   });
 
-  currentPage.drawText("HERUJI,S.Pd.I.M.Si", {
+  // === Tampilkan nama Lurah ===
+  currentPage.drawText(sanitizeText(lurahName || "Lurah Panggungjati"), {
     x: rightX,
     y: pengesahanYStart - 65,
     size: 10,
@@ -790,7 +1011,7 @@ export async function GET(
   try {
     await authenticateAndGetUser();
     const { id } = await params;
-    
+
     if (!id) {
       return NextResponse.json(
         { success: false, message: "ID tidak ditemukan" },
@@ -800,6 +1021,11 @@ export async function GET(
 
     const kegiatan = await getKegiatan(id);
     const rekomendasi = parseRekomendasi(kegiatan);
+
+    // ======== AMBIL DATA LURAH AKTIF ========
+    const lurah = await getLurahAktif();
+    const lurahName = lurah?.name || "Lurah Panggungjati";
+    const lurahJabatan = lurah?.jabatan || "Lurah Panggungjati";
 
     const pdfDoc = await PDFDocument.create();
     const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
@@ -819,7 +1045,7 @@ export async function GET(
     state = drawTitle(state);
     state = drawInfoKegiatan(state, kegiatan);
     state = drawRekomendasiPrioritas(state, rekomendasi);
-    state = drawPengesahan(state);
+    state = drawPengesahan(state, lurahName, lurahJabatan);
 
     addFootersToAllPages(pdfDoc, helvetica);
 
@@ -837,7 +1063,7 @@ export async function GET(
     });
   } catch (error) {
     console.error("Error generating PDF:", error);
-    
+
     const statusMap: Record<string, number> = {
       "User belum login": 403,
       "Akses ditolak": 403,

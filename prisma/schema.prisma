@@ -339,8 +339,6 @@ model ProgramKelurahan {
   domainIsuId String?
   domainIsu   DomainIsu?     @relation(fields: [domainIsuId], references: [id])
 
-  pic            String?       @db.VarChar(100)
-
   createdAt   DateTime      @default(now()) @map("created_at")
   updatedAt   DateTime      @updatedAt @map("updated_at")
 

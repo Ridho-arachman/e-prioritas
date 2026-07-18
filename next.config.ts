@@ -10,12 +10,12 @@ const nextConfig: NextConfig = {
   //   }
   //   return config;
   // },
-  compiler: {
-    removeConsole: true,
-  },
+  // compiler: {
+  //   removeConsole: true,
+  // },
 
-  // allowedDevOrigins: ["aromatically-dreamiest-delia.ngrok-free.dev"],
-  allowedDevOrigins: ["panggungjati.my.id"],
+  allowedDevOrigins: ["aromatically-dreamiest-delia.ngrok-free.dev"],
+  // allowedDevOrigins: ["panggungjati.my.id"],
 
   images: {
     remotePatterns: [

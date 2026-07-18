@@ -45,7 +45,7 @@ interface FormState {
   status: StatusProgram;
   tanggalMulai: string;
   tanggalSelesai: string;
-  pic: string;
+  // pic: string;
   domainIsuId: string;
   lokasi: string;
 }
@@ -56,7 +56,7 @@ const initialForm: FormState = {
   status: StatusProgram.BERJALAN,
   tanggalMulai: "",
   tanggalSelesai: "",
-  pic: "",
+  // pic: "",
   domainIsuId: "",
   lokasi: "",
 };
@@ -115,7 +115,7 @@ export default function ProgramKelurahanForm({
         tanggalSelesai: existingData.tanggalSelesai
           ? new Date(existingData.tanggalSelesai).toISOString().split("T")[0]
           : "",
-        pic: existingData.pic || "",
+        // pic: existingData.pic || "",
         domainIsuId: existingData.domainIsuId || "",
         lokasi: existingData.lokasi || "",
       });
@@ -142,11 +142,11 @@ export default function ProgramKelurahanForm({
       newErrors.deskripsi = "Deskripsi wajib diisi";
     }
 
-    if (!form.pic.trim()) {
-      newErrors.pic = "PIC wajib diisi";
-    } else if (form.pic.length > 100) {
-      newErrors.pic = "PIC maksimal 100 karakter";
-    }
+    // if (!form.pic.trim()) {
+    //   newErrors.pic = "PIC wajib diisi";
+    // } else if (form.pic.length > 100) {
+    //   newErrors.pic = "PIC maksimal 100 karakter";
+    // }
 
     if (!form.domainIsuId.trim()) {
       newErrors.domainIsuId = "Domain Isu wajib diisi";
@@ -159,7 +159,8 @@ export default function ProgramKelurahanForm({
     // Check if tanggalMulai is after tanggalSelesai
     if (form.tanggalMulai && form.tanggalSelesai) {
       if (new Date(form.tanggalMulai) > new Date(form.tanggalSelesai)) {
-        newErrors.tanggalMulai = "Tanggal mulai tidak boleh setelah tanggal selesai";
+        newErrors.tanggalMulai =
+          "Tanggal mulai tidak boleh setelah tanggal selesai";
       }
     }
 
@@ -171,7 +172,8 @@ export default function ProgramKelurahanForm({
       const tanggalMulai = new Date(form.tanggalMulai);
       tanggalMulai.setHours(0, 0, 0, 0);
       if (tanggalMulai > today) {
-        newErrors.tanggalMulai = "Tanggal mulai tidak boleh lewat hari ini untuk status berjalan";
+        newErrors.tanggalMulai =
+          "Tanggal mulai tidak boleh lewat hari ini untuk status berjalan";
       }
     }
 
@@ -179,17 +181,17 @@ export default function ProgramKelurahanForm({
       const tanggalSelesai = new Date(form.tanggalSelesai);
       tanggalSelesai.setHours(0, 0, 0, 0);
       if (tanggalSelesai > today) {
-        newErrors.tanggalSelesai = "Tanggal selesai tidak boleh lewat hari ini untuk status selesai";
+        newErrors.tanggalSelesai =
+          "Tanggal selesai tidak boleh lewat hari ini untuk status selesai";
       }
     }
-
-
 
     if (form.status === StatusProgram.DITUNDA && form.tanggalMulai) {
       const tanggalMulai = new Date(form.tanggalMulai);
       tanggalMulai.setHours(0, 0, 0, 0);
       if (tanggalMulai < today) {
-        newErrors.tanggalMulai = "Tanggal mulai tidak boleh sebelum hari ini untuk status ditunda";
+        newErrors.tanggalMulai =
+          "Tanggal mulai tidak boleh sebelum hari ini untuk status ditunda";
       }
     }
 
@@ -197,7 +199,8 @@ export default function ProgramKelurahanForm({
       const tanggalSelesai = new Date(form.tanggalSelesai);
       tanggalSelesai.setHours(0, 0, 0, 0);
       if (tanggalSelesai < today) {
-        newErrors.status = "Tanggal selesai sudah lewat hari ini, status tidak boleh berjalan";
+        newErrors.status =
+          "Tanggal selesai sudah lewat hari ini, status tidak boleh berjalan";
       }
     }
 
@@ -221,7 +224,7 @@ export default function ProgramKelurahanForm({
         status: form.status,
         tanggalMulai: form.tanggalMulai || null,
         tanggalSelesai: form.tanggalSelesai || null,
-        pic: form.pic,
+        // pic: form.pic,
         domainIsuId: form.domainIsuId,
         lokasi: form.lokasi || null,
       };
@@ -351,7 +354,7 @@ export default function ProgramKelurahanForm({
               </div>
 
               {/* PIC */}
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <Label htmlFor="pic">
                   Penanggung Jawab (PIC) <span className="text-red-500">*</span>
                 </Label>
@@ -364,7 +367,7 @@ export default function ProgramKelurahanForm({
                 {errors.pic && (
                   <p className="text-sm text-red-500">{errors.pic}</p>
                 )}
-              </div>
+              </div> */}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -441,7 +444,9 @@ export default function ProgramKelurahanForm({
                   }
                 />
                 {errors.tanggalSelesai && (
-                  <p className="text-sm text-red-500">{errors.tanggalSelesai}</p>
+                  <p className="text-sm text-red-500">
+                    {errors.tanggalSelesai}
+                  </p>
                 )}
               </div>
             </div>
