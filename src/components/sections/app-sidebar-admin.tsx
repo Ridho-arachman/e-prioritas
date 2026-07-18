@@ -43,7 +43,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: User2Icon,
       },
       {
-        title: "Kelola Warga",
+        title: "Kelola Verifikasi Warga",
         url: "/admin/kelola-warga",
         icon: Users2Icon,
       },
@@ -51,11 +51,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: "Kelola Kategori",
         url: "/admin/kelola-kategori",
         icon: Tags,
-      },
-      {
-        title: "Kelola Masukan Warga",
-        url: "/admin/kelola-masukan",
-        icon: MessageCircleMore,
       },
       {
         title: "Kelola Data Master",
@@ -66,6 +61,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: "Program Kelurahan",
         url: "/admin/program-kelurahan",
         icon: ClipboardList,
+      },
+      {
+        title: "Kelola Masukan Warga",
+        url: "/admin/kelola-masukan",
+        icon: MessageCircleMore,
       },
       {
         title: "Atur Jadwal Program Mendatang",

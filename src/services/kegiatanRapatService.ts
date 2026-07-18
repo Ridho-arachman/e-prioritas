@@ -586,7 +586,26 @@ export const kegiatanRapatService = {
       };
     });
 
-    // 11. Bentuk final rekomendasi
+    // ================================================================
+    // ✅ PERBAIKAN DI SINI: inputData berdasarkan ID yang digunakan
+    // ================================================================
+    // Kumpulkan semua ID yang digunakan dari semua prioritas
+    const allUsedMasukanIds = processedPrioritas.flatMap(
+      (p) => p.usedMasukanIds || [],
+    );
+    const allUsedDataMasterIds = processedPrioritas.flatMap(
+      (p) => p.usedDataMasterIds || [],
+    );
+
+    // Ambil data detail berdasarkan ID yang digunakan (bukan slice)
+    const usedMasukanDetails = masukanInput.filter((m) =>
+      allUsedMasukanIds.includes(m.id),
+    );
+    const usedDataMasterDetails = dataMasterInput.filter((d) =>
+      allUsedDataMasterIds.includes(d.id),
+    );
+
+    // 11. Bentuk final rekomendasi dengan inputData yang akurat
     const finalRekomendasi = {
       ...aiResponse,
       prioritas: processedPrioritas,
@@ -598,7 +617,7 @@ export const kegiatanRapatService = {
         modeRekomendasi: "FUSI_DATA" as const,
       },
       inputData: {
-        masukan: masukanInput.slice(0, 10).map((m) => ({
+        masukan: usedMasukanDetails.map((m) => ({
           id: m.id,
           judul: m.judul,
           deskripsi:
@@ -606,7 +625,7 @@ export const kegiatanRapatService = {
             (m.deskripsi?.length > 100 ? "..." : ""),
           lokasi: m.lokasi,
         })),
-        dataMaster: dataMasterInput.slice(0, 10).map((d) => ({
+        dataMaster: usedDataMasterDetails.map((d) => ({
           id: d.id,
           namaAtribut: d.namaAtribut,
           kritikalitas: d.kritikalitas,

@@ -105,7 +105,7 @@ Sebelum menggunakan suatu data master atau masukan warga sebagai evidence untuk 
    ❌ Data yang tidak relevan: data agama, data kesehatan, data pendidikan.
 
 3. **Kesehatan** → Data yang relevan: balita, gizi buruk, imunisasi, posyandu, ibu melahirkan, dll.
-   ❌ Data yang tidak relevan: data agama, data ekonomi, data pendidikan.
+   ❌ Data yang tidak relevan: data agama, data ekonomi, data educação.
 
 4. **Pendidikan** → Data yang relevan: putus sekolah, buta huruf, sarana pendidikan, tingkat pendidikan, dll.
    ❌ Data yang tidak relevan: data agama, data kesehatan (kecuali terkait stunting untuk PAUD).
@@ -121,8 +121,6 @@ Sebelum menggunakan suatu data master atau masukan warga sebagai evidence untuk 
      * Pemeliharaan tempat ibadah
      * Kegiatan keagamaan bersama
    - Jika konteks rapat adalah kegiatan umum (misal: HUT RI, musdes, kegiatan sosial lainnya yang tidak berfokus pada agama), maka data agama HARUS DIABAIKAN karena tidak relevan dengan tema kegiatan.
-   - Contoh: Rapat HUT RI → jangan gunakan data agama untuk rekomendasi. Fokus pada lomba, gotong royong, kebersihan, dekorasi, dll.
-   - Contoh: Rapat kerukunan umat beragama → data agama boleh digunakan.
 
 7. **Keamanan & Ketertiban** → Data yang relevan: pos kamling, angka kriminalitas, siskamling, dll.
 
@@ -334,26 +332,43 @@ INSTRUKSI FINAL:
 - JANGAN gunakan data agama untuk rekomendasi HUT RI kecuali jika rapat secara spesifik membahas kegiatan keagamaan bersama.
 - Jika Anda ragu apakah suatu data relevan dengan konteks rapat, lebih baik tidak digunakan.
 
-**PENTING - KONSISTENSI ID (WAJIB):**
-- Setiap prioritas WAJIB memiliki field "usedMasukanIds" dan "usedDataMasterIds".
-- usedMasukanIds harus berisi ID dari masukan warga yang digunakan sebagai evidence, dan jumlah elemennya HARUS sama dengan evidence.masukanWargaCount.
-- usedDataMasterIds harus berisi ID dari data master yang digunakan sebagai evidence, dan jumlah elemennya HARUS sama dengan evidence.dataMasterCount.
-- ID yang dicantumkan HARUS berasal dari data yang diberikan (jangan buat ID fiktif).
-- Jika evidence.masukanWargaCount = 0, maka usedMasukanIds harus berupa array kosong [].
-- Jika evidence.dataMasterCount = 0, maka usedDataMasterIds harus berupa array kosong [].
-- Deskripsi dan alasanAnalisis harus konsisten dengan ID yang dipilih.
+============================================================
+**VALIDASI KONSISTENSI EVIDENCE & ID (WAJIB DIPERIKSA SEBELUM OUTPUT)**
+============================================================
+- **ATURAN DASAR**: Setiap prioritas harus memiliki konsistensi sempurna antara angka evidence dan array ID.
+- **RUMUS WAJIB**:
+  1. \`evidence.masukanWargaCount === usedMasukanIds.length\`
+  2. \`evidence.dataMasterCount === usedDataMasterIds.length\`
 
-**VALIDASI KONSISTENSI (WAJIB DIPERIKSA SEBELUM OUTPUT):**
-- Panjang array usedMasukanIds HARUS sama dengan evidence.masukanWargaCount
-- Panjang array usedDataMasterIds HARUS sama dengan evidence.dataMasterCount
-- Jika tidak sama, PERBAIKI dengan menambahkan atau menghapus ID yang sesuai.
+- **CONTOH BENAR**:
+  * \`evidence.masukanWargaCount = 2\` → \`usedMasukanIds = ["id1", "id2"]\` (panjang 2) ✅
+  * \`evidence.dataMasterCount = 3\` → \`usedDataMasterIds = ["id5", "id6", "id7"]\` (panjang 3) ✅
 
-**INSTRUKSI PENGGABUNGAN DATA:**
-- Dalam mode FUSI_DATA, setiap prioritas HARUS berusaha memanfaatkan KEDUA jenis data jika terdapat keterkaitan tematik.
-- Jangan membuat rekomendasi terpisah untuk masukan dan data master jika topiknya bisa digabung.
-- Jika memang tidak ada data master yang relevan dengan suatu masukan, barulah gunakan hanya masukan saja (dan sebaliknya).
+- **CONTOH SALAH (JANGAN PERNAH DIBUAT)**:
+  * \`evidence.dataMasterCount = 3\` tapi \`usedDataMasterIds = ["id5"]\` (panjang 1) ❌
+  * \`evidence.masukanWargaCount = 2\` tapi \`usedMasukanIds = []\` (panjang 0) ❌
+  * \`evidence.dataMasterCount = 1\` tapi \`usedDataMasterIds = ["id5", "id6"]\` (panjang 2) ❌
 
-**TERAKHIR: SETIAP REKOMENDASI HARUS REALISTIS DAN SESUAI KAPASITAS KELURAHAN**
+- **JIKA ANDA TIDAK DAPAT MENEMUKAN DATA YANG RELEVAN**:
+  * Set \`masukanWargaCount = 0\` dan \`usedMasukanIds = []\`
+  * Set \`dataMasterCount = 0\` dan \`usedDataMasterIds = []\`
+  * JANGAN membuat angka fiktif.
+
+- **PROSEDUR VALIDASI (WAJIB)**:
+  1. Sebelum menulis output final, periksa semua 5 prioritas.
+  2. Untuk setiap prioritas, pastikan kedua persamaan di atas terpenuhi.
+  3. Jika ada yang tidak konsisten, PERBAIKI segera dengan menyesuaikan count atau menambahkan/menghapus ID yang sesuai.
+  4. Hanya setelah semua prioritas konsisten, Anda boleh mengirim output.
+
+- **PERINGATAN**: Ketidaksesuaian antara count dan array ID akan menyebabkan data tidak tampil di UI dan merusak kredibilitas rekomendasi. Ini adalah kesalahan serius yang harus dihindari.
+
+============================================================
+**PENUTUP**
+============================================================
+- Setiap rekomendasi HARUS REALISTIS dan sesuai kapasitas kelurahan.
+- Gabungkan data yang saling terkait untuk rekomendasi yang kuat.
+- Gunakan data master dan masukan warga secara bijak.
+- Utamakan evidence yang valid daripada asumsi.
 
 Sekarang, hasilkan rekomendasi berdasarkan data di atas. Output HANYA JSON.`;
 }
