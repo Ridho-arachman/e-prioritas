@@ -229,6 +229,9 @@ export const auth = betterAuth({
     sendOnSignUp: true,
   },
   user: {
+    changeEmail: {
+      enabled: true,
+    },
     additionalFields: {
       role: {
         type: "string",
